@@ -18,7 +18,7 @@ public class Main {
 		DictionaryCrawler crw = new DictionaryCrawler("goo");
 		List<String> writings = new ArrayList<String>();
 		try {
-			crw.search(1, 10, 10);
+			crw.search(1, 5, 5);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
