@@ -8,11 +8,12 @@ import java.util.List;
 
 public class OntologyBuilder {
 	public String body; // RDF/XMLの本文
-	
+	public String sub;
+	/*
 	public String saveFile;				// 出力ファイル名
 	static String saveDir = "owls/";	// 出力ファイルを保管するディレクトリ
 	static String saveExt = ".owl"; 	// owlの拡張子
-	
+	*/
 	public OntologyBuilder() {
 		body = "<?xml version=\"1.0\"?>\n"
 				+ "<rdf:RDF\n"
@@ -25,13 +26,13 @@ public class OntologyBuilder {
 				+ "<owl:Ontology rdf:about=\"\"/>\n";
 	}
 
-	/* <rdf:RDF>タグを閉じてファイルを完結させる */
+	/* <rdf:RDF>タグを閉じてRDF/XMLファイルを完結させる */
 	public void close() {
 		body += "</rdf:RDF>";
 	}
-	public void output(String fileName) {
+	/* RDF/XMLファイルを出力する */
+	public void output(String saveFile) {
 		close();
-		saveFile = saveDir + fileName + saveExt;
 		File file = new File(saveFile);
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -40,6 +41,21 @@ public class OntologyBuilder {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	/* txtファイルを出力する.確認用 */
+	public void output2(String saveFile) {
+		close();
+		File file = new File(saveFile);
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(sub);
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void addText(String text) {
+		sub += text;
 	}
 	
 	public void writeOntology(List<String> uri, List<List<Integer>> triples) {

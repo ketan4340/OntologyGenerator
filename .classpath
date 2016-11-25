@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jsoup-1.10.1"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/lucene-gosen4.6.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/StanfordPerser3.6.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OWLAPI"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSR-305"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JUnit4.12"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -90,28 +90,19 @@ public class Sentence {
 		return newsent;
 	}
 	
-	public List<Integer> setURI() {
-		// 名詞を集めてNodeインスタンスにする
-		String[][] nounTag = {{"名詞"}};
-		List<Integer> nouns = collectTagWords(nounTag);
-		
-		List<Integer> uri = new ArrayList<Integer>();
-		return uri;
-	}
-	
 	public List<List<String>> extractRelation() {
 		List<List<String>> relations = new ArrayList<List<String>>();
-		/* 係助詞"は"を探す */
-		String[][] spTag = {{"助詞", "係助詞"}};	// 主語sと述語pを結ぶ助詞
+		/* 主語を探す */
+		String[][] spTag = {{"助詞", "係助詞"}};	// 主語と述語を結ぶ係助詞"は"を探す
 		List<Integer> ptcls_sp = collectTagWords(spTag);
-		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0)
+		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
 		
-		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主語("は"を含む)
-		Word subjectWord = Word.get(subjectChunk.wordIDs.get(0));
-		Chunk predicateChunk = Chunk.get(subjectChunk.dependUpon);		// 述語
-		Word predicateWord = Word.get(predicateChunk.wordIDs.get(0));	
-		//Chunk complementChunk;										// 補語(いつか使うかも)
-		//Word complementWord;
+		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主節("は"を含む)
+		Word subjectWord = Word.get(subjectChunk.wordIDs.get(0));		// 主語
+		Chunk predicateChunk = Chunk.get(subjectChunk.dependUpon);		// 述節
+		Word predicateWord = Word.get(predicateChunk.wordIDs.get(0));	// 述語
+		//Chunk complementChunk;										// 補節(いつか使うかも)
+		//Word complementWord;											// 補語
 		printW();
 		printDep();
 	

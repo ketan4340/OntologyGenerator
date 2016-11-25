@@ -54,6 +54,7 @@ public class Phrase extends Word{
 		}
 		List<String> phraseTags = Word.get(idl.get(idl.size()-1)).tags;	// 新しいPhraseのTagは最後尾のWordに依存
 		/*
+		Cabochaの仕様によりエラー原因となりやすいので封印
 		phraseTags.set(6, genkei);
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);

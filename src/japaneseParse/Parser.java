@@ -86,8 +86,8 @@ public class Parser {
 					}
 					wdl = new ArrayList<Integer>();
 					chk = new Chunk();
-					String str = line.split(" ")[2];
-					depto = Integer.decode(str.substring(0, str.length()-1));
+					String dep_str = line.split(" ")[2];
+					depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
 					if(depto!=-1) depto += nextID;	// *要注意(上に同じ)*
 					
 				}else {								// 他は単語の登録
