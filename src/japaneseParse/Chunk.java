@@ -29,17 +29,16 @@ public class Chunk {
 		dependUpon = depto;
 	}
 	
-	public void uniteChunks(List<Integer> chunks_ph) {
+	public void uniteChunks(List<Integer> baseChunks) {
 		List<Integer> phraseWords = new ArrayList<Integer>();		// 新しいPhraseの元になるWord
-		List<Integer> conjunctionWords = new ArrayList<Integer>();	// Phrase完成後につなげる接続詞を保管
+		List<Integer> conjunctionWords = new ArrayList<Integer>();	// Phrase完成後につなげる接続詞を保持
 		int depto = -1;												// 最後尾のChunkがどのChunkに係るか
 		
-		for(Iterator<Integer> itr = chunks_ph.iterator(); itr.hasNext(); ) {
+		for(Iterator<Integer> itr = baseChunks.iterator(); itr.hasNext(); ) {
 			int chID = itr.next();
 			Chunk ch = Chunk.get(chID);
-			for(int wdID: ch.wordIDs) {
-				Word wd = Word.get(wdID);
-				wd.inChunk = this.chunkID;
+			for(int wdID: ch.wordIDs) {		// 元ChunkのWordはこの新しいChunkに属するように変える
+				Word.get(wdID).inChunk = this.chunkID;
 			}
 			// 全ての元Chunkの係り先を新しいChunkに変える
 			for(int bedep: ch.beDepended) Chunk.get(bedep).dependUpon = this.chunkID;	

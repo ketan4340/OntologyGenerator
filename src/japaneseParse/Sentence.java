@@ -55,39 +55,53 @@ public class Sentence {
 	}
 	
 	/* 渡された修飾語のWordを被修飾語につなげ、新しいPhraseを作る */
-	public Sentence concatenate(List<Integer> wdl_NP) {
+	/* 結合元のWordをPhraseに置き換えたSentenceを返す */
+	/* 現状のChunk依存の結合方法からWord結合に治すべき*要改善* */
+	public Sentence concatenate(List<Integer> modifyWordList) {
 		Sentence newsent = new Sentence();
 		List<Integer> newIDlist = chunkIDs;
-		
-		List<Integer> chl_NP = new ArrayList<Integer>();
-		for(int wd: wdl_NP) {
-			chl_NP.add(Word.get(wd).inChunk);
-		}
-		
-		List<List<Integer>> phraseMaterials_ch = new ArrayList<List<Integer>>();
-		
-		for(int ch: chl_NP) {
-			List<Integer> chunks4phrase = new ArrayList<Integer>();
-			 int nextIndex = chunkIDs.indexOf(ch) + 1;
-			if(nextIndex != chunkIDs.size()) {		// このChunkが文の最後の場合
-				int nextch = chunkIDs.get(nextIndex);	// 修飾語と被修飾語が連続していることが前提の設計 *要改善*
-				chunks4phrase.add(ch);
-				if( !chl_NP.contains(nextch)) chunks4phrase.add(nextch);
-				phraseMaterials_ch.add(chunks4phrase);
+
+		List<Integer> modifyChunkList = new ArrayList<Integer>();
+		for(int modifywd: modifyWordList) {
+			int modchID = Word.get(modifywd).inChunk;
+			if(!modifyChunkList.contains(modchID)) {	// 同一Chunk内に2つ修飾語がある場合(例:大地"の"よう"な")
+				modifyChunkList.add(modchID);			// 重複回避 *要改善*
 			}
 		}
+		List<List<Integer>> phChunksList = makeModificationList(modifyChunkList);
 		
 		// 複数のChunkを結合して新しいChunkを作成
-		for(List<Integer> chunks_ph: phraseMaterials_ch) {
+		for(List<Integer> phChunks: phChunksList) {
+			System.out.println("phChunks: " + phChunks);
 			Chunk nch = new Chunk();
-			nch.uniteChunks(chunks_ph);
+			nch.uniteChunks(phChunks);
 			// 古いChunkを削除して新しいChunkを挿入
-			newIDlist.add(newIDlist.indexOf(chunks_ph.get(0)), nch.chunkID);
-			newIDlist.removeAll(chunks_ph);
+			newIDlist.add(newIDlist.indexOf(phChunks.get(0)), nch.chunkID);
+			newIDlist.removeAll(phChunks);
 		}
 		Chunk.updateAllDependency();
 		newsent.setSentence(newIDlist);
 		return newsent;
+	}
+	
+	/* 上記concatenateの補助 */
+	/* 修飾節のリストから修飾節被修飾節のセットを作る */
+	private List<List<Integer>> makeModificationList(List<Integer> modifyChunkList) {
+		List<List<Integer>> phChunksList = new ArrayList<List<Integer>>();
+		List<Integer> phChunks = new ArrayList<Integer>();
+		for(int modifych: modifyChunkList) {
+			int nextIndex = chunkIDs.indexOf(modifych) + 1;	// 修飾節の次の文節が被修飾節だろうという前提
+			if(nextIndex != chunkIDs.size()) {	// 修飾節が文末なら回避
+				int nextch = chunkIDs.get(nextIndex);			// 修飾語の直後に被修飾語があることが前提の設計
+				phChunks.add(modifych);
+				if( !modifyChunkList.contains(nextch) ) {	// 三文節以上連続の可能性を考慮
+					phChunks.add(nextch);
+					phChunksList.add(phChunks);
+					phChunks = new ArrayList<Integer>();
+				}
+			}
+		}
+		return phChunksList;
 	}
 	
 	public List<List<String>> extractRelation() {

@@ -8,39 +8,42 @@ import edu.stanford.nlp.io.EncodingPrintWriter.out;
 public class Main {
 
 	public static void main(String[] args) {
-		String sent_str1 = "クジラは広い海を泳いでいる。";	
-		String sent_str2 = "鯨とは水生の巨大な哺乳類である。";
+		List<String> writings = new ArrayList<String>();
+		String writing1 = "クジラは広い海を泳いでいる。";	
+		String writing2 = "鯨とは水生の巨大な哺乳類である。";
 		//String sample = "辞書とは多数の語を集録し、一定の順序に配列して一つの集合体として、個々の語の意味・用法、またはその示す内容について記したもの。";
 		//String sample = "夏目漱石はこころを執筆した。";
-		//String sample = "クジラ目の哺乳類の総称。";		
+		//String sample = "クジラ目の哺乳類の総称。";
+		String writing3 = "アースカラーは大地のような褐色や、空・海の青色、草木の緑色など";
+		writings.addAll(Arrays.asList(writing1,writing2,writing3));
 		
 		/*** Collecting Entries ***/
+		OntologyBuilder ob = new OntologyBuilder();
+		/*
 		DictionaryCrawler crw = new DictionaryCrawler("goo");
-		List<String> writings = new ArrayList<String>();
 		try {
-			crw.search(1, 5, 5);
+			crw.search(50, 100, 10);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		writings =  crw.getJpnWritings();
 		System.out.println("\twritings");
 		//　確認用に得られたwritingをテキストファイルとして出力
-		OntologyBuilder ob = new OntologyBuilder();
 		int n=0;
 		for(String writing: writings) {
 			ob.addText(writing+"\n");
 			System.out.println(n++ + ":" + writing);
 		}
 		ob.output("writings/test.txt");
-				
+		*/		
 		List<List<String>> relations = new ArrayList<List<String>>();
 		for(String writing: writings) {
 			/*** Syntactic Parsing Module ***/
 			System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence sent = parse.run(writing);
-			System.out.println(writing);
-						
+			//System.out.println(writing);
+			sent.printC();
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
 			/* 名詞と形容詞だけ取り出す */
@@ -49,17 +52,18 @@ public class Main {
 			List<Integer> wordList_NP = new ArrayList<Integer>(sent.collectTagWords(tagNP)); // 上記のtagを持つWordを集めた
 			
 			for(int word_NP: wordList_NP) {
-				//System.out.println(word_NP + "@(C"+Word.get(word_NP).inChunk+"): " + Word.get(word_NP).wordName);
-				System.out.print(Word.get(word_NP).wordName + ", ");
+				Word wd = Word.get(word_NP);
+				System.out.print(word_NP + "@(C"+wd.inChunk+"):" + wd.wordName + "|");
 			}
+			System.out.println();
 			 		
 			
 			/** Step2: Concatenation **/
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
 			
-			Sentence connectedSent = sent.concatenate(wordList_NP);
-			connectedSent.printS();
+			sent = sent.concatenate(wordList_NP);
+			sent.printS();
 			
 			
 			/** Step3: Break Phrases **/
@@ -69,7 +73,7 @@ public class Main {
 			/** Step4: Relations Extraction **/
 			/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
 			//System.out.println("\n\t Step4");
-			List<List<String>> relation = connectedSent.extractRelation(); 
+			List<List<String>> relation = sent.extractRelation(); 
 			relations.addAll(relation);
 		}
 		
