@@ -1,9 +1,12 @@
 package japaneseParse;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-
-import edu.stanford.nlp.io.EncodingPrintWriter.out;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -13,37 +16,35 @@ public class Main {
 		String writing2 = "鯨とは水生の巨大な哺乳類である。";
 		//String sample = "辞書とは多数の語を集録し、一定の順序に配列して一つの集合体として、個々の語の意味・用法、またはその示す内容について記したもの。";
 		//String sample = "夏目漱石はこころを執筆した。";
-		//String sample = "クジラ目の哺乳類の総称。";
 		String writing3 = "アースカラーは大地のような褐色や、空・海の青色、草木の緑色など";
-		writings.addAll(Arrays.asList(writing1,writing2,writing3));
+		//writings.addAll(Arrays.asList(writing1,writing2,writing3));
 		
 		/*** Collecting Entries ***/
-		OntologyBuilder ob = new OntologyBuilder();
-		/*
-		DictionaryCrawler crw = new DictionaryCrawler("goo");
+		/* 外部ファイルから日本語テキストを読み込む */
+		String readFile = "writings/writingSample.txt";
+		File file = new File(readFile);
 		try {
-			crw.search(50, 100, 10);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line = br.readLine();
+			while(line != null){
+				writings.add(line);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		writings =  crw.getJpnWritings();
-		System.out.println("\twritings");
-		//　確認用に得られたwritingをテキストファイルとして出力
-		int n=0;
-		for(String writing: writings) {
-			ob.addText(writing+"\n");
-			System.out.println(n++ + ":" + writing);
-		}
-		ob.output("writings/test.txt");
-		*/		
+		
 		List<List<String>> relations = new ArrayList<List<String>>();
 		for(String writing: writings) {
 			/*** Syntactic Parsing Module ***/
 			System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence sent = parse.run(writing);
-			//System.out.println(writing);
 			sent.printC();
+			
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
 			/* 名詞と形容詞だけ取り出す */
@@ -61,12 +62,11 @@ public class Main {
 			/** Step2: Concatenation **/
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
-			
 			sent = sent.concatenate(wordList_NP);
 			sent.printS();
 			
-			
 			/** Step3: Break Phrases **/
+			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
 			// 未実装
 			
@@ -108,10 +108,10 @@ public class Main {
 	// ここまでMainに詰め込みすぎ．何らかのクラスのメソッドにしましょう
 		
 		/*** OWL DL Axiom Module ***/
-		//OntologyBuilder dlb = new OntologyBuilder();
+		OntologyBuilder ob = new OntologyBuilder();		
 		ob.writeOntology(uri, triples);
 		ob.output("owls/ontology.owl");	// 渡すのは保存先のパス
-		//dlb.print();
+		//ob.print();
 		
 	}
 

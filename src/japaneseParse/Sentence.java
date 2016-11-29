@@ -72,7 +72,6 @@ public class Sentence {
 		
 		// 複数のChunkを結合して新しいChunkを作成
 		for(List<Integer> phChunks: phChunksList) {
-			System.out.println("phChunks: " + phChunks);
 			Chunk nch = new Chunk();
 			nch.uniteChunks(phChunks);
 			// 古いChunkを削除して新しいChunkを挿入
