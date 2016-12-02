@@ -108,6 +108,7 @@ public class Sentence {
 		/* 主語を探す */
 		String[][] spTag = {{"助詞", "係助詞"}};	// 主語と述語を結ぶ係助詞"は"を探す
 		List<Integer> ptcls_sp = collectTagWords(spTag);
+		if(ptcls_sp.isEmpty()) return new ArrayList<List<String>>(); 
 		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
 		
 		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主節("は"を含む)

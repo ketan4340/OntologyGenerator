@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class Main {
 
@@ -21,7 +23,7 @@ public class Main {
 		
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
-		String readFile = "writings/writingSample.txt";
+		String readFile = "writings/gooText生物-動物名-さ.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -108,11 +110,11 @@ public class Main {
 	// ここまでMainに詰め込みすぎ．何らかのクラスのメソッドにしましょう
 		
 		/*** OWL DL Axiom Module ***/
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
 		OntologyBuilder ob = new OntologyBuilder();		
 		ob.writeOntology(uri, triples);
-		ob.output("owls/ontology.owl");	// 渡すのは保存先のパス
-		//ob.print();
-		
+		ob.output("owls/ontology"+sdf.format(c.getTime())+".owl");	// 渡すのは保存先のパス
 	}
 
 }
