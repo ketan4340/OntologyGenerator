@@ -20,8 +20,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Crawler {
-	public LinkedHashMap<String,List<String>> dicMap;
-	public List<String> writings;
+	public LinkedHashMap<String,String> dicMap;
+	//public String writings;
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
 	public int depth;
@@ -33,22 +33,25 @@ public class Crawler {
 	public String urlSyl;
 	public String idxURL;
 	
+	public String urlDir = "urls/";
+	public String urlFile;
+	public String urlPath;	
+	public String dicDir = "dics/";
+	public String dicFile;
+	public String dicPath;
 	public String textDir = "writings/";
 	public String textFile;
 	public String textPath;
-	public String urlDir = "urls/";
-	public String urlFile;
-	public String urlPath;
 	public String expansion = ".txt";
 
 	public Crawler(String dic, int dep, int itv) {
-		dicMap = new LinkedHashMap<String,List<String>>();
-		writings = new ArrayList<String>();
+		dicMap = new LinkedHashMap<String,String>();
+		//writings = new ArrayList<String>();
 		onlineDic = dic;
 		depth = dep;
 		interval = itv;
 		
-		switch (onlineDic){
+		switch(onlineDic) {
 		case "goo":
 			urlHead = "http://dictionary.goo.ne.jp/jn/";
 			urlTail = "/meaning/m1u/";
@@ -66,40 +69,29 @@ public class Crawler {
 	}
 	
 	/* 探索，読み込み，文書整形，ファイル出力の一連を行う */
-	public void runAll(String[] cats, String syl) {
-		String fileCat = "";
-		for(String cat: cats) {
+	public void run(int phase, String[] cats, String syl) {
+		String fileCat = new String();
+		for(String cat: cats) {	// ここはgoo辞書向けの処理
 			urlCat += cat + "/";
 			fileCat += cat + "-";
 		}
 		urlSyl = syl + "/";
 		urlFile = onlineDic + "URL" + fileCat + syl;
-		urlPath = urlDir + urlFile + expansion;
+		urlPath = urlDir + urlFile + expansion;	
+		dicFile = onlineDic + "Dic" + fileCat + syl;
+		dicPath = dicDir + dicFile + expansion; 
 		textFile = onlineDic + "Text" + fileCat + syl;
 		textPath = textDir + textFile + expansion; 
-		collectURL(cats, syl);
-		search();
-		setJpnWritings();
-		saveTextFile();
-	}
-	
-	public void run(String[] cats, String syl) {
-		String fileCat = "";
-		for(String cat: cats) {
-			urlCat += cat + "/";
-			fileCat += cat + "-";
+		switch(phase) {
+		case 0:			// URL集め
+			collectURL(cats, syl);
+		case 1:			// 見出し語，語釈収集
+			search();
+		case 2:			// 語釈整形
+			saveJpnWritings();
 		}
-		urlSyl = syl + "/";
-		urlFile = onlineDic + "URL" + fileCat + syl;
-		urlPath = urlDir + urlFile + expansion;
-		textFile = onlineDic + "Text" + fileCat + syl;
-		textPath = textDir + textFile + expansion; 
-		search();
-		setJpnWritings();
-		saveTextFile();
 	}
 	
-	/* カテゴリ中のURLを順に収集する */
 	/* 単純に全単語から五十音順で探索 */
 	public void collectURL(int start) {
 		File file = new File(urlPath);
@@ -120,8 +112,8 @@ public class Crawler {
 	/* 指定カテゴリから五十音順で探索 */
 	public void collectURL(String[] cats, String syl) {
 		try {
-			File file = new File(urlPath);
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			File writefile = new File(urlPath);
+			BufferedWriter bw = new BufferedWriter(new FileWriter(writefile));
 			
 			int sum = 1;
 			for(int i = 1; sum < depth; i++) {
@@ -159,21 +151,24 @@ public class Crawler {
 	/* ファイルに書かれたURLを読み取り探索する */
 	/* 見出し語と語釈のMapを作る */
 	public void search() {
-		int sum = 0;
-		File file = new File(urlPath);
+		int sum = 0;		// 読み込んだ見出し語数のカウンタ
+		File readfile = new File(urlPath);
+		File writefile = new File(dicPath);
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
+			BufferedReader br = new BufferedReader(new FileReader(readfile));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(writefile));
 			String url = br.readLine();
-			while(url != null){
+			for(; url != null; url = br.readLine()){
 				sum++;
+				String entry = new String();
+				String interpretation = new String();
+				
 				/* クローラーの礼儀として何秒か間隔をあける */
 				Thread.sleep(interval*1000);	// 1000=1秒
 				Connection connection = Jsoup.connect(url);
 				connection.timeout(0);
 				Document document = connection.get();
-				String entry = "entry" + url;						// デフォルトの見出し語
-				String interpretation = "";		// デフォルトの語釈
-				// 何らかの原因でデータを得られなければこれらデフォルト文字列がそのまま出力される
+				
 				entry = document.getElementsByTag("input").attr("value");	// 見出し語取得
 				System.out.print(sum + ":" + entry + "\t");
 				if(entry == null) break;			// 見出し語を得られないような状況ならばループを抜け終了
@@ -183,14 +178,15 @@ public class Crawler {
 				Iterator<Element> itr = expElem.getElementsByClass("list-data-b").iterator();
 				while(itr.hasNext()) {
 					Element elem = itr.next();
-					interpretation += cleanText(elem.text());	// 数字+スペース形式の箇条書きを消す
+					interpretation += elem.text().replaceAll("<strong>[１-９]</strong>", "");		// 箇条書きの全角数字とスペース除去
 				}
+				dicMap.put(entry, interpretation);
 				System.out.println(interpretation);
-				/* 複数の文章からなる語釈を読点で区切ってMap<見出し語,List<語釈>>として登録 */
-				List<String> interpretationl = Arrays.asList(interpretation.split("。"));
-				dicMap.put(entry, interpretationl);
-				url = br.readLine();
+				// 見出し語+タブ+語釈(原文)を書き出し
+				bw.write(entry + "\t" + interpretation);	// 原文にtabが含まれていると破綻する*要注意*
+				bw.newLine();
 			}
+			bw.close();
 			br.close();
 			
 		} catch (FileNotFoundException e) {
@@ -203,39 +199,60 @@ public class Crawler {
 	}
 	
 	/* 日本語テキストから余計なタグ,スペース,かっこを除去する */
-	public String cleanText(String text) {
+	public String cleanText(String text, String entry) {
 		String regexTag = "<(\".*?\"|'.*?'|[^'\"])*?>";
 		text = text.replaceAll(regexTag, "");		// タグ除去
-		text = text.replaceAll("[０-９]+ ", "");		// 箇条書きの全角数字とスペース除去
-		text = text.replaceAll(" ", "");			// 特殊なスペース&nbsp;除去
-		text = text.replaceAll("\\s| ", "");		// 空白文字除去
+		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
+		text = text.replaceAll("⇒", "");			// 矢印除去
+		text = text.replaceAll("\\s| ", "");		// 空白文字と&nbsp;除去
 		text = text.replaceAll("\\(.+?\\)", "");	// 半角かっこ除去()
 		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ除去[]
+		text = text.replaceAll("\\（.+?\\）", "");	// 全角かっこ除去（）
+		text = text.replaceAll("\\〈.+?\\〉", "");	// 全角かっこ除去〈〉
 		text = text.replaceAll("\\《.+?\\》", "");	// 全角かっこ除去《》
 		return text;
 	}
 	
 	/* 辞書(Map)を扱いやすいようList<String>にして返す */
-	public void setJpnWritings() {
-		for(String entry: dicMap.keySet()) {
-			List<String> interpretationList = dicMap.get(entry);
-			for(String interpretation: interpretationList) {
-				String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
-				writings.add(writing);
+	public void saveJpnWritings() {
+		File readfile = new File(dicPath);
+		File writefile = new File(textPath);
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(readfile));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(writefile));
+			String line = br.readLine();
+			for(; line != null; line = br.readLine()) {
+				String[] item = line.split("\t", 0); 
+				String entry = item[0];
+				item[1] = cleanText(item[1], entry);
+				String[] interpretations = item[1].split("。", 0);
+				for(String interpretation: interpretations) {
+					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
+					System.out.println(writing);
+					bw.write(writing);
+					bw.newLine();
+				}
 			}
+			bw.close();
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 		
-	public void saveTextFile() {
+	// 過去の遺物
+	public void saveTextFile(String path, String serialText) {
 		System.out.println("---------------------------------------------------------------");
-		File file = new File(textPath);
+		File file = new File(path);
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			for(String writing: writings) {
-				System.out.println(writing);
-				bw.write(writing);
+			String[] texts = serialText.split("。");
+			for(String text: texts) {
+				System.out.println(text);
+				bw.write(text);
 				bw.newLine();
-				bw.flush();
 			}
 			bw.close();
 		} catch (IOException e) {

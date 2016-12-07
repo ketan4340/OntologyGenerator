@@ -1,10 +1,11 @@
 package japaneseParse;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Sentence {
-	// Chunkのリストで文を構成する
-	public List<Integer> chunkIDs;
+	public List<Integer> chunkIDs; // Chunkのリストで文を構成する
 	
 	public Sentence() {
 		chunkIDs = new ArrayList<Integer>();
@@ -52,6 +53,34 @@ public class Sentence {
 		Sentence subsent = new Sentence();
 		subsent.setSentence(chunkIDs.subList(fromIndex, toIndex));
 		return subsent;
+	}
+	
+	public void concatenate2() {
+		for(int chID: chunkIDs) {
+			Chunk ch = Chunk.get(chID);
+			List<Integer> nwdIDs = new ArrayList<Integer>();
+			List<Integer> nounsList = new ArrayList<Integer>();
+			while( !ch.wordIDs.isEmpty() ) {
+				int wdID = ch.wordIDs.remove(0);
+				Word wd = Word.get(wdID);
+				
+				String[] nounTag = {"名詞"};
+				if( wd.hasTags(nounTag) ) {
+					nounsList.add(wd.wordID);
+				}else {
+					if(nounsList.isEmpty()) {
+						
+					}else {
+						Phrase nph = new Phrase();
+						nph.setPhrase(nounsList, ch.chunkID);
+						nwdIDs.add(nph.wordID);
+					}
+					nwdIDs.add(wdID);
+					nounsList.clear();
+				}
+			}
+			ch.wordIDs = nwdIDs;
+		}
 	}
 	
 	/* 渡された修飾語のWordを被修飾語につなげ、新しいPhraseを作る */

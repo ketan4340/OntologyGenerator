@@ -23,7 +23,8 @@ public class Main {
 		
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
-		String readFile = "writings/gooText生物-動物名-さ.txt";
+		//String readFile = "writings/gooText生物-動物名-さ.txt";
+		String readFile = "writings/gooDicSample.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -52,7 +53,7 @@ public class Main {
 			/* 名詞と形容詞だけ取り出す */
 			//System.out.println("\n\t Step1");
 			String[][] tagNP = {{"形容詞"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
-			List<Integer> wordList_NP = new ArrayList<Integer>(sent.collectTagWords(tagNP)); // 上記のtagを持つWordを集めた
+			List<Integer> wordList_NP = sent.collectTagWords(tagNP); // 上記のtagを持つWordを集めた
 			
 			for(int word_NP: wordList_NP) {
 				Word wd = Word.get(word_NP);
@@ -65,7 +66,9 @@ public class Main {
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
 			sent = sent.concatenate(wordList_NP);
-			sent.printS();
+			sent.printW();
+			sent.concatenate2();
+			sent.printW();
 			
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */

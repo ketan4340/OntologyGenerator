@@ -30,6 +30,14 @@ public class Word {
 		return allWordsList.get(id);
 	}
 	
+	public boolean hasTags(String[] tagNames) {
+		if( tags.containsAll(Arrays.asList(tagNames)) ) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
 	/* 同じWordか確かめる */
 	public boolean equalsW(Word wd) {
 		if(wordID == wd.wordID) {
