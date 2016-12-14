@@ -20,12 +20,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Crawler {
-	public LinkedHashMap<String,String> dicMap;
-	//public String writings;
+	public static void main(String[] args) {
+		int depth = 500;
+		int interval = 30;
+		Crawler crw = new Crawler("goo", depth, interval);
+
+		String[] categories = {"生物", "動物名"}; 
+		String syllabary = "ひ";
+		crw.run(1, false, categories, syllabary);
+	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
-	public int depth;
-	public int interval;
+	public int depth;			// 何項目まで探索するか
+	public int interval;		// クローリングのスリープ間隔
 	
 	public String urlHead;
 	public String urlTail;
@@ -45,8 +52,6 @@ public class Crawler {
 	public String expansion = ".txt";
 
 	public Crawler(String dic, int dep, int itv) {
-		dicMap = new LinkedHashMap<String,String>();
-		//writings = new ArrayList<String>();
 		onlineDic = dic;
 		depth = dep;
 		interval = itv;
@@ -69,7 +74,7 @@ public class Crawler {
 	}
 	
 	/* 探索，読み込み，文書整形，ファイル出力の一連を行う */
-	public void run(int phase, String[] cats, String syl) {
+	public void run(int phase, boolean only, String[] cats, String syl) {
 		String fileCat = new String();
 		for(String cat: cats) {	// ここはgoo辞書向けの処理
 			urlCat += cat + "/";
@@ -83,16 +88,22 @@ public class Crawler {
 		textFile = onlineDic + "Text" + fileCat + syl;
 		textPath = textDir + textFile + expansion; 
 		switch(phase) {
-		case 0:			// URL集め
-			collectURL(cats, syl);
-		case 1:			// 見出し語，語釈収集
+		case 1:			// URL集め
+			collectURL();
+			if(only==true) break;
+		case 2:			// 見出し語，語釈収集
 			search();
-		case 2:			// 語釈整形
+			if(only==true) break;
+		case 3:			// 語釈整形
 			saveJpnWritings();
+			if(only==true) break;
+		default:
+			System.out.println("No." + phase + " is nothing.");
 		}
 	}
 	
 	/* 単純に全単語から五十音順で探索 */
+	/* goo辞書のみ有効 */
 	public void collectURL(int start) {
 		File file = new File(urlPath);
 		try {
@@ -110,7 +121,7 @@ public class Crawler {
 	}
 	/* カテゴリ中のURLを順に収集する */
 	/* 指定カテゴリから五十音順で探索 */
-	public void collectURL(String[] cats, String syl) {
+	public void collectURL() {
 		try {
 			File writefile = new File(urlPath);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(writefile));
@@ -120,8 +131,7 @@ public class Crawler {
 				String urlPage = i+"/";
 				String url = urlHead + urlCat + urlSyl + urlPage;
 				System.out.println("\t" + url);
-				/* クローラーの礼儀として何秒か間隔をあける */
-				Thread.sleep(interval*1000);	// 1000=1秒
+				
 				Connection connection = Jsoup.connect(url);
 				connection.timeout(0);
 				Document document = connection.get();
@@ -141,6 +151,8 @@ public class Crawler {
 					sum++;
 				}
 				bw.flush();
+				/* クローラーの礼儀として何秒か間隔をあける */
+				Thread.sleep(interval*1000);	// 1000=1秒
 			}	
 			bw.close();
 		} catch (IOException | InterruptedException e) {
@@ -163,8 +175,6 @@ public class Crawler {
 				String entry = new String();
 				String interpretation = new String();
 				
-				/* クローラーの礼儀として何秒か間隔をあける */
-				Thread.sleep(interval*1000);	// 1000=1秒
 				Connection connection = Jsoup.connect(url);
 				connection.timeout(0);
 				Document document = connection.get();
@@ -180,15 +190,16 @@ public class Crawler {
 					Element elem = itr.next();
 					interpretation += elem.text().replaceAll("<strong>[１-９]</strong>", "");		// 箇条書きの全角数字とスペース除去
 				}
-				dicMap.put(entry, interpretation);
 				System.out.println(interpretation);
 				// 見出し語+タブ+語釈(原文)を書き出し
 				bw.write(entry + "\t" + interpretation);	// 原文にtabが含まれていると破綻する*要注意*
 				bw.newLine();
+				bw.flush();
+				// クローラーの礼儀として何秒か間隔をあける
+				Thread.sleep(interval*1000);	// 1000=1秒
 			}
 			bw.close();
-			br.close();
-			
+			br.close();	
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -203,7 +214,7 @@ public class Crawler {
 		String regexTag = "<(\".*?\"|'.*?'|[^'\"])*?>";
 		text = text.replaceAll(regexTag, "");		// タグ除去
 		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
-		text = text.replaceAll("⇒", "");			// 矢印除去
+		text = text.replaceAll("→|⇒", "");			// 矢印除去
 		text = text.replaceAll("\\s| ", "");		// 空白文字と&nbsp;除去
 		text = text.replaceAll("\\(.+?\\)", "");	// 半角かっこ除去()
 		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ除去[]
@@ -213,7 +224,7 @@ public class Crawler {
 		return text;
 	}
 	
-	/* 辞書(Map)を扱いやすいようList<String>にして返す */
+	/* 辞書を扱いやすいよう主語を加えた文章にして出力 */
 	public void saveJpnWritings() {
 		File readfile = new File(dicPath);
 		File writefile = new File(textPath);
@@ -241,22 +252,5 @@ public class Crawler {
 			e.printStackTrace();
 		}
 	}
-		
-	// 過去の遺物
-	public void saveTextFile(String path, String serialText) {
-		System.out.println("---------------------------------------------------------------");
-		File file = new File(path);
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			String[] texts = serialText.split("。");
-			for(String text: texts) {
-				System.out.println(text);
-				bw.write(text);
-				bw.newLine();
-			}
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+
 }

@@ -13,30 +13,7 @@ public class Phrase extends Word{
 		orgIDs = new ArrayList<Integer>();
 	}
 	
-	public void setPhrase(List<Integer> idl) {
-		String phraseName = new String();
-		String genkei = new String();
-		String yomi1 = new String();
-		String yomi2 = new String();
-		int id = -1;
-		for(Iterator<Integer> itr = idl.iterator(); itr.hasNext(); ) {
-			Word wd = Word.get(id);
-			id = itr.next();
-			orgWords.add(wd);
-			orgIDs.add(id);
-			phraseName += wd.wordName;
-			//if(itr.hasNext()) phraseName += "_";
-			genkei += wd.tags.get(6);
-			yomi1 += wd.tags.get(7);
-			yomi2 += wd.tags.get(8);
-		}
-		List<String> phraseTags = Word.get(idl.get(idl.size()-1)).tags;	// 新しいPhraseのTagは最後尾のWordに依存
-		phraseTags.set(6, genkei);
-		phraseTags.set(7, yomi1);
-		phraseTags.set(8, yomi2);
-		setWord(phraseName, phraseTags, Word.get(id).inChunk);	// 新しいPhraseの所属するChunkは最後尾のWordに依存
-	}
-	public void setPhrase(List<Integer> idl, int chunkNum) {	// 所属するChunkが明らかな場合
+	public void setPhrase(List<Integer> idl, int chunkNum) {
 		String phraseName = new String();
 		String genkei = new String();
 		String yomi1 = new String();
@@ -59,6 +36,7 @@ public class Phrase extends Word{
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
 		*/
+		chunkNum = (chunkNum == -1)? Word.get(id).inChunk: chunkNum;// 新しいPhraseの所属するChunkは最後尾のWordに依存
 		setWord(phraseName, phraseTags, chunkNum);
 	}
 }

@@ -30,21 +30,33 @@ public class Word {
 		return allWordsList.get(id);
 	}
 	
+	/* 渡されたTagを全て持って入れば真、それ以外は偽を返す */
 	public boolean hasTags(String[] tagNames) {
-		if( tags.containsAll(Arrays.asList(tagNames)) ) {
-			return true;
-		}else {
-			return false;
+		boolean match = true;
+		for(String tag: tagNames) {
+			if(tag.equals(".")) {	// .は任意のタグ
+				return true;		// よって必ずtrue
+			}
+			boolean not = false;	// NOT検索用のフラグ
+			if(tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
+				not = true;
+				tag = tag.substring(1);	// -を消しておく
+			}
+			
+			if( tags.contains(tag) ) {
+				match = (not)? false: true;
+			}else {
+				match = (not)? true: false;
+			}
+			if(!match) break;	// falseなら即終了
 		}
+		return match;
 	}
 	
 	/* 同じWordか確かめる */
 	public boolean equalsW(Word wd) {
-		if(wordID == wd.wordID) {
-			return true;
-		}else {
-			return false;
-		}
+		if(wordID == wd.wordID) return true;
+		else return false;
 	}
 	
 	/* 渡されたIDのリストを文字列のリストに変える */

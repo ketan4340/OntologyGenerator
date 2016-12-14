@@ -8,29 +8,38 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class Main {
 
 	public static void main(String[] args) {
-		List<String> writings = new ArrayList<String>();
-		String writing1 = "クジラは広い海を泳いでいる。";	
-		String writing2 = "鯨とは水生の巨大な哺乳類である。";
-		//String sample = "辞書とは多数の語を集録し、一定の順序に配列して一つの集合体として、個々の語の意味・用法、またはその示す内容について記したもの。";
-		//String sample = "夏目漱石はこころを執筆した。";
-		String writing3 = "アースカラーは大地のような褐色や、空・海の青色、草木の緑色など";
-		//writings.addAll(Arrays.asList(writing1,writing2,writing3));
+		List<String> writingList = new ArrayList<String>();
+		List<Sentence> sentList = new ArrayList<Sentence>();
+		List<List<String>> relations = new ArrayList<List<String>>();
+		
+		String[] writings = {
+				//"クジラは広い海を泳いでいる。",
+				//"鯨とは水生の巨大な哺乳類である。",
+				"辞書とは多数の語を集録し、一定の順序に配列して一つの集合体として、個々の語の意味・用法、またはその示す内容について記したもの。",
+				//"文豪の夏目漱石はこころを執筆した。",
+				"アースカラーは大地のような褐色や、空・海の青色、草木の緑色など",
+				"アイアイは頭胴長40センチくらいで、尾が長い。",
+				"藍子は全長約55センチ。"
+		};
+		writingList.addAll(Arrays.asList(writings));
 		
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
 		//String readFile = "writings/gooText生物-動物名-さ.txt";
+		/*
 		String readFile = "writings/gooDicSample.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();
-			while(line != null){
-				writings.add(line);
+			while(line != null) {
+				writingList.add(line);
 				line = br.readLine();
 			}
 			br.close();
@@ -39,15 +48,14 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		*/
 		
-		List<List<String>> relations = new ArrayList<List<String>>();
-		for(String writing: writings) {
+		for(String writing: writingList) {
 			/*** Syntactic Parsing Module ***/
 			System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence sent = parse.run(writing);
-			sent.printC();
-			
+						
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
 			/* 名詞と形容詞だけ取り出す */
@@ -65,21 +73,28 @@ public class Main {
 			/** Step2: Concatenation **/
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
-			sent = sent.concatenate(wordList_NP);
-			sent.printW();
 			sent.concatenate2();
-			sent.printW();
-			
+			sent = sent.concatenate1(wordList_NP);
+			sent.printDep();
+						
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			// 未実装
-			
+			sentList.addAll(sent.separate());
+		}
+		
+		System.out.println("--------sentences---------");
+		for(final Sentence partSent: sentList) {
+			partSent.simplePrint();;
+		}
+		System.out.println("--------sentences---------");
+		
+		for(final Sentence partSent: sentList) {
 			/** Step4: Relations Extraction **/
 			/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
 			//System.out.println("\n\t Step4");
-			List<List<String>> relation = sent.extractRelation(); 
-			relations.addAll(relation);
+			List<List<String>> relation = partSent.extractRelation(); 
+			relations.addAll(relation);	
 		}
 		
 		// 得られた関係を読み取り，uriとtriplesに入れる
@@ -110,14 +125,16 @@ public class Main {
 			nodes.get(i).printNode2();
 		}
 		*/
-	// ここまでMainに詰め込みすぎ．何らかのクラスのメソッドにしましょう
+	// ここまでMainに詰め込みすぎ．何らかのクラスのメソッドにしょう
 		
 		/*** OWL DL Axiom Module ***/
+		/*
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
 		OntologyBuilder ob = new OntologyBuilder();		
 		ob.writeOntology(uri, triples);
 		ob.output("owls/ontology"+sdf.format(c.getTime())+".owl");	// 渡すのは保存先のパス
+		*/
 	}
 
 }

@@ -79,7 +79,7 @@ public class Chunk {
 		return chunkName;
 	}
 	
-	/* Chunkに指定の品詞が含まれるかを判定 */
+	/* Chunk中の指定の品詞を返す */
 	public List<Integer> collectTagWords(String[][] tagNames) {
 		List<String[]> tagNamesList = Arrays.asList(tagNames);
 		List<Integer> taggedIDs = new ArrayList<Integer>();
@@ -92,11 +92,31 @@ public class Chunk {
 		return taggedIDs;
 	}
 	
+	public List<Integer> collectTagIndexC(String[][] tagNames) {
+		List<Integer> indexes = new ArrayList<Integer>();
+		for(final int wdID: wordIDs) {
+			Word wd = Word.get(wdID);
+			for(final String[] tagName: tagNames) {
+				wd.hasTags(tagName);	
+			}
+		}
+		return null;
+	}
+	
+	/* 保持するwordのIDからWord型リストにして返す */
+	public List<Word> getWordList() {
+		List<Word> wordList = new ArrayList<Word>();
+		for(final int wdID: wordIDs) {
+			wordList.add(Word.get(wdID));
+		}
+		return wordList;
+	}
+	
 	/* chunkの係り受け関係を更新 */
 	/* 全てのChunkインスタンスのdependUponが正しいことが前提の設計 */
 	public static void updateAllDependency() {
-		for(Chunk chk: Chunk.allChunksList) chk.beDepended.clear();	// 一度全ての被係り受けをまっさらにする
-		for(Chunk chk: Chunk.allChunksList) {
+		for(final Chunk chk: Chunk.allChunksList) chk.beDepended.clear();	// 一度全ての被係り受けをまっさらにする
+		for(final Chunk chk: Chunk.allChunksList) {
 			int depto = chk.dependUpon;
 			if(depto != -1) Chunk.get(depto).beDepended.add(chk.chunkID);
 		}
