@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -22,12 +24,12 @@ import org.jsoup.select.Elements;
 public class Crawler {
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 30;
+		int interval = 10;
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
 		String syllabary = "ひ";
-		crw.run(1, false, categories, syllabary);
+		crw.run(2, false, categories, syllabary);
 	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
@@ -98,7 +100,7 @@ public class Crawler {
 			saveJpnWritings();
 			if(only==true) break;
 		default:
-			System.out.println("No." + phase + " is nothing.");
+			System.out.println("Finished.");
 		}
 	}
 	
@@ -151,7 +153,7 @@ public class Crawler {
 					sum++;
 				}
 				bw.flush();
-				/* クローラーの礼儀として何秒か間隔をあける */
+			
 				Thread.sleep(interval*1000);	// 1000=1秒
 			}	
 			bw.close();
@@ -188,14 +190,16 @@ public class Crawler {
 				Iterator<Element> itr = expElem.getElementsByClass("list-data-b").iterator();
 				while(itr.hasNext()) {
 					Element elem = itr.next();
-					interpretation += elem.text().replaceAll("<strong>[１-９]</strong>", "");		// 箇条書きの全角数字とスペース除去
+					String html = elem.html();
+					html = cleanHTML(html);
+					interpretation += html;
 				}
 				System.out.println(interpretation);
 				// 見出し語+タブ+語釈(原文)を書き出し
 				bw.write(entry + "\t" + interpretation);	// 原文にtabが含まれていると破綻する*要注意*
 				bw.newLine();
 				bw.flush();
-				// クローラーの礼儀として何秒か間隔をあける
+
 				Thread.sleep(interval*1000);	// 1000=1秒
 			}
 			bw.close();
@@ -208,19 +212,29 @@ public class Crawler {
 			e.printStackTrace();
 		}
 	}
-	
-	/* 日本語テキストから余計なタグ,スペース,かっこを除去する */
-	public String cleanText(String text, String entry) {
-		String regexTag = "<(\".*?\"|'.*?'|[^'\"])*?>";
-		text = text.replaceAll(regexTag, "");		// タグ除去
-		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
-		text = text.replaceAll("→|⇒", "");			// 矢印除去
+
+	/* HTMLテキストから余計なタグ,スペース,かっこを除去する */
+	public String cleanHTML(String text) {
+		text = text.replaceAll("<strong>[0-9 ０-９]+</strong>", "");		// 箇条書きの全角数字とスペース除去
+		text = text.replaceAll("<(\".*?\"|'.*?'|[^'\"])*?>", "");	// 残りのタグ除去
 		text = text.replaceAll("\\s| ", "");		// 空白文字と&nbsp;除去
-		text = text.replaceAll("\\(.+?\\)", "");	// 半角かっこ除去()
-		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ除去[]
-		text = text.replaceAll("\\（.+?\\）", "");	// 全角かっこ除去（）
-		text = text.replaceAll("\\〈.+?\\〉", "");	// 全角かっこ除去〈〉
-		text = text.replaceAll("\\《.+?\\》", "");	// 全角かっこ除去《》
+		Pattern ptnKagi = Pattern.compile("^「(.+?)」");
+		Matcher mchKagi = ptnKagi.matcher(text);
+		text = mchKagi.replaceFirst("$1");			// 文頭の「」は消す．他は用例とみなして残す
+		return text;
+	}
+	
+	/* 日本語テキストから余計なスペース,かっこを除去する */
+	public String cleanText(String text, String entry) {
+		text = text.replaceAll("\\(.+?\\)", "");	// 半角かっこ()除去
+		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
+		text = text.replaceAll("（.+?）", "");		// 全角かっこ（）除去
+		text = text.replaceAll("［.+?］", "");		// 全角かっこ［］除去
+		text = text.replaceAll("〈.+?〉", "");		// 全角かっこ〈〉除去
+		text = text.replaceAll("《.+?》", "");		// 全角かっこ《》除去
+		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
+		text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
+		text = text.replaceAll("→|⇒", "");			// 矢印除去
 		return text;
 	}
 	
@@ -238,6 +252,10 @@ public class Crawler {
 				item[1] = cleanText(item[1], entry);
 				String[] interpretations = item[1].split("。", 0);
 				for(String interpretation: interpretations) {
+					Pattern ptnKagi = Pattern.compile("「(.+?)(／.*?)?」");
+					Matcher mchKagi = ptnKagi.matcher(interpretation);
+					
+					String text = mchKagi.replaceFirst("$1");
 					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
 					System.out.println(writing);
 					bw.write(writing);

@@ -71,7 +71,7 @@ public class Chunk {
 	}
 	
 	/* Chunkを文字列で返す */
-	public String name() {
+	public String toString() {
 		String chunkName = new String();
 		for(int orgid: wordIDs) {
 			chunkName += Word.get(orgid).wordName;
@@ -124,7 +124,7 @@ public class Chunk {
 	
 	public static void printAllChunks() {
 		for(Chunk ch: allChunksList) {
-			System.out.println("C" + ch.chunkID + ": " + ch.name() + "\t->" + ch.dependUpon);
+			System.out.println("C" + ch.chunkID + ": " + ch.toString() + "\t->" + ch.dependUpon);
 		}
 	}
 }

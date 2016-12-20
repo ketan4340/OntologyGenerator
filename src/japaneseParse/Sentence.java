@@ -1,6 +1,8 @@
 package japaneseParse;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -87,7 +89,7 @@ public class Sentence {
 		}
 	}
 	/* 連続した名詞を繋いで一つの名詞にする */
-	public void concatenate2() {
+	public void concatenateNouns() {
 		for(final int chID: chunkIDs) {
 			Chunk ch = Chunk.get(chID);
 			List<Integer> nwdIDs = new ArrayList<Integer>();
@@ -97,7 +99,10 @@ public class Sentence {
 				Word wd = Word.get(wdID);
 				
 				String[] nounTag = {"名詞"};
-				if( wd.hasTags(nounTag) ) {
+				String[] prefixTag = {"名詞接続"};
+				String[] sufixTag = {"接尾"};	
+			
+				if( wd.hasTags(nounTag) | wd.hasTags(prefixTag) | wd.hasTags(sufixTag)) {
 					serialNouns.add(wd.wordID);
 				}else {
 					if(!serialNouns.isEmpty()) {
@@ -173,7 +178,7 @@ public class Sentence {
 		/* 主語を探す */
 		String[][] spTag = {{"助詞", "係助詞"}};	// 主語と述語を結ぶ係助詞"は"を探す
 		List<Integer> ptcls_sp = collectTagWords(spTag);
-		if(ptcls_sp.isEmpty()) return null;		// **
+		if(ptcls_sp.isEmpty()) return null;
 		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
 		
 		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主節
@@ -184,14 +189,18 @@ public class Sentence {
 		int toIndex = indexOfC(p2pChunkID)+1;
 		while(p2pChunkID != -1) {
 			Chunk nextPredicateChunk = Chunk.get(p2pChunkID);
-			System.out.println("(" + fromIndex + "," + toIndex + ")" + chunkIDs.subList(fromIndex, toIndex));
+			List<Integer> newPredicates = chunkIDs.subList(fromIndex, toIndex);
+			System.out.println("(" + fromIndex + "," + toIndex + ")" + newPredicates);
 			List<Integer> partChunkList = new ArrayList<Integer>();
-			partChunkList.add(subjectChunk.chunkID);
-			partChunkList.addAll(chunkIDs.subList(fromIndex, toIndex));
+			// 主節は新しいインスタンスを用意
+			Chunk newSubject = new Chunk();
+			newSubject.setChunk(subjectChunk.wordIDs, p2pChunkID);	// 主節の係り先だけ変更
+			partChunkList.add(newSubject.chunkID);
+			partChunkList.addAll(newPredicates);
 			// 短文生成
 			Sentence partSent = new Sentence();
 			partSent.setSentence(partChunkList);
-			partSent.simplePrint();
+			System.out.println(partSent.toString());
 			partSentList.add(partSent);
 			
 			// 次の述語を見つけ，fromとtoを更新
@@ -218,12 +227,24 @@ public class Sentence {
 		//Chunk complementChunk;										// 補節(いつか使うかも)
 		//Word complementWord;											// 補語
 		printDep();
-	
+		//System.out.println(subjectChunk.name() + predicateChunk.name());
+		
 		String[][] verbTag = {{"動詞"}};
 		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
 		// 述語が動詞でない-> (親クラス, 子クラス)を記述
 		if( predicateChunk.collectTagWords(verbTag).isEmpty()) {
-			List<String> relation = Arrays.asList(subjectWord.wordName, "rdfs:subClassOf", predicateWord.wordName);
+			List<String> relation;
+			/* リテラル情報かどうか */
+			String regexLiteral = "(.*?)(\\d+)([ア-ンa-zA-Z　ー－]+)(.*?)";	// ~(数字)(単位)~を探す
+			Pattern ptrnLiteral = Pattern.compile(regexLiteral);
+			Matcher mtchLiteral = ptrnLiteral.matcher(predicateChunk.toString());
+			boolean boolLiteral = mtchLiteral.matches();
+			
+			if(boolLiteral) {
+				relation = Arrays.asList(subjectWord.wordName, "size", mtchLiteral.group(2) + "("+mtchLiteral.group(3)+")");
+			}else {
+				relation = Arrays.asList(subjectWord.wordName, "rdfs:subClassOf", predicateWord.wordName);
+			}
 			relations.add(relation);
 		// 述語が動詞である
 		}else {
@@ -278,11 +299,12 @@ public class Sentence {
 		return wordList;
 	}
 	
-	public void simplePrint() {
+	public String toString() {
+		String str = new String();
 		for(int cid: chunkIDs) {
-			System.out.print(Chunk.get(cid).name());
+			str +=Chunk.get(cid).toString();
 		}
-		System.out.println();
+		return str;
 	}
 	public void printW() {
 		for(int wid: wordIDs()) {
@@ -292,15 +314,16 @@ public class Sentence {
 	}
 	public void printC() {
 		for(int cid: chunkIDs) {
-			System.out.print("("+cid+")" + Chunk.get(cid).name());
+			System.out.print("("+cid+")" + Chunk.get(cid).toString());
 		}
 		System.out.println();
 	}
 	public void printDep() {
 		for(int id: chunkIDs) {
 			Chunk ch = Chunk.get(id);
-			System.out.println("C" + ch.chunkID + ": " + ch.name() + "\t->" + ch.dependUpon);
+			System.out.print("(" + ch.chunkID + ">" + ch.dependUpon + ")" + ch.toString());
 		}
+		System.out.println();
 	}
 	/* 文を区切りを挿入して出力する */
 	public void printS() {
@@ -309,7 +332,7 @@ public class Sentence {
 		}
 		System.out.println();
 		for(int cid: chunkIDs) { // Chunk単位で区切る
-			System.out.print(Chunk.get(cid).name() + "|");
+			System.out.print(Chunk.get(cid).toString() + "|");
 		}
 		System.out.println();
 	}

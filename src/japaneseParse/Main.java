@@ -17,22 +17,28 @@ public class Main {
 		List<String> writingList = new ArrayList<String>();
 		List<Sentence> sentList = new ArrayList<Sentence>();
 		List<List<String>> relations = new ArrayList<List<String>>();
-		
+		/*
 		String[] writings = {
 				//"クジラは広い海を泳いでいる。",
 				//"鯨とは水生の巨大な哺乳類である。",
-				"辞書とは多数の語を集録し、一定の順序に配列して一つの集合体として、個々の語の意味・用法、またはその示す内容について記したもの。",
+				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
+				"アイベックスは角は、雄のものは大きくて後方に湾曲し、表面に竹のような節がある",
 				//"文豪の夏目漱石はこころを執筆した。",
-				"アースカラーは大地のような褐色や、空・海の青色、草木の緑色など",
-				"アイアイは頭胴長40センチくらいで、尾が長い。",
-				"藍子は全長約55センチ。"
+				//"アースカラーは大地のような褐色や、空・海の青色、草木の緑色など",
+				//"藍鮫は全長約1メートル",
+				//"アイアイは頭胴長40センチくらいで、尾が長い。",
+				"アイアイは長い指は鉤爪をもち、樹皮下の昆虫を掘り出して食う。",
+				//"藍子は全長約55センチ。",
+				//"青擬天牛は体長13ミリくらい",
+				"青大将は全長1.5～2.5メートルで、日本では最大",
+				//"青眼狗母魚は体長は10～15センチ"
 		};
 		writingList.addAll(Arrays.asList(writings));
 		
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
 		//String readFile = "writings/gooText生物-動物名-さ.txt";
-		/*
+		
 		String readFile = "writings/gooDicSample.txt";
 		File file = new File(readFile);
 		try {
@@ -48,52 +54,58 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		*/
+		
 		
 		for(String writing: writingList) {
 			/*** Syntactic Parsing Module ***/
 			System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
-			Sentence sent = parse.run(writing);
+			Sentence originalSent = parse.run(writing);
 						
 			/*** Semantic Parsing Module ***/
-			/** Step1: Term Extraction **/
-			/* 名詞と形容詞だけ取り出す */
-			//System.out.println("\n\t Step1");
-			String[][] tagNP = {{"形容詞"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
-			List<Integer> wordList_NP = sent.collectTagWords(tagNP); // 上記のtagを持つWordを集めた
-			
-			for(int word_NP: wordList_NP) {
-				Word wd = Word.get(word_NP);
-				System.out.print(word_NP + "@(C"+wd.inChunk+"):" + wd.wordName + "|");
-			}
-			System.out.println();
-			 		
-			
-			/** Step2: Concatenation **/
-			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
-			//System.out.println("\n\t Step2");
-			sent.concatenate2();
-			sent = sent.concatenate1(wordList_NP);
-			sent.printDep();
-						
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			sentList.addAll(sent.separate());
+			List<Sentence> partSentList = new ArrayList<Sentence>();
+			partSentList.addAll(originalSent.separate());
+						
+			for(final Sentence partSent: partSentList) {
+				/* 短く区切った文を再び解析 */
+				Parser parse2 = new Parser("cabocha");
+				Sentence shortSent = parse2.run(partSent.toString());
+				/** Step1: Term Extraction **/
+				/* 名詞と形容詞だけ取り出す */
+				//System.out.println("\n\t Step1");
+				String[][] tagNP = {{"形容詞"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
+				List<Integer> wordList_NP = shortSent.collectTagWords(tagNP); // 上記のtagを持つWordを集めた
+				
+				for(int word_NP: wordList_NP) {
+					Word wd = Word.get(word_NP);
+					System.out.print(word_NP + "@(C"+wd.inChunk+"):" + wd.wordName + "|");
+				}
+				System.out.println();
+				
+				/** Step2: Concatenation **/
+				/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
+				//System.out.println("\n\t Step2");
+				shortSent.concatenateNouns();
+				shortSent = shortSent.concatenate1(wordList_NP);
+								
+				sentList.add(shortSent);
+			}
 		}
 		
 		System.out.println("--------sentences---------");
-		for(final Sentence partSent: sentList) {
-			partSent.simplePrint();;
+		for(final Sentence shortSent: sentList) {
+			System.out.println(shortSent.toString());
 		}
-		System.out.println("--------sentences---------");
+		System.out.println("--------sentences---------\n");
 		
-		for(final Sentence partSent: sentList) {
+		for(final Sentence shortSent: sentList) {
 			/** Step4: Relations Extraction **/
 			/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
 			//System.out.println("\n\t Step4");
-			List<List<String>> relation = partSent.extractRelation(); 
+			List<List<String>> relation = shortSent.extractRelation(); 
 			relations.addAll(relation);	
 		}
 		
