@@ -40,6 +40,13 @@ public class Sentence {
 		}
 		return indexList;
 	}
+	
+	public Sentence subSentence(int fromIndex, int toIndex) {
+		Sentence partS = new Sentence();
+		List<Integer> partIDs = new ArrayList<Integer>(chunkIDs.subList(fromIndex, toIndex));
+		partS.setSentence(partIDs);
+		return partS;
+	}
 
 	/* 渡された品詞に一致するWordのIDを返す */
 	public List<Integer> collectTagWords(String[][] tagNames) {
@@ -178,12 +185,13 @@ public class Sentence {
 		/* 主語を探す */
 		String[][] spTag = {{"助詞", "係助詞"}};	// 主語と述語を結ぶ係助詞"は"を探す
 		List<Integer> ptcls_sp = collectTagWords(spTag);
-		if(ptcls_sp.isEmpty()) return null;
+		if(ptcls_sp.isEmpty()) return partSentList;
 		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
 		
 		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主節
 		Chunk predicateChunk = Chunk.get(subjectChunk.dependUpon);		// 述節
-				
+		if(predicateChunk == null) return partSentList;
+		
 		int p2pChunkID = predicateChunk.chunkID;
 		int fromIndex = indexOfC(subjectChunk.chunkID)+1;
 		int toIndex = indexOfC(p2pChunkID)+1;
@@ -217,7 +225,7 @@ public class Sentence {
 		/* 主語を探す */
 		String[][] spTag = {{"助詞", "係助詞"}};	// 主語と述語を結ぶ係助詞"は"を探す
 		List<Integer> ptcls_sp = collectTagWords(spTag);
-		if(ptcls_sp.isEmpty()) return new ArrayList<List<String>>(); 
+		if(ptcls_sp.isEmpty()) return relations;
 		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
 		
 		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主節("は"を含む)
@@ -226,6 +234,7 @@ public class Sentence {
 		Word predicateWord = Word.get(predicateChunk.wordIDs.get(0));	// 述語
 		//Chunk complementChunk;										// 補節(いつか使うかも)
 		//Word complementWord;											// 補語
+		String predicatePart = subSentence(chunkIDs.indexOf(subjectChunk.chunkID)+1, chunkIDs.size()).toString();	// 述部(主節に続く全ての節)
 		printDep();
 		//System.out.println(subjectChunk.name() + predicateChunk.name());
 		
@@ -239,9 +248,15 @@ public class Sentence {
 			Pattern ptrnLiteral = Pattern.compile(regexLiteral);
 			Matcher mtchLiteral = ptrnLiteral.matcher(predicateChunk.toString());
 			boolean boolLiteral = mtchLiteral.matches();
-			
+			/* 別名・同義語かどうか */
+			String regexSynonym = "(.*?)((に同じ)|(の別名))";	// 「〜の別名」「〜に同じ」を探す
+			Pattern ptrnSynonym = Pattern.compile(regexSynonym);
+			Matcher mtchSynonym = ptrnSynonym.matcher(predicatePart);
+			boolean boolSynonym = mtchSynonym.matches();
 			if(boolLiteral) {
 				relation = Arrays.asList(subjectWord.wordName, "size", mtchLiteral.group(2) + "("+mtchLiteral.group(3)+")");
+			}else if(boolSynonym){
+				relation = Arrays.asList(subjectWord.wordName, "owl:equivalentClass", mtchSynonym.group(1));
 			}else {
 				relation = Arrays.asList(subjectWord.wordName, "rdfs:subClassOf", predicateWord.wordName);
 			}

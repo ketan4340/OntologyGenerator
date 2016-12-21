@@ -37,7 +37,7 @@ public class Main {
 		
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
-		//String readFile = "writings/gooText生物-動物名-さ.txt";
+		//String readFile = "writings/gooText生物-動物名-ひ.txt";
 		
 		String readFile = "writings/gooDicSample.txt";
 		File file = new File(readFile);
@@ -140,13 +140,13 @@ public class Main {
 	// ここまでMainに詰め込みすぎ．何らかのクラスのメソッドにしょう
 		
 		/*** OWL DL Axiom Module ***/
-		/*
+		
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
 		OntologyBuilder ob = new OntologyBuilder();		
 		ob.writeOntology(uri, triples);
 		ob.output("owls/ontology"+sdf.format(c.getTime())+".owl");	// 渡すのは保存先のパス
-		*/
+		
 	}
 
 }

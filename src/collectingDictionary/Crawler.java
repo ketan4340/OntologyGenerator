@@ -24,11 +24,11 @@ import org.jsoup.select.Elements;
 public class Crawler {
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 10;
+		int interval = 20;
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "ひ";
+		String syllabary = "い";
 		crw.run(2, false, categories, syllabary);
 	}
 	
@@ -242,6 +242,8 @@ public class Crawler {
 	public void saveJpnWritings() {
 		File readfile = new File(dicPath);
 		File writefile = new File(textPath);
+		// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnKagi = Pattern.compile("「(.+?)(／.*?)?」");	// 繰り返しつかうのでここでコンパイル
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(readfile));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(writefile));
@@ -250,12 +252,14 @@ public class Crawler {
 				String[] item = line.split("\t", 0); 
 				String entry = item[0];
 				item[1] = cleanText(item[1], entry);
+				Matcher mchKagi = ptnKagi.matcher(item[1]);	// 用例を先に全て出力してから消す
+				while(mchKagi.find()){
+					bw.write(mchKagi.group(1));
+					bw.newLine();
+				}
+				item[1] = mchKagi.replaceAll("");
 				String[] interpretations = item[1].split("。", 0);
 				for(String interpretation: interpretations) {
-					Pattern ptnKagi = Pattern.compile("「(.+?)(／.*?)?」");
-					Matcher mchKagi = ptnKagi.matcher(interpretation);
-					
-					String text = mchKagi.replaceFirst("$1");
 					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
 					System.out.println(writing);
 					bw.write(writing);

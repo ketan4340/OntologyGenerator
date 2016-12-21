@@ -63,6 +63,7 @@ public class Chunk {
 	}
 	
 	public static Chunk get(int id) {
+		if(id == -1) return null; 
 		return allChunksList.get(id);
 	}
 	

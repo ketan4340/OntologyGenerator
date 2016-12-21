@@ -60,7 +60,6 @@ public class OntologyBuilder {
 	
 	public void writeOntology(List<String> uri, List<List<Integer>> triples) {
 		for(final List<Integer> triple: triples) {
-			System.out.println(triple);
 			int s = triple.get(0);
 			int p = triple.get(1);
 			int o = triple.get(2);
