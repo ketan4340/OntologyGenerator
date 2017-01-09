@@ -24,12 +24,12 @@ import org.jsoup.select.Elements;
 public class Crawler {
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 20;
+		int interval = 30;
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "い";
-		crw.run(2, false, categories, syllabary);
+		String syllabary = "ね";
+		crw.run(3, false, categories, syllabary);
 	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
@@ -215,9 +215,9 @@ public class Crawler {
 
 	/* HTMLテキストから余計なタグ,スペース,かっこを除去する */
 	public String cleanHTML(String text) {
-		text = text.replaceAll("<strong>[0-9 ０-９]+</strong>", "");		// 箇条書きの全角数字とスペース除去
+		text = text.replaceAll("<strong>[0-9 ０-９]+</strong>", "");	// 箇条書きの全角数字とスペース除去
 		text = text.replaceAll("<(\".*?\"|'.*?'|[^'\"])*?>", "");	// 残りのタグ除去
-		text = text.replaceAll("\\s| ", "");		// 空白文字と&nbsp;除去
+		text = text.replaceAll("\\s| ", "");						// 空白文字と&nbsp;除去
 		Pattern ptnKagi = Pattern.compile("^「(.+?)」");
 		Matcher mchKagi = ptnKagi.matcher(text);
 		text = mchKagi.replaceFirst("$1");			// 文頭の「」は消す．他は用例とみなして残す
@@ -232,6 +232,7 @@ public class Crawler {
 		text = text.replaceAll("［.+?］", "");		// 全角かっこ［］除去
 		text = text.replaceAll("〈.+?〉", "");		// 全角かっこ〈〉除去
 		text = text.replaceAll("《.+?》", "");		// 全角かっこ《》除去
+		text = text.replaceAll("\\s| ", "");		// 空白文字と&nbsp;除去
 		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
 		text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
 		text = text.replaceAll("→|⇒", "");			// 矢印除去

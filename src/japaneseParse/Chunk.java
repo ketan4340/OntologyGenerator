@@ -71,6 +71,14 @@ public class Chunk {
 		wordIDs.add(wordID);
 	}
 	
+	/* 全く同じChunkを複製する */
+	public Chunk copy() {
+		Chunk replica = new Chunk();
+		replica.setChunk(wordIDs, dependUpon);
+		
+		return replica;
+	}
+	
 	/* Chunkを文字列で返す */
 	public String toString() {
 		String chunkName = new String();
@@ -80,28 +88,17 @@ public class Chunk {
 		return chunkName;
 	}
 	
-	/* Chunk中の指定の品詞を返す */
+	/* Chunk中の指定の品詞を持つWordのIDを返す */
 	public List<Integer> collectTagWords(String[][] tagNames) {
 		List<String[]> tagNamesList = Arrays.asList(tagNames);
 		List<Integer> taggedIDs = new ArrayList<Integer>();
 		for(final int id: wordIDs) {
+			Word wd = Word.get(id);
 			for (final String[] tagsArray: tagNamesList){
-				List<String> taglist = Arrays.asList(tagsArray);
-				if(Word.get(id).tags.containsAll(taglist)) taggedIDs.add(id);
+				if(wd.hasTags(tagsArray))	taggedIDs.add(id);
 			}
 		}
 		return taggedIDs;
-	}
-	
-	public List<Integer> collectTagIndexC(String[][] tagNames) {
-		List<Integer> indexes = new ArrayList<Integer>();
-		for(final int wdID: wordIDs) {
-			Word wd = Word.get(wdID);
-			for(final String[] tagName: tagNames) {
-				wd.hasTags(tagName);	
-			}
-		}
-		return null;
 	}
 	
 	/* 保持するwordのIDからWord型リストにして返す */

@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Sentence {
 	public List<Integer> chunkIDs; // Chunkのリストで文を構成する
@@ -18,6 +19,13 @@ public class Sentence {
 	
 	public int indexOfC(int chunkID) {
 		return chunkIDs.indexOf(chunkID);
+	}
+	public List<Integer> indexesOfC(List<Integer> chunkIDList) {
+		List<Integer> indexList = new ArrayList<Integer>(chunkIDList.size());
+		for(int chunkID: chunkIDList) {
+			indexList.add(indexOfC(chunkID));
+		}
+		return indexList;
 	}
 	public int indexOfW(int wordID) {
 		int indexW = 0;
@@ -33,10 +41,10 @@ public class Sentence {
 		}
 		return indexW;
 	}
-	public List<Integer> indexesOfW(List<Integer> wdl) {
-		List<Integer> indexList = new ArrayList<Integer>();
-		for(int wd: wdl) {
-			indexList.add(indexOfW(wd));
+	public List<Integer> indexesOfW(List<Integer> wordIDList) {
+		List<Integer> indexList = new ArrayList<Integer>(wordIDList.size());
+		for(int wordID: wordIDList) {
+			indexList.add(indexOfW(wordID));
 		}
 		return indexList;
 	}
@@ -108,7 +116,6 @@ public class Sentence {
 				String[] nounTag = {"名詞"};
 				String[] prefixTag = {"名詞接続"};
 				String[] sufixTag = {"接尾"};	
-			
 				if( wd.hasTags(nounTag) | wd.hasTags(prefixTag) | wd.hasTags(sufixTag)) {
 					serialNouns.add(wd.wordID);
 				}else {
@@ -133,12 +140,11 @@ public class Sentence {
 	/* 渡された修飾語のWordを被修飾語につなげ、新しいPhraseを作る */
 	/* 結合元のWordをPhraseに置き換えたSentenceを返す */
 	/* 現状のChunk依存の結合方法からWord結合に治すべき*要改善* */
-	public Sentence concatenate1(List<Integer> modifyWordList) {
-		Sentence newsent = new Sentence();
+	public void concatenate1(List<Integer> modifyWordList) {
 		List<Integer> newIDlist = chunkIDs;
 
 		List<Integer> modifyChunkList = new ArrayList<Integer>();
-		for(int modifywd: modifyWordList) {
+		for(final int modifywd: modifyWordList) {
 			int modchID = Word.get(modifywd).inChunk;
 			if(!modifyChunkList.contains(modchID)) {	// 同一Chunk内に2つ修飾語がある場合(例:大地"の"よう"な")
 				modifyChunkList.add(modchID);			// 重複回避 *要改善*
@@ -147,7 +153,7 @@ public class Sentence {
 		List<List<Integer>> phChunksList = makeModificationList(modifyChunkList);
 		
 		// 複数のChunkを結合して新しいChunkを作成
-		for(List<Integer> phChunks: phChunksList) {
+		for(final List<Integer> phChunks: phChunksList) {
 			Chunk nch = new Chunk();
 			nch.uniteChunks(phChunks);
 			// 古いChunkを削除して新しいChunkを挿入
@@ -155,8 +161,7 @@ public class Sentence {
 			newIDlist.removeAll(phChunks);
 		}
 		Chunk.updateAllDependency();
-		newsent.setSentence(newIDlist);
-		return newsent;
+		setSentence(newIDlist);
 	}
 	
 	/* 上記concatenateの補助 */
@@ -164,7 +169,7 @@ public class Sentence {
 	private List<List<Integer>> makeModificationList(List<Integer> modifyChunkList) {
 		List<List<Integer>> phChunksList = new ArrayList<List<Integer>>();
 		List<Integer> phChunks = new ArrayList<Integer>();
-		for(int modifych: modifyChunkList) {
+		for(final int modifych: modifyChunkList) {
 			int nextIndex = chunkIDs.indexOf(modifych) + 1;	// 修飾節の次の文節が被修飾節だろうという前提
 			if(nextIndex != chunkIDs.size()) {	// 修飾節が文末なら回避
 				int nextch = chunkIDs.get(nextIndex);			// 修飾語の直後に被修飾語があることが前提の設計
@@ -189,20 +194,19 @@ public class Sentence {
 		int ptcl_sp = ptcls_sp.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
 		
 		Chunk subjectChunk = Chunk.get(Word.get(ptcl_sp).inChunk);		// 主節
-		Chunk predicateChunk = Chunk.get(subjectChunk.dependUpon);		// 述節
-		if(predicateChunk == null) return partSentList;
 		
-		int p2pChunkID = predicateChunk.chunkID;
-		int fromIndex = indexOfC(subjectChunk.chunkID)+1;
-		int toIndex = indexOfC(p2pChunkID)+1;
-		while(p2pChunkID != -1) {
-			Chunk nextPredicateChunk = Chunk.get(p2pChunkID);
+		int nextPredicateID = subjectChunk.dependUpon;			// 次の述語のID
+		if(nextPredicateID == -1) return partSentList;
+		int fromIndex = indexOfC(subjectChunk.chunkID)+1;		// 述部を切り取るための始点
+		int toIndex = indexOfC(nextPredicateID)+1;				// 述部を切り取るための終点
+		while(nextPredicateID != -1) {
+			Chunk nextPredicateChunk = Chunk.get(nextPredicateID);
 			List<Integer> newPredicates = chunkIDs.subList(fromIndex, toIndex);
 			System.out.println("(" + fromIndex + "," + toIndex + ")" + newPredicates);
 			List<Integer> partChunkList = new ArrayList<Integer>();
 			// 主節は新しいインスタンスを用意
 			Chunk newSubject = new Chunk();
-			newSubject.setChunk(subjectChunk.wordIDs, p2pChunkID);	// 主節の係り先だけ変更
+			newSubject.setChunk(subjectChunk.wordIDs, nextPredicateID);	// 主節の係り先だけ変更
 			partChunkList.add(newSubject.chunkID);
 			partChunkList.addAll(newPredicates);
 			// 短文生成
@@ -212,10 +216,124 @@ public class Sentence {
 			partSentList.add(partSent);
 			
 			// 次の述語を見つけ，fromとtoを更新
-			p2pChunkID = nextPredicateChunk.dependUpon;
+			nextPredicateID = nextPredicateChunk.dependUpon;
 			fromIndex = toIndex;
-			toIndex = indexOfC(p2pChunkID)+1;
+			toIndex = indexOfC(nextPredicateID)+1;
 		}
+		return partSentList;
+	}
+	
+	/* 渡したChunkが文中で連続しているかをBooleanリストで返す */
+	/* 例:(2,3,4,6,8,9)なら(T,T,F,F,T,F) */
+	public List<Boolean> getContinuity(List<Integer> chunkIDList) {
+		List<Boolean> continuity = new ArrayList<Boolean>(chunkIDList.size());
+		List<Integer> chunkIndexList = indexesOfC(chunkIDList);
+		int chIdx = chunkIndexList.remove(0);
+		int nextIdx = 0;
+		for(Iterator<Integer> li = chunkIndexList.listIterator(); li.hasNext(); ) {
+			nextIdx = li.next();
+			if(chIdx+1 == nextIdx) {	// indexが連続しているか
+				continuity.add(true);
+			}else {						// 否か
+				continuity.add(false);
+			}
+			chIdx = nextIdx;
+		}
+		continuity.add(false);		// 最後はどうせ連続しないからfalse
+		
+		return continuity;
+	}
+	
+	/* 複数の述語を持つ文を述語ごと短文に切り分ける */
+	public List<Sentence> separate2() {
+		List<Sentence> partSentList = new ArrayList<Sentence>(5);
+		
+		/* 主語を全て探し，それらが連続しているか否かを調べる */
+		List<Integer> s_pParticleList;		// 係助詞のリスト
+		List<Integer> subjectList;			// 主節のリスト
+		List<Boolean> sbjContinuityList;	// 主節の連続性を表す真偽値のリスト
+		String[][] s_pTag = {{"助詞", "係助詞"}};		// subject-predicate
+		s_pParticleList = collectTagWords(s_pTag);			// 係助詞"は"探し
+		if(s_pParticleList.isEmpty()) return partSentList;	// 係助詞がなければ終わり
+		subjectList = new ArrayList<Integer>(s_pParticleList.size());	
+		for(final int s_pParticle: s_pParticleList) {
+			subjectList.add(Word.get(s_pParticle).inChunk);		// 係助詞リストから主節リストを作る
+		}
+		sbjContinuityList = getContinuity(subjectList);		// 主節の連続性を真偽値で表す
+		
+		System.out.println(subjectList);
+		System.out.println(sbjContinuityList);
+		
+		List<Integer> headSubjectList = new ArrayList<Integer>(subjectList.size());
+		for(int i=0; i < subjectList.size(); i++) {
+			int spParticle = s_pParticleList.get(i);		// 係助詞
+			int sbjID = subjectList.get(i);					// 主節のID
+			Chunk directSubject = Chunk.get(sbjID);			// 主節のChunk
+			boolean sbjContinuity = sbjContinuityList.get(i);		// 主節のあとに別の主節が隣接しているか
+			
+			if(sbjContinuity) {	// このChunkの次も主節である場合
+				Chunk headSubject = directSubject.copy();
+				Word no = new Word();	// 助詞・連体化"の"を新たに用意
+				no.setWord("の", Arrays.asList("助詞","連体化"), headSubject.chunkID);
+				headSubject.wordIDs.set(headSubject.wordIDs.indexOf(spParticle), no.wordID);	// "は"の代わりに"の"を挿入
+				headSubjectList.add(headSubject.chunkID);	// 連続した主節は貯め置きしとく
+				
+			}else {				// このChunkの次は主節ではない場合
+				List<Integer> partChunkList = new ArrayList<Integer>();		// 短文を構成するChunkのリスト
+				// 主部をまとめる
+				// 新しい主節のインスタンスを用意
+				Chunk partSubject = directSubject.copy();
+				List<Integer> copiedHeadSubjectList = new ArrayList<Integer>(headSubjectList);	// 使い回すので複製
+				copiedHeadSubjectList.add(partSubject.chunkID);
+				int headChunkID = copiedHeadSubjectList.get(0);
+				for(Iterator<Integer> li = copiedHeadSubjectList.listIterator(1); li.hasNext(); ) {
+					int nextChunkID = li.next();
+					Chunk.get(headChunkID).dependUpon = nextChunkID;	// 複数の主節は隣に係る
+					headChunkID = nextChunkID;
+				}
+				// 連続した主節はこの場で結合する
+				Chunk newSbjChunk = new Chunk();
+				newSbjChunk.uniteChunks(copiedHeadSubjectList);
+									
+				// 述部を切り離す
+				int fromIndex = indexOfC(directSubject.chunkID)+1;	// 述部切り取りの始点は主節の次
+				int toIndex = (i+1<sbjContinuityList.size())			// 述部切り取りの終点は
+						? indexOfC(subjectList.get(i+1))				// 次の主節の位置
+						: chunkIDs.size();								// なければ文末
+				System.out.println("\t(from: " + fromIndex + ", to: " + toIndex + ")");
+				List<Integer> partPredicates = chunkIDs.subList(fromIndex, toIndex);	// 切り取った述部
+				Chunk partEndChunk = Chunk.get(partPredicates.get(partPredicates.size()-1));
+				partEndChunk.dependUpon = -1;	// 最後尾の述語はどこにも係らない
+				// 述部の分割
+				int nextPredicateID = directSubject.dependUpon;			// 次の述語のID
+				if(nextPredicateID == -1) break;
+				int fromPrdIndex = indexOfC(directSubject.chunkID)+1;	// 述部分割の始点
+				int toPrdIndex = indexOfC(nextPredicateID)+1;			// 述部分割の終点
+				while(nextPredicateID != -1) {
+					Chunk nextPredicateChunk = Chunk.get(nextPredicateID);
+					List<Integer> piecePredicates = chunkIDs.subList(fromPrdIndex, toPrdIndex);
+					System.out.println("(" + fromPrdIndex + "," + toPrdIndex + ")" + piecePredicates);
+					// 主節は新しいインスタンスを用意
+					Chunk newSubject_c = newSbjChunk.copy();
+					newSubject_c.dependUpon = nextPredicateID;
+					
+					partChunkList.add(newSubject_c.chunkID);	// 結合主部セット
+					partChunkList.addAll(piecePredicates);		// 部分述部セット
+					// 短文生成
+					Sentence partSent = new Sentence();
+					partSent.setSentence(partChunkList);
+					partSent.printC();
+					//System.out.println(partSent.toString());
+					partSentList.add(partSent);
+					
+					// 次の述語を見つけ，fromとtoを更新
+					nextPredicateID = nextPredicateChunk.dependUpon;
+					fromPrdIndex = toPrdIndex;
+					toPrdIndex = indexOfC(nextPredicateID)+1;
+				}
+			}
+		}
+		
 		return partSentList;
 	}
 	
@@ -242,25 +360,35 @@ public class Sentence {
 		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
 		// 述語が動詞でない-> (親クラス, 子クラス)を記述
 		if( predicateChunk.collectTagWords(verbTag).isEmpty()) {
-			List<String> relation;
 			/* リテラル情報かどうか */
 			String regexLiteral = "(.*?)(\\d+)([ア-ンa-zA-Z　ー－]+)(.*?)";	// ~(数字)(単位)~を探す
 			Pattern ptrnLiteral = Pattern.compile(regexLiteral);
 			Matcher mtchLiteral = ptrnLiteral.matcher(predicateChunk.toString());
 			boolean boolLiteral = mtchLiteral.matches();
 			/* 別名・同義語かどうか */
-			String regexSynonym = "(.*?)((に同じ)|(の別名))";	// 「〜の別名」「〜に同じ」を探す
+			String regexSynonym = "(.*?)((に同じ)|(の別名)|(の略)|(のこと))";	// 「〜の別名」「〜に同じ」を探す
 			Pattern ptrnSynonym = Pattern.compile(regexSynonym);
 			Matcher mtchSynonym = ptrnSynonym.matcher(predicatePart);
 			boolean boolSynonym = mtchSynonym.matches();
+			/* 一種・一品種かどうか */
+			String regexKind = "(.*?)((の一種)|(の一品種))";	// 「〜の別名」「〜に同じ」を探す
+			Pattern ptrnKind = Pattern.compile(regexKind);
+			Matcher mtchKind = ptrnKind.matcher(predicatePart);
+			boolean boolKind = mtchKind.matches();
 			if(boolLiteral) {
-				relation = Arrays.asList(subjectWord.wordName, "size", mtchLiteral.group(2) + "("+mtchLiteral.group(3)+")");
-			}else if(boolSynonym){
-				relation = Arrays.asList(subjectWord.wordName, "owl:equivalentClass", mtchSynonym.group(1));
+				String blank = subjectWord.wordName+"_size";
+				relations.add( Arrays.asList(subjectWord.wordName, "ex:size", blank) );			// 空白ノード
+				relations.add( Arrays.asList(blank, "rdf:value", mtchLiteral.group(2)) );		// リテラル
+				relations.add( Arrays.asList(blank, "exterms:units", mtchLiteral.group(3)) );	// 単位
+			}else if(boolSynonym) {
+				relations.add( Arrays.asList(subjectWord.wordName, "owl:sameAs", mtchSynonym.group(1)) );
+				//relations.add( Arrays.asList(subjectWord.wordName, "owl:equivalentClass", mtchSynonym.group(1)) );
+			}else if(boolKind) {
+				relations.add( Arrays.asList(subjectWord.wordName, "rdf:type", mtchSynonym.group(1)) );
 			}else {
-				relation = Arrays.asList(subjectWord.wordName, "rdfs:subClassOf", predicateWord.wordName);
+				relations.add( Arrays.asList(subjectWord.wordName, "rdfs:subClassOf", predicateWord.wordName) );
 			}
-			relations.add(relation);
+			
 		// 述語が動詞である
 		}else {
 			List<String> relation = Arrays.asList(predicateWord.tags.get(6), "rdf:type", "rdfs:Proprety");
@@ -285,12 +413,9 @@ public class Sentence {
 				Chunk objectChunk = Chunk.get(Word.get(ptcl_op).inChunk);
 				Word objectWord = Word.get(objectChunk.wordIDs.get(0));		// 目的語
 				// (subject, property, object)を記述
-				relation = Arrays.asList(predicateWord.tags.get(6), "rdfs:domain", subjectWord.wordName);
-				relations.add(relation);
-				relation = Arrays.asList(predicateWord.tags.get(6), "rdfs:range", objectWord.wordName);
-				relations.add(relation);
-				relation = Arrays.asList(subjectWord.wordName, predicateWord.tags.get(6), objectWord.wordName);
-				relations.add(relation);
+				relations.add( Arrays.asList(predicateWord.tags.get(6), "rdfs:domain", subjectWord.wordName) );
+				relations.add( Arrays.asList(predicateWord.tags.get(6), "rdfs:range", objectWord.wordName) );	
+				relations.add( Arrays.asList(subjectWord.wordName, predicateWord.tags.get(6), objectWord.wordName) );
 			}
 		}
 		return relations;

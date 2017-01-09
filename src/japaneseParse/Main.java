@@ -17,28 +17,30 @@ public class Main {
 		List<String> writingList = new ArrayList<String>();
 		List<Sentence> sentList = new ArrayList<Sentence>();
 		List<List<String>> relations = new ArrayList<List<String>>();
-		/*
+		
 		String[] writings = {
 				//"クジラは広い海を泳いでいる。",
 				//"鯨とは水生の巨大な哺乳類である。",
-				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
-				"アイベックスは角は、雄のものは大きくて後方に湾曲し、表面に竹のような節がある",
+				//"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
+				"アイベックスは角は、雄のものが大きくて後方に湾曲し、表面に竹のような節がある",
 				//"文豪の夏目漱石はこころを執筆した。",
 				//"アースカラーは大地のような褐色や、空・海の青色、草木の緑色など",
 				//"藍鮫は全長約1メートル",
-				//"アイアイは頭胴長40センチくらいで、尾が長い。",
+				"アイアイは頭胴長40センチくらいで、尾が長い。",
 				"アイアイは長い指は鉤爪をもち、樹皮下の昆虫を掘り出して食う。",
 				//"藍子は全長約55センチ。",
 				//"青擬天牛は体長13ミリくらい",
-				"青大将は全長1.5～2.5メートルで、日本では最大",
-				//"青眼狗母魚は体長は10～15センチ"
+				//"青大将は全長1.5～2.5メートルで、日本では最大",
+				//"青眼狗母魚は体長は10～15センチ",
+				"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある。",
+				//"葵貝は雄は体長約1.5センチで、殻をつくらない。"
 		};
 		writingList.addAll(Arrays.asList(writings));
 		
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
 		//String readFile = "writings/gooText生物-動物名-ひ.txt";
-		
+		/*
 		String readFile = "writings/gooDicSample.txt";
 		File file = new File(readFile);
 		try {
@@ -54,7 +56,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		 */		
 		
 		for(String writing: writingList) {
 			/*** Syntactic Parsing Module ***/
@@ -63,36 +65,29 @@ public class Main {
 			Sentence originalSent = parse.run(writing);
 						
 			/*** Semantic Parsing Module ***/
+			/** Step1: Term Extraction **/
+			/* 名詞と形容詞だけ取り出す */
+			//System.out.println("\n\t Step1");
+			String[][] tagNP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
+			List<Integer> wordList_NP = originalSent.collectTagWords(tagNP); // 上記のtagを持つWordを集めた
+			
+			for(int word_NP: wordList_NP) {
+				Word wd = Word.get(word_NP);
+				System.out.print(word_NP + "@(C"+wd.inChunk+"):" + wd.wordName + "|");
+			}
+			System.out.println();
+			
+			/** Step2: Concatenation **/
+			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
+			//System.out.println("\n\t Step2");
+			originalSent.concatenateNouns();
+			originalSent.concatenate1(wordList_NP);
+			
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			List<Sentence> partSentList = new ArrayList<Sentence>();
-			partSentList.addAll(originalSent.separate());
-						
-			for(final Sentence partSent: partSentList) {
-				/* 短く区切った文を再び解析 */
-				Parser parse2 = new Parser("cabocha");
-				Sentence shortSent = parse2.run(partSent.toString());
-				/** Step1: Term Extraction **/
-				/* 名詞と形容詞だけ取り出す */
-				//System.out.println("\n\t Step1");
-				String[][] tagNP = {{"形容詞"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
-				List<Integer> wordList_NP = shortSent.collectTagWords(tagNP); // 上記のtagを持つWordを集めた
-				
-				for(int word_NP: wordList_NP) {
-					Word wd = Word.get(word_NP);
-					System.out.print(word_NP + "@(C"+wd.inChunk+"):" + wd.wordName + "|");
-				}
-				System.out.println();
-				
-				/** Step2: Concatenation **/
-				/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
-				//System.out.println("\n\t Step2");
-				shortSent.concatenateNouns();
-				shortSent = shortSent.concatenate1(wordList_NP);
-								
-				sentList.add(shortSent);
-			}
+			originalSent.printC();
+			sentList.addAll(originalSent.separate2());			
 		}
 		
 		System.out.println("--------sentences---------");

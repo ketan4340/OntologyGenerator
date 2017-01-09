@@ -97,7 +97,7 @@ public class Parser {
 					Pattern p = Pattern.compile(regex);
 					Matcher m = p.matcher(line);
 					while(m.find()){
-						wd.setWord(m.group(1), Arrays.asList((m.group(3).split(","))), chk.chunkID);
+						wd.setWord(m.group(1), Arrays.asList(m.group(3).split(",")), chk.chunkID);
 						wordList.add(wd.wordID);
 					}	
 				}
