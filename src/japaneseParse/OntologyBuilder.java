@@ -9,11 +9,7 @@ import java.util.List;
 public class OntologyBuilder {
 	public String body; // RDF/XMLの本文
 	public String sub;
-	/*
-	public String saveFile;				// 出力ファイル名
-	static String saveDir = "owls/";	// 出力ファイルを保管するディレクトリ
-	static String saveExt = ".owl"; 	// owlの拡張子
-	*/
+
 	public OntologyBuilder() {
 		body = "<?xml version=\"1.0\"?>\n"
 				+ "<rdf:RDF\n"

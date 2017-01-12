@@ -13,6 +13,8 @@ public class Chunk {
 	public List<Integer> wordIDs;		// 構成するWordのidを持つ
 	public int dependUpon;	// どのChunkに係るか
 	public List<Integer> beDepended;	// どのChunkから係り受けるか
+	public int originID;		// このChunkが別Chunkのコピーである場合，そのIDを示す
+	public List<Integer> cloneIDs;	// このChunkのクローン達のID
 
 	public Chunk() {
 		chunkID = chunkSum++;
@@ -20,6 +22,8 @@ public class Chunk {
 		wordIDs = new ArrayList<Integer>();
 		dependUpon = -1;
 		beDepended = new ArrayList<Integer>();
+		originID = -1;
+		cloneIDs = new ArrayList<Integer>();
 	}
 	public void setChunk(List<Integer> wdl, int depto) {
 		for(Iterator<Integer> itr = wdl.iterator(); itr.hasNext(); ) {
@@ -41,7 +45,10 @@ public class Chunk {
 				Word.get(wdID).inChunk = this.chunkID;
 			}
 			// 全ての元Chunkの係り先を新しいChunkに変える
-			for(int bedep: ch.beDepended) Chunk.get(bedep).dependUpon = this.chunkID;	
+			for(int bedep: ch.beDepended) {
+				Chunk.get(bedep).dependUpon = this.chunkID;
+			}
+			
 			if(!itr.hasNext()) {							// 最後尾の場合
 				int head = ch.wordIDs.get(0);				// とりあえず先頭1単語を被修飾語とする *要改善*
 				phraseWords.add(head);
@@ -74,8 +81,15 @@ public class Chunk {
 	/* 全く同じChunkを複製する */
 	public Chunk copy() {
 		Chunk replica = new Chunk();
-		replica.setChunk(wordIDs, dependUpon);
-		
+		List<Integer> subWordIDs = new ArrayList<Integer>(wordIDs.size());
+		for(int id: wordIDs) {
+			Word subWord = Word.get(id).copy();
+			subWord.inChunk = replica.chunkID;
+			subWordIDs.add(subWord.wordID);
+		}
+		replica.setChunk(subWordIDs, dependUpon);
+		replica.originID = this.chunkID;
+		cloneIDs.add(replica.chunkID);
 		return replica;
 	}
 	
@@ -88,6 +102,14 @@ public class Chunk {
 		return chunkName;
 	}
 	
+	public List<Integer> collectWords(String name) {
+		List<Integer> ids = new ArrayList<Integer>();
+		for(final int id: wordIDs) {
+			Word wd = Word.get(id);
+			if(wd.wordName.equals(name))	ids.add(id);
+		}
+		return ids;
+	}	
 	/* Chunk中の指定の品詞を持つWordのIDを返す */
 	public List<Integer> collectTagWords(String[][] tagNames) {
 		List<String[]> tagNamesList = Arrays.asList(tagNames);

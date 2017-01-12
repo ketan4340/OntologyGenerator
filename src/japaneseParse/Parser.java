@@ -107,7 +107,7 @@ public class Parser {
 			
 			// chunkの係り受け関係を更新
 			Chunk.updateAllDependency();
-			System.out.println(analysed);
+			//System.out.println(analysed);
 						
 			// プロセス終了
 			is.close();

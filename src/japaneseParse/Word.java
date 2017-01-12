@@ -10,15 +10,17 @@ public class Word {
 	public String wordName;		// 単語の文字列
 	public List<String> tags;	// 品詞・活用形、読みなど
 	public int inChunk;			// どのChunkに所属するか
-	//public Map<Integer,String> dependUpon; // 従属関係のMap<従属先, 関係性>
-	//public Map<Integer,String> beDepended; // 被従属関係のMap<従属先, 関係性>
-	
+	public int originID;		// このWordが別Wordのコピーである場合，そのIDを示す
+	public List<Integer> cloneIDs;	// このWordのクローン達のID
+		
 	public Word() {
 		wordID = wordsSum++;
 		allWordsList.add(this);
 		wordName = new String();
 		tags = new ArrayList<String>();
 		inChunk = -1;
+		originID = -1;
+		cloneIDs = new ArrayList<Integer>();
 	}
 	public void setWord(String nWordName, List<String> nWordTags, int chunkID) {
 		wordName = nWordName;
@@ -54,9 +56,18 @@ public class Word {
 	}
 	
 	/* 同じWordか確かめる */
-	public boolean equalsW(Word wd) {
+	public boolean equals(Word wd) {
 		if(wordID == wd.wordID) return true;
 		else return false;
+	}
+	
+	/* 全く同じWordを複製する */
+	public Word copy() {
+		Word replica = new Word();
+		replica.setWord(wordName, tags, inChunk);
+		replica.originID = this.wordID;
+		cloneIDs.add(replica.wordID);
+		return replica;
 	}
 	
 	/* 渡されたIDのリストを文字列のリストに変える */
