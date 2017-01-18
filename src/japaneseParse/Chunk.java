@@ -11,10 +11,10 @@ public class Chunk {
 	
 	public int chunkID;
 	public List<Integer> wordIDs;		// 構成するWordのidを持つ
-	public int dependUpon;	// どのChunkに係るか
+	public int dependUpon;				// どのChunkに係るか
 	public List<Integer> beDepended;	// どのChunkから係り受けるか
-	public int originID;		// このChunkが別Chunkのコピーである場合，そのIDを示す
-	public List<Integer> cloneIDs;	// このChunkのクローン達のID
+	public int originID;				// このChunkが別Chunkのコピーである場合，そのIDを示す
+	public List<Integer> cloneIDs;		// このChunkのクローン達のID
 
 	public Chunk() {
 		chunkID = chunkSum++;
@@ -62,7 +62,7 @@ public class Chunk {
 
 		// 新しいPhraseを作成
 		Phrase nph = new Phrase();
-		nph.setPhrase(phraseWords, chunkID);
+		nph.setPhrase(phraseWords, chunkID, false);
 		List<Integer> chunkSource_wd = new ArrayList<Integer>();
 		chunkSource_wd.add(nph.wordID);
 		chunkSource_wd.addAll(conjunctionWords);
@@ -74,8 +74,22 @@ public class Chunk {
 		return allChunksList.get(id);
 	}
 	
+	public Word getMainWord() {
+		for(int wordID: wordIDs) {
+			Word word = Word.get(wordID);
+			if(word.sb_fc) {
+				return word;
+			}
+		}
+		return null;
+	}
+	
 	public void addWord(int wordID) {
 		wordIDs.add(wordID);
+	}
+	
+	public int indexOfW(int wordID) {
+		return wordIDs.indexOf(wordID);
 	}
 	
 	/* 全く同じChunkを複製する */
@@ -93,6 +107,43 @@ public class Chunk {
 		return replica;
 	}
 	
+	/* 指定の品詞を持つWordが並んでいたら繋げる */
+	public void concatenate(String[][] tagNames) {
+		List<Integer> newWordIDs = new ArrayList<Integer>();
+		List<Integer> serialNouns = new ArrayList<Integer>();
+		
+		while( !wordIDs.isEmpty() ) {
+			int wordID = wordIDs.remove(0);
+			Word word = Word.get(wordID);
+			
+			boolean hasSomeTag = false;
+			for(String[] tagName: tagNames) {
+				if(word.hasTags(tagName)) {
+					hasSomeTag = true;
+					break;
+				}
+			}
+			if(hasSomeTag) {
+				serialNouns.add(word.wordID);
+			}else {
+				if(!serialNouns.isEmpty()) {	// 初っ端からTagに該当しない場合のif
+					Phrase nph = new Phrase();
+					nph.setPhrase(serialNouns, chunkID, false);
+					newWordIDs.add(nph.wordID);
+					serialNouns.clear();
+				}
+				newWordIDs.add(wordID);
+			}
+		}
+		
+		if(!serialNouns.isEmpty()) {		// Chunkの末尾が名詞の場合ここで処理
+			Phrase nph = new Phrase();
+			nph.setPhrase(serialNouns, chunkID, false);
+			newWordIDs.add(nph.wordID);
+		}
+		wordIDs = newWordIDs;
+	}
+	
 	/* Chunkを文字列で返す */
 	public String toString() {
 		String chunkName = new String();
@@ -102,6 +153,7 @@ public class Chunk {
 		return chunkName;
 	}
 	
+	/* 指定の文字列に一致するWordのIDを返す */
 	public List<Integer> collectWords(String name) {
 		List<Integer> ids = new ArrayList<Integer>();
 		for(final int id: wordIDs) {
@@ -110,17 +162,42 @@ public class Chunk {
 		}
 		return ids;
 	}	
-	/* Chunk中の指定の品詞を持つWordのIDを返す */
+	/* 指定の品詞を持つWordのIDを返す */
 	public List<Integer> collectTagWords(String[][] tagNames) {
-		List<String[]> tagNamesList = Arrays.asList(tagNames);
+		List<String[]> tagNameList = Arrays.asList(tagNames);
 		List<Integer> taggedIDs = new ArrayList<Integer>();
-		for(final int id: wordIDs) {
-			Word wd = Word.get(id);
-			for (final String[] tagsArray: tagNamesList){
-				if(wd.hasTags(tagsArray))	taggedIDs.add(id);
+		for(final int wordID: wordIDs) {
+			Word word = Word.get(wordID);
+			for (final String[] tagsArray: tagNameList){
+				if(word.hasTags(tagsArray))	taggedIDs.add(wordID);
 			}
 		}
 		return taggedIDs;
+	}
+	/* 指定の品詞を持つWordが含まれているか判定 */
+	public boolean haveTagWord(String[][] tagNames) {
+		List<String[]> tagNamesList = Arrays.asList(tagNames);
+		for(final int wordID: wordIDs) {
+			Word word = Word.get(wordID);
+			for (final String[] tagsArray: tagNamesList){
+				if(word.hasTags(tagsArray))	return true;
+			}
+		}
+		return false;
+	}
+	
+	/* このChunkのうち、指定された範囲のWordを繋げて一つの品詞にする */
+	public void nounize(int fromIndex, int toIndex) {
+		List<Integer> frontIDs = wordIDs.subList(0, fromIndex);
+		List<Integer> mainIDs = wordIDs.subList(fromIndex, toIndex);
+		List<Integer> rearIDs = wordIDs.subList(toIndex, wordIDs.size());
+		
+		Phrase properNoun = new Phrase();	// 固有名詞として扱う
+		properNoun.setPhrase(mainIDs, chunkID, true);
+		mainIDs.clear();
+		//this.wordIDs.addAll(frontIDs);
+		this.wordIDs.add(fromIndex, properNoun.wordID);
+		//this.wordIDs.addAll(rearIDs);
 	}
 	
 	/* 保持するwordのIDからWord型リストにして返す */
@@ -142,9 +219,4 @@ public class Chunk {
 		}
 	}
 	
-	public static void printAllChunks() {
-		for(Chunk ch: allChunksList) {
-			System.out.println("C" + ch.chunkID + ": " + ch.toString() + "\t->" + ch.dependUpon);
-		}
-	}
 }

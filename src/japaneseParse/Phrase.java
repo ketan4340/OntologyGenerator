@@ -5,38 +5,41 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Phrase extends Word{
-	public List<Word> orgWords; // Phraseを構成する単語一つ一つを持つ
 	public List<Integer> orgIDs;
 	
 	public Phrase() {
-		orgWords = new ArrayList<Word>();
 		orgIDs = new ArrayList<Integer>();
 	}
 	
-	public void setPhrase(List<Integer> idl, int chunkNum) {
+	public void setPhrase(List<Integer> baseIDList, int inChunkID, boolean head_tail) {
 		String phraseName = new String();
 		String genkei = new String();
 		String yomi1 = new String();
 		String yomi2 = new String();
-		int id = -1;
-		for(Iterator<Integer> itr = idl.iterator(); itr.hasNext(); ) {
-			id = itr.next();
-			Word wd = Word.get(id);
-			orgWords.add(wd);
-			orgIDs.add(id);
+		for(Iterator<Integer> itr = baseIDList.iterator(); itr.hasNext(); ) {
+			int baseID = itr.next();
+			Word wd = Word.get(baseID);
+			orgIDs.add(baseID);
 			phraseName += wd.wordName;
 			if(wd.tags.size() > 7) genkei += wd.tags.get(6);
 			if(wd.tags.size() > 8) yomi1 += wd.tags.get(7);
 			if(wd.tags.size() > 9) yomi2 += wd.tags.get(8);
 		}
-		List<String> phraseTags = Word.get(idl.get(idl.size()-1)).tags;	// 新しいPhraseのTagは最後尾のWordに依存
+		int headID = baseIDList.get(0);
+		int tailID = baseIDList.get(baseIDList.size()-1);
+		
+		List<String> phraseTags = Word.get(head_tail ?headID :tailID).tags;	// Tagはhead_tailがtrueなら先頭、falseなら最後尾のWordに依存
 		/*
 		Cabochaの仕様によりエラー原因となりやすいので封印
 		phraseTags.set(6, genkei);
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
 		*/
-		chunkNum = (chunkNum == -1)? Word.get(id).inChunk: chunkNum;// 新しいPhraseの所属するChunkは最後尾のWordに依存
-		setWord(phraseName, phraseTags, chunkNum);
+		if(inChunkID == -1) {
+			inChunkID = head_tail
+					? Word.get(headID).inChunk	// 新しいPhraseの所属するChunkは先頭のWordに依存
+					: Word.get(tailID).inChunk;	// 新しいPhraseの所属するChunkは最後尾のWordに依存
+		}
+		setWord(phraseName, phraseTags, inChunkID, true);
 	}
 }

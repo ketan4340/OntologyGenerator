@@ -71,6 +71,8 @@ public class Parser {
 			Chunk chk = null;
 			List<Integer> wdl = null;
 			int depto = -1;
+			int[] border = new int[2];
+			boolean sbj_fnc;
 			int nextID = 0;
 			while ((line = br.readLine()) != null) {
 				if(line.startsWith("EOS")) {		// EOSがきたら終了
@@ -86,20 +88,22 @@ public class Parser {
 					}
 					wdl = new ArrayList<Integer>();
 					chk = new Chunk();
-					String dep_str = line.split(" ")[2];
+					String[] chunkInfo = line.split(" ");
+					String dep_str = chunkInfo[2];
 					depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
 					if(depto!=-1) depto += nextID;	// *要注意(上に同じ)*
-					
+					String[] border_str = chunkInfo[3].split("/");
+					border[0] = Integer.decode(border_str[0]);
+					border[1] = Integer.decode(border_str[1]);
 				}else {								// 他は単語の登録
 					Word wd = new Word();
+					sbj_fnc = (wdl.size() <= border[0])
+							? true
+							: false;
 					wdl.add(wd.wordID);
-					String regex = "(.*?)(\t)(.*?)(\t)(.*?)";
-					Pattern p = Pattern.compile(regex);
-					Matcher m = p.matcher(line);
-					while(m.find()){
-						wd.setWord(m.group(1), Arrays.asList(m.group(3).split(",")), chk.chunkID);
-						wordList.add(wd.wordID);
-					}	
+					String[] wordInfo = line.split("\t");
+					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), chk.chunkID, sbj_fnc);
+					wordList.add(wd.wordID);
 				}
 				//読み込んだ行を格納
 				analysed += line + "\n";

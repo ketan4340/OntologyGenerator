@@ -22,14 +22,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Crawler {
+	
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 30;
+		int interval = 20;
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "ね";
-		crw.run(3, false, categories, syllabary);
+		String syllabary = "き";
+		crw.run(2, false, categories, syllabary);
+		
+		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
 	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
@@ -215,27 +218,34 @@ public class Crawler {
 
 	/* HTMLテキストから余計なタグ,スペース,かっこを除去する */
 	public String cleanHTML(String text) {
-		text = text.replaceAll("<strong>[0-9 ０-９]+</strong>", "");	// 箇条書きの全角数字とスペース除去
+		//text = text.replaceAll("<strong>[0-9０-９]+</strong>", "");	// 箇条書きの全角数字とスペース除去
 		text = text.replaceAll("<(\".*?\"|'.*?'|[^'\"])*?>", "");	// 残りのタグ除去
-		text = text.replaceAll("\\s| ", "");						// 空白文字と&nbsp;除去
+		text = text.replaceAll("[ \n]", "");						// &nbsp;と改行除去
 		Pattern ptnKagi = Pattern.compile("^「(.+?)」");
 		Matcher mchKagi = ptnKagi.matcher(text);
 		text = mchKagi.replaceFirst("$1");			// 文頭の「」は消す．他は用例とみなして残す
 		return text;
 	}
 	
-	/* 日本語テキストから余計なスペース,かっこを除去する */
-	public String cleanText(String text, String entry) {
+	/* 日本語テキストから余計なかっこ,記号を除去し，見出し語の代入を行う */
+	public String cleanText1(String text, String entry) {
 		text = text.replaceAll("\\(.+?\\)", "");	// 半角かっこ()除去
-		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
+		//text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
 		text = text.replaceAll("（.+?）", "");		// 全角かっこ（）除去
 		text = text.replaceAll("［.+?］", "");		// 全角かっこ［］除去
 		text = text.replaceAll("〈.+?〉", "");		// 全角かっこ〈〉除去
 		text = text.replaceAll("《.+?》", "");		// 全角かっこ《》除去
-		text = text.replaceAll("\\s| ", "");		// 空白文字と&nbsp;除去
 		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
-		text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
+		//text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
 		text = text.replaceAll("→|⇒", "");			// 矢印除去
+		return text;
+	}
+	
+	/* テキストからスペースを除去する */
+	public String cleanText2(String text) {
+		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
+		text = text.replaceAll("[「」]", "");		// 全角鉤かっこ「」除去
+		text = text.replaceAll("[\\s　]", "");		// 空白文字除去
 		return text;
 	}
 	
@@ -243,24 +253,39 @@ public class Crawler {
 	public void saveJpnWritings() {
 		File readfile = new File(dicPath);
 		File writefile = new File(textPath);
-		// 鉤括弧で囲まれた用例を探す正規表現
-		Pattern ptnKagi = Pattern.compile("「(.+?)(／.*?)?」");	// 繰り返しつかうのでここでコンパイル
+
+		// 繰り返しつかうのでここでコンパイル
+		Pattern ptnExm = Pattern.compile("(?<=[。」])「(.+?)(／.*?)?」(?<![あ-ん])");	// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnNum = Pattern.compile("^[１-９\\d{2}][ ㋐-㋾]");		// 語釈文頭の箇条書きの数字を探す正規表現
+		Pattern ptnSpl = Pattern.compile("\\[補説\\].+");				// 補説とそこから行末までを探す正規表現
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(readfile));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(writefile));
 			String line = br.readLine();
 			for(; line != null; line = br.readLine()) {
-				String[] item = line.split("\t", 0); 
+				String[] item = line.split("\t", 2);
 				String entry = item[0];
-				item[1] = cleanText(item[1], entry);
-				Matcher mchKagi = ptnKagi.matcher(item[1]);	// 用例を先に全て出力してから消す
-				while(mchKagi.find()){
-					bw.write(mchKagi.group(1));
+				String serialInterpretation = item[1];
+				serialInterpretation = cleanText1(serialInterpretation, entry);	// 余計なかっこを消す
+				Matcher mchExm = ptnExm.matcher(serialInterpretation);	// 「用例」を先に全て出力してから消す
+				/*
+				while(mchExm.find()){
+					System.out.println(mchExm.group(1));
+					bw.write(mchExm.group(1));
 					bw.newLine();
 				}
-				item[1] = mchKagi.replaceAll("");
-				String[] interpretations = item[1].split("。", 0);
+				*/
+				serialInterpretation = mchExm.replaceAll("");
+				Matcher mchSpl = ptnSpl.matcher(serialInterpretation);
+				if(mchSpl.find())	serialInterpretation = mchSpl.replaceAll("");	// 文末の補説を消す
+				
+				String[] interpretations = serialInterpretation.split("。", 0);
 				for(String interpretation: interpretations) {
+					Matcher mchNum = ptnNum.matcher(interpretation);
+					if(mchNum.find())	interpretation = mchNum.replaceAll("");	// 語釈文頭の数字を消す
+					interpretation = cleanText2(interpretation);		// 残しておいたスペースを消す
+					
 					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
 					System.out.println(writing);
 					bw.write(writing);
@@ -271,6 +296,36 @@ public class Crawler {
 			br.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	/* ディレクトリ内のファイルの内容を全て纏めた一つのファイルを出力する */
+	public static void gatheringTexts(String dirName, String opFileName) {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(opFileName));
+		
+			File dir = new File(dirName);
+			File[] files = dir.listFiles();
+			if( files == null )
+				System.out.println("file is null.");
+			for(File file: files) {
+				if(!file.exists()) {
+					continue;
+				}else if(file.isFile()) {
+			        BufferedReader br = new BufferedReader(new FileReader(file));
+			        String line = br.readLine();
+			        while(line != null) {
+			        	bw.write(line);
+			        	bw.newLine();
+			        	line = br.readLine();
+			        }
+			        br.close();
+				}
+			}
+			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

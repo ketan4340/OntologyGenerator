@@ -6,12 +6,13 @@ public class Word {
 	public static int wordsSum = 0;
 	public static List<Word> allWordsList = new ArrayList<Word>();
 	
-	public int wordID;			// 通し番号。Wordを特定する
-	public String wordName;		// 単語の文字列
-	public List<String> tags;	// 品詞・活用形、読みなど
-	public int inChunk;			// どのChunkに所属するか
-	public int originID;		// このWordが別Wordのコピーである場合，そのIDを示す
+	public int wordID;				// 通し番号。Wordを特定する
+	public String wordName;			// 単語の文字列
+	public List<String> tags;		// 品詞・活用形、読みなど
+	public int inChunk;				// どのChunkに所属するか
+	public int originID;			// このWordが別Wordのコピーである場合，そのIDを示す
 	public List<Integer> cloneIDs;	// このWordのクローン達のID
+	public boolean sb_fc;			// 主辞か機能語か
 		
 	public Word() {
 		wordID = wordsSum++;
@@ -21,11 +22,13 @@ public class Word {
 		inChunk = -1;
 		originID = -1;
 		cloneIDs = new ArrayList<Integer>();
+		sb_fc = false;
 	}
-	public void setWord(String nWordName, List<String> nWordTags, int chunkID) {
+	public void setWord(String nWordName, List<String> nWordTags, int chunkID, boolean sf) {
 		wordName = nWordName;
 		tags.addAll(nWordTags);
 		inChunk = chunkID;
+		sb_fc = sf;
 	}
 	
 	public static Word get(int id) {
@@ -36,9 +39,6 @@ public class Word {
 	public boolean hasTags(String[] tagNames) {
 		boolean match = true;
 		for(String tag: tagNames) {
-			if(tag.equals(".")) {	// .は任意のタグ
-				return true;		// よって必ずtrue
-			}
 			boolean not = false;	// NOT検索用のフラグ
 			if(tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
 				not = true;
@@ -64,7 +64,7 @@ public class Word {
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(wordName, tags, inChunk);
+		replica.setWord(wordName, tags, inChunk, sb_fc);
 		replica.originID = this.wordID;
 		cloneIDs.add(replica.wordID);
 		return replica;
