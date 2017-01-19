@@ -27,6 +27,11 @@ public class Word {
 	public void setWord(String nWordName, List<String> nWordTags, int chunkID, boolean sf) {
 		wordName = nWordName;
 		tags.addAll(nWordTags);
+		if(tags.size() < 9) tags.addAll(Arrays.asList("*", "*"));	// tagの数が最低9個になるように
+		if(tags.get(6).equals("*")) {	// 特殊漢字の原形をここで入力してあげる
+			tags.set(6, nWordName);
+		}
+		
 		inChunk = chunkID;
 		sb_fc = sf;
 	}

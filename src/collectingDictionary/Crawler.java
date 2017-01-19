@@ -25,12 +25,12 @@ public class Crawler {
 	
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 20;
+		int interval = 25;
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "き";
-		crw.run(2, false, categories, syllabary);
+		String syllabary = "さ";
+		crw.run(3, false, categories, syllabary);
 		
 		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
 	}
@@ -244,7 +244,7 @@ public class Crawler {
 	/* テキストからスペースを除去する */
 	public String cleanText2(String text) {
 		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
-		text = text.replaceAll("[「」]", "");		// 全角鉤かっこ「」除去
+		//text = text.replaceAll("[「」]", "");		// 全角鉤かっこ「」除去
 		text = text.replaceAll("[\\s　]", "");		// 空白文字除去
 		return text;
 	}
@@ -255,9 +255,10 @@ public class Crawler {
 		File writefile = new File(textPath);
 
 		// 繰り返しつかうのでここでコンパイル
-		Pattern ptnExm = Pattern.compile("(?<=[。」])「(.+?)(／.*?)?」(?<![あ-ん])");	// 鉤括弧で囲まれた用例を探す正規表現
-		Pattern ptnNum = Pattern.compile("^[１-９\\d{2}][ ㋐-㋾]");		// 語釈文頭の箇条書きの数字を探す正規表現
-		Pattern ptnSpl = Pattern.compile("\\[補説\\].+");				// 補説とそこから行末までを探す正規表現
+		Pattern ptnExm1 = Pattern.compile("「(.+?)／(.+?)」");			// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnExm2 = Pattern.compile("「(.+?)」(?![あ-ん])");		// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnNum = Pattern.compile("[１-９\\d{2}][ ㋐-㋾]");		// 語釈文頭の箇条書きの数字を探す正規表現
+		Pattern ptnSplm = Pattern.compile("\\[補説\\].+");				// 補説とそこから行末までを探す正規表現
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(readfile));
@@ -268,24 +269,18 @@ public class Crawler {
 				String entry = item[0];
 				String serialInterpretation = item[1];
 				serialInterpretation = cleanText1(serialInterpretation, entry);	// 余計なかっこを消す
-				Matcher mchExm = ptnExm.matcher(serialInterpretation);	// 「用例」を先に全て出力してから消す
-				/*
-				while(mchExm.find()){
-					System.out.println(mchExm.group(1));
-					bw.write(mchExm.group(1));
-					bw.newLine();
-				}
-				*/
-				serialInterpretation = mchExm.replaceAll("");
-				Matcher mchSpl = ptnSpl.matcher(serialInterpretation);
-				if(mchSpl.find())	serialInterpretation = mchSpl.replaceAll("");	// 文末の補説を消す
-				
+				Matcher mchExm1 = ptnExm1.matcher(serialInterpretation);
+				serialInterpretation = mchExm1.replaceAll("");	// 「用例」を消す
+				Matcher mchExm2 = ptnExm2.matcher(serialInterpretation);
+				serialInterpretation = mchExm2.replaceAll("");	// 「用例」を消す
+				Matcher mchNum = ptnNum.matcher(serialInterpretation);
+				serialInterpretation = mchNum.replaceAll("");	// 語釈文頭の箇条書きの数字を消す
+				Matcher mchSplm = ptnSplm.matcher(serialInterpretation);
+				serialInterpretation = mchSplm.replaceAll("");	// 文末の補説を消す
+				serialInterpretation = cleanText2(serialInterpretation);		// 残しておいたスペースを消す
+
 				String[] interpretations = serialInterpretation.split("。", 0);
 				for(String interpretation: interpretations) {
-					Matcher mchNum = ptnNum.matcher(interpretation);
-					if(mchNum.find())	interpretation = mchNum.replaceAll("");	// 語釈文頭の数字を消す
-					interpretation = cleanText2(interpretation);		// 残しておいたスペースを消す
-					
 					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
 					System.out.println(writing);
 					bw.write(writing);

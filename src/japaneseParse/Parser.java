@@ -71,7 +71,7 @@ public class Parser {
 			Chunk chk = null;
 			List<Integer> wdl = null;
 			int depto = -1;
-			int[] border = new int[2];
+			int border = 0;
 			boolean sbj_fnc;
 			int nextID = 0;
 			while ((line = br.readLine()) != null) {
@@ -93,11 +93,10 @@ public class Parser {
 					depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
 					if(depto!=-1) depto += nextID;	// *要注意(上に同じ)*
 					String[] border_str = chunkInfo[3].split("/");
-					border[0] = Integer.decode(border_str[0]);
-					border[1] = Integer.decode(border_str[1]);
+					border = Integer.decode(border_str[0]);
 				}else {								// 他は単語の登録
 					Word wd = new Word();
-					sbj_fnc = (wdl.size() <= border[0])
+					sbj_fnc = (wdl.size() <= border)
 							? true
 							: false;
 					wdl.add(wd.wordID);
@@ -111,7 +110,7 @@ public class Parser {
 			
 			// chunkの係り受け関係を更新
 			Chunk.updateAllDependency();
-			//System.out.println(analysed);
+			System.out.println(analysed);
 						
 			// プロセス終了
 			is.close();

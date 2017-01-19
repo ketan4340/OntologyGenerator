@@ -188,16 +188,12 @@ public class Chunk {
 	
 	/* このChunkのうち、指定された範囲のWordを繋げて一つの品詞にする */
 	public void nounize(int fromIndex, int toIndex) {
-		List<Integer> frontIDs = wordIDs.subList(0, fromIndex);
 		List<Integer> mainIDs = wordIDs.subList(fromIndex, toIndex);
-		List<Integer> rearIDs = wordIDs.subList(toIndex, wordIDs.size());
 		
 		Phrase properNoun = new Phrase();	// 固有名詞として扱う
 		properNoun.setPhrase(mainIDs, chunkID, true);
 		mainIDs.clear();
-		//this.wordIDs.addAll(frontIDs);
 		this.wordIDs.add(fromIndex, properNoun.wordID);
-		//this.wordIDs.addAll(rearIDs);
 	}
 	
 	/* 保持するwordのIDからWord型リストにして返す */

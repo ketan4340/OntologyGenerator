@@ -21,20 +21,19 @@ public class Phrase extends Word{
 			Word wd = Word.get(baseID);
 			orgIDs.add(baseID);
 			phraseName += wd.wordName;
-			if(wd.tags.size() > 7) genkei += wd.tags.get(6);
-			if(wd.tags.size() > 8) yomi1 += wd.tags.get(7);
-			if(wd.tags.size() > 9) yomi2 += wd.tags.get(8);
+			if(wd.tags.size() > 6) genkei += wd.tags.get(6);
+			if(wd.tags.size() > 7) yomi1 += wd.tags.get(7);
+			if(wd.tags.size() > 8) yomi2 += wd.tags.get(8);
 		}
+
 		int headID = baseIDList.get(0);
 		int tailID = baseIDList.get(baseIDList.size()-1);
 		
 		List<String> phraseTags = Word.get(head_tail ?headID :tailID).tags;	// Tagはhead_tailがtrueなら先頭、falseなら最後尾のWordに依存
-		/*
-		Cabochaの仕様によりエラー原因となりやすいので封印
-		phraseTags.set(6, genkei);
+		phraseTags.set(6, genkei);	// 原形・読みに関しては元の単語からつなげたもの
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
-		*/
+
 		if(inChunkID == -1) {
 			inChunkID = head_tail
 					? Word.get(headID).inChunk	// 新しいPhraseの所属するChunkは先頭のWordに依存
