@@ -24,18 +24,21 @@ public class Main {
 				//"クジラは広い海を泳いでいる。",
 				//"鯨とは水生の巨大な哺乳類である。",
 				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
+				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わり、尾びれは短い",
 				"アイベックスは角は、雄のものは大きくて後方に湾曲し、表面に竹のような節がある",
 				//"藍鮫は全長約1メートル",
 				"アイアイは長い指は鉤爪をもち、樹皮下の昆虫を掘り出して食う。",
-				"アイアイは頭胴長40センチくらいで、尾が長い。",
+				"アイアイは頭胴長40センチくらいで、尾が長い",
 				//"藍子は全長約55センチ。",
 				//"青擬天牛は体長13ミリくらい",
 				"秋沙は日本では冬鳥であるが、北海道で繁殖するものもある",
 				"青大将は全長1.5～2.5メートルで、日本では最大",
 				//"青眼狗母魚は体長は10～15センチ",
-				"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある。",
-				"葵貝は雄は体長約1.5センチで、殻をつくらない。",
+				"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある",
+				"葵貝は雄は体長約1.5センチで、殻をつくらない",
 				//"甘子はえのは",
+				"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
+				"鯉は体は長い筒形で背から腹へかけての幅が広く、長短二対の口ひげがある",
 				//"一角は一分銀の異称",
 				//"犬はドッグに同じ"
 		};
@@ -70,23 +73,22 @@ public class Main {
 						
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
-			originalSent.concatenateNouns();
-			originalSent.concatenateVerbs();
+			originalSent.connectNouns();
+			originalSent.connectVerbs();
 			/* 名詞と形容詞だけ取り出す */
 			//System.out.println("\n\t Step1");
 			String[][] tagNP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
-			List<Integer> wordList_NP = originalSent.collectTagWords(tagNP); // 上記のtagを持つWordを集めた
+			List<Integer> chunkList_NP = originalSent.collectTagChunks(tagNP); // 上記のtagを持つWordを集めた
 			
 			/** Step2: Concatenation **/
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
-			originalSent.concatenateModifer(wordList_NP);
+			originalSent.connectModifer(chunkList_NP);
 			
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			System.out.println(originalSent.toString());
-			sentList.addAll(originalSent.separate());
+			sentList.addAll(originalSent.separate2());
 		}
 		
 		System.out.println("--------sentences---------");

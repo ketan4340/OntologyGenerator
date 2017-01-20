@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Phrase extends Word{
-	public List<Integer> orgIDs;
+	public List<Integer> origins;
 	
 	public Phrase() {
-		orgIDs = new ArrayList<Integer>();
+		origins = new ArrayList<Integer>();
 	}
 	
 	public void setPhrase(List<Integer> baseIDList, int inChunkID, boolean head_tail) {
@@ -19,7 +19,7 @@ public class Phrase extends Word{
 		for(Iterator<Integer> itr = baseIDList.iterator(); itr.hasNext(); ) {
 			int baseID = itr.next();
 			Word wd = Word.get(baseID);
-			orgIDs.add(baseID);
+			origins.add(baseID);
 			phraseName += wd.wordName;
 			if(wd.tags.size() > 6) genkei += wd.tags.get(6);
 			if(wd.tags.size() > 7) yomi1 += wd.tags.get(7);

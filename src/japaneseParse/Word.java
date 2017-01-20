@@ -40,9 +40,9 @@ public class Word {
 		return allWordsList.get(id);
 	}
 	
-	/* 渡されたTagを全て持って入れば真、それ以外は偽を返す */
-	public boolean hasTags(String[] tagNames) {
-		boolean match = true;
+	/* 渡されたTagを"全て"持って入れば真、それ以外は偽を返す */
+	public boolean hasAllTags(String[] tagNames) {
+		boolean match = true;	// デフォがtrueなので空の配列は任意の品詞とみなされる
 		for(String tag: tagNames) {
 			boolean not = false;	// NOT検索用のフラグ
 			if(tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
@@ -59,11 +59,25 @@ public class Word {
 		}
 		return match;
 	}
-	
-	/* 同じWordか確かめる */
-	public boolean equals(Word wd) {
-		if(wordID == wd.wordID) return true;
-		else return false;
+	/* 渡されたTagを"1つでも"持って入れば真、それ以外は偽を返す */
+	public boolean hasSomeTags(String[] tagNames) {
+		if(tagNames.length == 0) return true;	// 空の品詞を渡されたらtrue
+		boolean match = false;
+		for(String tag: tagNames) {
+			boolean not = false;	// NOT検索用のフラグ
+			if(tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
+				not = true;
+				tag = tag.substring(1);	// -を消しておく
+			}
+			
+			if( tags.contains(tag) ) {
+				match = (not)? false: true;
+			}else {
+				match = (not)? true: false;
+			}
+			if(match) break;	// trueなら即終了
+		}
+		return match;
 	}
 	
 	/* 全く同じWordを複製する */

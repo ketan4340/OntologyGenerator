@@ -84,6 +84,14 @@ public class Chunk {
 		return null;
 	}
 	
+	public List<Integer> getAllDepending() {
+		List<Integer> allDepending = new ArrayList<Integer>();
+		for(int depto = this.dependUpon; depto != -1; depto = Chunk.get(depto).dependUpon) {
+			allDepending.add(depto);
+		}
+		return allDepending;
+	}
+	
 	public void addWord(int wordID) {
 		wordIDs.add(wordID);
 	}
@@ -108,7 +116,7 @@ public class Chunk {
 	}
 	
 	/* 指定の品詞を持つWordが並んでいたら繋げる */
-	public void concatenate(String[][] tagNames) {
+	public void connect(String[][] tagNames) {
 		List<Integer> newWordIDs = new ArrayList<Integer>();
 		List<Integer> serialNouns = new ArrayList<Integer>();
 		
@@ -118,7 +126,7 @@ public class Chunk {
 			
 			boolean hasSomeTag = false;
 			for(String[] tagName: tagNames) {
-				if(word.hasTags(tagName)) {
+				if(word.hasAllTags(tagName)) {
 					hasSomeTag = true;
 					break;
 				}
@@ -144,15 +152,6 @@ public class Chunk {
 		wordIDs = newWordIDs;
 	}
 	
-	/* Chunkを文字列で返す */
-	public String toString() {
-		String chunkName = new String();
-		for(int orgid: wordIDs) {
-			chunkName += Word.get(orgid).wordName;
-		}
-		return chunkName;
-	}
-	
 	/* 指定の文字列に一致するWordのIDを返す */
 	public List<Integer> collectWords(String name) {
 		List<Integer> ids = new ArrayList<Integer>();
@@ -163,24 +162,24 @@ public class Chunk {
 		return ids;
 	}	
 	/* 指定の品詞を持つWordのIDを返す */
-	public List<Integer> collectTagWords(String[][] tagNames) {
+	public List<Integer> collectAllTagWords(String[][] tagNames) {
 		List<String[]> tagNameList = Arrays.asList(tagNames);
 		List<Integer> taggedIDs = new ArrayList<Integer>();
 		for(final int wordID: wordIDs) {
 			Word word = Word.get(wordID);
 			for (final String[] tagsArray: tagNameList){
-				if(word.hasTags(tagsArray))	taggedIDs.add(wordID);
+				if(word.hasAllTags(tagsArray))	taggedIDs.add(wordID);
 			}
 		}
 		return taggedIDs;
 	}
-	/* 指定の品詞を持つWordが含まれているか判定 */
-	public boolean haveTagWord(String[][] tagNames) {
+	/* 指定の品詞を"全て"持つWordが含まれているか判定 */
+	public boolean haveAllTagWord(String[][] tagNames) {
 		List<String[]> tagNamesList = Arrays.asList(tagNames);
 		for(final int wordID: wordIDs) {
 			Word word = Word.get(wordID);
 			for (final String[] tagsArray: tagNamesList){
-				if(word.hasTags(tagsArray))	return true;
+				if(word.hasAllTags(tagsArray))	return true;
 			}
 		}
 		return false;
@@ -195,14 +194,14 @@ public class Chunk {
 		mainIDs.clear();
 		this.wordIDs.add(fromIndex, properNoun.wordID);
 	}
-	
-	/* 保持するwordのIDからWord型リストにして返す */
-	public List<Word> getWordList() {
-		List<Word> wordList = new ArrayList<Word>();
-		for(final int wdID: wordIDs) {
-			wordList.add(Word.get(wdID));
+
+	/* Chunkを文字列で返す */
+	public String toString() {
+		String chunkName = new String();
+		for(int orgid: wordIDs) {
+			chunkName += Word.get(orgid).wordName;
 		}
-		return wordList;
+		return chunkName;
 	}
 	
 	/* chunkの係り受け関係を更新 */
