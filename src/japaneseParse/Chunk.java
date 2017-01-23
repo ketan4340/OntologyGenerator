@@ -124,7 +124,12 @@ public class Chunk {
 			Chunk replica = origin.copy();
 			replicaList.add(replica.chunkID);
 		}
-		
+		for(final int id: replicaList) {
+			Chunk replica = Chunk.get(id);
+			Chunk origin = Chunk.get(replica.originID);
+			int index4Dep = chunkIDList.indexOf(origin.dependUpon);
+			replica.dependUpon = (index4Dep != -1)? replicaList.get(index4Dep): -1;
+		}
 		return replicaList;
 	}
 	

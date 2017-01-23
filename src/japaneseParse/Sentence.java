@@ -2,8 +2,10 @@ package japaneseParse;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.ArrayList;
@@ -44,14 +46,14 @@ public class Sentence {
 	}
 	public List<Integer> indexesOfC(List<Integer> chunkIDList) {
 		List<Integer> indexList = new ArrayList<Integer>(chunkIDList.size());
-		for(int chunkID: chunkIDList) {
+		for(final int chunkID: chunkIDList) {
 			indexList.add(indexOfC(chunkID));
 		}
 		return indexList;
 	}
 	public int indexOfW(int wordID) {
 		int indexW = 0;
-		for(int chunkID: chunkIDs) {
+		for(final int chunkID: chunkIDs) {
 			Chunk chunk = Chunk.get(chunkID);
 			int order = chunk.wordIDs.indexOf(wordID);
 			if(order == -1) {
@@ -112,10 +114,10 @@ public class Sentence {
 		printDep();
 		
 		// 渡されたChunkがSentence上で連続しているか
-		List<Boolean> continuity = getContinuity(connectChunkList);
-		continuity.remove(continuity.size()-1);
-		for(final boolean tf: continuity) {
-			if(tf == false) {
+		Map<Integer, Boolean> continuity = getContinuity(connectChunkList);
+		continuity.remove(continuity.size()-1);	// 最後は必ずfalseなので抜いておく
+		for(final Map.Entry<Integer, Boolean> entry: continuity.entrySet()) {
+			if(entry.getValue() == false) {
 				System.out.println("error: Not serial in sentence.");
 				return baseChunkID;
 			}
@@ -281,23 +283,26 @@ public class Sentence {
 		return phChunksList;
 	}
 	
-	/* 渡したChunkが文中で連続しているかをBooleanリストで返す */
-	/* 例:(2,3,4,6,8,9)なら(T,T,F,F,T,F) */
-	public List<Boolean> getContinuity(List<Integer> chunkIDList) {
-		List<Boolean> continuity = new ArrayList<Boolean>(chunkIDList.size());
+	/* 渡したChunkが文中で連続しているかを<chunkID, Boolean>のMapで返す */
+	/* 例:indexのリストが(2,3,4,6,8,9)なら(T,T,F,F,T,F) */
+	public Map<Integer, Boolean> getContinuity(List<Integer> chunkIDList) {
+		Map<Integer, Boolean> continuity = new LinkedHashMap<Integer, Boolean>(chunkIDList.size());
 		List<Integer> chunkIndexList = indexesOfC(chunkIDList);
-		int chIdx = chunkIndexList.remove(0);
-		int nextIdx = 0;
-		for(Iterator<Integer> li = chunkIndexList.listIterator(); li.hasNext(); ) {
-			nextIdx = li.next();
-			if(chIdx+1 == nextIdx) {	// indexが連続しているか
-				continuity.add(true);
-			}else {						// 否か
-				continuity.add(false);
+		
+		Iterator<Integer> liID = chunkIDList.listIterator();
+		Iterator<Integer> liIdx = chunkIndexList.listIterator();
+		int currentIdx = liIdx.next();
+		while(liIdx.hasNext() && liID.hasNext()) {
+			int nextIdx = liIdx.next();
+			int chID = liID.next();
+			if(currentIdx+1 == nextIdx) {	// indexが連続しているか
+				continuity.put(chID, true);
+			}else {							// 否か
+				continuity.put(chID, false);
 			}
-			chIdx = nextIdx;
+			currentIdx = nextIdx;
 		}
-		continuity.add(false);		// 最後はどうせ連続しないからfalse
+		continuity.put(liID.next(), false);	// 最後は絶対連続しないからfalse
 		
 		return continuity;
 	}
@@ -323,20 +328,18 @@ public class Sentence {
 			subjectList.remove(subjectList.indexOf(lastChunkID));
 		}
 		// 主節の連続性を表す真偽値のリスト
-		List<Boolean> subjectsContinuity = getContinuity(subjectList);
+		Map<Integer, Boolean> subjectsContinuity = getContinuity(subjectList); 
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		List<Integer> mainSubjectList = new ArrayList<Integer>(subjectList.size());
-		int coreChunkID = -1;
-		for(int i=0; i<subjectsContinuity.size(); i++) {
-			boolean cnt = subjectsContinuity.get(i);
-			int sbjID = subjectList.get(i);
-			mainSubjectList.add(sbjID);
-			if(cnt == false) {
-				coreChunkID = sbjID;
-				break;	// false=主語が連続しなくなったら
+		int coreChunkID = -1;	Chunk coreChunk;
+		for(Map.Entry<Integer, Boolean> entry: subjectsContinuity.entrySet()) {
+			mainSubjectList.add(entry.getKey());
+			if(!entry.getValue()) {	// 主語の連続が途切れたら
+				coreChunkID = entry.getKey();	// 後続の多くの述語に係る、核たる主語
+				break;				// 核主語集め完了
 			}
 		}
-		Chunk coreChunk = Chunk.get(coreChunkID);
+		coreChunk = Chunk.get(coreChunkID);
 
 		
 		/* 文章分割(主語切り) */
@@ -348,9 +351,11 @@ public class Sentence {
 			Sentence subSent = subSentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
 			if(fromIndex!=0) {	// 最初の分割文には必要ない
-				subSent.chunkIDs.addAll(0, Chunk.copy(mainSubjectList));
+				List<Integer> replicaMainSubjectList = Chunk.copy(mainSubjectList);
+				
+				subSent.chunkIDs.addAll(0, replicaMainSubjectList);
 			}
-			System.out.println(subSent.toString());
+			subSent.printDep();
 			fromIndex = toIndex;
 		}
 		
@@ -365,7 +370,7 @@ public class Sentence {
 		
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<Integer> subjectList;			// 主節のリスト
-		List<Boolean> sbjContinuityList;	// 主節の連続性を表す真偽値のリスト
+		Map<Integer, Boolean> sbjContinuityMap;	// 主節の連続性を表す真偽値のマップ
 		String[][] tag_Ha = {{"係助詞", "は"}};	// "は"
 		String[][] tag_De = {{"格助詞", "で"}};	// "で"
 		List<Integer> chunk_Ha_List = new ArrayList<Integer>(collectTagChunks(tag_Ha));	// 係助詞"は"を含むChunk
@@ -384,13 +389,19 @@ public class Sentence {
 			subjectList.remove(idx);
 		}
 		
-		sbjContinuityList = getContinuity(subjectList);		// 主節の連続性を真偽値で表す
+				
+		List<Integer> headSubjectList = new ArrayList<Integer>(subjectList.size());	// 先頭の主語群を集める
 		
-		List<Integer> headSubjectList = new ArrayList<Integer>(subjectList.size());
-		for(int i=0; i < subjectList.size(); i++) {
-			int sbjID = subjectList.get(i);					// 主節のID
+		sbjContinuityMap = getContinuity(subjectList);	// 主節の連続性を真偽値で表す
+		sbjContinuityMap.put(-1, null);		// 最後の要素を表すサイン
+				
+		Iterator<Map.Entry<Integer, Boolean>> mapItr = sbjContinuityMap.entrySet().iterator();
+		Map.Entry<Integer, Boolean> currentSbjEntry = mapItr.next();
+		while(mapItr.hasNext()) {
+			Map.Entry<Integer, Boolean> nextSbjEntry = mapItr.next();
+			int sbjID = currentSbjEntry.getKey();					// 主節のID
 			Chunk directSubject = Chunk.get(sbjID);			// 主節のChunk
-			boolean sbjContinuity = sbjContinuityList.get(i);		// 主節のあとに別の主節が隣接しているか
+			boolean sbjContinuity = currentSbjEntry.getValue();	// 主節のあとに別の主節が隣接しているか
 			Chunk copySubject = directSubject.copy();
 			
 			if(sbjContinuity) {	// このChunkの次も主節である場合
@@ -417,14 +428,13 @@ public class Sentence {
 				newSbjChunk.uniteChunks(copiedHeadSubjectList);
 			
 				// 述部を切り離す
-				int fromIndex = indexOfC(directSubject.chunkID)+1;		// 述部切り取りの始点は主節の次
-				int toIndex = (i+1<sbjContinuityList.size())			// 述部切り取りの終点は
-						? indexOfC(subjectList.get(i+1))				// 次の主節の位置
-						: chunkIDs.size();								// なければ文末
+				int fromIndex = indexOfC(directSubject.chunkID)+1;	// 述部切り取りの始点は主節の次
+				int toIndex = (nextSbjEntry.getKey() != -1)			// 述部切り取りの終点は
+						? indexOfC(nextSbjEntry.getKey())			// 次の主節の位置
+						: chunkIDs.size();							// なければ文末
 				//System.out.println("\t"+"mainPre(" + fromIndex + "~" + toIndex + ")");
 				List<Integer> partPredicates = chunkIDs.subList(fromIndex, toIndex);	// 切り取った述部
-				Chunk partEndChunk = Chunk.get(partPredicates.get(partPredicates.size()-1));
-				partEndChunk.dependUpon = -1;	// 最後尾の述語はどこにも係らない
+				Chunk.get(partPredicates.get(partPredicates.size()-1)).dependUpon = -1;	// 最後尾の述語はどこにも係らない
 				
 				// 述部の分割
 				int nextPredicateID = directSubject.dependUpon;			// 次の述語のID
@@ -454,6 +464,7 @@ public class Sentence {
 					toPrdIndex = indexOfC(nextPredicateID)+1;
 				}
 			}
+		currentSbjEntry = nextSbjEntry;
 		}
 		
 		return partSentList;

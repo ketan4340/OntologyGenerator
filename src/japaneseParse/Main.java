@@ -83,13 +83,13 @@ public class Main {
 			/** Step2: Concatenation **/
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
-			originalSent.printC();
 			originalSent.connectModifer(chunkList_NP);
 			
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			sentList.addAll(originalSent.separate2());
+			originalSent.printC();
+			sentList.addAll(originalSent.separate());
 		}
 		
 		System.out.println("--------sentences---------");
