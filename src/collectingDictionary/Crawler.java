@@ -29,7 +29,7 @@ public class Crawler {
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "た";
+		String syllabary = "ち";
 		crw.run(1, false, categories, syllabary);
 		
 		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");

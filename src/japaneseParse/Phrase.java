@@ -36,8 +36,8 @@ public class Phrase extends Word{
 
 		if(inChunkID == -1) {
 			inChunkID = head_tail
-					? Word.get(headID).inChunk	// 新しいPhraseの所属するChunkは先頭のWordに依存
-					: Word.get(tailID).inChunk;	// 新しいPhraseの所属するChunkは最後尾のWordに依存
+					? Word.get(headID).belongChunk	// 新しいPhraseの所属するChunkは先頭のWordに依存
+					: Word.get(tailID).belongChunk;	// 新しいPhraseの所属するChunkは最後尾のWordに依存
 		}
 		setWord(phraseName, phraseTags, inChunkID, true);
 	}

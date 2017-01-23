@@ -9,7 +9,7 @@ public class Word {
 	public int wordID;				// 通し番号。Wordを特定する
 	public String wordName;			// 単語の文字列
 	public List<String> tags;		// 品詞・活用形、読みなど
-	public int inChunk;				// どのChunkに所属するか
+	public int belongChunk;				// どのChunkに所属するか
 	public int originID;			// このWordが別Wordのコピーである場合，そのIDを示す
 	public List<Integer> cloneIDs;	// このWordのクローン達のID
 	public boolean sb_fc;			// 主辞か機能語か
@@ -19,7 +19,7 @@ public class Word {
 		allWordsList.add(this);
 		wordName = new String();
 		tags = new ArrayList<String>();
-		inChunk = -1;
+		belongChunk = -1;
 		originID = -1;
 		cloneIDs = new ArrayList<Integer>();
 		sb_fc = false;
@@ -32,7 +32,7 @@ public class Word {
 			tags.set(6, nWordName);
 		}
 		
-		inChunk = chunkID;
+		belongChunk = chunkID;
 		sb_fc = sf;
 	}
 	
@@ -83,22 +83,22 @@ public class Word {
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(wordName, tags, inChunk, sb_fc);
+		replica.setWord(wordName, tags, belongChunk, sb_fc);
 		replica.originID = this.wordID;
 		cloneIDs.add(replica.wordID);
 		return replica;
 	}
 	
-	/* 渡されたIDのリストを文字列のリストに変える */
-	public static List<String> toStringList(List<Integer> wordIDs) {
-		List<String> wordNames = new ArrayList<String>();
-		for(final int id: wordIDs) wordNames.add(Word.get(id).wordName);
+	/* 渡されたIDのリストを一つの文字列に変える */
+	public static String toStringList(List<Integer> wordIDs) {
+		String wordNames = new String();
+		for(final int id: wordIDs) wordNames+=Word.get(id).wordName;
 		return wordNames;
 	}
 	
 	public static void printAllWords() {
 		for(Word wd: allWordsList) {
-			System.out.println("W"+wd.wordID + "@(C"+wd.inChunk+"):\t" + wd.wordName + "("+wd.tags+")");
+			System.out.println("W"+wd.wordID + "@(C"+wd.belongChunk+"):\t" + wd.wordName + "("+wd.tags+")");
 		}
 	}
 }

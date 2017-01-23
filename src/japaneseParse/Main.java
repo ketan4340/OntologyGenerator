@@ -83,6 +83,7 @@ public class Main {
 			/** Step2: Concatenation **/
 			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
+			originalSent.printC();
 			originalSent.connectModifer(chunkList_NP);
 			
 			/** Step3: Break Phrases **/

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class Chunk {
 	public static int chunkSum = 0; 
@@ -33,6 +34,30 @@ public class Chunk {
 		dependUpon = depto;
 	}
 	
+	public static Chunk get(int id) {
+		if(id == -1) return null; 
+		return allChunksList.get(id);
+	}
+	
+	public List<Integer> getMainWords() {
+		List<Integer> mains = new ArrayList<Integer>();
+		for(int wordID: wordIDs) {
+			Word word = Word.get(wordID);
+			if(word.sb_fc) {
+				mains.add(wordID);
+			}
+		}
+		return mains;
+	}
+	
+	public List<Integer> getAllDepending() {
+		List<Integer> allDepending = new ArrayList<Integer>();
+		for(int depto = this.dependUpon; depto != -1; depto = Chunk.get(depto).dependUpon) {
+			allDepending.add(depto);
+		}
+		return allDepending;
+	}
+	
 	public void uniteChunks(List<Integer> baseChunks) {
 		List<Integer> phraseWords = new ArrayList<Integer>();		// 新しいPhraseの元になるWord
 		List<Integer> conjunctionWords = new ArrayList<Integer>();	// Phrase完成後につなげる接続詞を保持
@@ -42,7 +67,7 @@ public class Chunk {
 			int chID = itr.next();
 			Chunk ch = Chunk.get(chID);
 			for(int wdID: ch.wordIDs) {		// 元ChunkのWordはこの新しいChunkに属するように変える
-				Word.get(wdID).inChunk = this.chunkID;
+				Word.get(wdID).belongChunk = this.chunkID;
 			}
 			// 全ての元Chunkの係り先を新しいChunkに変える
 			for(int bedep: ch.beDepended) {
@@ -63,33 +88,10 @@ public class Chunk {
 		// 新しいPhraseを作成
 		Phrase nph = new Phrase();
 		nph.setPhrase(phraseWords, chunkID, false);
-		List<Integer> chunkSource_wd = new ArrayList<Integer>();
-		chunkSource_wd.add(nph.wordID);
-		chunkSource_wd.addAll(conjunctionWords);
-		setChunk(chunkSource_wd, depto);
-	}
-	
-	public static Chunk get(int id) {
-		if(id == -1) return null; 
-		return allChunksList.get(id);
-	}
-	
-	public Word getMainWord() {
-		for(int wordID: wordIDs) {
-			Word word = Word.get(wordID);
-			if(word.sb_fc) {
-				return word;
-			}
-		}
-		return null;
-	}
-	
-	public List<Integer> getAllDepending() {
-		List<Integer> allDepending = new ArrayList<Integer>();
-		for(int depto = this.dependUpon; depto != -1; depto = Chunk.get(depto).dependUpon) {
-			allDepending.add(depto);
-		}
-		return allDepending;
+		List<Integer> newWordIDs = new ArrayList<Integer>();
+		newWordIDs.add(nph.wordID);
+		newWordIDs.addAll(conjunctionWords);
+		setChunk(newWordIDs, depto);
 	}
 	
 	public void addWord(int wordID) {
@@ -106,13 +108,24 @@ public class Chunk {
 		List<Integer> subWordIDs = new ArrayList<Integer>(wordIDs.size());
 		for(int id: wordIDs) {
 			Word subWord = Word.get(id).copy();
-			subWord.inChunk = replica.chunkID;
+			subWord.belongChunk = replica.chunkID;
 			subWordIDs.add(subWord.wordID);
 		}
 		replica.setChunk(subWordIDs, dependUpon);
 		replica.originID = this.chunkID;
 		cloneIDs.add(replica.chunkID);
 		return replica;
+	}
+	/* 複数のChunkを係り受け関係を維持しつつ複製する */
+	public static List<Integer> copy(List<Integer> chunkIDList) {
+		List<Integer> replicaList = new ArrayList<Integer>();
+		for(final int id: chunkIDList) {
+			Chunk origin = Chunk.get(id);
+			Chunk replica = origin.copy();
+			replicaList.add(replica.chunkID);
+		}
+		
+		return replicaList;
 	}
 	
 	/* 指定の品詞を持つWordが並んでいたら繋げる */
@@ -183,6 +196,29 @@ public class Chunk {
 			}
 		}
 		return false;
+	}
+	
+	/* このChunkの最後尾が渡された品詞のWordかどうか */
+	/* 最後尾が読点"、"の場合は無視 */
+	public boolean endWith(String[][] tagNames) {
+		boolean endWith = true;
+		int tagIndex = tagNames.length-1;
+		String[] tagComma = {"読点"};
+		
+		for(ListIterator<Integer> li = wordIDs.listIterator(wordIDs.size()-1); li.hasPrevious(); ) {
+			int wordID = li.previous();
+			Word word = Word.get(wordID);
+			String[] tagName = tagNames[tagIndex];
+			if(word.hasAllTags(tagComma)) continue;	// "、"の場合はスルー
+			if(word.hasAllTags(tagName)) {
+				tagIndex--;
+			}else {
+				endWith = false;
+				break;
+			}
+			if(tagIndex < 0) break;
+		}
+		return endWith;
 	}
 	
 	/* このChunkのうち、指定された範囲のWordを繋げて一つの品詞にする */
