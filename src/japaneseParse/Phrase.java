@@ -29,8 +29,10 @@ public class Phrase extends Word{
 		int headID = baseIDList.get(0);
 		int tailID = baseIDList.get(baseIDList.size()-1);
 		
-		List<String> phraseTags = Word.get(head_tail ?headID :tailID).tags;	// Tagはhead_tailがtrueなら先頭、falseなら最後尾のWordに依存
-		phraseTags.set(6, genkei);	// 原形・読みに関しては元の単語からつなげたもの
+		// Tagはhead_tailがtrueなら先頭、falseなら最後尾のWordに依存
+		List<String> phraseTags = Word.get(head_tail ?headID :tailID).tags;
+		// 原形・読みに関しては元の単語からつなげたもの
+		phraseTags.set(6, genkei);
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
 

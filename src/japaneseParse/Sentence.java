@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 public class Sentence {
+	public static int sentSum = 0;
+	public int sentID;
 	public List<Integer> chunkIDs; // Chunkのリストで文を構成する
 	public Chunk haChunk;
 	public Chunk gaChunk;
@@ -21,6 +24,7 @@ public class Sentence {
 	public Chunk deChunk;
 			
 	public Sentence() {
+		sentID = sentSum++;
 		chunkIDs = new ArrayList<Integer>();
 	}
 	public void setSentence(List<Integer> chunkList) {
@@ -145,10 +149,8 @@ public class Sentence {
 				}	
 			}
 			if(!itr.hasNext()) {		// 最後尾の場合
-				List<Integer> mains = connectChunk.getMainWords();	// とりあえず先頭1単語を被修飾語とする *要改善*
-				phraseWords.addAll(mains);
-				functionWords.addAll(connectChunk.wordIDs);				// 先頭以外を保管したいので
-				functionWords.removeAll(connectChunk.getMainWords());	// 全部入れて先頭を消す
+				phraseWords.add(connectChunk.getMainWord());			// 被修飾語を入れる
+				functionWords.addAll(connectChunk.getFunctionWords());	// それに繋がる機能語を入れる
 				//depto = connectChunk.dependUpon;
 			}else {
 				phraseWords.addAll(connectChunk.wordIDs);
@@ -220,24 +222,15 @@ public class Sentence {
 		}
 	}
 	
-	/* 連続した名詞を繋いで一つの名詞にする */
+	/* 渡された品詞を繋げる */
 	/* Chunkを跨いで連結はしない */
-	public void connectNouns() {
+	public void connect(String[][] tagNames) {
 		for(final int chID: chunkIDs) {
 			Chunk ch = Chunk.get(chID);
-			String[][] tagNames = {{"名詞"}, {"名詞接続"}, {"接尾"}, {"形容詞"}};
 			ch.connect(tagNames);
 		}
 	}
-	/* 連続した名詞を繋いで一つの名詞にする */
-	/* Chunkを跨いで連結はしない */
-	public void connectVerbs() {
-		for(final int chID: chunkIDs) {
-			Chunk ch = Chunk.get(chID);
-			String[][] tagNames = {{"名詞"}, {"動詞", "する"}};
-			ch.connect(tagNames);
-		}
-	}
+	
 	/* 渡された修飾語のWordを被修飾語につなげ、新しいPhraseを作る */
 	/* 結合元のWordをPhraseに置き換えたSentenceを返す */
 	/* 現状のChunk依存の結合方法からWord結合に治すべき*要改善* */
@@ -476,18 +469,20 @@ public class Sentence {
 	public List<List<String>> extractRelation() {
 		List<List<String>> relations = new ArrayList<List<String>>();
 		/* 主語を探す */
-		String[][] tagSP = {{"係助詞", "は"}};	// 主語と述語を結ぶ助詞"は"を探す
-		List<Integer> ptcls_SP = collectTagWords(tagSP);
-		if(ptcls_SP.isEmpty()) return relations;
-		int ptcl_SP = ptcls_SP.get(0);			// 文中に1つしかないと仮定しているのでget(0) *要注意*
-		
-		Chunk subjectChunk = Chunk.get(Word.get(ptcl_SP).belongChunk);		// 主節("は"を含む)
-		Word subjectWord = Word.get(subjectChunk.wordIDs.get(0));		// 主語
+		String[][] tag_Ha = {{"係助詞", "は"}};	// 助詞"は"を含むChunkを探す
+		List<Integer> subjectChunkList = collectTagChunks(tag_Ha);
+		if(subjectChunkList.isEmpty()) return relations;
+				
+		Chunk subjectChunk = Chunk.get(subjectChunkList.get(0));		// 主節("は"を含む)
+		Word subjectWord = Word.get(subjectChunk.getMainWord());		// 主語
 		Chunk predicateChunk = Chunk.get(subjectChunk.dependUpon);		// 述節
-		Word predicateWord = Word.get(predicateChunk.wordIDs.get(0));	// 述語
+		Word predicateWord = Word.get(predicateChunk.getMainWord());	// 述語
 		//Chunk complementChunk;										// 補節(いつか使うかも)
 		//Word complementWord;											// 補語
 		String predicatePart = subSentence(chunkIDs.indexOf(subjectChunk.chunkID)+1, chunkIDs.size()).toString();	// 述部(主節に続く全ての節)
+		String[][] tag_Not = {{"助動詞", "ない"}};
+		boolean not = (predicateChunk.haveAllTagWord(tag_Not))? true: false;	// 述語が否定かどうか
+		
 		/*
 		printDep();
 		System.out.println("prePart: " + predicatePart + "________\t" + "preChunk: " + predicateChunk.toString());
@@ -500,19 +495,15 @@ public class Sentence {
 		
 		/* 述語が動詞 */
 		if( predicateChunk.haveAllTagWord(tagVerb) ) {
-			String[][] tag_Not = {{"助動詞", "ない"}};
-			
 			int idxprd = indexOfC(predicateChunk.chunkID);
-			Chunk previousChunk = Chunk.get(chunkIDs.get(idxprd-1));	// 動詞の一つ前の文節
-			String part = Word.toStringList(previousChunk.getMainWords());	// その主辞
+			Chunk previousChunk = Chunk.get(chunkIDs.get(idxprd-1));		// 動詞の一つ前の文節
+			String part = Word.get(previousChunk.getMainWord()).wordName;	// その主辞の文字列
 
 			/* "がある"かどうか */
 			String[][] tag_Have = {{"ある"}, {"もつ"}};		// 動詞の"ある"(助動詞ではない)
 			boolean boolHave = predicateChunk.haveAllTagWord(tag_Have);
-			String[][] tag_Do = {{"する"}};		// 動詞の"する"
-			boolean boolDo = predicateChunk.haveAllTagWord(tag_Do);
 			/* "~の総称" */
-			String regexGnrnm = "(.*?)(の総称)";					// 「〜の総称」を探す
+			String regexGnrnm = "(.*?)(の総称)";				// 「〜の総称」を探す
 			Pattern ptrnGnrnm = Pattern.compile(regexGnrnm);
 			Matcher mtchGnrnm = ptrnGnrnm.matcher(predicateChunk.toString());
 			boolean boolGnrnm = mtchGnrnm.matches();
@@ -523,42 +514,31 @@ public class Sentence {
 					relations.add( Arrays.asList(part, "dcterms:isPartOf", subjectWord.wordName) );
 					relations.add( Arrays.asList(subjectWord.wordName, "dcterms:hasPart", part) );
 				}
+				
 			}else if(boolGnrnm) {	// "~の総称"
 				relations.add( Arrays.asList(subjectWord.wordName, "owl:equivalentClass", mtchGnrnm.group(1)) );				
+		
 			}else {					// その他の動詞
-				String predicate = predicateWord.tags.get(6);	// 原形を取り出すためのget(6)
-				relations.add( Arrays.asList(predicate, "rdf:type", "rdfs:Proprety") );
+				String verb = predicateWord.tags.get(6);	// 原形を取り出すためのget(6)
+				relations.add( Arrays.asList(verb, "rdf:type", "rdfs:ObjectProprety") );
+						
+				// 格助詞"に","を","へ"などを元に目的語を探す
+				String[][] tag_Ni_Wo = {{"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
+				List<Integer> chunks_Ni_Wo = collectTagChunks(tag_Ni_Wo);
 								
-				// 格助詞"で","に","を","へ"などを元に目的語を探す
-				String[][] tag_Ni = {{"格助詞", "に"}};	// 目的語oと述語pを結ぶ助詞
-				List<Integer> ptcls_ni = collectTagWords(tag_Ni);
-				String[][] tag_Wo = {{"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
-				List<Integer> ptcls_wo = collectTagWords(tag_Wo);
-				
 				/* 目的語の有無 */
-				if(!ptcls_ni.isEmpty()) {		// 目的語"に"あり
-					int ptcl_ni = ptcls_ni.get(0);	// 文中に1つしかないと仮定しているのでget(0) 要改善
-					Chunk niChunk = Chunk.get(Word.get(ptcl_ni).belongChunk);
-					Word niWord = Word.get(niChunk.wordIDs.get(0));		// 目的語"に"
+				if(!chunks_Ni_Wo.isEmpty()) {	// 目的語あり
+					Chunk chunk_Ni_Wo = Chunk.get(chunks_Ni_Wo.get(0));
+					Word word_Ni_Wo = Word.get(chunk_Ni_Wo.getMainWord());		// "に"の主辞
 					// (subject, property, object)を記述
-					relations.add( Arrays.asList(predicate, "rdfs:domain", subjectWord.wordName) );
-					relations.add( Arrays.asList(predicate, "rdfs:range", niWord.wordName) );	
-					relations.add( Arrays.asList(subjectWord.wordName, predicateWord.tags.get(6), niWord.wordName) );
-				
-				}else if(!ptcls_wo.isEmpty()) {	// 目的語"を"あり
-					int ptcl_wo = ptcls_wo.get(0);	// 文中に1つしかないと仮定しているのでget(0) 要改善
-					Chunk woChunk = Chunk.get(Word.get(ptcl_wo).belongChunk);
-					Word woWord = Word.get(woChunk.wordIDs.get(0));		// 目的語"を"
-					// (subject, property, object)を記述
-					relations.add( Arrays.asList(predicate, "rdfs:domain", subjectWord.wordName) );
-					relations.add( Arrays.asList(predicate, "rdfs:range", woWord.wordName) );	
-					relations.add( Arrays.asList(subjectWord.wordName, predicateWord.tags.get(6), woWord.wordName) );
-					
+					relations.add( Arrays.asList(verb, "rdfs:domain", subjectWord.wordName) );
+					relations.add( Arrays.asList(verb, "rdfs:range", word_Ni_Wo.wordName) );
+					relations.add( Arrays.asList(subjectWord.wordName, verb, word_Ni_Wo.wordName) );
 				}else {							// 目的語なし
 					// (property, domain, subject)を記述
 					// 動詞の原形が欲しいのでget(6)
-					relations.add( Arrays.asList(predicate, "rdfs:domain", subjectWord.wordName) );
-					relations.add( Arrays.asList(subjectWord.wordName, predicateWord.tags.get(6), "NoObject") );  // rdfでobjectなしってどうすんの
+					relations.add( Arrays.asList(verb, "rdfs:domain", subjectWord.wordName) );
+					relations.add( Arrays.asList(subjectWord.wordName, verb, "NoObject") );  // rdfでobjectなしってどうすんの
 				}
 			}
 			
@@ -587,7 +567,7 @@ public class Sentence {
 			boolean boolKind = mtchKind.matches();
 			
 			if(boolLiteral) {
-				String blank = subjectWord.wordName+"_size";
+				String blank = "_:"+subjectWord.wordName+"-size";
 				relations.add( Arrays.asList(subjectWord.wordName, "ex:size", blank) );			// 空白ノード
 				relations.add( Arrays.asList(blank, "rdf:value", mtchLiteral.group(2)) );		// リテラル
 				relations.add( Arrays.asList(blank, "exterms:units", mtchLiteral.group(4)) );	// 単位
@@ -601,6 +581,24 @@ public class Sentence {
 		}
 		
 		return relations;
+	}
+	
+	/* (s,p,o)の三つ組を受け取り、否定のオントロジーにして返す */
+	private List<List<String>> makeObjectiveProperty(String[] spo, boolean not) {
+		List<List<String>> spoList = new LinkedList<List<String>>();
+		String s = spo[0];
+		String p = spo[1];
+		String o = spo[2];
+		if(!not) {
+			spoList.add(Arrays.asList(s,p,o));
+		}else {		// 否定形
+			String blank = "_:" + p+sentID + "-not";	// 空白ノードの名前を決める
+			spoList.add(Arrays.asList(blank, "rdf:type", "owl:NegativePropertyAssertion"));
+			spoList.add(Arrays.asList(blank, "owl:sourceIndividual", s));
+			spoList.add(Arrays.asList(blank, "owl:assertionProperty", p));
+			spoList.add(Arrays.asList(blank, "owl:targetIndividual", o));
+		}
+		return spoList;
 	}
 	
 	/* ChunkのIDのリストからWordのIDのリストにする */
@@ -636,6 +634,14 @@ public class Sentence {
 	public void printW() {
 		for(int wid: wordIDs()) {
 			System.out.print("("+wid+")" + Word.get(wid).wordName);
+		}
+		System.out.println();
+	}
+	public void printSF() {
+		for(int wid: wordIDs()) {
+			boolean sf = Word.get(wid).sbj_fnc;
+			String t_f = sf? "T": "F";
+			System.out.print("("+t_f+")" + Word.get(wid).wordName);
 		}
 		System.out.println();
 	}

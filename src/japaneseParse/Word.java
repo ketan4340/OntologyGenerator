@@ -12,7 +12,7 @@ public class Word {
 	public int belongChunk;				// どのChunkに所属するか
 	public int originID;			// このWordが別Wordのコピーである場合，そのIDを示す
 	public List<Integer> cloneIDs;	// このWordのクローン達のID
-	public boolean sb_fc;			// 主辞か機能語か
+	public boolean sbj_fnc;			// 主辞か機能語か
 		
 	public Word() {
 		wordID = wordsSum++;
@@ -22,7 +22,7 @@ public class Word {
 		belongChunk = -1;
 		originID = -1;
 		cloneIDs = new ArrayList<Integer>();
-		sb_fc = false;
+		sbj_fnc = false;
 	}
 	public void setWord(String nWordName, List<String> nWordTags, int chunkID, boolean sf) {
 		wordName = nWordName;
@@ -31,9 +31,9 @@ public class Word {
 		if(tags.get(6).equals("*")) {	// 特殊漢字の原形をここで入力してあげる
 			tags.set(6, nWordName);
 		}
-		
+		if(tags.contains("記号")) sf = false;	// 記号なら明らかに主辞ではない
 		belongChunk = chunkID;
-		sb_fc = sf;
+		sbj_fnc = sf;
 	}
 	
 	public static Word get(int id) {
@@ -83,7 +83,7 @@ public class Word {
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(wordName, tags, belongChunk, sb_fc);
+		replica.setWord(wordName, tags, belongChunk, sbj_fnc);
 		replica.originID = this.wordID;
 		cloneIDs.add(replica.wordID);
 		return replica;

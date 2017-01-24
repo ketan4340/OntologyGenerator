@@ -15,15 +15,11 @@ import java.util.regex.Pattern;
 public class Parser {
 	public String tool; // どの解析器を使うか(stanford,cabocha,knp)
 	public String analysed;
-	public List<Integer> wordList;
-	public List<String[]> tagList;
 	public List<Integer> chunkList;
 	
 	public Parser(String howto) {
 		tool = howto;
 		analysed = new String();
-		wordList = new ArrayList<Integer>();
-		tagList = new ArrayList<String[]>();
 		chunkList = new ArrayList<Integer>();
 	}
 	public Parser() {
@@ -95,14 +91,13 @@ public class Parser {
 					String[] border_str = chunkInfo[3].split("/");
 					border = Integer.decode(border_str[0]);
 				}else {								// 他は単語の登録
-					Word wd = new Word();
+					String[] wordInfo = line.split("\t");
 					sbj_fnc = (wdl.size() <= border)
 							? true
 							: false;
-					wdl.add(wd.wordID);
-					String[] wordInfo = line.split("\t");
+					Word wd = new Word();
 					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), chk.chunkID, sbj_fnc);
-					wordList.add(wd.wordID);
+					wdl.add(wd.wordID);
 				}
 				//読み込んだ行を格納
 				analysed += line + "\n";

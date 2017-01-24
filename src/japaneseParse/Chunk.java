@@ -1,9 +1,10 @@
 package japaneseParse;
 
+import java.util.List;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ListIterator;
 
 public class Chunk {
@@ -27,11 +28,36 @@ public class Chunk {
 		cloneIDs = new ArrayList<Integer>();
 	}
 	public void setChunk(List<Integer> wdl, int depto) {
+		List<Integer> mains = new LinkedList<Integer>();
 		for(Iterator<Integer> itr = wdl.iterator(); itr.hasNext(); ) {
-			int wd = itr.next();
-			addWord(wd);
+			int wordID = itr.next();
+			Word word = Word.get(wordID);
+			if(word.sbj_fnc) {	// 複数の主辞があれば一つにまとめる
+				mains.add(wordID);
+			}else {
+				int mainsSize = mains.size();
+				switch(mainsSize) {	// mainsの要素数が
+				case 0:				// 0なら
+					break;			// スルー
+				case 1:				// 1なら
+					wordIDs.addAll(mains);	// そのまま入れる
+					mains.clear();
+					break;
+				default:			// 2以上
+					Phrase main = new Phrase();	// 主辞合成
+					main.setPhrase(mains, this.chunkID, false);
+					wordIDs.add(main.wordID);	// 生成したPhraseを入れる
+					mains.clear();
+				}
+				wordIDs.add(wordID);
+			}
 		}
+		wordIDs.addAll(mains);	// 残り物があれば回収
+		
 		dependUpon = depto;
+	}
+	public int indexOfW(int wordID) {
+		return wordIDs.indexOf(wordID);
 	}
 	
 	public static Chunk get(int id) {
@@ -39,15 +65,25 @@ public class Chunk {
 		return allChunksList.get(id);
 	}
 	
-	public List<Integer> getMainWords() {
-		List<Integer> mains = new ArrayList<Integer>();
+	/* 主辞だけを返す */
+	public int getMainWord() {
+		int mainID = -1;
 		for(int wordID: wordIDs) {
 			Word word = Word.get(wordID);
-			if(word.sb_fc) {
-				mains.add(wordID);
-			}
+			if(word.sbj_fnc) mainID = wordID;
 		}
-		return mains;
+		return mainID;
+	}
+	/* 機能語だけを返す */
+	public List<Integer> getFunctionWords() {
+		List<Integer> functionIDs = new ArrayList<Integer>();
+		for(int wordID: wordIDs) {
+			Word word = Word.get(wordID);
+			String[] tag_sign = {"記号"};
+			if(word.hasSomeTags(tag_sign))	continue;	// 記号(「」、。など)はスルー
+			if(!word.sbj_fnc) functionIDs.add(wordID);
+		}
+		return functionIDs;
 	}
 	
 	public List<Integer> getAllDepending() {
@@ -92,14 +128,6 @@ public class Chunk {
 		newWordIDs.add(nph.wordID);
 		newWordIDs.addAll(conjunctionWords);
 		setChunk(newWordIDs, depto);
-	}
-	
-	public void addWord(int wordID) {
-		wordIDs.add(wordID);
-	}
-	
-	public int indexOfW(int wordID) {
-		return wordIDs.indexOf(wordID);
 	}
 	
 	/* 全く同じChunkを複製する */
@@ -164,7 +192,7 @@ public class Chunk {
 		
 		if(!serialNouns.isEmpty()) {		// Chunkの末尾が名詞の場合ここで処理
 			Phrase nph = new Phrase();
-			nph.setPhrase(serialNouns, chunkID, false);
+			nph.setPhrase(serialNouns, chunkID, false);	// 末尾のWordに依存=false
 			newWordIDs.add(nph.wordID);
 		}
 		wordIDs = newWordIDs;
@@ -193,10 +221,9 @@ public class Chunk {
 	}
 	/* 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean haveAllTagWord(String[][] tagNames) {
-		List<String[]> tagNamesList = Arrays.asList(tagNames);
 		for(final int wordID: wordIDs) {
 			Word word = Word.get(wordID);
-			for (final String[] tagsArray: tagNamesList){
+			for (final String[] tagsArray: tagNames){
 				if(word.hasAllTags(tagsArray))	return true;
 			}
 		}

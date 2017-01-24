@@ -70,11 +70,15 @@ public class Main {
 			System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence originalSent = parse.run(writing);
+			
+			originalSent.printSF();
 						
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
-			originalSent.connectNouns();
-			originalSent.connectVerbs();
+			String[][] tagNouns = {{"名詞"}, {"名詞接続"}, {"接尾"}, {"形容詞"}};
+			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
+			originalSent.connect(tagNouns);
+			originalSent.connect(tagDo);
 			/* 名詞と形容詞だけ取り出す */
 			//System.out.println("\n\t Step1");
 			String[][] tagNP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
