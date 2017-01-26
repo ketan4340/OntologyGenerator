@@ -34,13 +34,14 @@ public class Main {
 				//"青大将は全長1.5～2.5メートルで、日本では最大",
 				//"青眼狗母魚は体長は10～15センチ",
 				"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある",
-				//"葵貝は雄は体長約1.5センチで、殻をつくらない",
+				"葵貝は雄は体長約1.5センチで、殻をつくらない",
 				//"甘子はえのは",
-				"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
+				//"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
 				"鯉は体は長い筒形で背から腹へかけての幅が広く、長短二対の口ひげがある",
 				"いとまきえいは体はひし形で扁平、尾は細いむち状",
 				//"一角は一分銀の異称",
-				//"犬はドッグに同じ"
+				//"犬はドッグに同じ",
+				"金鳩はくちばしが赤、ほおから腹にかけては紫褐色、背は緑色で金属光沢がある"
 		};
 		writingList.addAll(Arrays.asList(writings));
 		*/
@@ -48,7 +49,7 @@ public class Main {
 		/* 外部ファイルから日本語テキストを読み込む */
 		///*
 		String readFile = "gooText生物-動物名-All.txt";
-		//String readFile = "writings/gooText生物-動物名-わ.txt";
+		//String readFile = "writings/gooText生物-動物名-あ.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -72,10 +73,12 @@ public class Main {
 			
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
-			String[][] tagNouns = {{"名詞"}, {"名詞接続"}, {"接尾"}, {"形容詞"}};
+			String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}, {"形容詞"}};
 			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
+			String[][] tagDone = {{"動詞"}, {"動詞", "接尾"}};
 			originalSent.connect(tagNouns);
 			originalSent.connect(tagDo);
+			originalSent.connect(tagDone);
 			/* 名詞と形容詞だけ取り出す */
 			//System.out.println("\n\t Step1");
 			// これらがChunkの末尾につくものを次のChunkにつなげる
@@ -88,20 +91,24 @@ public class Main {
 			//originalSent.connectModifer(chunkList_NP);
 			originalSent.connect2Next(tags_NP);
 			originalSent.printC();
-			System.out.println();
-			
+						
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
 			for(final Sentence shortSent: originalSent.separate2()) {
-				sentList.addAll(shortSent.separate3());
+				for(final Sentence partSent: shortSent.separate3()) {
+					partSent.uniteSubject();
+					sentList.add(partSent);
+				}
 			}
 		}
 		
 		System.out.println("--------sentences---------");
+		/*
 		for(final Sentence partSent: sentList) {
 			System.out.println(partSent.toString());
 		}
+		*/
 		System.out.println("--------sentences---------\n");
 		
 		
@@ -157,7 +164,6 @@ public class Main {
 			nodes.get(i).printNode2();
 		}
 		*/
-	// ここまでMainに詰め込みすぎ．何らかのクラスのメソッドにしょう
 		
 		/*** OWL DL Axiom Module ***/
 		

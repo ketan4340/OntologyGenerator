@@ -164,10 +164,10 @@ public class Chunk {
 	
 	/* 指定の品詞を持つWordが並んでいたら繋げる */
 	public void connect(String[][] tagNames) {
+		if(wordIDs.size() < 2) return;	// ChunkのWordが一つなら意味がない
 		List<Integer> newWordIDs = new ArrayList<Integer>();
 		List<Integer> serialNouns = new ArrayList<Integer>();
-		if(wordIDs.size() < 2) return;	// ChunkのWordが一つなら意味がない
-		
+			
 		while( !wordIDs.isEmpty() ) {
 			int wordID = wordIDs.remove(0);
 			Word word = Word.get(wordID);
@@ -222,7 +222,7 @@ public class Chunk {
 		return taggedIDs;
 	}
 	/* 指定の品詞を"全て"持つWordが含まれているか判定 */
-	public boolean haveAllTagWord(String[][] tagNames) {
+	public boolean haveSomeTagWord(String[][] tagNames) {
 		for(final int wordID: wordIDs) {
 			Word word = Word.get(wordID);
 			for (final String[] tagsArray: tagNames){

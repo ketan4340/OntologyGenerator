@@ -110,7 +110,7 @@ public class Sentence {
 		List<Integer> taggedChunks = new ArrayList<Integer>();
 		for(final int chunkID: chunkIDs) {
 			Chunk chunk = Chunk.get(chunkID);
-			if(chunk.haveAllTagWord(tagNames))	taggedChunks.add(chunkID);	// 各Chunk内を探す
+			if(chunk.haveSomeTagWord(tagNames))	taggedChunks.add(chunkID);	// 各Chunk内を探す
 		}
 		return taggedChunks;
 	}
@@ -316,16 +316,9 @@ public class Sentence {
 		List<Sentence> partSentList = new ArrayList<Sentence>(5);
 		
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
-		List<Integer> subjectList;			// 主節のリスト
-		Map<Integer, Boolean> sbjContinuityMap;	// 主節の連続性を表す真偽値のマップ
-		String[][] tag_Ha = {{"係助詞", "は"}};	// "は"
-		String[][] tag_De = {{"格助詞", "で"}};	// "で"
-		List<Integer> chunk_Ha_List = new ArrayList<Integer>(collectTagChunks(tag_Ha));	// 係助詞"は"を含むChunk
-		List<Integer> chunk_De_List = new ArrayList<Integer>(collectTagChunks(tag_De));	// 格助詞"で"を含むChunk
-		chunk_Ha_List.removeAll(chunk_De_List);			// "は"を含むChunkのうち、"で"を含まないものが主語
-		subjectList = chunk_Ha_List;
+		List<Integer> subjectList = getSubjectList();	// 主節のリスト
 		if(subjectList.isEmpty()) return partSentList;		// 文中に主語がなければ終了
-		
+	
 		int lastChunkID = chunkIDs.get(chunkIDs.size()-1);	// 文の最後尾Chunk
 		Chunk lastChunk = Chunk.get(lastChunkID);
 		if(subjectList.contains(lastChunkID)) {	// 文の最後尾が主節の場合
@@ -339,7 +332,7 @@ public class Sentence {
 				
 		List<Integer> headSubjectList = new ArrayList<Integer>(subjectList.size());	// 先頭の主語群を集める
 		
-		sbjContinuityMap = getContinuity(subjectList);	// 主節の連続性を真偽値で表す
+		Map<Integer, Boolean> sbjContinuityMap = getContinuity(subjectList);	// 主節の連続性を真偽値で表す
 		sbjContinuityMap.put(-1, null);		// 最後の要素を表すサイン
 				
 		Iterator<Map.Entry<Integer, Boolean>> mapItr = sbjContinuityMap.entrySet().iterator();
@@ -352,6 +345,7 @@ public class Sentence {
 			Chunk copySubject = directSubject.copy();
 			
 			if(sbjContinuity) {	// このChunkの次も主節である場合
+				String[][] tag_Ha = {{"係助詞", "は"}};
 				Word no = new Word();	// 助詞・連体化"の"を新たに用意
 				no.setWord("の", Arrays.asList("助詞","連体化","*","*","*","*","の","ノ","ノ"), copySubject.chunkID, false);
 				int index_Ha = copySubject.indexOfW(copySubject.collectAllTagWords(tag_Ha).get(0));
@@ -421,12 +415,7 @@ public class Sentence {
 	public List<Sentence> separate2() {
 		List<Sentence> shortSentList = new ArrayList<Sentence>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
-		String[][] tag_Ha = {{"係助詞", "は"}};	// "は"
-		String[][] tag_De = {{"格助詞", "で"}};	// "で"
-		List<Integer> chunk_Ha_List = new ArrayList<Integer>(collectTagChunks(tag_Ha));	// 係助詞"は"を含むChunk
-		List<Integer> chunk_De_List = new ArrayList<Integer>(collectTagChunks(tag_De));	// 格助詞"で"を含むChunk
-		chunk_Ha_List.removeAll(chunk_De_List);			// "は"を含むChunkのうち、"で"を含まないものが主語
-		List<Integer> subjectList = chunk_Ha_List;		// 主語のリスト
+		List<Integer> subjectList = getSubjectList();		// 主語のリスト
 				
 		int lastChunkID = chunkIDs.get(chunkIDs.size()-1);	// 文の最後尾Chunk
 		Chunk lastChunk = Chunk.get(lastChunkID);
@@ -487,17 +476,12 @@ public class Sentence {
 	public List<Sentence> separate3() {
 		List<Sentence> partSentList = new ArrayList<Sentence>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
-		String[][] tag_Ha = {{"係助詞", "は"}};	// "は"
-		String[][] tag_De = {{"格助詞", "で"}};	// "で"
-		List<Integer> chunk_Ha_List = new ArrayList<Integer>(collectTagChunks(tag_Ha));	// 係助詞"は"を含むChunk
-		List<Integer> chunk_De_List = new ArrayList<Integer>(collectTagChunks(tag_De));	// 格助詞"で"を含むChunk
-		chunk_Ha_List.removeAll(chunk_De_List);			// "は"を含むChunkのうち、"で"を含まないものが主語
-		List<Integer> subjectList = chunk_Ha_List;		// 主語のリスト
+		List<Integer> subjectList = getSubjectList();	// 主語のリスト
 		if(subjectList.isEmpty()) return partSentList;	// 文中に主語がなければ終了
 		
-		int lastChunkID = chunkIDs.get(chunkIDs.size()-1);	// 文の最後尾Chunk
-		Chunk lastChunk = Chunk.get(lastChunkID);
-		if(subjectList.contains(lastChunkID)) {	// 文の最後尾が主節の場合
+		int lastChunkID = chunkIDs.get(chunkIDs.size()-1);
+		Chunk lastChunk = Chunk.get(lastChunkID);	// 文の最後尾Chunk
+		if(subjectList.contains(lastChunkID)) {		// 文の最後尾が主節の場合
 			// おそらく固有名詞を正しく判定できていないせい
 			// 最後尾の文節は一つの名詞にする
 			lastChunk.nounize(0, lastChunk.wordIDs.size());
@@ -520,8 +504,9 @@ public class Sentence {
 		List<Integer> predicateIDs = new ArrayList<Integer>();
 		for(final int toLast: lastChunk.beDepended) {
 			Chunk chunk2Last = Chunk.get(toLast);
-			if( !chunk2Last.endWith(tagParticle, true) && !chunk2Last.endWith(tagAdverb, true) )	// 助詞"て","で"またはそれ以外の品詞が
-				predicateIDs.add(toLast);				// 末尾に来るChunkを追加
+			// 末尾が"て","で"を除く助詞または副詞でないChunkを追加
+			if( !chunk2Last.endWith(tagParticle, true) && !chunk2Last.endWith(tagAdverb, true) )
+				predicateIDs.add(toLast);
 		}
 		predicateIDs.add(lastChunkID);
 		predicateIDs.retainAll(chunkIDs);
@@ -545,7 +530,7 @@ public class Sentence {
 					List<Integer> commonObjectsReplica = Chunk.copy(commonObjects); 
 					for(final int obj: commonObjectsReplica) Chunk.get(obj).dependUpon = predicateID;
 					subSent.chunkIDs.addAll(0, commonObjectsReplica);	// 直前の述語と共通する目的語を挿入
-					commonObjects.clear();;
+					commonObjects.clear();
 				}
 				// 文頭の主語は全ての分割後の文に係る
 				List<Integer> commonSubjects = (fromIndex!=0)
@@ -555,7 +540,7 @@ public class Sentence {
 					subSent.chunkIDs.addAll(0, commonSubjects);	// 共通の主語を挿入
 	
 				// 主語の係り先を正す
-				for(final int sbj: commonSubjects) Chunk.get(sbj).dependUpon = predicateID;
+				for(final int sbj: subSent.getSubjectList()) Chunk.get(sbj).dependUpon = predicateID;
 				// 係り元の更新
 				subSent.updateDependency();
 				partSentList.add(subSent);
@@ -574,15 +559,47 @@ public class Sentence {
 		return partSentList;
 	}
 	
+	/* 主語のリストを得る */
+	private List<Integer> getSubjectList() {
+		String[][] tag_Ha = {{"係助詞", "は"}};	// "は"
+		String[][] tag_De = {{"格助詞", "で"}};	// "で"
+		List<Integer> chunk_Ha_List = new ArrayList<Integer>(collectTagChunks(tag_Ha));	// 係助詞"は"を含むChunk
+		List<Integer> chunk_De_List = new ArrayList<Integer>(collectTagChunks(tag_De));	// 格助詞"で"を含むChunk
+		chunk_Ha_List.removeAll(chunk_De_List);			// "は"を含むChunkのうち、"で"を含まないものが主語
+		List<Integer> subjectList = chunk_Ha_List;		// 主語のリスト
+		return subjectList;
+	}
+	
+	public void uniteSubject() {
+		List<Integer> subjectList = getSubjectList();
+		if(subjectList.isEmpty()) return;
+		
+		// 主節の連続性を表す真偽値のリスト
+		Map<Integer, Boolean> subjectsContinuity = getContinuity(subjectList);
+		String[][] tag_Ha = {{"係助詞", "は"}};
+		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
+		for(Map.Entry<Integer, Boolean> entry: subjectsContinuity.entrySet()) {
+			int sbjID = entry.getKey();
+			boolean sbjCnt = entry.getValue();
+			if(!sbjCnt) break;	// 連続した主語の最後尾には必要ない
+			Chunk subject = Chunk.get(sbjID);
+			Word no = new Word();	// 助詞・連体化"の"を新たに用意
+			no.setWord("の", Arrays.asList("助詞","連体化","*","*","*","*","の","ノ","ノ"), subject.chunkID, false);
+			int index_Ha = subject.indexOfW(subject.collectAllTagWords(tag_Ha).get(0));
+			subject.wordIDs.set(index_Ha, no.wordID);	// "は"の代わりに"の"を挿入
+		}
+		String[][] tags_NP = {{"助詞", "連体化"}};
+		connect2Next(tags_NP);	
+	}
+	
 	/* 文章から関係を見つけtripleにする */
 	public List<List<String>> extractRelation() {
 		List<List<String>> relations = new ArrayList<List<String>>();
-		/* 主語を探す */
-		String[][] tag_Ha = {{"係助詞", "は"}};	// 助詞"は"を含むChunkを探す
-		List<Integer> subjectChunkList = collectTagChunks(tag_Ha);
-		if(subjectChunkList.isEmpty()) return relations;
-				
-		Chunk subjectChunk = Chunk.get(subjectChunkList.get(0));		// 主節("は"を含む)
+		
+		List<Integer> subjectList = getSubjectList();	// 主語を整えたところで再定義
+		if(subjectList.isEmpty()) return relations;
+
+		Chunk subjectChunk = Chunk.get(subjectList.get(0));		// 主節("は"を含む)
 		Word subjectWord = Word.get(subjectChunk.getMainWord());		// 主語
 		String subject = subjectWord.wordName;
 		Chunk predicateChunk = Chunk.get(subjectChunk.dependUpon);		// 述節
@@ -591,7 +608,7 @@ public class Sentence {
 		//Word complementWord;											// 補語
 		String predicatePart = subSentence(chunkIDs.indexOf(subjectChunk.chunkID)+1, chunkIDs.size()).toString();	// 述部(主節に続く全ての節)
 		String[][] tag_Not = {{"助動詞", "ない"}};
-		boolean not = (predicateChunk.haveAllTagWord(tag_Not))? true: false;	// 述語が否定かどうか
+		boolean not = (predicateChunk.haveSomeTagWord(tag_Not))? true: false;	// 述語が否定かどうか
 		
 		
 		printDep();
@@ -605,10 +622,10 @@ public class Sentence {
 		String[][] tagAdjective = {{"形容詞"}};
 		
 		/* 述語が動詞 */
-		if( predicateChunk.haveAllTagWord(tagVerb) ) {
+		if( predicateChunk.haveSomeTagWord(tagVerb) ) {
 			/* "がある"かどうか */
-			String[][] tag_Have = {{"ある"}, {"もつ"}};		// 動詞の"ある"(助動詞ではない)
-			boolean boolHave = predicateChunk.haveAllTagWord(tag_Have);
+			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}};		// 動詞の"ある"(助動詞ではない)
+			boolean boolHave = predicateChunk.haveSomeTagWord(tag_Have);
 			/* "~の総称" */
 			String regexGnrnm = "(.*?)(の総称)";				// 「〜の総称」を探す
 			Pattern ptrnGnrnm = Pattern.compile(regexGnrnm);
@@ -620,7 +637,7 @@ public class Sentence {
 				Chunk previousChunk = Chunk.get(chunkIDs.get(idxprd-1));		// 動詞の一つ前の文節
 				String part = Word.get(previousChunk.getMainWord()).wordName;	// その主辞の文字列
 				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
-				if(previousChunk.haveAllTagWord(tag_Ga_Wo)) {
+				if(previousChunk.haveSomeTagWord(tag_Ga_Wo)) {
 					relations.add( Arrays.asList(part, "dcterms:isPartOf", subject) );
 					relations.add( Arrays.asList(subject, "dcterms:hasPart", part) );
 				}
@@ -629,11 +646,12 @@ public class Sentence {
 				relations.add( Arrays.asList(subjectWord.wordName, "owl:equivalentClass", mtchGnrnm.group(1)) );				
 		
 			}else {					// その他の動詞
+				
 				String verb = predicateWord.tags.get(6);	// 原形を取り出すためのget(6)
 				String object = null;
 					
 				// 格助詞"に","を","へ"などを元に目的語を探す
-				String[][] tag_Ni_Wo = {{"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
+				String[][] tag_Ni_Wo = {{"格助詞", "が"}, {"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
 				List<Integer> chunks_Ni_Wo = collectTagChunks(tag_Ni_Wo);
 				if(!chunks_Ni_Wo.isEmpty()) {	// 目的語あり
 					Chunk chunk_Ni_Wo = Chunk.get(chunks_Ni_Wo.get(0));
@@ -648,7 +666,7 @@ public class Sentence {
 			
 			
 		/* 述語が形容詞 */
-		}else if(predicateChunk.haveAllTagWord(tagAdjective)) {
+		}else if(predicateChunk.haveSomeTagWord(tagAdjective)) {
 			
 			
 		/* 述語が名詞または助動詞 */
@@ -749,6 +767,9 @@ public class Sentence {
 			str +=Chunk.get(cid).toString();
 		}
 		return str;
+	}
+	public void print() {
+		System.out.println(toString());
 	}
 	public void printW() {
 		for(int wid: wordIDs()) {

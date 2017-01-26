@@ -21,7 +21,12 @@ public class Phrase extends Word{
 			Word wd = Word.get(baseID);
 			origins.add(baseID);
 			phraseName += wd.wordName;
-			if(wd.tags.size() > 6) genkei += wd.tags.get(6);
+			if(wd.tags.size() > 6) {
+				if(itr.hasNext())
+					genkei += wd.wordName;
+				else	// 最後尾は原形
+					genkei += wd.tags.get(6);
+			}
 			if(wd.tags.size() > 7) yomi1 += wd.tags.get(7);
 			if(wd.tags.size() > 8) yomi2 += wd.tags.get(8);
 		}

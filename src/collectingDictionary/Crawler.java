@@ -25,14 +25,14 @@ public class Crawler {
 	
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 30;
+		int interval = 20;
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "ち";
-		//crw.run(1, false, categories, syllabary);
+		String syllabary = "つ";
+		crw.run(1, false, categories, syllabary);
 		
-		Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
+		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
 	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
