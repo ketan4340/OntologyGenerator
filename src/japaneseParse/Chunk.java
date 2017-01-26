@@ -28,7 +28,7 @@ public class Chunk {
 		cloneIDs = new ArrayList<Integer>();
 	}
 	public void setChunk(List<Integer> wdl, int depto) {
-		List<Integer> mains = new LinkedList<Integer>();
+		List<Integer> mains = new LinkedList<Integer>();	// 主辞
 		for(Iterator<Integer> itr = wdl.iterator(); itr.hasNext(); ) {
 			int wordID = itr.next();
 			Word word = Word.get(wordID);
@@ -95,10 +95,11 @@ public class Chunk {
 	}
 	
 	public void uniteChunks(List<Integer> baseChunks) {
+		if(baseChunks.size() < 2) return;
 		List<Integer> phraseWords = new ArrayList<Integer>();		// 新しいPhraseの元になるWord
 		List<Integer> conjunctionWords = new ArrayList<Integer>();	// Phrase完成後につなげる接続詞を保持
 		int depto = -1;												// 最後尾のChunkがどのChunkに係るか
-		
+
 		for(Iterator<Integer> itr = baseChunks.iterator(); itr.hasNext(); ) {
 			int chID = itr.next();
 			Chunk ch = Chunk.get(chID);
@@ -110,11 +111,9 @@ public class Chunk {
 				Chunk.get(bedep).dependUpon = this.chunkID;
 			}
 			
-			if(!itr.hasNext()) {							// 最後尾の場合
-				int head = ch.wordIDs.get(0);				// とりあえず先頭1単語を被修飾語とする *要改善*
-				phraseWords.add(head);
-				conjunctionWords.addAll(ch.wordIDs);		// 先頭以外を保管したいので
-				conjunctionWords.remove(0);					// 全部入れて0番目を消す
+			if(!itr.hasNext()) {	// 最後尾の場合
+				phraseWords.add(ch.getMainWord());
+				conjunctionWords.addAll(ch.getFunctionWords());
 				depto = ch.dependUpon;
 			}else {
 				phraseWords.addAll(ch.wordIDs);
@@ -147,11 +146,13 @@ public class Chunk {
 	/* 複数のChunkを係り受け関係を維持しつつ複製する */
 	public static List<Integer> copy(List<Integer> chunkIDList) {
 		List<Integer> replicaList = new ArrayList<Integer>();
+		// まず複製
 		for(final int id: chunkIDList) {
 			Chunk origin = Chunk.get(id);
 			Chunk replica = origin.copy();
 			replicaList.add(replica.chunkID);
 		}
+		// 係り先があれば整え、なければ-1
 		for(final int id: replicaList) {
 			Chunk replica = Chunk.get(id);
 			Chunk origin = Chunk.get(replica.originID);
@@ -165,6 +166,7 @@ public class Chunk {
 	public void connect(String[][] tagNames) {
 		List<Integer> newWordIDs = new ArrayList<Integer>();
 		List<Integer> serialNouns = new ArrayList<Integer>();
+		if(wordIDs.size() < 2) return;	// ChunkのWordが一つなら意味がない
 		
 		while( !wordIDs.isEmpty() ) {
 			int wordID = wordIDs.remove(0);
@@ -177,10 +179,10 @@ public class Chunk {
 					break;
 				}
 			}
-			if(hasSomeTag) {
+			if(hasSomeTag) {	// 指定品詞に該当
 				serialNouns.add(word.wordID);
-			}else {
-				if(!serialNouns.isEmpty()) {	// 初っ端からTagに該当しない場合のif
+			}else {				// 該当せず
+				if(!serialNouns.isEmpty()) {
 					Phrase nph = new Phrase();
 					nph.setPhrase(serialNouns, chunkID, false);
 					newWordIDs.add(nph.wordID);
@@ -190,7 +192,7 @@ public class Chunk {
 			}
 		}
 		
-		if(!serialNouns.isEmpty()) {		// Chunkの末尾が名詞の場合ここで処理
+		if(!serialNouns.isEmpty()) {	// Chunkの末尾が該当した場合ここで処理
 			Phrase nph = new Phrase();
 			nph.setPhrase(serialNouns, chunkID, false);	// 末尾のWordに依存=false
 			newWordIDs.add(nph.wordID);
@@ -232,16 +234,18 @@ public class Chunk {
 	
 	/* このChunkの最後尾が渡された品詞のWordかどうか */
 	/* 最後尾が読点"、"の場合は無視 */
-	public boolean endWith(String[][] tagNames) {
+	public boolean endWith(String[][] tagNames, boolean ignoreSign) {
 		boolean endWith = true;
 		int tagIndex = tagNames.length-1;
-		String[] tagComma = {"読点"};
+		String[] tagSign = {"記号"};
 		
-		for(ListIterator<Integer> li = wordIDs.listIterator(wordIDs.size()-1); li.hasPrevious(); ) {
-			int wordID = li.previous();
+		for(ListIterator<Integer> li = wordIDs.listIterator(wordIDs.size()); li.hasPrevious(); ) {
+			int wordID = li.previous();				// wordも
 			Word word = Word.get(wordID);
-			String[] tagName = tagNames[tagIndex];
-			if(word.hasAllTags(tagComma)) continue;	// "、"の場合はスルー
+			String[] tagName = tagNames[tagIndex];	// tagも後ろから遡る
+			if(ignoreSign && word.hasAllTags(tagSign))
+				continue;	// 記号の場合はスルー
+			
 			if(word.hasAllTags(tagName)) {
 				tagIndex--;
 			}else {

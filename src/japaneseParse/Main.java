@@ -19,37 +19,36 @@ public class Main {
 		List<String> writingList = new ArrayList<String>();
 		List<Sentence> sentList = new ArrayList<Sentence>();
 		List<List<String>> relations = new ArrayList<List<String>>();
-
+		/*
 		String[] writings = {
 				//"クジラは広い海を泳いでいる。",
 				//"鯨とは水生の巨大な哺乳類である。",
-				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
-				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わり、尾びれは短い",
+				//"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
 				"アイベックスは角は、雄のものは大きくて後方に湾曲し、表面に竹のような節がある",
 				//"藍鮫は全長約1メートル",
 				"アイアイは長い指は鉤爪をもち、樹皮下の昆虫を掘り出して食う。",
 				"アイアイは頭胴長40センチくらいで、尾が長い",
 				//"藍子は全長約55センチ。",
 				//"青擬天牛は体長13ミリくらい",
-				"秋沙は日本では冬鳥であるが、北海道で繁殖するものもある",
-				"青大将は全長1.5～2.5メートルで、日本では最大",
+				//"秋沙は日本では冬鳥であるが、北海道で繁殖するものもある",
+				//"青大将は全長1.5～2.5メートルで、日本では最大",
 				//"青眼狗母魚は体長は10～15センチ",
 				"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある",
-				"葵貝は雄は体長約1.5センチで、殻をつくらない",
+				//"葵貝は雄は体長約1.5センチで、殻をつくらない",
 				//"甘子はえのは",
 				"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
 				"鯉は体は長い筒形で背から腹へかけての幅が広く、長短二対の口ひげがある",
+				"いとまきえいは体はひし形で扁平、尾は細いむち状",
 				//"一角は一分銀の異称",
 				//"犬はドッグに同じ"
 		};
 		writingList.addAll(Arrays.asList(writings));
-		
+		*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
-		/*
-		//String readFile = "gooText生物-動物名-test.txt";
-		String readFile = "writings/gooText生物-動物名-わ.txt";
-		
+		///*
+		String readFile = "gooText生物-動物名-All.txt";
+		//String readFile = "writings/gooText生物-動物名-わ.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -64,15 +63,13 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		*/
-		for(String writing: writingList) {
+		//*/
+		for(final String writing: writingList) {
 			/*** Syntactic Parsing Module ***/
-			System.out.println("\n\t Step0");
+			//System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence originalSent = parse.run(writing);
 			
-			originalSent.printSF();
-						
 			/*** Semantic Parsing Module ***/
 			/** Step1: Term Extraction **/
 			String[][] tagNouns = {{"名詞"}, {"名詞接続"}, {"接尾"}, {"形容詞"}};
@@ -81,19 +78,24 @@ public class Main {
 			originalSent.connect(tagDo);
 			/* 名詞と形容詞だけ取り出す */
 			//System.out.println("\n\t Step1");
-			String[][] tagNP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}}; //これらを含むChunkを係り受け先につなげる
-			List<Integer> chunkList_NP = originalSent.collectTagChunks(tagNP); // 上記のtagを持つWordを集めた
+			// これらがChunkの末尾につくものを次のChunkにつなげる
+			String[][] tags_NP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}, {"名詞"}};
+
 			
-			/** Step2: Concatenation **/
-			/* 名詞と名詞または形容詞と名詞をつなげて1つの名詞句にする */
+			/** Step1: Concatenation **/
+			/* 修飾語と被修飾語をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
-			originalSent.connectModifer(chunkList_NP);
+			//originalSent.connectModifer(chunkList_NP);
+			originalSent.connect2Next(tags_NP);
+			originalSent.printC();
+			System.out.println();
 			
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			originalSent.printC();
-			sentList.addAll(originalSent.separate());
+			for(final Sentence shortSent: originalSent.separate2()) {
+				sentList.addAll(shortSent.separate3());
+			}
 		}
 		
 		System.out.println("--------sentences---------");
