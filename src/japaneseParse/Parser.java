@@ -64,7 +64,7 @@ public class Parser {
 			
 			//出力結果に格納するための文字列を用意
 			String line = new String();
-			Chunk chk = null;
+			Clause chk = null;
 			List<Integer> wdl = null;
 			int depto = -1;
 			int border = 0;
@@ -72,18 +72,18 @@ public class Parser {
 			int nextID = 0;
 			while ((line = br.readLine()) != null) {
 				if(line.startsWith("EOS")) {		// EOSがきたら終了
-					chk.setChunk(wdl, depto);
-					chunkList.add(chk.chunkID);
+					chk.setClause(wdl, depto);
+					chunkList.add(chk.clauseID);
 					
 				}else if(line.startsWith("*")) {	// *で始まる場合直前までのChunkを閉じ、新しいChunkを用意
 					if(wdl != null) {				// 最初は直前までのChunkが存在しないので回避
-						chk.setChunk(wdl, depto);
-						chunkList.add(chk.chunkID);
+						chk.setClause(wdl, depto);
+						chunkList.add(chk.clauseID);
 					}else {
-						nextID = Chunk.chunkSum;	// *要注意というか汚い*
+						nextID = Clause.clauseSum;	// *要注意というか汚い*
 					}
 					wdl = new ArrayList<Integer>();
-					chk = new Chunk();
+					chk = new Clause();
 					String[] chunkInfo = line.split(" ");
 					String dep_str = chunkInfo[2];
 					depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
@@ -96,7 +96,7 @@ public class Parser {
 							? true
 							: false;
 					Word wd = new Word();
-					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), chk.chunkID, sbj_fnc);
+					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), chk.clauseID, sbj_fnc);
 					wdl.add(wd.wordID);
 				}
 				//読み込んだ行を格納
@@ -104,7 +104,7 @@ public class Parser {
 			}
 			
 			// chunkの係り受け関係を更新
-			Chunk.updateAllDependency();
+			Clause.updateAllDependency();
 			//System.out.println(analysed);
 						
 			// プロセス終了

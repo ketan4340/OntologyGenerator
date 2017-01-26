@@ -29,10 +29,10 @@ public class Crawler {
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "つ";
-		crw.run(1, false, categories, syllabary);
+		String syllabary = "わ";
+		//crw.run(3, false, categories, syllabary);
 		
-		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
+		Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
 	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
@@ -229,23 +229,24 @@ public class Crawler {
 	
 	/* 日本語テキストから余計なかっこ,記号を除去し，見出し語の代入を行う */
 	public String cleanText1(String text, String entry) {
-		text = text.replaceAll("\\(.+?\\)", "");	// 半角かっこ()除去
+		text = text.replaceAll("\\(.*?\\)", "");	// 半角かっこ()除去
 		//text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
-		text = text.replaceAll("（.+?）", "");		// 全角かっこ（）除去
-		text = text.replaceAll("［.+?］", "");		// 全角かっこ［］除去
-		text = text.replaceAll("〈.+?〉", "");		// 全角かっこ〈〉除去
-		text = text.replaceAll("《.+?》", "");		// 全角かっこ《》除去
+		text = text.replaceAll("（.*?）", "");		// 全角かっこ（）除去
+		text = text.replaceAll("［.*?］", "");		// 全角かっこ［］除去
+		text = text.replaceAll("〈.*?〉", "");		// 全角かっこ〈〉除去
+		text = text.replaceAll("《.*?》", "");		// 全角かっこ《》除去
 		text = text.replaceAll("―", entry);			// 例文の―を見出し語に置き換える
-		//text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
 		text = text.replaceAll("→|⇒", "");			// 矢印除去
+		text = text.replaceAll(" ", "");			// 謎の空白文字除去
 		return text;
 	}
 	
 	/* テキストからスペースを除去する */
 	public String cleanText2(String text) {
-		text = text.replaceAll("\\[.+?\\]", "");	// 半角かっこ[]除去
+		text = text.replaceAll("\\[.*?\\]", "");	// 半角かっこ[]除去
 		//text = text.replaceAll("[「」]", "");		// 全角鉤かっこ「」除去
 		text = text.replaceAll("[\\s　]", "");		// 空白文字除去
+		text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
 		return text;
 	}
 	
@@ -255,8 +256,8 @@ public class Crawler {
 		File writefile = new File(textPath);
 
 		// 繰り返しつかうのでここでコンパイル
-		Pattern ptnExm1 = Pattern.compile("「(.+?)／(.+?)」");			// 鉤括弧で囲まれた用例を探す正規表現
-		Pattern ptnExm2 = Pattern.compile("「(.+?)」(?![あ-ん])");		// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnExm1 = Pattern.compile("「[^「」]+／[^「」]+」");			// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnExm2 = Pattern.compile("「([^「」]+)」(?![あ-ん])");		// 鉤括弧で囲まれた用例を探す正規表現
 		Pattern ptnNum = Pattern.compile("[１-９\\d{2}][ ㋐-㋾]");		// 語釈文頭の箇条書きの数字を探す正規表現
 		Pattern ptnSplm = Pattern.compile("\\[補説\\].+");				// 補説とそこから行末までを探す正規表現
 		
@@ -277,8 +278,8 @@ public class Crawler {
 				serialInterpretation = mchNum.replaceAll("");	// 語釈文頭の箇条書きの数字を消す
 				Matcher mchSplm = ptnSplm.matcher(serialInterpretation);
 				serialInterpretation = mchSplm.replaceAll("");	// 文末の補説を消す
+				
 				serialInterpretation = cleanText2(serialInterpretation);		// 残しておいたスペースを消す
-
 				String[] interpretations = serialInterpretation.split("。", 0);
 				for(String interpretation: interpretations) {
 					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
@@ -296,7 +297,6 @@ public class Crawler {
 		}
 	}
 
-	
 	/* ディレクトリ内のファイルの内容を全て纏めた一つのファイルを出力する */
 	public static void gatheringTexts(String dirName, String opFileName) {
 		try {

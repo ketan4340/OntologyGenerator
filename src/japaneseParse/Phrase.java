@@ -11,7 +11,7 @@ public class Phrase extends Word{
 		origins = new ArrayList<Integer>();
 	}
 	
-	public void setPhrase(List<Integer> baseIDList, int inChunkID, boolean head_tail) {
+	public void setPhrase(List<Integer> baseIDList, int belongClauseID, boolean head_tail) {
 		String phraseName = new String();
 		String genkei = new String();
 		String yomi1 = new String();
@@ -41,11 +41,11 @@ public class Phrase extends Word{
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
 
-		if(inChunkID == -1) {
-			inChunkID = head_tail
-					? Word.get(headID).belongChunk	// 新しいPhraseの所属するChunkは先頭のWordに依存
-					: Word.get(tailID).belongChunk;	// 新しいPhraseの所属するChunkは最後尾のWordに依存
+		if(belongClauseID == -1) {
+			belongClauseID = head_tail
+					? Word.get(headID).belongClause	// 新しいPhraseの所属するChunkは先頭のWordに依存
+					: Word.get(tailID).belongClause;	// 新しいPhraseの所属するChunkは最後尾のWordに依存
 		}
-		setWord(phraseName, phraseTags, inChunkID, true);
+		setWord(phraseName, phraseTags, belongClauseID, true);
 	}
 }

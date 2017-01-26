@@ -41,10 +41,11 @@ public class Main {
 				"いとまきえいは体はひし形で扁平、尾は細いむち状",
 				//"一角は一分銀の異称",
 				//"犬はドッグに同じ",
-				"金鳩はくちばしが赤、ほおから腹にかけては紫褐色、背は緑色で金属光沢がある"
+				"金鳩はくちばしが赤、ほおから腹にかけては紫褐色、背は緑色で金属光沢がある",
+				"丸は文の終わりにつける"
 		};
 		writingList.addAll(Arrays.asList(writings));
-		*/
+		//*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
 		///*
@@ -89,8 +90,8 @@ public class Main {
 			/* 修飾語と被修飾語をつなげて1つの名詞句にする */
 			//System.out.println("\n\t Step2");
 			//originalSent.connectModifer(chunkList_NP);
-			originalSent.connect2Next(tags_NP);
-			originalSent.printC();
+			originalSent.connect2Next(tags_NP, false);
+			originalSent.printDep();
 						
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
