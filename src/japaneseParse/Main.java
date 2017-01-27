@@ -21,36 +21,30 @@ public class Main {
 		List<List<String>> relations = new ArrayList<List<String>>();
 		/*
 		String[] writings = {
-				//"クジラは広い海を泳いでいる。",
-				//"鯨とは水生の巨大な哺乳類である。",
-				//"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
+				"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
 				"アイベックスは角は、雄のものは大きくて後方に湾曲し、表面に竹のような節がある",
-				//"藍鮫は全長約1メートル",
 				"アイアイは長い指は鉤爪をもち、樹皮下の昆虫を掘り出して食う。",
 				"アイアイは頭胴長40センチくらいで、尾が長い",
-				//"藍子は全長約55センチ。",
-				//"青擬天牛は体長13ミリくらい",
-				//"秋沙は日本では冬鳥であるが、北海道で繁殖するものもある",
-				//"青大将は全長1.5～2.5メートルで、日本では最大",
-				//"青眼狗母魚は体長は10～15センチ",
+				"秋沙は日本では冬鳥であるが、北海道で繁殖するものもある",
+				"青大将は全長1.5～2.5メートルで、日本では最大",
+				"青眼狗母魚は体長は10～15センチ",
 				"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある",
 				"葵貝は雄は体長約1.5センチで、殻をつくらない",
-				//"甘子はえのは",
-				//"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
+				"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
 				"鯉は体は長い筒形で背から腹へかけての幅が広く、長短二対の口ひげがある",
 				"いとまきえいは体はひし形で扁平、尾は細いむち状",
-				//"一角は一分銀の異称",
-				//"犬はドッグに同じ",
 				"金鳩はくちばしが赤、ほおから腹にかけては紫褐色、背は緑色で金属光沢がある",
-				"丸は文の終わりにつける"
+				"皮剥は背びれと腹びれにとげをもち、口は小さく、歯がある",
+				"金頭は腹面が白色のほかは赤色",
+				"黒梶木は体長約4メートル、体重500キロに達する"
 		};
 		writingList.addAll(Arrays.asList(writings));
 		//*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
 		///*
-		String readFile = "gooText生物-動物名-All.txt";
-		//String readFile = "writings/gooText生物-動物名-あ.txt";
+		//String readFile = "gooText生物-動物名-All.txt";
+		String readFile = "writings/gooText生物-動物名-お.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -91,7 +85,7 @@ public class Main {
 			//System.out.println("\n\t Step2");
 			//originalSent.connectModifer(chunkList_NP);
 			originalSent.connect2Next(tags_NP, false);
-			originalSent.printDep();
+			//originalSent.printDep();
 						
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
@@ -99,9 +93,11 @@ public class Main {
 			for(final Sentence shortSent: originalSent.separate2()) {
 				for(final Sentence partSent: shortSent.separate3()) {
 					partSent.uniteSubject();
+					partSent.printDep();
 					sentList.add(partSent);
 				}
 			}
+			System.out.println();
 		}
 		
 		System.out.println("--------sentences---------");
@@ -113,14 +109,24 @@ public class Main {
 		System.out.println("--------sentences---------\n");
 		
 		
-		for(final Sentence partSent: sentList) {
-			/** Step4: Relations Extraction **/
-			/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
-			//System.out.println("\n\t Step4");
-			List<List<String>> relation = partSent.extractRelation(); 
-			relations.addAll(relation);	
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
+		File fileText = new File("texts/text"+sdf.format(c.getTime())+".txt");
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(fileText));
+			for(final Sentence partSent: sentList) {
+				/** Step4: Relations Extraction **/
+				/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
+				//System.out.println("\n\t Step4");
+				bw.write(partSent.toString());
+				bw.newLine();
+				List<List<String>> relation = partSent.extractRelation(); 
+				relations.addAll(relation);
+			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
 		// 得られた関係を読み取り，uriとtriplesに入れる
 		List<String> uri = new ArrayList<String>();	// ここに入れた単語はWordとしての情報を失いその後は文字列として扱う
 		uri.add("rdf:type");
@@ -128,10 +134,8 @@ public class Main {
 		uri.add("rdfs:subPropertyOf");
 		uri.add("rdfs:domain");
 		uri.add("rdfs:range");
-		
 		List<List<Integer>> triples = new ArrayList<List<Integer>>();
-		Calendar c = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
+		
 		File fileRln = new File("csvs/relation"+sdf.format(c.getTime())+".csv");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileRln));
