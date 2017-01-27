@@ -43,8 +43,8 @@ public class Main {
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
 		///*
-		//String readFile = "gooText生物-動物名-All.txt";
-		String readFile = "writings/gooText生物-動物名-お.txt";
+		String readFile = "gooText生物-動物名-All.txt";
+		//String readFile = "writings/gooText生物-動物名-お.txt";
 		File file = new File(readFile);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -90,14 +90,14 @@ public class Main {
 			/** Step3: Break Phrases **/
 			/* 長文を分割し複数の短文に分ける */
 			//System.out.println("\n\t Step3");
-			for(final Sentence shortSent: originalSent.separate2()) {
-				for(final Sentence partSent: shortSent.separate3()) {
+			for(final Sentence shortSent: originalSent.divide2()) {
+				for(final Sentence partSent: shortSent.divide3()) {
 					partSent.uniteSubject();
 					partSent.printDep();
 					sentList.add(partSent);
 				}
 			}
-			System.out.println();
+			//System.out.println();
 		}
 		
 		System.out.println("--------sentences---------");
@@ -177,6 +177,9 @@ public class Main {
 		ob.writeOntology(uri, triples);
 		ob.output("owls/ontology"+sdf.format(c.getTime())+".owl");	// 渡すのは保存先のパス
 		
+		System.out.println("Finished.");
+		System.out.println("Sentences: " + writingList.size() + "\t->dividedSentences: " + sentList.size());
+		System.out.println("Relations: " + triples.size());
 	}
 
 }

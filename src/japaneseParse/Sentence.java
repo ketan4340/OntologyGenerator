@@ -301,7 +301,7 @@ public class Sentence {
 	}
 	
 	/* 複数の述語を持つ文を述語ごと短文に切り分ける */
-	public List<Sentence> separate1() {
+	public List<Sentence> divide1() {
 		List<Sentence> partSentList = new ArrayList<Sentence>(5);
 		
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
@@ -401,7 +401,7 @@ public class Sentence {
 	}
 	
 	/* メインの主語が係る述語ごとに分割 */
-	public List<Sentence> separate2() {
+	public List<Sentence> divide2() {
 		List<Sentence> shortSentList = new ArrayList<Sentence>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<Integer> subjectList = getSubjectList(false);		// 主語のリスト
@@ -463,7 +463,7 @@ public class Sentence {
 	}
 	
 	/* 述語に係る{動詞,形容詞,名詞,~だ,接続助詞}ごとに分割 */
-	public List<Sentence> separate3() {
+	public List<Sentence> divide3() {
 		List<Sentence> partSentList = new ArrayList<Sentence>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<Integer> subjectList = getSubjectList(false);	// 主語のリスト
@@ -661,17 +661,19 @@ public class Sentence {
 		Matcher mtchWeight = ptrnWeight.matcher(predicatePart);
 		boolean boolWeight = mtchWeight.matches();
 		
-		if(boolLength) {
-			String blank = "_:"+subjectWord.wordName+"-length";
-			relations.add( Arrays.asList(subjectWord.wordName, "hasLength", blank) );			// 空白ノード
-			relations.add( Arrays.asList(blank, "rdf:value", mtchLength.group(2)) );		// リテラル
-			relations.add( Arrays.asList(blank, "exterms:units", mtchLength.group(4)) );	// 単位
-		}else if(boolWeight) {
-			String blank = "_:"+subjectWord.wordName+"-weight";
-			relations.add( Arrays.asList(subjectWord.wordName, "hasWeight", blank) );			// 空白ノード
-			relations.add( Arrays.asList(blank, "rdf:value", mtchWeight.group(2)) );		// リテラル
-			relations.add( Arrays.asList(blank, "exterms:units", mtchWeight.group(4)) );	// 単位
-			
+		if(boolLength || boolWeight) {
+			if(boolLength) {
+				String blank = "_:"+subjectWord.wordName+"-length";
+				relations.add( Arrays.asList(subjectWord.wordName, "hasLength", blank) );		// 空白ノード
+				relations.add( Arrays.asList(blank, "rdf:value", mtchLength.group(2)) );		// リテラル
+				relations.add( Arrays.asList(blank, "exterms:units", mtchLength.group(4)) );	// 単位
+			}
+			if(boolWeight) {
+				String blank = "_:"+subjectWord.wordName+"-weight";
+				relations.add( Arrays.asList(subjectWord.wordName, "hasWeight", blank) );		// 空白ノード
+				relations.add( Arrays.asList(blank, "rdf:value", mtchWeight.group(2)) );		// リテラル
+				relations.add( Arrays.asList(blank, "exterms:units", mtchWeight.group(4)) );	// 単位
+			}
 		/* 述語が動詞 */
 		}else if( predicateClause.haveSomeTagWord(tagVerb) ) {
 			/* "がある"かどうか */
