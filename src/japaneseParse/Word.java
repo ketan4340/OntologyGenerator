@@ -37,6 +37,7 @@ public class Word {
 	}
 	
 	public static Word get(int id) {
+		if(id < 0) return null;
 		return allWordsList.get(id);
 	}
 	

@@ -29,9 +29,10 @@ public class Crawler {
 		Crawler crw = new Crawler("goo", depth, interval);
 
 		String[] categories = {"生物", "動物名"}; 
-		String syllabary = "わ";
+		String syllabary = "お";
 		//crw.run(3, false, categories, syllabary);
 		
+		//Crawler.runAll(3);
 		Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
 	}
 	
@@ -247,6 +248,7 @@ public class Crawler {
 		//text = text.replaceAll("[「」]", "");		// 全角鉤かっこ「」除去
 		text = text.replaceAll("[\\s　]", "");		// 空白文字除去
 		text = text.replaceAll("[㋐-㋾]+", "");		// 囲み文字(カタカナ)除去
+		text = text.replaceAll("\\d(?=」)", "");		// カギカッコ内最後の数字除去
 		return text;
 	}
 	
@@ -256,8 +258,8 @@ public class Crawler {
 		File writefile = new File(textPath);
 
 		// 繰り返しつかうのでここでコンパイル
-		Pattern ptnExm1 = Pattern.compile("「[^「」]+／[^「」]+」");			// 鉤括弧で囲まれた用例を探す正規表現
-		Pattern ptnExm2 = Pattern.compile("「([^「」]+)」(?![あ-ん])");		// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnExm1 = Pattern.compile("「[^「」]+／[^「」]+」");		// 鉤括弧で囲まれた用例を探す正規表現
+		Pattern ptnExm2 = Pattern.compile("(?<![あ-ん])「[^「」]+」(?![あ-ん、。])");	// 鉤括弧で囲まれた用例を探す正規表現
 		Pattern ptnNum = Pattern.compile("[１-９\\d{2}][ ㋐-㋾]");		// 語釈文頭の箇条書きの数字を探す正規表現
 		Pattern ptnSplm = Pattern.compile("\\[補説\\].+");				// 補説とそこから行末までを探す正規表現
 		
@@ -297,6 +299,33 @@ public class Crawler {
 		}
 	}
 
+	public static void runAll(int o) {
+		int depth = 500;
+		int interval = 20;
+		Crawler crw = new Crawler("goo", depth, interval);
+		String[] categories = {"生物", "動物名"}; 
+		String[] syllabaries = {
+				"あ","い","う","え","お",
+				"か","き","く","け","こ",
+				"さ","し","す","せ","そ",
+				"ざ","じ","ず","ぜ","ぞ",
+				"た","ち","つ","て","と",
+				"だ",		  "で","ど",
+				"な","に","ぬ","ね","の",
+				"は","ひ","ふ","へ","ほ",
+				"ば","び","ぶ","べ","ぼ",
+				"ぱ","ぴ","ぷ","ぺ","ぽ",
+				"ま","み","む","め","も",
+				"や",	 "ゆ",	  "よ",
+				"ら","り","る","れ","ろ",
+				"わ"
+		};
+		
+		for(final String syllabary: syllabaries) {
+			crw.run(o, false, categories, syllabary);	
+		}
+	}
+	
 	/* ディレクトリ内のファイルの内容を全て纏めた一つのファイルを出力する */
 	public static void gatheringTexts(String dirName, String opFileName) {
 		try {
