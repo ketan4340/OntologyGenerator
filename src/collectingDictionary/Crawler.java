@@ -30,10 +30,10 @@ public class Crawler {
 
 		String[] categories = {"生物", "動物名"}; 
 		String syllabary = "お";
-		//crw.run(3, false, categories, syllabary);
+		crw.run(3, false, categories, syllabary);
 		
 		//Crawler.runAll(3);
-		Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
+		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
 	}
 	
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)

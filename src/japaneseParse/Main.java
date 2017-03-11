@@ -9,17 +9,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-
+import java.util.LinkedHashSet;
 public class Main {
 
 	public static void main(String[] args) {
 		List<String> writingList = new ArrayList<String>();
 		List<Sentence> sentList = new ArrayList<Sentence>();
 		List<List<String>> relations = new ArrayList<List<String>>();
-		///*
+		/*
 		String[] writings = {
 				///*
 				//"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
@@ -40,13 +41,12 @@ public class Main {
 				//"皮剥は背びれと腹びれにとげをもち、口は小さく、歯がある",
 				//"金頭は腹面が白色のほかは赤色",
 				//"黒梶木は体長約4メートル、体重500キロに達する"
-				//*/
 		};
 		writingList.addAll(Arrays.asList(writings));
 		//*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
-		/*
+		///*
 		String readFile = "gooText生物-動物名-All.txt";
 		//String readFile = "writings/gooText生物-動物名-お.txt";
 		File file = new File(readFile);
@@ -98,7 +98,7 @@ public class Main {
 		System.out.println("--------sentences---------");
 		
 		for(final Sentence partSent: sentList) {
-			System.out.println(partSent.toString());
+			//System.out.println(partSent.toString());
 		}
 		
 		System.out.println("--------sentences---------\n");
@@ -111,46 +111,43 @@ public class Main {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileText));
 			for(final Sentence partSent: sentList) {
 				/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
-				//System.out.println("\n\t Step4");
-				bw.write(partSent.toString());
+				bw.write(partSent.toString());		// 分割後の文を出力
 				bw.newLine();
-				List<List<String>> relation = partSent.extractRelation(); 
+				List<List<String>> relation = partSent.extractRelation();
 				relations.addAll(relation);
 			}
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//重複排除 
+		relations = new ArrayList<List<String>>(new LinkedHashSet<List<String>>(relations));
+		
 		// 得られた関係を読み取り，uriとtriplesに入れる
 		List<String> uri = new ArrayList<String>();	// ここに入れた単語はWordとしての情報を失いその後は文字列として扱う
-		uri.add("rdf:type");
-		uri.add("rdfs:subClassOf");
-		uri.add("rdfs:subPropertyOf");
-		uri.add("rdfs:domain");
-		uri.add("rdfs:range");
+		uri.add("rdf:type");			// 0
+		uri.add("rdfs:subClassOf");		// 1
+		uri.add("rdfs:subPropertyOf");	// 2
+		uri.add("rdfs:domain");			// 3
+		uri.add("rdfs:range");			// 4
 		List<List<Integer>> triples = new ArrayList<List<Integer>>();
 		
-		File fileRln = new File("csvs/relation"+sdf.format(c.getTime())+".csv");
+		File fileCSV = new File("csvs/relation"+sdf.format(c.getTime())+".csv");
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileRln));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(fileCSV));
 					
 			for(final List<String> relation: relations) {
-	        	System.out.println(relation);
+	        	//System.out.println(relation);
 	        	List<Integer> triple_id = new ArrayList<Integer>(3);
-	        	for (int i=0; i < 3; i++) {
-	        		String concept = relation.get(i);
-	
+	        	for(final String concept: relation) {
 	        		bw.write(concept+",");
-	
 	        		if( !uri.contains(concept) ) uri.add(concept);
 	        		triple_id.add(uri.indexOf(concept));
 	        	}
-        	
 	        	bw.newLine();
 	        	triples.add(triple_id);
 			}
-		
-		bw.close();
+			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -167,10 +164,9 @@ public class Main {
 		/*** OWL DL Axiom Module ***/
 		
 		
-		OntologyBuilder ob = new OntologyBuilder();		
-		ob.writeOntology(uri, triples);
-		ob.output("owls/ontology"+sdf.format(c.getTime())+".owl");	// 渡すのは保存先のパス
-		
+		OntologyBuilder ob = new OntologyBuilder("n3", uri, triples);		
+		ob.output("owls/ontology"+sdf.format(c.getTime()));	// 渡すのは保存先のパス(拡張子は含まない)
+				
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + writingList.size() + "\t->dividedSentences: " + sentList.size());
 		System.out.println("Relations: " + triples.size());
