@@ -20,7 +20,7 @@ public class Main {
 		List<String> writingList = new ArrayList<String>();
 		List<Sentence> sentList = new ArrayList<Sentence>();
 		List<List<String>> relations = new ArrayList<List<String>>();
-		/*
+		///*
 		String[] writings = {
 				///*
 				//"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
@@ -46,7 +46,7 @@ public class Main {
 		//*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
-		///*
+		/*
 		String readFile = "gooText生物-動物名-All.txt";
 		//String readFile = "writings/gooText生物-動物名-お.txt";
 		File file = new File(readFile);
