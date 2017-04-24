@@ -1,4 +1,4 @@
-package japaneseParse;
+package grammar;
 
 import java.util.List;
 import java.util.LinkedList;

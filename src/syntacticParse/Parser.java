@@ -1,4 +1,4 @@
-package japaneseParse;
+package syntacticParse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,11 +12,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import grammar.Clause;
+import grammar.Sentence;
+import grammar.Word;
+
 public class Parser {
 	public String tool; // どの解析器を使うか(stanford,cabocha,knp)
 	public String analysed;
 	public List<Integer> chunkList;
-	
+
 	public Parser(String howto) {
 		tool = howto;
 		analysed = new String();
@@ -25,7 +29,7 @@ public class Parser {
 	public Parser() {
 		this(null);
 	}
-	
+
 	public Sentence run(String text) {
 		Sentence sent = null;
 		switch (tool){
@@ -48,20 +52,20 @@ public class Parser {
 			String btmp= new String(bytes, "UTF-8");
 			//BOM除去
 			text=text.replaceAll(btmp, "");
-		
+
 			//cabochaの実行開始　lattice形式で出力(-f1の部分で決定、詳しくはcabochaのhelp参照)
 			ProcessBuilder pb = new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1");
 			Process process = pb.start();
-			
+
 			//実行途中で文字列を入力(コマンドプロンプトで文字を入力する操作に相当)
 			OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream(), "UTF-8");
 			osw.write(text);
 			osw.close();
-			
+
 			//出力結果を読み込む
 			InputStream is = process.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
-			
+
 			//出力結果に格納するための文字列を用意
 			String line = new String();
 			Clause chk = null;
@@ -74,7 +78,7 @@ public class Parser {
 				if(line.startsWith("EOS")) {		// EOSがきたら終了
 					chk.setClause(wdl, depto);
 					chunkList.add(chk.clauseID);
-					
+
 				}else if(line.startsWith("*")) {	// *で始まる場合直前までのChunkを閉じ、新しいChunkを用意
 					if(wdl != null) {				// 最初は直前までのChunkが存在しないので回避
 						chk.setClause(wdl, depto);
@@ -102,17 +106,17 @@ public class Parser {
 				//読み込んだ行を格納
 				analysed += line + "\n";
 			}
-			
+
 			// chunkの係り受け関係を更新
 			Clause.updateAllDependency();
 			//System.out.println(analysed);
-						
+
 			// プロセス終了
 			is.close();
 			br.close();
 			process.destroy();
 			process.waitFor();
-			
+
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -120,7 +124,7 @@ public class Parser {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		return makeSentence();
 	}
 

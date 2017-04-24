@@ -1,4 +1,4 @@
-package japaneseParse;
+package relationExtract;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -1,4 +1,4 @@
-package japaneseParse;
+package grammar;
 
 import java.util.ArrayList;
 import java.util.Iterator;

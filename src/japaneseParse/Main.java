@@ -10,17 +10,69 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.swing.*;
+
+import grammar.Sentence;
+import relationExtract.OntologyBuilder;
+import syntacticParse.Parser;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
-public class Main {
+
+public class Main extends JFrame {
+	JButton bt;
+	JPanel pn1, pn2;
+	JTextArea txArea1, txArea2;
+
+	List<List<String>> relations;
 
 	public static void main(String[] args) {
+		Main frame = new Main("テキスト→オントロジー");
+		frame.setVisible(true);
+	}
+
+	Main (String title) {
+		setTitle(title);
+		setSize(1200,500);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		pn1 = new JPanel();
+		pn1.setSize(500, 500);
+	    pn1.setBackground(Color.GRAY);
+	    pn2 = new JPanel();
+	    pn2.setSize(500, 500);
+	    pn2.setBackground(Color.GRAY);
+
+	    bt = new JButton("オントロジー構築");
+	    bt.addActionListener(new SampleActionListener());
+	    txArea1 = new JTextArea(25, 35);
+	    txArea1.setLineWrap(true);
+
+	    txArea2 = new JTextArea(25, 35);
+	    txArea2.setLineWrap(true);
+
+	    pn1.add(txArea1);
+	    pn2.add(txArea2);
+
+	    add(pn1, BorderLayout.WEST);
+	    add(bt, BorderLayout.CENTER);
+	    add(pn2, BorderLayout.EAST);
+
+	    relations = new ArrayList<List<String>>();
+	}
+
+	public void generate(String text) {
 		List<String> writingList = new ArrayList<String>();
 		List<Sentence> sentList = new ArrayList<Sentence>();
-		List<List<String>> relations = new ArrayList<List<String>>();
-		///*
+
+		if(text.isEmpty()) {
 		String[] writings = {
 				///*
 				//"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
@@ -32,7 +84,7 @@ public class Main {
 				//"葵貝は雌は貝殻をもち、殻は扁平で直径10～25センチ、白色で放射状のひだがある",
 				"七面鳥はキジ目シチメンチョウ科の鳥",
 				"七面鳥は北アメリカに分布",
-				//"鮭はサケ科の海水魚の総称"
+				"鮭はサケ科の海水魚の総称"
 				//"葵貝は雄は体長約1.5センチで、殻をつくらない",
 				//"コアラは夜行性で木の上にすみ、ユーカリの葉だけを食べる",
 				//"鯉は体は長い筒形で背から腹へかけての幅が広く、長短二対の口ひげがある",
@@ -43,6 +95,12 @@ public class Main {
 				//"黒梶木は体長約4メートル、体重500キロに達する"
 		};
 		writingList.addAll(Arrays.asList(writings));
+
+		}else {
+			String[] writings = text.split("\n");
+			writingList.addAll(Arrays.asList(writings));
+		}
+
 		//*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
@@ -64,12 +122,17 @@ public class Main {
 			e.printStackTrace();
 		}
 		//*/
+
+		txArea1.setText("");
+		for(final String writing: writingList) {
+			txArea1.append(writing+"\n");
+		}
 		for(final String writing: writingList) {
 			/*** 構文解析Module ***/
 			//System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence originalSent = parse.run(writing);
-			
+
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/
 			String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}, {"形容詞"}};
@@ -82,7 +145,7 @@ public class Main {
 			// これらがClauseの末尾につくものを隣のClauseにつなげる
 			String[][] tags_NP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}, {"名詞"}};
 			originalSent.connect2Next(tags_NP, false);
-						
+
 			/** Step2: 長文分割 **/
 			/* 長文を分割し複数の短文に分ける */
 			originalSent.print();
@@ -94,15 +157,9 @@ public class Main {
 				}
 			}
 		}
-		
-		System.out.println("--------sentences---------");
-		
-		for(final Sentence partSent: sentList) {
-			//System.out.println(partSent.toString());
-		}
-		
-		System.out.println("--------sentences---------\n");
-				
+
+		System.out.println("------------関係抽出モジュール------------");
+
 		/*** 関係抽出モジュール ***/
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
@@ -120,9 +177,9 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//重複排除 
+		//重複排除
 		relations = new ArrayList<List<String>>(new LinkedHashSet<List<String>>(relations));
-		
+
 		// 得られた関係を読み取り，uriとtriplesに入れる
 		List<String> uri = new ArrayList<String>();	// ここに入れた単語はWordとしての情報を失いその後は文字列として扱う
 		uri.add("rdf:type");			// 0
@@ -131,13 +188,13 @@ public class Main {
 		uri.add("rdfs:domain");			// 3
 		uri.add("rdfs:range");			// 4
 		List<List<Integer>> triples = new ArrayList<List<Integer>>();
-		
+
 		File fileCSV = new File("csvs/relation"+sdf.format(c.getTime())+".csv");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileCSV));
-					
+
 			for(final List<String> relation: relations) {
-	        	//System.out.println(relation);
+	        	//System.out.println("relation = " + relation);
 	        	List<Integer> triple_id = new ArrayList<Integer>(3);
 	        	for(final String concept: relation) {
 	        		bw.write(concept+",");
@@ -151,7 +208,6 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        
 		//List<Node> nodes = Node.setTriples2Nodes(uri, triples);
 		/*
 		for(int i=0; i<uri.size(); i++) {
@@ -160,16 +216,31 @@ public class Main {
 			nodes.get(i).printNode2();
 		}
 		*/
-		
+
 		/*** OWL DL Axiom Module ***/
-		
-		
-		OntologyBuilder ob = new OntologyBuilder("n3", uri, triples);		
+
+
+		OntologyBuilder ob = new OntologyBuilder("n3", uri, triples);
 		ob.output("owls/ontology"+sdf.format(c.getTime()));	// 渡すのは保存先のパス(拡張子は含まない)
-				
+
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + writingList.size() + "\t->dividedSentences: " + sentList.size());
 		System.out.println("Relations: " + triples.size());
 	}
 
+	class SampleActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			String text = txArea1.getText();
+			generate(text);
+
+			txArea2.setText("");
+			for(List<String> relation: relations) {
+				for(String concept: relation) {
+					txArea2.append(concept + ",");
+				}
+				txArea2.append("\n");
+			}
+			relations.clear();
+		}
+	}
 }
