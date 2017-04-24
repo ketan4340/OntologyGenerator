@@ -1,11 +1,11 @@
 bin/
 
-<<<<<<< HEAD
-=======
+
+
 .classpath
 .project
 .settings/
->>>>>>> 28141a6562900537ee0a062078f37f32e0558635
+
 .DS_Store
 
 csvs/
