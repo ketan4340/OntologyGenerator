@@ -1,12 +1,9 @@
 bin/
 
-
-
 .DS_Store
 
 csvs/
 dics/
-libs/
 owls/
 texts/
 urls/
