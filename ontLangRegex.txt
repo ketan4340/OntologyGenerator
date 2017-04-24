@@ -1,9 +1,0 @@
-_:\S+
-rdf:\w+
-rdfs:\w+
-owl:\w+
-dcterms:\w+
-attributeOf
-hasLength
-hasWeight
-exterms:\w+

@@ -17,7 +17,7 @@ public class OntologyBuilder {
 	public boolean xml_n3;		// RDF/XML形式ならtrue,N-Triples形式ならfalse
 	public String extension;	// 拡張子
 	private List<String> ontLangRegexes;
-	
+
 	public OntologyBuilder(String xml_n3, List<String> uri, List<List<Integer>> triples) {
 		this.uri = uri;
 		this.triples = triples;
@@ -30,7 +30,7 @@ public class OntologyBuilder {
 		}
 		ontLangRegexes = new ArrayList<String>();
 		try {
-			String fileName = "ontLangRegex.txt";
+			String fileName = "rules/ontLangRegex.txt";
 			File file = new File(fileName);
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String regex = br.readLine();
@@ -45,7 +45,7 @@ public class OntologyBuilder {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/* RDF/XMLファイルを出力する */
 	public void output(String saveFile) {
 		saveFile += extension;
@@ -89,13 +89,13 @@ public class OntologyBuilder {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getRDF(List<Integer> triple) {
 		String rdf;
 		int s = triple.get(0);
 		int p = triple.get(1);
 		int o = triple.get(2);
-		
+
 		rdf = setDefaultTriple(uri.get(s), uri.get(p), uri.get(o));
 		/*
 		switch (p) {
@@ -120,7 +120,7 @@ public class OntologyBuilder {
 	   */
 		return rdf;
 	}
-	
+
 	/*** body(本文に)公理を追記する ***/
 	/* インスタンスの定義 */
 	public String setType(String instance, String mainClass) {
@@ -219,7 +219,7 @@ public class OntologyBuilder {
 		}
 		return axiom;
 	}
-	
+
 	public String setDefaultTriple(String s, String p, String o) {
 		String axiom = new String();
 		if(xml_n3) {
@@ -233,7 +233,7 @@ public class OntologyBuilder {
 		}
 		return axiom;
 	}
-	
+
 	private String getN3Elem(String elem) {
 		boolean isOntLang = false;
 		for(final String regex: ontLangRegexes) {
@@ -242,13 +242,13 @@ public class OntologyBuilder {
 				break;
 			}
 		}
-		if(elem.matches("\\d+")) {
-			elem = "\""+elem+"\"";
-		}else if(isOntLang) {
-			;		// そのままっつーこと
-		}else {
-			elem = "<"+elem+">";
+		if(elem.matches("\\d+")) {	// 数値なら
+			elem = "\""+elem+"\"";		// リテラルとして扱う
+		}else if(isOntLang) {		// rules/ontLangRegexesで指定したオントロジー言語なら
+			;							// そのまま
+		}else {						// それ以外なら
+			elem = "<"+elem+">";		// URIの記法に則る
 		}
 		return elem;
-	}	
+	}
 }
