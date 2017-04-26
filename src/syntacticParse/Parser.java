@@ -20,11 +20,13 @@ public class Parser {
 	public String tool; // どの解析器を使うか(stanford,cabocha,knp)
 	public String analysed;
 	public List<Integer> chunkList;
+	private String osName;
 
 	public Parser(String howto) {
 		tool = howto;
 		analysed = new String();
 		chunkList = new ArrayList<Integer>();
+		osName=System.getProperty("os.name").toLowerCase();
 	}
 	public Parser() {
 		this(null);
@@ -54,8 +56,14 @@ public class Parser {
 			text=text.replaceAll(btmp, "");
 
 			//cabochaの実行開始　lattice形式で出力(-f1の部分で決定、詳しくはcabochaのhelp参照)
-			ProcessBuilder pb = new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1");
-			//ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "cabocha", "-f1", "-n1");
+			ProcessBuilder pb;
+			if(PlatformUtil.isMac()) {
+				pb = new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1");
+			}else if(PlatformUtil.isWindows()) {
+				pb = new ProcessBuilder("cmd", "/c", "cabocha", "-f1", "-n1");
+			}else {
+				pb = null;
+			}
 
 			Process process = pb.start();
 
