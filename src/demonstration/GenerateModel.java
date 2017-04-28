@@ -58,6 +58,11 @@ public class GenerateModel extends Observable{
 		getRelations().clear();
 	}
 
+	private String setText() {
+		String text = new String();
+		return text;
+	}
+
 	private void setProcessMembers() {
 		process.setWritingList(writingList);
 		process.setSentList(sentList);

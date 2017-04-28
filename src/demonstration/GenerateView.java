@@ -14,15 +14,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 public class GenerateView extends JFrame implements Observer{
-	JButton bt;
-	JPanel pn1, pn2;
-	JTextArea txArea1, txArea2;
-
-	public GenerateView(String title) {
-		setTitle(title);
-	}
+	private GenerateController controller;
+	private JButton bt;
+	private JPanel pn1, pn2;
+	private JTextArea txArea1, txArea2;
 
 	public GenerateView(GenerateController controller) {
+		this.controller = controller;
+
 		setSize(1200,500);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
