@@ -1,4 +1,4 @@
-package collectingDictionary;
+package japaneseParse;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -7,11 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,19 +17,17 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class Crawler {
+import collectingDictionary.Crawler;
 
+public class TextCrawler {
 	public static void main(String[] args) {
 		int depth = 500;
-		int interval = 10;
+		int interval = 20;
 		Crawler crw = new Crawler("goo", depth, interval);
 
-		String[] categories = {"生物", "動物名"};
+		String[] categories = {"生物", "植物名"};
 		String syllabary = "あ";
-		crw.run(1, false, categories, syllabary);
-
-		//Crawler.runAll(3);
-		//Crawler.gatheringTexts("writings", "gooText生物-動物名-All.txt");
+		crw.run(1, true, categories, syllabary);
 	}
 
 	public String onlineDic;	// どの辞書を探索するかのスイッチ(現状gooのみ)
@@ -57,16 +51,16 @@ public class Crawler {
 	public String textPath;
 	public String expansion = ".txt";
 
-	public Crawler(String dic, int dep, int itv) {
+	public TextCrawler(String dic, int dep, int itv) {
 		onlineDic = dic;
 		depth = dep;
 		interval = itv;
 
 		switch(onlineDic) {
 		case "goo":
-			urlHead = "http://dictionary.goo.ne.jp/jn/";
-			urlTail = "/meaning/m1u/";
-			urlCat = "category/";
+			urlHead = "https://news.goo.ne.jp/";
+			urlTail = "";
+			urlCat = "";
 			break;
 		case "weblio":
 			urlHead = "http://www.weblio.jp/";
@@ -354,5 +348,4 @@ public class Crawler {
 			e.printStackTrace();
 		}
 	}
-
 }

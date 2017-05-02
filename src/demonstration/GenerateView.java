@@ -2,6 +2,9 @@ package demonstration;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -12,61 +15,70 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.border.LineBorder;
 
 public class GenerateView extends JFrame implements Observer{
-<<<<<<< HEAD
-	private GenerateController controller;
-	private JButton bt;
-	private JPanel pn1, pn2;
+	//private GenerateController controller;
+	public JButton bt, reset;
+	public JPanel pn1, pn2;
 	private JTextArea txArea1, txArea2;
-
-	public GenerateView(GenerateController controller) {
-		this.controller = controller;
-=======
-//	private GenerateController controller;
-
-	private JButton bt;
-	private JPanel pn1, pn2;
-	private JTextArea txArea1, txArea2;
-	private JLabel lb;
 
 	public GenerateView(GenerateController controller) {
 		super("OntologyGenerator");
 		//this.controller = controller;
 		controller.setView(this);
 		controller.getModel().addObserver(this);
->>>>>>> 814156a82d053888839f5ccbb3e816ec1889f266
 
-		setSize(1200,500);
+		setSize(1200,800);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		pn1 = new JPanel();
-		pn1.setSize(500, 500);
-	    pn1.setBackground(Color.GRAY);
+		pn1.setSize(1200, 300);
+	    pn1.setBackground(Color.WHITE);
+	    txArea1 = new JTextArea(10, 100);
+	    txArea1.setLineWrap(true);
+	    pn1.add(txArea1);
+
 	    pn2 = new JPanel();
-	    pn2.setSize(500, 500);
-	    pn2.setBackground(Color.GRAY);
+	    pn2.setLayout(new GridLayout(0, 3));
+	    pn2.setSize(1200, 300);
+	    pn2.setBackground(Color.WHITE);
+	    JScrollPane scrollpane = new JScrollPane(pn2);
+	    scrollpane.setPreferredSize(new Dimension(1200, 500));
+	    /*
+	    txArea2 = new JTextArea(25, 35);
+	    txArea2.setLineWrap(true);
+	    pn2.add(txArea2);
+	    */
+	    LineBorder border = new LineBorder(Color.BLACK, 2, true);
+	    JLabel s = new JLabel("Subject");
+	    s.setForeground(Color.CYAN);
+	    s.setBorder(border);
+	    s.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	    JLabel p = new JLabel("Predicate");
+	    p.setForeground(Color.RED);
+	    p.setBorder(border);
+	    p.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	    JLabel o = new JLabel("Object");
+	    o.setForeground(Color.CYAN);
+	    o.setBorder(border);
+	    o.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	    pn2.add(s);
+	    pn2.add(p);
+	    pn2.add(o);
 
 	    bt = new JButton("オントロジー構築");
 	    bt.addActionListener(controller);
+	    reset = new JButton("ランダムテキスト");
+	    reset.addActionListener(controller);
 
-	    txArea1 = new JTextArea(25, 35);
-	    txArea1.setLineWrap(true);
-
-	    txArea2 = new JTextArea(25, 35);
-	    txArea2.setLineWrap(true);
-
-	    lb = new JLabel("ラベル");
-
-	    pn1.add(txArea1);
-	    pn2.add(txArea2);
-
-	    add(pn1, BorderLayout.WEST);
-	    add(bt, BorderLayout.CENTER);
-	    add(pn2, BorderLayout.EAST);
-	    add(lb, BorderLayout.NORTH);
+	    this.add(pn1, BorderLayout.NORTH);
+	    this.add(bt, BorderLayout.WEST);
+	    this.add(reset, BorderLayout.EAST);
+	    this.add(scrollpane, BorderLayout.SOUTH);
 
 	    this.setVisible(true);
 	}
@@ -85,13 +97,12 @@ public class GenerateView extends JFrame implements Observer{
 			txArea1.append(writing+"\n");
 		}
 
-		txArea2.setText("");
 		for(List<String> relation: model.getRelations()) {
 			for(String concept: relation) {
-				txArea2.append(concept + ",");
-				System.out.print(concept+",");
+			    JLabel c = new JLabel(concept);
+			    c.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+			    pn2.add(c);
 			}
-			txArea2.append("\n");
 		}
 	}
 }

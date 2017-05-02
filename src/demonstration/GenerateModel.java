@@ -18,9 +18,7 @@ public class GenerateModel extends Observable{
 		process = new GenerateProcess();
 	}
 
-	public GenerateProcess getGenerateProcess() {
-		return process;
-	}
+
 	public List<String> getWritingList() {
 		return process.getWritingList();
 	}
@@ -44,10 +42,7 @@ public class GenerateModel extends Observable{
 	public void runGenerator(String text) {
 		process.run(text);
 		setProcessMembers();
-		System.out.println("wl"+writingList);
-		System.out.println("sl"+sentList);
-		System.out.println("rl"+relations);
-		//process.setRelations(new ArrayList<>());
+		process.setRelations(new ArrayList<>());
 	}
 
 	public void setProcessMembers() {
@@ -57,17 +52,8 @@ public class GenerateModel extends Observable{
 		setChanged();
 		notifyObservers();
 	}
-<<<<<<< HEAD
 
-	private String setText() {
-		String text = new String();
-		return text;
-	}
-
-	private void setProcessMembers() {
-=======
 	public void replaceProcessMembers() {
->>>>>>> 814156a82d053888839f5ccbb3e816ec1889f266
 		process.setWritingList(writingList);
 		process.setSentList(sentList);
 		process.setRelations(relations);

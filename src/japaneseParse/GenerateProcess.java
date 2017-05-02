@@ -47,6 +47,7 @@ public class GenerateProcess {
 
 
 	public void run(String text) {
+		writingList.clear();
 		if(text.isEmpty()) {
 			writingList.add("これはデフォルトの文章です。");
 		}else {
