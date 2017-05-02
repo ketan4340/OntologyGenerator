@@ -16,7 +16,7 @@ import relationExtract.OntologyBuilder;
 import syntacticParse.Parser;
 
 public class GenerateProcess {
-	private List<String> writingList;
+	public List<String> writingList;
 	private List<Sentence> sentList;
 	private List<List<String>> relations;
 
@@ -25,7 +25,6 @@ public class GenerateProcess {
 		sentList = new ArrayList<Sentence>();
 		relations = new ArrayList<List<String>>();
 	}
-
 
 	public List<String> getWritingList() {
 		return writingList;
@@ -47,17 +46,9 @@ public class GenerateProcess {
 	}
 
 
-	public void generate(String text) {
-
+	public void run(String text) {
 		if(text.isEmpty()) {
-			String[] writings = {
-					"鮎魚女は岩礁域に多く、体色は黄褐色から紫褐色まで場所によって変わる",
-					"アイベックスは角は、雄のものは大きくて後方に湾曲し、表面に竹のような節がある",
-					"アイアイは長い指は鉤爪をもち、樹皮下の昆虫を掘り出して食う。",
-					"アイアイは頭胴長40センチくらいで、尾が長い",
-					"黒梶木は体長約4メートル、体重500キロに達する"
-			};
-			writingList.addAll(Arrays.asList(writings));
+			writingList.add("これはデフォルトの文章です。");
 		}else {
 			String[] writings = text.split("\n");
 			writingList.addAll(Arrays.asList(writings));

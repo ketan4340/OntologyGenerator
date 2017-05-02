@@ -1,26 +1,15 @@
 package demonstration;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Observable;
 
 import grammar.Sentence;
 import japaneseParse.GenerateProcess;
-import relationExtract.OntologyBuilder;
-import syntacticParse.Parser;
 
 public class GenerateModel extends Observable{
 	private GenerateProcess process;
 
-	private String text;
 	private List<String> writingList;
 	private List<Sentence> sentList;
 	private List<List<String>> relations;
@@ -29,6 +18,9 @@ public class GenerateModel extends Observable{
 		process = new GenerateProcess();
 	}
 
+	public GenerateProcess getGenerateProcess() {
+		return process;
+	}
 	public List<String> getWritingList() {
 		return process.getWritingList();
 	}
@@ -48,15 +40,24 @@ public class GenerateModel extends Observable{
 		this.relations = relations;
 	}
 
-
-	// Generator実行
+// Generator実行
 	public void runGenerator(String text) {
+		process.run(text);
 		setProcessMembers();
-		process.generate(text);
+		System.out.println("wl"+writingList);
+		System.out.println("sl"+sentList);
+		System.out.println("rl"+relations);
+		//process.setRelations(new ArrayList<>());
+	}
+
+	public void setProcessMembers() {
+		writingList = process.getWritingList();
+		sentList = process.getSentList();
+		relations = process.getRelations();
 		setChanged();
 		notifyObservers();
-		getRelations().clear();
 	}
+<<<<<<< HEAD
 
 	private String setText() {
 		String text = new String();
@@ -64,6 +65,9 @@ public class GenerateModel extends Observable{
 	}
 
 	private void setProcessMembers() {
+=======
+	public void replaceProcessMembers() {
+>>>>>>> 814156a82d053888839f5ccbb3e816ec1889f266
 		process.setWritingList(writingList);
 		process.setSentList(sentList);
 		process.setRelations(relations);
