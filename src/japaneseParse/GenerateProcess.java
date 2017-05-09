@@ -16,22 +16,14 @@ import relationExtract.OntologyBuilder;
 import syntacticParse.Parser;
 
 public class GenerateProcess {
-	public List<String> writingList;
 	private List<Sentence> sentList;
 	private List<List<String>> relations;
 
 	public GenerateProcess() {
-		writingList = new ArrayList<String>();
 		sentList = new ArrayList<Sentence>();
 		relations = new ArrayList<List<String>>();
 	}
 
-	public List<String> getWritingList() {
-		return writingList;
-	}
-	public void setWritingList(List<String> writingList) {
-		this.writingList = writingList;
-	}
 	public List<Sentence> getSentList() {
 		return sentList;
 	}
@@ -45,16 +37,18 @@ public class GenerateProcess {
 		this.relations = relations;
 	}
 
-
 	public void run(String text) {
-		writingList.clear();
+		List<String> writingList = new ArrayList<String>();
 		if(text.isEmpty()) {
 			writingList.add("これはデフォルトの文章です。");
 		}else {
 			String[] writings = text.split("\n");
 			writingList.addAll(Arrays.asList(writings));
 		}
+		run(writingList);
+	}
 
+	public void run(List<String> writingList) {
 		//*/
 		/*** Collecting Entries ***/
 		/* 外部ファイルから日本語テキストを読み込む */
