@@ -28,7 +28,7 @@ public class MainView extends JFrame implements Observer{
 	private JLabel l;
 	private JButton runGeneratorBt, randomTextBt;
 	private JPanel inputPanel, outputPanel;
-	JScrollPane scrollpane;
+	private JScrollPane scrollpane;
 	private JTextArea txtArea;
 
 	public MainView(MainController controller) {
@@ -36,17 +36,15 @@ public class MainView extends JFrame implements Observer{
 		this.controller = controller;
 		controller.setView(this);
 		i_model = controller.getI_model();
-		i_model.addObserver(this);
 		o_model = controller.getO_model();
-		o_model.addObserver(this);
 
 		designWholeFrame();
 	    this.setVisible(true);
 	}
 
 	private void designWholeFrame() {
-		this.setSize(1200,800);
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);	// 最大化
+		//this.setSize(1200,800);
+		this.setExtendedState((int)(JFrame.MAXIMIZED_BOTH * 0.5));	// 画面全体の半分のサイズ
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -156,7 +154,6 @@ public class MainView extends JFrame implements Observer{
 			    c.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 			    outputPanel.add(c);
 			}
-			//l.setText(triple[0]);
 		}
 	}
 }

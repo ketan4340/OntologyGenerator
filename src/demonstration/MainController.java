@@ -19,10 +19,10 @@ public class MainController implements ActionListener{
 	private MainView view;
 
 	public MainController() {
-		i_model = new InputModel();
-		o_model = new OutputModel();
-
 		view = new MainView(this);
+
+		i_model = new InputModel(view);
+		o_model = new OutputModel(view);
 	}
 
 	public InputModel getI_model() {

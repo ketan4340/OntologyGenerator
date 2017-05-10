@@ -7,7 +7,8 @@ import java.util.Observable;
 public class OutputModel extends Observable{
 	List<String[]> triples;
 
-	public OutputModel() {
+	public OutputModel(final MainView view) {
+		addObserver(view);
 		triples = new ArrayList<String[]>();
 	}
 

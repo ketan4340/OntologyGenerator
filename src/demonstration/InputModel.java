@@ -10,8 +10,8 @@ import japaneseParse.GenerateProcess;
 public class InputModel extends Observable{
 	private List<String> inputTextList;
 
-	public InputModel() {
-
+	public InputModel(final MainView view) {
+		addObserver(view);
 	}
 
 	public List<String> getInputTextList() {
