@@ -17,9 +17,13 @@ public class MainController implements ActionListener{
 	private OutputModel o_model;
 
 	private MainView view;
+	private InputView i_view;
+	private OutputView o_view;
 
 	public MainController() {
 		view = new MainView(this);
+		i_view = new InputView(this);
+		o_view = new OutputView(this);
 
 		i_model = new InputModel(view);
 		o_model = new OutputModel(view);
