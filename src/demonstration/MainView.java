@@ -5,9 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -16,20 +13,25 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 
 public class MainView extends JFrame implements Observer{
+	/* Model */
 	private InputModel i_model;
 	private OutputModel o_model;
-
+	/* Controller */
 	private MainController controller;
 
-	private JLabel l;
-	private JButton runGeneratorBt, randomTextBt;
-	private JPanel inputPanel, outputPanel;
-	private JScrollPane scrollpane;
+	/* Input parts */
+	private JPanel inputPanel;
 	private JTextArea txtArea;
+	private JButton runGeneratorBt, randomTextBt;
+	/* Output parts */
+	private JPanel outputPanel;
+	private JScrollPane scrollpane;
+	private JTable tb;
 
 	public MainView(MainController controller) {
 		super("OntologyGenerator");
@@ -44,7 +46,7 @@ public class MainView extends JFrame implements Observer{
 
 	private void designWholeFrame() {
 		//this.setSize(1200,800);
-		this.setExtendedState((int)(JFrame.MAXIMIZED_BOTH * 0.5));	// 画面全体の半分のサイズ
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH / 2);	// 画面全体の半分のサイズ
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -56,9 +58,6 @@ public class MainView extends JFrame implements Observer{
 	    randomTextBt = new JButton("ランダムテキスト");
 	    randomTextBt.addActionListener(controller);
 
-	    l = new JLabel("ラベル");
-
-	    this.add(l, BorderLayout.CENTER);
 	    this.add(runGeneratorBt, BorderLayout.WEST);
 	    this.add(randomTextBt, BorderLayout.EAST);
 	}
