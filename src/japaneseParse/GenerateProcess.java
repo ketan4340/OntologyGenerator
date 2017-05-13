@@ -17,11 +17,11 @@ import syntacticParse.Parser;
 
 public class GenerateProcess {
 	private List<Sentence> sentList;
-	private List<List<String>> relations;
+	private List<String[]> relations;
 
 	public GenerateProcess() {
 		sentList = new ArrayList<Sentence>();
-		relations = new ArrayList<List<String>>();
+		relations = new ArrayList<String[]>();
 	}
 
 	public List<Sentence> getSentList() {
@@ -30,10 +30,10 @@ public class GenerateProcess {
 	public void setSentList(List<Sentence> sentList) {
 		this.sentList = sentList;
 	}
-	public List<List<String>> getRelations() {
+	public List<String[]> getRelations() {
 		return relations;
 	}
-	public void setRelations(List<List<String>> relations) {
+	public void setRelations(List<String[]> relations) {
 		this.relations = relations;
 	}
 
@@ -114,7 +114,7 @@ public class GenerateProcess {
 				/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
 				bw.write(partSent.toString());		// 分割後の文を出力
 				bw.newLine();
-				List<List<String>> relation = partSent.extractRelation();
+				List<String[]> relation = partSent.extractRelation();
 				relations.addAll(relation);
 			}
 			bw.close();
@@ -122,7 +122,7 @@ public class GenerateProcess {
 			e.printStackTrace();
 		}
 		//重複排除
-		relations = new ArrayList<List<String>>(new LinkedHashSet<List<String>>(relations));
+		relations = new ArrayList<String[]>(new LinkedHashSet<String[]>(relations));
 
 		// 得られた関係を読み取り，uriとtriplesに入れる
 		List<String> uri = new ArrayList<String>();	// ここに入れた単語はWordとしての情報を失いその後は文字列として扱う
@@ -131,20 +131,23 @@ public class GenerateProcess {
 		uri.add("rdfs:subPropertyOf");	// 2
 		uri.add("rdfs:domain");			// 3
 		uri.add("rdfs:range");			// 4
-		List<List<Integer>> triples = new ArrayList<List<Integer>>();
+		List<int[]> triples = new ArrayList<int[]>();
 
 		File fileCSV = new File("csvs/relation"+sdf.format(c.getTime())+".csv");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileCSV));
 
-			for(final List<String> relation: relations) {
-	        	//System.out.println("relation = " + relation);
-	        	List<Integer> triple_id = new ArrayList<Integer>(3);
+			for(final String[] relation: relations) {
+				String spo = new String();
 	        	for(final String concept: relation) {
-	        		bw.write(concept+",");
+	        		spo += concept+",";
 	        		if( !uri.contains(concept) ) uri.add(concept);
-	        		triple_id.add(uri.indexOf(concept));
 	        	}
+	        	int uriS = uri.indexOf(relation[0]);
+	        	int uriP= uri.indexOf(relation[0]);
+	        	int uriO= uri.indexOf(relation[0]);
+	        	int[] triple_id = {uriS, uriP, uriO};
+	        	bw.write(spo);
 	        	bw.newLine();
 	        	triples.add(triple_id);
 			}

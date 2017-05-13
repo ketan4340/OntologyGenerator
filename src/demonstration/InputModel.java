@@ -10,6 +10,8 @@ import japaneseParse.GenerateProcess;
 public class InputModel extends Observable{
 	private List<String> inputTextList;
 
+	public InputModel() {
+	}
 	public InputModel(final MainView view) {
 		addObserver(view);
 	}
@@ -31,10 +33,10 @@ public class InputModel extends Observable{
 
 		GenerateProcess process = new GenerateProcess();
 		process.run(text);
-		for(List<String> relation: process.getRelations()) {
+		for(String[] relation: process.getRelations()) {
 			String[] triple = new String[3];
 			for(int i = 0; i < 3; i++) {
-				triple[i] = relation.get(i);
+				triple[i] = relation[i];
 			}
 			triples.add(triple);
 		}

@@ -13,12 +13,12 @@ import java.util.List;
 public class OntologyBuilder {
 	//public String body; 		// RDF/XMLの本文
 	public List<String> uri;
-	public List<List<Integer>> triples;
+	public List<int[]> triples;
 	public boolean xml_n3;		// RDF/XML形式ならtrue,N-Triples形式ならfalse
 	public String extension;	// 拡張子
 	private List<String> ontLangRegexes;
 
-	public OntologyBuilder(String xml_n3, List<String> uri, List<List<Integer>> triples) {
+	public OntologyBuilder(String xml_n3, List<String> uri, List<int[]> triples) {
 		this.uri = uri;
 		this.triples = triples;
 		if(xml_n3.equals("xml")) {
@@ -65,7 +65,7 @@ public class OntologyBuilder {
 					+ ">"+"\n"
 					+ "<owl:Ontology rdf:about=\"\"/>"+"\n");
 				bw.newLine();
-				for(final List<Integer> triple: triples) {
+				for(final int[] triple: triples) {
 					rdf = getRDF(triple);
 					bw.write(rdf);
 					bw.newLine();
@@ -77,7 +77,7 @@ public class OntologyBuilder {
 				+ "@prefix owl: <http://www.w3.org/2002/07/owl#>."+"\n"
 				+ "@prefix dc: <http://purl.org/dc/elements/1.1/>."+"\n");
 				bw.newLine();
-				for(final List<Integer> triple: triples) {
+				for(final int[] triple: triples) {
 					rdf = getRDF(triple);
 					//System.out.println("rdf : " + rdf);
 					bw.write(rdf);
@@ -90,11 +90,11 @@ public class OntologyBuilder {
 		}
 	}
 
-	public String getRDF(List<Integer> triple) {
+	public String getRDF(int[] triple) {
 		String rdf;
-		int s = triple.get(0);
-		int p = triple.get(1);
-		int o = triple.get(2);
+		int s = triple[0];
+		int p = triple[1];
+		int o = triple[2];
 
 		rdf = setDefaultTriple(uri.get(s), uri.get(p), uri.get(o));
 		/*

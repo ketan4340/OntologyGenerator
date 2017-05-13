@@ -17,16 +17,22 @@ public class MainController implements ActionListener{
 	private OutputModel o_model;
 
 	private MainView view;
+	/*
 	private InputView i_view;
 	private OutputView o_view;
+	*/
 
 	public MainController() {
+		i_model = new InputModel();
+		o_model = new OutputModel();
+
 		view = new MainView(this);
+		/*
 		i_view = new InputView(this);
 		o_view = new OutputView(this);
-
-		i_model = new InputModel(view);
-		o_model = new OutputModel(view);
+		 */
+		i_model.addObserver(view);
+		o_model.addObserver(view);
 	}
 
 	public InputModel getI_model() {
@@ -55,7 +61,7 @@ public class MainController implements ActionListener{
 			List<String[]> triples = new ArrayList<String[]>();
 			triples = i_model.runGenerator(text);
 
-			o_model.setTriples(triples);
+			o_model.addAllTriples(triples);
 
 		}else if(e.getSource() == view.getRandomTextBt()) {
 			String text = "*";
