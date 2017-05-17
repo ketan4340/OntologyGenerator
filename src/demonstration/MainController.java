@@ -7,30 +7,53 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-public class MainController implements ActionListener{
+public class MainController/* implements ActionListener*/{
+	/*** Model ***/
 	private InputModel i_model;
 	private OutputModel o_model;
 
+	/*** View ***/
 	private MainView view;
-	/*
-	private InputView i_view;
-	private OutputView o_view;
-	*/
 
 	public MainController() {
 		i_model = new InputModel();
 		o_model = new OutputModel();
 
 		view = new MainView(this);
-		/*
-		i_view = new InputView(this);
-		o_view = new OutputView(this);
-		 */
+		view.setModels(i_model, o_model);
+		/* RunGeneratorボタンの実装 */
+		view.getRunGeneratorBt().addActionListener(event -> {
+			String text = view.getTxArea1().getText();
+			List<String[]> triples = i_model.runGenerator(text);
+			o_model.addAllTriples(triples);
+		});
+		/* RandomTextボタンの実装 */
+		view.getRandomTextBt().addActionListener(event -> {
+			List<String> strs = new LinkedList<String>();
+
+			Path path = Paths.get("writings/gooText生物-動物名-あ.txt");
+			//List<String> strs = Files.readAllLines(path, StandardCharsets.UTF_8);	// ファイルが小さければこれでもいい
+			try(Stream<String> stream = Files.lines(path, Charset.forName("UTF-8"))) {
+				stream.forEach(line -> strs.add(line));
+			}catch(IOException e){
+			  System.out.println(e);
+			}
+
+			String text = strs.get(new Random().nextInt(strs.size()));
+			view.getTxArea1().setText(text);
+		});
+
+		// ModelのオブザーバーにViewを追加
 		i_model.addObserver(view);
 		o_model.addObserver(view);
 	}
@@ -47,13 +70,8 @@ public class MainController implements ActionListener{
 	public void setO_model(OutputModel o_Model) {
 		this.o_model = o_Model;
 	}
-	public MainView getView() {
-		return view;
-	}
-	public void setView(MainView view) {
-		this.view = view;
-	}
 
+/*
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == view.getRunGeneratorBt()) {
@@ -90,4 +108,16 @@ public class MainController implements ActionListener{
 			view.getTxArea1().setText(text);
 		}
 	}
+	*/
+
+	/*
+	 * 各ActionListener(インスタンス変数)の実装
+	 */
+	private ActionListener Action = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO 自動生成されたメソッド・スタブ
+
+		}
+	};
 }

@@ -46,9 +46,10 @@ public class OutputModel extends Observable{
 			triples.add(newTriple);
 			tableModel.addRow(newTriple);
 		}
-
+		/*
 		setChanged();
 		notifyObservers();
+		*/
 	}
 	public void addAllTriples(List<String[]> newTriples) {
 		for(String[] newTriple: newTriples) {

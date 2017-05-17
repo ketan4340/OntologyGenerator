@@ -23,7 +23,7 @@ public class MainView extends JFrame implements Observer{
 	private OutputModel o_model;
 
 	/*** Controller ***/
-	private MainController controller;
+	//private MainController controller;
 
 	/*** View ***/
 	/** Whole part **/
@@ -45,9 +45,10 @@ public class MainView extends JFrame implements Observer{
 
 	public MainView(MainController controller) {
 		super("OntologyGenerator");
-
+		/*
 		this.controller = controller;
 		controller.setView(this);
+		*/
 		i_model = controller.getI_model();
 		o_model = controller.getO_model();
 
@@ -73,7 +74,7 @@ public class MainView extends JFrame implements Observer{
 		JPanel pn_menu = new JPanel();
 		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
 	    randomTextBt = new JButton("インポート");
-	    randomTextBt.addActionListener(controller);
+	    //randomTextBt.addActionListener(controller);
 		pn_menu.add(randomTextBt);
 		pn_menu.add(new JLabel("設定"));
 		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
@@ -93,7 +94,7 @@ public class MainView extends JFrame implements Observer{
 		JPanel pn_menu = new JPanel();
 		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
 	    runGeneratorBt = new JButton("オントロジー構築");
-	    runGeneratorBt.addActionListener(controller);
+	    //runGeneratorBt.addActionListener(controller);
 	    pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
 		pn_menu.add(runGeneratorBt);
 		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
@@ -109,29 +110,21 @@ public class MainView extends JFrame implements Observer{
 	    add(pn_ont);
 	}
 
-	public InputModel getI_model() {
-		return i_model;
-	}
 	public void setI_model(InputModel i_model) {
 		this.i_model = i_model;
-	}
-	public OutputModel getO_model() {
-		return o_model;
 	}
 	public void setO_model(OutputModel o_model) {
 		this.o_model = o_model;
 	}
-
+	public void setModels(InputModel i_model, OutputModel o_model) {
+		setI_model(i_model);
+		setO_model(o_model);
+	}
 
 	@Override
 	public void update(Observable obs, Object arg) {
-		o_model = (OutputModel) obs;
-
-		for(String[] triple: o_model.getTriples()) {
-			for(String concept: triple) {
-				designOutputFrame();
-			}
-		}
+		final OutputModel o_model = (OutputModel) obs;
+		tb = new JTable(o_model.getTableModel());
 	}
 
 	public JButton getRunGeneratorBt() {
