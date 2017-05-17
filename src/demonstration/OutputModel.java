@@ -13,16 +13,10 @@ public class OutputModel extends Observable{
 	private DefaultTableModel tableModel;
 
 	private String[] columnNames = {"Subject", "Predicate", "Object"};
-	private String[][] data = {
-			{"s1", "p1", "o1"},
-			{"s2", "p2", "o2"},
-			{"s3", "p3", "o3"}
-	};
 
 	public OutputModel() {
 		triples = new ArrayList<String[]>();
-		tableModel = new DefaultTableModel(columnNames, 1);
-		//tableModel = new DefaultTableModel(data, columnNames);
+		tableModel = new DefaultTableModel(columnNames, 0);
 	}
 	public OutputModel(final MainView view) {
 		this();
