@@ -8,24 +8,19 @@ import javax.swing.table.DefaultTableModel;
 
 import com.sun.xml.internal.ws.util.NoCloseOutputStream;
 
-public class OutputModel extends Observable{
+public class OutputModel extends DefaultTableModel{
 	private List<String[]> triples;
-	private DefaultTableModel tableModel;
 
-	private String[] columnNames = {"Subject", "Predicate", "Object"};
+	private static String[] columnNames = {"Subject", "Predicate", "Object"};
 
 	public OutputModel() {
+		super(columnNames, 0);
 		triples = new ArrayList<String[]>();
-		tableModel = new DefaultTableModel(columnNames, 0);
 	}
 	public OutputModel(final MainView view) {
 		this();
-		addObserver(view);
 	}
 
-	public DefaultTableModel getTableModel() {
-		return tableModel;
-	}
 	public String[] getColumnNames() {
 		return columnNames;
 	}
@@ -34,9 +29,6 @@ public class OutputModel extends Observable{
 	}
 	public void setTriples(List<String[]> triples) {
 		this.triples = triples;
-
-		setChanged();
-        notifyObservers();
 	}
 
 	private void addTriple(String[] newTriple) {
@@ -44,12 +36,8 @@ public class OutputModel extends Observable{
 			System.err.println("ERROR: triple is not composed of 3 concepts.");
 		}else {
 			triples.add(newTriple);
-			tableModel.addRow(newTriple);
+			addRow(newTriple);
 		}
-		/*
-		setChanged();
-		notifyObservers();
-		*/
 	}
 	public void addAllTriples(List<String[]> newTriples) {
 		for(String[] newTriple: newTriples) {

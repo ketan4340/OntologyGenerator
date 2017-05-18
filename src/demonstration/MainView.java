@@ -100,7 +100,7 @@ public class MainView extends JFrame implements Observer{
 		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
 		pn_menu.add(new JLabel("クリア"));
 
-		tb = new JTable(o_model.getTableModel());
+		tb = new JTable(o_model);
 		scrollpane_ont = new JScrollPane(tb);
 
 		pn_ont = new JPanel(new BorderLayout());
@@ -123,8 +123,10 @@ public class MainView extends JFrame implements Observer{
 
 	@Override
 	public void update(Observable obs, Object arg) {
+		/*
 		final OutputModel o_model = (OutputModel) obs;
 		tb = new JTable(o_model.getTableModel());
+		*/
 	}
 
 	public JButton getRunGeneratorBt() {
