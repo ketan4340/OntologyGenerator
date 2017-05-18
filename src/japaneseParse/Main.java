@@ -5,6 +5,10 @@ import demonstration.*;
 
 public class Main{
 	public static void main(String[] args) {
-		new MainController();
+		// FX未使用
+		new MainView(new MainController(new InputTextModel(), new OntologyModel()));
+
+		// FX使用
+		//new MainFXView(new MainController()).launch(args);
 	}
 }

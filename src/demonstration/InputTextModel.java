@@ -11,8 +11,10 @@ public class InputTextModel extends Observable{
 	private List<String> inputTextList;
 
 	public InputTextModel() {
+		inputTextList = new ArrayList<String>();
 	}
 	public InputTextModel(final MainView view) {
+		this();
 		addObserver(view);
 	}
 

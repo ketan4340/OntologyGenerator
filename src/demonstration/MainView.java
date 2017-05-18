@@ -17,10 +17,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
+import javafx.embed.swing.JFXPanel;
+
 public class MainView extends JFrame implements Observer{
 	/*** Model ***/
-	private InputTextModel inputTextModel;
-	private OntologyModel ontologyModel;
+	private InputTextModel iptModel;
+	private OntologyModel ontModel;
 
 	/*** Controller ***/
 	//private MainController controller;
@@ -45,29 +47,35 @@ public class MainView extends JFrame implements Observer{
 
 	public MainView(MainController controller) {
 		super("OntologyGenerator");
-		// Modelを参照のために保持する
-		inputTextModel = controller.getI_model();
-		ontologyModel = controller.getO_model();
+		// controllerにこのviewインスタンスを持たせる
+		controller.setMainView(this);
 
-		designWholeFrame();
+		// Modelを参照のために保持する
+		iptModel = controller.getI_model();
+		ontModel = controller.getO_model();
+		// modelのオブザーバーにこのviewを追加
+		iptModel.addObserver(this);
+
+		designWholeFrame(controller);
 	    setVisible(true);	// 表示
 	}
 
-	private void designWholeFrame() {
+	private void designWholeFrame(MainController controller) {
 		//setSize(1200,800);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);		// 画面全体の半分のサイズ
 		setLocationRelativeTo(null);					// フレームを中央に表示
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// ウインドウを閉じたら終了
 		setLayout(new GridLayout(2, 1));
 
-		designInputFrame();
-		designOutputFrame();
+		designInputFrame(controller);
+		designOutputFrame(controller);
 	}
 
-	private void designInputFrame() {
+	private void designInputFrame(MainController controller) {
 		JPanel pn_menu = new JPanel();
 		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
 	    importBt = new JButton("インポート");
+	    importBt.addActionListener(controller.getImportTextAction());
 		pn_menu.add(importBt);
 		pn_menu.add(new JLabel("設定"));
 		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
@@ -83,16 +91,17 @@ public class MainView extends JFrame implements Observer{
 
 	    add(iptPanel);
 	}
-	private void designOutputFrame() {
+	private void designOutputFrame(MainController controller) {
 		JPanel pn_menu = new JPanel();
 		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
 	    generateBt = new JButton("オントロジー構築");
+	    generateBt.addActionListener(controller.getGenerateAction());
 	    pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
 		pn_menu.add(generateBt);
 		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
 		pn_menu.add(new JLabel("クリア"));
 
-		ontTable = new JTable(ontologyModel);
+		ontTable = new JTable(ontModel);
 		ontScrollpane = new JScrollPane(ontTable);
 
 		ontPanel = new JPanel(new BorderLayout());
@@ -103,10 +112,10 @@ public class MainView extends JFrame implements Observer{
 	}
 
 	public void setInputTextModel(InputTextModel i_model) {
-		this.inputTextModel = i_model;
+		this.iptModel = i_model;
 	}
 	public void setOntologyModel(OntologyModel o_model) {
-		this.ontologyModel = o_model;
+		this.ontModel = o_model;
 	}
 	public void setModels(InputTextModel i_model, OntologyModel o_model) {
 		setInputTextModel(i_model);
