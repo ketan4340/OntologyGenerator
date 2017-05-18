@@ -8,16 +8,16 @@ import javax.swing.table.DefaultTableModel;
 
 import com.sun.xml.internal.ws.util.NoCloseOutputStream;
 
-public class OutputModel extends DefaultTableModel{
+public class OntologyModel extends DefaultTableModel{
 	private List<String[]> triples;
 
 	private static String[] columnNames = {"Subject", "Predicate", "Object"};
 
-	public OutputModel() {
+	public OntologyModel() {
 		super(columnNames, 0);
 		triples = new ArrayList<String[]>();
 	}
-	public OutputModel(final MainView view) {
+	public OntologyModel(final MainView view) {
 		this();
 	}
 

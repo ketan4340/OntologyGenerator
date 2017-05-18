@@ -19,26 +19,26 @@ import java.util.stream.Stream;
 
 public class MainController{
 	/*** Model ***/
-	private InputModel i_model;
-	private OutputModel o_model;
+	private InputTextModel i_model;
+	private OntologyModel o_model;
 
 	/*** View ***/
 	private MainView view;
 
 	public MainController() {
-		i_model = new InputModel();
-		o_model = new OutputModel();
+		i_model = new InputTextModel();
+		o_model = new OntologyModel();
 
 		view = new MainView(this);
 		view.setModels(i_model, o_model);
 		/* RunGeneratorボタンの実装 */
-		view.getRunGeneratorBt().addActionListener(event -> {
-			String text = view.getTxArea1().getText();
+		view.getGenerateBt().addActionListener(event -> {
+			String text = view.getIptTextArea().getText();
 			List<String[]> triples = i_model.runGenerator(text);
 			o_model.addAllTriples(triples);
 		});
 		/* RandomTextボタンの実装 */
-		view.getRandomTextBt().addActionListener(event -> {
+		view.getImportBt().addActionListener(event -> {
 			List<String> strs = new LinkedList<String>();
 
 			Path path = Paths.get("writings/gooText生物-動物名-あ.txt");
@@ -50,7 +50,7 @@ public class MainController{
 			}
 
 			String text = strs.get(new Random().nextInt(strs.size()));
-			view.getTxArea1().setText(text);
+			view.getIptTextArea().setText(text);
 		});
 
 		// ModelのオブザーバーにViewを追加
@@ -58,10 +58,10 @@ public class MainController{
 		//o_model.addObserver(view);
 	}
 
-	public InputModel getI_model() {
+	public InputTextModel getI_model() {
 		return i_model;
 	}
-	public OutputModel getO_model() {
+	public OntologyModel getO_model() {
 		return o_model;
 	}
 }

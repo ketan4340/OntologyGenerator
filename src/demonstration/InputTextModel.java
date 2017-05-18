@@ -7,12 +7,12 @@ import java.util.Observable;
 
 import japaneseParse.GenerateProcess;
 
-public class InputModel extends Observable{
+public class InputTextModel extends Observable{
 	private List<String> inputTextList;
 
-	public InputModel() {
+	public InputTextModel() {
 	}
-	public InputModel(final MainView view) {
+	public InputTextModel(final MainView view) {
 		addObserver(view);
 	}
 
