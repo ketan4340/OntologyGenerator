@@ -16,7 +16,7 @@ import java.util.HashSet;
 public class Sentence {
 	public static int sentSum = 0;
 	public int sentID;
-	public List<Integer> clauseIDs; // Chunkのリストで文を構成する
+	public List<Integer> clauseIDs; // Clauseのリストで文を構成する
 
 	public Sentence() {
 		sentID = sentSum++;

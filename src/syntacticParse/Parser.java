@@ -19,13 +19,13 @@ import grammar.Word;
 public class Parser {
 	public String tool; // どの解析器を使うか(stanford,cabocha,knp)
 	public String analysed;
-	public List<Integer> chunkList;
+	public List<Integer> clauseList;
 	private String osName;
 
 	public Parser(String howto) {
 		tool = howto;
 		analysed = new String();
-		chunkList = new ArrayList<Integer>();
+		clauseList = new ArrayList<Integer>();
 		osName=System.getProperty("os.name").toLowerCase();
 	}
 	public Parser() {
@@ -78,7 +78,7 @@ public class Parser {
 
 			//出力結果に格納するための文字列を用意
 			String line = new String();
-			Clause chk = null;
+			Clause clause = null;
 			List<Integer> wdl = null;
 			int depto = -1;
 			int border = 0;
@@ -86,23 +86,27 @@ public class Parser {
 			int nextID = 0;
 			while ((line = br.readLine()) != null) {
 				if(line.startsWith("EOS")) {		// EOSがきたら終了
-					chk.setClause(wdl, depto);
-					chunkList.add(chk.clauseID);
+					if(wdl == null) {				// 初手EOSだった場合、文章が正しく渡されていない
+						return null;
+					}else {
+						clause.setClause(wdl, depto);
+					}
+					clauseList.add(clause.clauseID);
 
-				}else if(line.startsWith("*")) {	// *で始まる場合直前までのChunkを閉じ、新しいChunkを用意
-					if(wdl != null) {				// 最初は直前までのChunkが存在しないので回避
-						chk.setClause(wdl, depto);
-						chunkList.add(chk.clauseID);
+				}else if(line.startsWith("*")) {	// *で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
+					if(wdl != null) {				// 最初は直前までのClauseが存在しないので回避
+						clause.setClause(wdl, depto);
+						clauseList.add(clause.clauseID);
 					}else {
 						nextID = Clause.clauseSum;	// *要注意というか汚い*
 					}
 					wdl = new ArrayList<Integer>();
-					chk = new Clause();
-					String[] chunkInfo = line.split(" ");
-					String dep_str = chunkInfo[2];
+					clause = new Clause();
+					String[] clauseInfo = line.split(" ");
+					String dep_str = clauseInfo[2];
 					depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
 					if(depto!=-1) depto += nextID;	// *要注意(上に同じ)*
-					String[] border_str = chunkInfo[3].split("/");
+					String[] border_str = clauseInfo[3].split("/");
 					border = Integer.decode(border_str[0]);
 				}else {								// 他は単語の登録
 					String[] wordInfo = line.split("\t");
@@ -110,7 +114,7 @@ public class Parser {
 							? true
 							: false;
 					Word wd = new Word();
-					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), chk.clauseID, sbj_fnc);
+					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.clauseID, sbj_fnc);
 					wdl.add(wd.wordID);
 				}
 				//読み込んだ行を格納
@@ -140,7 +144,7 @@ public class Parser {
 
 	public Sentence makeSentence() {
 		Sentence sent = new Sentence();
-		sent.setSentence(chunkList);
+		sent.setSentence(clauseList);
 		return sent;
 	}
 }

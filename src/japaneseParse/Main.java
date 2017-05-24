@@ -1,14 +1,17 @@
 package japaneseParse;
 
-import java.util.List;
-import demonstration.*;
+import demonstration.DocumentModel;
+import demonstration.InputTextModel;
+import demonstration.MainController;
+import demonstration.MainView;
+import demonstration.OntologyModel;
 
 public class Main{
 	public static void main(String[] args) {
 		// FX未使用
-		new MainView(new MainController(new InputTextModel(), new OntologyModel()));
+		new MainView(new MainController(new InputTextModel(), new OntologyModel(), new DocumentModel()));
 
 		// FX使用
-		//new MainFXView(new MainController()).launch(args);
+		//MainFXView.launch(args);
 	}
 }

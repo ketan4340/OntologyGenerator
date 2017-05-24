@@ -2,6 +2,7 @@ package demonstration;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -16,85 +17,109 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.BadLocationException;
 
 import javafx.embed.swing.JFXPanel;
 
 public class MainView extends JFrame implements Observer{
-	/*** Model ***/
+	/**** Model ****/
 	private InputTextModel iptModel;
 	private OntologyModel ontModel;
+	private DocumentModel docModel;
 
-	/*** Controller ***/
-	//private MainController controller;
+	/**** Controller ****/
+	private MainController controller;
 
-	/*** View ***/
-	/** Whole part **/
+	/**** View ****/
+	/*** Whole part ***/
 	private JSplitPane splitpane;
 
+	/** Left part **/
+	private JPanel leftPanel;
 	/* InputText parts */
 	private JPanel iptPanel;
 	private JScrollPane iptScrollpane;
-	private JTextArea iptTextArea;
-	private JButton generateBt, importBt;
+	private JButton iptImportBt, iptClearBt;
+	private JTextArea iptTextarea;
 	/* Ontology parts */
 	private JPanel ontPanel;
 	private JScrollPane ontScrollpane;
+	private JButton generateBt;
 	private JTable ontTable;
+	/** Right part **/
+	//private JPanel rightPanel;
 	/* Document parts */
 	private JPanel docPanel;
 	private JScrollPane docScrollpane;
-	private JEditorPane editorpane;
+	private JButton docImportBt, docClearBt;
+	private JToggleButton html_PlainTgBt;
+	private JEditorPane docEditorpane;
 
-	public MainView(MainController controller) {
+	public MainView(MainController ctrl) {
 		super("OntologyGenerator");
+		this.controller = ctrl;
 		// controllerにこのviewインスタンスを持たせる
 		controller.setMainView(this);
 
 		// Modelを参照のために保持する
-		iptModel = controller.getI_model();
-		ontModel = controller.getO_model();
+		iptModel = controller.getIptModel();
+		ontModel = controller.getOntModel();
+		docModel = controller.getDocModel();
 		// modelのオブザーバーにこのviewを追加
 		iptModel.addObserver(this);
 
-		designWholeFrame(controller);
+		designWholeFrame();
 	    setVisible(true);	// 表示
 	}
 
-	private void designWholeFrame(MainController controller) {
+	private void designWholeFrame() {
 		//setSize(1200,800);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);		// 画面全体の半分のサイズ
 		setLocationRelativeTo(null);					// フレームを中央に表示
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// ウインドウを閉じたら終了
-		setLayout(new GridLayout(2, 1));
+		//setLayout(new GridLayout(2, 1));
 
-		designInputFrame(controller);
-		designOutputFrame(controller);
+		designInputTextPanel();
+		designOntologyPanel();
+		designDocumentPanel();
+
+		leftPanel = new JPanel();
+		leftPanel.setLayout(new GridLayout(2, 1));
+		leftPanel.add(iptPanel);
+		leftPanel.add(ontPanel);
+
+		splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, docPanel);
+		splitpane.setOneTouchExpandable(true);
+		splitpane.setDividerLocation(JFrame.MAXIMIZED_BOTH / 2); // 画面半分の位置に初期設定
+		add(splitpane);
 	}
 
-	private void designInputFrame(MainController controller) {
+	private void designInputTextPanel() {
 		JPanel pn_menu = new JPanel();
 		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
-	    importBt = new JButton("インポート");
-	    importBt.addActionListener(controller.getImportTextAction());
-		pn_menu.add(importBt);
+	    iptImportBt = new JButton("インポート");
+	    iptImportBt.addActionListener(controller.getImportTextAction());
+		pn_menu.add(iptImportBt);
 		pn_menu.add(new JLabel("設定"));
 		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
-		pn_menu.add(new JLabel("クリア"));
+		iptClearBt = new JButton("クリア");
+		iptClearBt.addActionListener(controller.getClearTextAction());
+		pn_menu.add(iptClearBt);
 
-	    iptTextArea = new JTextArea();
-	    iptTextArea.setLineWrap(true);
-	    iptScrollpane = new JScrollPane(iptTextArea);
+	    iptTextarea = new JTextArea();
+	    iptTextarea.setLineWrap(true);
+	    iptScrollpane = new JScrollPane(iptTextarea);
 
 	    iptPanel = new JPanel(new BorderLayout());
 	    iptPanel.add(pn_menu, BorderLayout.NORTH);
 	    iptPanel.add(iptScrollpane, BorderLayout.CENTER);
-
-	    add(iptPanel);
 	}
-	private void designOutputFrame(MainController controller) {
+	private void designOntologyPanel() {
 		JPanel pn_menu = new JPanel();
 		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
-	    generateBt = new JButton("オントロジー構築");
+	    generateBt = new JButton("↓オントロジー構築↓");
 	    generateBt.addActionListener(controller.getGenerateAction());
 	    pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
 		pn_menu.add(generateBt);
@@ -107,8 +132,34 @@ public class MainView extends JFrame implements Observer{
 		ontPanel = new JPanel(new BorderLayout());
 		ontPanel.add(pn_menu, BorderLayout.NORTH);
 		ontPanel.add(ontScrollpane, BorderLayout.CENTER);
+	}
+	private void designDocumentPanel() {
+		JPanel pn_menu = new JPanel();
+		pn_menu.setLayout(new BoxLayout(pn_menu, BoxLayout.LINE_AXIS));	// 配置順を左から右に
 
-	    add(ontPanel);
+	    docImportBt = new JButton("インポート");
+	    docImportBt.addActionListener(controller.getImportTextAction());
+		pn_menu.add(docImportBt);
+		pn_menu.add(new JLabel("設定"));
+		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
+		html_PlainTgBt = new JToggleButton("plain", false);
+		html_PlainTgBt.addItemListener(controller.getSwitchHTMLPlainAction());
+		pn_menu.add(html_PlainTgBt);
+		pn_menu.add(Box.createGlue());	// 可変長の隙間を挿入
+		docClearBt = new JButton("クリア");
+		docClearBt.addActionListener(controller.getClearTextAction());
+		pn_menu.add(docClearBt);
+
+		docEditorpane = new JEditorPane();
+		docEditorpane.setContentType("text/plain");	// 初期設定:plain
+	    docEditorpane.setEditable(true);			// 初期設定:編集可能
+	    docEditorpane.setDocument(docModel.getPlainDoc());	// DocumentModelのメンバPlainDocをセット
+	    docEditorpane.addHyperlinkListener(controller.getHyperlinkAction());
+	    docScrollpane = new JScrollPane(docEditorpane);
+
+	    docPanel = new JPanel(new BorderLayout());
+	    docPanel.add(pn_menu, BorderLayout.NORTH);
+	    docPanel.add(docScrollpane, BorderLayout.CENTER);
 	}
 
 	public void setInputTextModel(InputTextModel i_model) {
@@ -130,10 +181,25 @@ public class MainView extends JFrame implements Observer{
 	public JButton getGenerateBt() {
 		return generateBt;
 	}
-	public JTextArea getIptTextArea() {
-		return iptTextArea;
+	public JTextArea getIptTextarea() {
+		return iptTextarea;
 	}
-	public JButton getImportBt() {
-		return importBt;
+	public JEditorPane getDocEditorpane() {
+		return docEditorpane;
+	}
+	public JButton getIptImportBt() {
+		return iptImportBt;
+	}
+	public JButton getIptClearBt() {
+		return iptClearBt;
+	}
+	public JButton getDocImportBt() {
+		return docImportBt;
+	}
+	public JButton getDocClearBt() {
+		return docClearBt;
+	}
+	public JToggleButton getHTML_PlainTgBt() {
+		return html_PlainTgBt;
 	}
 }

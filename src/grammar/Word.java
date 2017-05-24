@@ -5,7 +5,7 @@ import java.util.*;
 public class Word {
 	public static int wordsSum = 0;
 	public static List<Word> allWordsList = new ArrayList<Word>();
-	
+
 	public int wordID;				// 通し番号。Wordを特定する
 	public String wordName;			// 単語の文字列
 	public List<String> tags;		// 品詞・活用形、読みなど
@@ -13,7 +13,7 @@ public class Word {
 	public int originID;			// このWordが別Wordのコピーである場合，そのIDを示す
 	public List<Integer> cloneIDs;	// このWordのクローン達のID
 	public boolean sbj_fnc;			// 主辞か機能語か
-		
+
 	public Word() {
 		wordID = wordsSum++;
 		allWordsList.add(this);
@@ -35,12 +35,12 @@ public class Word {
 		belongClause = chunkID;
 		sbj_fnc = sf;
 	}
-	
+
 	public static Word get(int id) {
 		if(id < 0) return null;
 		return allWordsList.get(id);
 	}
-	
+
 	/* 渡されたTagを"全て"持って入れば真、それ以外は偽を返す */
 	public boolean hasAllTags(String[] tagNames) {
 		boolean match = true;	// デフォがtrueなので空の配列は任意の品詞とみなされる
@@ -50,7 +50,7 @@ public class Word {
 				not = true;
 				tag = tag.substring(1);	// -を消しておく
 			}
-			
+
 			if( tags.contains(tag) ) {
 				match = (not)? false: true;
 			}else {
@@ -60,7 +60,7 @@ public class Word {
 		}
 		return match;
 	}
-	/* 渡されたTagを"1つでも"持って入れば真、それ以外は偽を返す */
+	/* 渡されたTagをどれか"1つでも"持って入れば真、それ以外は偽を返す */
 	public boolean hasSomeTags(String[] tagNames) {
 		if(tagNames.length == 0) return true;	// 空の品詞を渡されたらtrue
 		boolean match = false;
@@ -70,7 +70,7 @@ public class Word {
 				not = true;
 				tag = tag.substring(1);	// -を消しておく
 			}
-			
+
 			if( tags.contains(tag) ) {
 				match = (not)? false: true;
 			}else {
@@ -80,7 +80,7 @@ public class Word {
 		}
 		return match;
 	}
-	
+
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
@@ -89,14 +89,14 @@ public class Word {
 		cloneIDs.add(replica.wordID);
 		return replica;
 	}
-	
+
 	/* 渡されたIDのリストを一つの文字列に変える */
 	public static String toStringList(List<Integer> wordIDs) {
 		String wordNames = new String();
 		for(final int id: wordIDs) wordNames+=Word.get(id).wordName;
 		return wordNames;
 	}
-	
+
 	public static void printAllWords() {
 		for(Word wd: allWordsList) {
 			System.out.println("W"+wd.wordID + "@(C"+wd.belongClause+"):\t" + wd.wordName + "("+wd.tags+")");
