@@ -6,48 +6,67 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import grammar.Clause;
 import grammar.Sentence;
 import grammar.Word;
 
 public class Parser {
-	public String tool; // どの解析器を使うか(stanford,cabocha,knp)
-	public String analysed;
-	public List<Integer> clauseList;
-	private String osName;
+	private String tool; // どの解析器を使うか(stanford,cabocha,knp)
 
 	public Parser(String howto) {
 		tool = howto;
-		analysed = new String();
-		clauseList = new ArrayList<Integer>();
-		osName=System.getProperty("os.name").toLowerCase();
-	}
-	public Parser() {
-		this(null);
 	}
 
 	public Sentence run(String text) {
-		Sentence sent = null;
 		switch (tool){
 		case "cabocha":
-			sent = runCaboCha(text);
-			break;
+			return runCabocha(text);
 		case "knp":
 			System.out.println("KNPは未実装です。");
-			break;
+			return null;
 		default:
 			System.out.println(tool+"には対応しておりません。");
-			break;
+			return null;
 		}
-		return sent;
 	}
-	public Sentence runCaboCha(String text) {
+	public Sentence run(Path inputPath) {
+		try (Stream<String> stream = Files.lines(inputPath, Charset.forName("UTF-8"))) {
+			stream.forEach(line -> System.out.println(line));
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+
+		switch (tool){
+		case "cabocha":
+			return runCabocha(inputPath);
+		case "knp":
+			System.out.println("KNPは未実装です。");
+			return null;
+		default:
+			System.out.println(tool+"には対応しておりません。");
+			return null;
+		}
+	}
+	// 一文だけ渡してもらって解析
+	private Sentence runCabocha(String text) {
+		Clause clause = null;
+		List<Integer> wdl = null;
+		List<Integer> clauseList = new LinkedList<Integer>();
+		int depto = -1;		// clauseの係り先のID
+		int border = 0;		// あるclauseの主たる単語が何番目かを示す
+		boolean sbj_fnc;	//
+		int nextID = 0;
+
 		try {
 			//UTF-8のBOMを除去するための準備←textファイルから読み込む場合を考慮
 			byte [] bytes = {-17, -69, -65};
@@ -56,18 +75,16 @@ public class Parser {
 			text=text.replaceAll(btmp, "");
 
 			//cabochaの実行開始　lattice形式で出力(-f1の部分で決定、詳しくはcabochaのhelp参照)
-			ProcessBuilder pb;
-			if(PlatformUtil.isMac()) {
-				pb = new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1");
-			}else if(PlatformUtil.isWindows()) {
-				pb = new ProcessBuilder("cmd", "/c", "cabocha", "-f1", "-n1");
-			}else {
-				pb = null;
-			}
+			ProcessBuilder pb
+			= (PlatformUtil.isMac())					// MacOSの場合
+				? new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1")
+			: (PlatformUtil.isWindows())				// Windowsの場合
+				? new ProcessBuilder("cmd", "/c", "cabocha", "-f1", "-n1")
+			: null;										// 他は実装予定なし
 
 			Process process = pb.start();
 
-			//実行途中で文字列を入力(コマンドプロンプトで文字を入力する操作に相当)
+			//実行途中で文字列を入力(コマンドプロンプトでテキストを入力する操作に相当)
 			OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream(), "UTF-8");
 			osw.write(text);
 			osw.close();
@@ -78,12 +95,6 @@ public class Parser {
 
 			//出力結果に格納するための文字列を用意
 			String line = new String();
-			Clause clause = null;
-			List<Integer> wdl = null;
-			int depto = -1;
-			int border = 0;
-			boolean sbj_fnc;
-			int nextID = 0;
 			while ((line = br.readLine()) != null) {
 				if(line.startsWith("EOS")) {		// EOSがきたら終了
 					if(wdl == null) {				// 初手EOSだった場合、文章が正しく渡されていない
@@ -93,7 +104,7 @@ public class Parser {
 					}
 					clauseList.add(clause.clauseID);
 
-				}else if(line.startsWith("*")) {	// *で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
+				}else if(line.startsWith("* ")) {	// * で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
 					if(wdl != null) {				// 最初は直前までのClauseが存在しないので回避
 						clause.setClause(wdl, depto);
 						clauseList.add(clause.clauseID);
@@ -110,20 +121,15 @@ public class Parser {
 					border = Integer.decode(border_str[0]);
 				}else {								// 他は単語の登録
 					String[] wordInfo = line.split("\t");
-					sbj_fnc = (wdl.size() <= border)
-							? true
-							: false;
+					sbj_fnc = (wdl.size() <= border)? true: false;
 					Word wd = new Word();
 					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.clauseID, sbj_fnc);
 					wdl.add(wd.wordID);
 				}
-				//読み込んだ行を格納
-				analysed += line + "\n";
 			}
 
 			// chunkの係り受け関係を更新
 			Clause.updateAllDependency();
-			//System.out.println(analysed);
 
 			// プロセス終了
 			is.close();
@@ -139,12 +145,14 @@ public class Parser {
 			e.printStackTrace();
 		}
 
-		return makeSentence();
+		return new Sentence(clauseList);
+	}
+	private Sentence runCabocha(Path inputPath) {
+		List<Integer> clauseList = new LinkedList<Integer>();
+		return new Sentence(clauseList);
 	}
 
-	public Sentence makeSentence() {
-		Sentence sent = new Sentence();
-		sent.setSentence(clauseList);
-		return sent;
+	private void readCabocha() {
+
 	}
 }

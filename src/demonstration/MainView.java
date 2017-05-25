@@ -151,8 +151,8 @@ public class MainView extends JFrame implements Observer{
 		pn_menu.add(docClearBt);
 
 		docEditorpane = new JEditorPane();
-		docEditorpane.setContentType("text/plain");	// 初期設定:plain
-	    docEditorpane.setEditable(true);			// 初期設定:編集可能
+		docEditorpane.setContentType("text/plain");			// 初期設定:plain
+	    docEditorpane.setEditable(true);					// 初期設定:編集可能
 	    docEditorpane.setDocument(docModel.getPlainDoc());	// DocumentModelのメンバPlainDocをセット
 	    docEditorpane.addHyperlinkListener(controller.getHyperlinkAction());
 	    docScrollpane = new JScrollPane(docEditorpane);

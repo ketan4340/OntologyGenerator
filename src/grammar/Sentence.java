@@ -15,12 +15,17 @@ import java.util.HashSet;
 
 public class Sentence {
 	public static int sentSum = 0;
+
 	public int sentID;
 	public List<Integer> clauseIDs; // Clauseのリストで文を構成する
 
 	public Sentence() {
 		sentID = sentSum++;
 		clauseIDs = new ArrayList<Integer>();
+	}
+	public Sentence(List<Integer> clauseList) {
+		sentID = sentSum++;
+		clauseIDs = clauseList;
 	}
 	public void setSentence(List<Integer> clauseList) {
 		clauseIDs = clauseList;

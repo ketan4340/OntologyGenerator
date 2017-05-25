@@ -28,7 +28,6 @@ public class DocumentModel{
 	private static String defaultHTMLTags =
 			"<head>default head</head>"
 			+ "<body id=\"body\">"
-			+ "hogehogebody"
 			+ "</body>";
 
 	public DocumentModel() {
@@ -49,25 +48,25 @@ public class DocumentModel{
 		//addObserver(view);
 	}
 
-	public List<Sentence> parsing(String plainText) {
+	public List<Sentence> getSentences(String plainTexts) {
 		List<Sentence> sentenceList = new LinkedList<Sentence>();
-
-		for(String text : plainText.split("\n")) {
-			Sentence sntc = parser.run(text);
-			if(sntc != null) sentenceList.add(sntc);
+		// PlainTextを改行を境に分解して解析
+		for(String plainText : plainTexts.split("\n")) {
+			Sentence sentence = parser.run(plainText);
+			if(sentence != null) sentenceList.add(sentence);
 		}
 		return sentenceList;
 	}
 	private void plain2html() {
 		List<Sentence> sentenceList = new ArrayList<Sentence>();
 		try {
-			sentenceList = parsing(plainDoc.getText(0, plainDoc.getLength()));
+			sentenceList = getSentences(plainDoc.getText(0, plainDoc.getLength()));
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 
 		for(final Sentence sentence : sentenceList) {
-			String htmlText = "<div>";
+			String htmlText = "<p><font size=\"+1\">";
 			sentence.printW();
 
 			for(int wdID : sentence.wordIDs()) {	// 文の単語を走査
@@ -76,10 +75,10 @@ public class DocumentModel{
 						? "<a href=\"" + word.wordName + "\">" + word.wordName + "</a>"
 						: word.wordName;
 			}
-			htmlText += "</div><br>";				// 文末で改行
+			htmlText += "</font></p><br>\n";				// 文末で改行
 			try {
-				System.out.println("Elem:\t"+htmlDoc.getElement("body").getName());
-				htmlDoc.setInnerHTML(htmlDoc.getElement("body"), htmlText);
+				//System.out.println("Elem:\t"+htmlDoc.getElement("body").getName());
+				htmlDoc.insertBeforeEnd(htmlDoc.getElement("body"), htmlText);
 			} catch (BadLocationException | IOException e) {
 				e.printStackTrace();
 			}

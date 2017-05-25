@@ -150,16 +150,10 @@ public class MainController {
 	private HyperlinkListener hyperlinkAction = (event -> {
 		JEditorPane editorpane = view.getDocEditorpane();
 
-		System.out.println("EventDescription: " + event.getDescription());
-
-		Element elem = event.getSourceElement();
-		Document inElem = elem.getDocument();
-
-        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {		// クリックした場合
+		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {		// クリックした場合
             try {
-            	String dialog = inElem.getText(0, inElem.getLength()) + "\n";
-				JOptionPane.showMessageDialog(editorpane, dialog);
-			} catch (HeadlessException | BadLocationException e) {
+				JOptionPane.showMessageDialog(editorpane, event.getDescription());
+			} catch (HeadlessException e) {
 				e.printStackTrace();
 			}
 
