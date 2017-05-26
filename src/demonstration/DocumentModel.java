@@ -43,10 +43,6 @@ public class DocumentModel{
 			e.printStackTrace();
 		}
 	}
-	public DocumentModel(final MainView view) {
-		this();
-		//addObserver(view);
-	}
 
 	public List<Sentence> getSentences(String plainTexts) {
 		List<Sentence> sentenceList = new LinkedList<Sentence>();
@@ -68,7 +64,6 @@ public class DocumentModel{
 		for(final Sentence sentence : sentenceList) {
 			String htmlText = "<p>";
 			//htmlText += "<font size=\"+1\">";
-			sentence.printW();
 
 			for(int wdID : sentence.wordIDs()) {	// 文の単語を走査
 				Word word = Word.get(wdID);

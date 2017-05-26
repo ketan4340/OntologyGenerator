@@ -49,10 +49,8 @@ public class OntologyModel extends DefaultTableModel{
 	private List<String[]> getCommonConcepts(String concept, int s_p_o) {
 		List<String[]> commonRowList = new LinkedList<String[]>();
 		for(final String[] row: getAllTable()) {
-			System.out.println("row: " + row[s_p_o] + ", concept: " + concept);
 			if(row[s_p_o].equals(concept)) {		// 共通のsまたはpまたはoを持つ行を集める
 				commonRowList.add(row);
-				System.out.println("match!! " + concept);
 			}
 		}
 		return commonRowList;

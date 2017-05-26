@@ -39,24 +39,7 @@ public class Parser {
 			return null;
 		}
 	}
-	public Sentence run(Path inputPath) {
-		try (Stream<String> stream = Files.lines(inputPath, Charset.forName("UTF-8"))) {
-			stream.forEach(line -> System.out.println(line));
-		} catch (IOException e) {
-			System.out.println(e);
-		}
 
-		switch (tool){
-		case "cabocha":
-			return runCabocha(inputPath);
-		case "knp":
-			System.out.println("KNPは未実装です。");
-			return null;
-		default:
-			System.out.println(tool+"には対応しておりません。");
-			return null;
-		}
-	}
 	// 一文だけ渡してもらって解析
 	private Sentence runCabocha(String text) {
 		Clause clause = null;
@@ -128,7 +111,7 @@ public class Parser {
 				}
 			}
 
-			// chunkの係り受け関係を更新
+			// clauseの係り受け関係を更新
 			Clause.updateAllDependency();
 
 			// プロセス終了
@@ -146,13 +129,5 @@ public class Parser {
 		}
 
 		return new Sentence(clauseList);
-	}
-	private Sentence runCabocha(Path inputPath) {
-		List<Integer> clauseList = new LinkedList<Integer>();
-		return new Sentence(clauseList);
-	}
-
-	private void readCabocha() {
-
 	}
 }
