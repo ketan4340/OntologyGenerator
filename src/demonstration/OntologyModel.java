@@ -1,41 +1,26 @@
 package demonstration;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Observable;
 
 import javax.swing.table.DefaultTableModel;
 
-import com.sun.xml.internal.ws.util.NoCloseOutputStream;
-
 public class OntologyModel extends DefaultTableModel{
-	private List<String[]> triples;
-
+	private static int TRIPLE = 3;
 	private static String[] columnNames = {"Subject", "Predicate", "Object"};
 
 	public OntologyModel() {
 		super(columnNames, 0);
-		triples = new ArrayList<String[]>();
-	}
-	public OntologyModel(final MainView view) {
-		this();
 	}
 
 	public String[] getColumnNames() {
 		return columnNames;
 	}
-	public List<String[]> getTriples() {
-		return triples;
-	}
-	public void setTriples(List<String[]> triples) {
-		this.triples = triples;
-	}
 
 	private void addTriple(String[] newTriple) {
-		if(newTriple.length != 3) {
-			System.err.println("ERROR: triple is not composed of 3 concepts.");
+		if(newTriple.length != TRIPLE) {
+			System.err.println("ERROR: this triple is not composed of 3 concepts." + newTriple);
 		}else {
-			triples.add(newTriple);
 			addRow(newTriple);
 		}
 	}
@@ -43,5 +28,42 @@ public class OntologyModel extends DefaultTableModel{
 		for(String[] newTriple: newTriples) {
 			addTriple(newTriple);
 		}
+	}
+
+	public String[] getRow(int rowNum) {
+		String[] row = new String[TRIPLE];
+		for(int t = 0; t<TRIPLE; t++) {
+			row[t] = (String) getValueAt(rowNum, t);
+		}
+		return row;
+	}
+
+	public List<String[]> getAllTable() {
+		List<String[]> table = new LinkedList<String[]>();
+		for(int r = 0; r<getRowCount(); r++) {
+			table.add(getRow(r));
+		}
+		return table;
+	}
+
+	private List<String[]> getCommonConcepts(String concept, int s_p_o) {
+		List<String[]> commonRowList = new LinkedList<String[]>();
+		for(final String[] row: getAllTable()) {
+			System.out.println("row: " + row[s_p_o] + ", concept: " + concept);
+			if(row[s_p_o].equals(concept)) {		// 共通のsまたはpまたはoを持つ行を集める
+				commonRowList.add(row);
+				System.out.println("match!! " + concept);
+			}
+		}
+		return commonRowList;
+	}
+	public List<String[]> getPO(String subject) {
+		return getCommonConcepts(subject, Triple.SUBJECT);
+	}
+	public List<String[]> getSO(String predicate) {
+		return getCommonConcepts(predicate, Triple.PREDICATE);
+	}
+	public List<String[]> getSP(String object) {
+		return getCommonConcepts(object, Triple.OBJECT);
 	}
 }

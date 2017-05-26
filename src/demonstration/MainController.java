@@ -1,6 +1,5 @@
 package demonstration;
 
-import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -13,8 +12,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import javax.swing.BoxLayout;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -23,7 +27,6 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.Element;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -119,12 +122,6 @@ public class MainController {
 		JToggleButton tgbt = (JToggleButton) event.getItem();
 		if(tgbt.isSelected()) {						// plain->HTML
 			HTMLDocument htmlDoc = docModel.getHtmlDoc();		// DocumentModelからhtmlDoc取得
-			try {
-				System.out.println("html :\t" + htmlDoc.getText(0, htmlDoc.getLength()));
-				System.out.println("-----------------------------------");
-			} catch (BadLocationException e) {
-				e.printStackTrace();
-			}
 			tgbt.setText("HTML(編集不可)");						// ボタンの表示をHTMLに
 			editorpane.setEditable(false);						// 編集不可に
 			editorpane.setOpaque(false);						// 背景を透過に
@@ -132,12 +129,6 @@ public class MainController {
 			editorpane.setDocument(htmlDoc);					// HTMLDocumentをセット
 		}else {										// HTML->plain
 			PlainDocument plainDoc = docModel.getPlainDoc();	// DocumentModelからplainDoc取得
-			try {
-				System.out.println("plain:\t" + plainDoc.getText(0, plainDoc.getLength()));
-				System.out.println("-----------------------------------");
-			} catch (BadLocationException e) {
-				e.printStackTrace();
-			}
 			tgbt.setText("plain(編集可能)");						// ボタンの表示をplainに
 			editorpane.setEditable(true);						// 編集可能に
 			editorpane.setOpaque(true);							// 背景を非透過に
@@ -148,22 +139,25 @@ public class MainController {
 	});
 	/* Hyperlinkをクリックした時の動作を実装 */
 	private HyperlinkListener hyperlinkAction = (event -> {
-		JEditorPane editorpane = view.getDocEditorpane();
+		String subject = event.getDescription();
+		JDialog dialog = new JDialog(view, subject+"のpo");
+		dialog.setBounds(100,100,300,300);
+		dialog.add(new JLabel("hgoehogegehoga"));
+
 
 		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {		// クリックした場合
-            try {
-				JOptionPane.showMessageDialog(editorpane, event.getDescription());
-			} catch (HeadlessException e) {
-				e.printStackTrace();
-			}
+			List<String[]> poList = ontModel.getPO(subject);
+			OntologyModel selectedOnt = new OntologyModel();
+			selectedOnt.addAllTriples(poList);
+			JTable ontTable = new JTable(selectedOnt);
+			JScrollPane scrollpane = new JScrollPane(ontTable);
+			dialog.add(scrollpane);
+			dialog.setVisible(true);
 
         }else if(event.getEventType() == HyperlinkEvent.EventType.ENTERED) {	// カーソルを当てた場合
-
         }else if(event.getEventType() == HyperlinkEvent.EventType.EXITED) {		// カーソルを外した場合
-
-        }else {
-
         }
+
     });
 
 	public ActionListener getGenerateAction() {
@@ -175,11 +169,6 @@ public class MainController {
 	public ActionListener getClearTextAction() {
 		return clearTextAction;
 	}
-	/*
-	public ActionListener getParseAction() {
-		return parseAction;
-	}
-	*/
 	public ItemListener getSwitchHTMLPlainAction() {
 		return switchHTMLPlainAction;
 	}

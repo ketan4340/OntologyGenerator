@@ -77,7 +77,6 @@ public class DocumentModel{
 			}
 			htmlText += "</font></p><br>\n";				// 文末で改行
 			try {
-				//System.out.println("Elem:\t"+htmlDoc.getElement("body").getName());
 				htmlDoc.insertBeforeEnd(htmlDoc.getElement("body"), htmlText);
 			} catch (BadLocationException | IOException e) {
 				e.printStackTrace();
