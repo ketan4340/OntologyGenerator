@@ -66,7 +66,8 @@ public class DocumentModel{
 		}
 
 		for(final Sentence sentence : sentenceList) {
-			String htmlText = "<p><font size=\"+1\">";
+			String htmlText = "<p>";
+			//htmlText += "<font size=\"+1\">";
 			sentence.printW();
 
 			for(int wdID : sentence.wordIDs()) {	// 文の単語を走査
@@ -75,7 +76,8 @@ public class DocumentModel{
 						? "<a href=\"" + word.wordName + "\">" + word.wordName + "</a>"
 						: word.wordName;
 			}
-			htmlText += "</font></p><br>\n";				// 文末で改行
+			//htmlText += "</font>";
+			htmlText += "</p><br>\n";				// 文末で改行
 			try {
 				htmlDoc.insertBeforeEnd(htmlDoc.getElement("body"), htmlText);
 			} catch (BadLocationException | IOException e) {

@@ -1,5 +1,8 @@
 package demonstration;
 
+import edu.uci.ics.jung.graph.*;
+import edu.uci.ics.jung.algorithms.layout.*;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.io.IOException;
