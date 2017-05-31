@@ -58,12 +58,13 @@ public class Parser {
 			text=text.replaceAll(btmp, "");
 
 			//cabochaの実行開始　lattice形式で出力(-f1の部分で決定、詳しくはcabochaのhelp参照)
-			ProcessBuilder pb
-			= (PlatformUtil.isMac())					// MacOSの場合
-				? new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1")
-			: (PlatformUtil.isWindows())				// Windowsの場合
-				? new ProcessBuilder("cmd", "/c", "cabocha", "-f1", "-n1")
-			: null;										// 他は実装予定なし
+			ProcessBuilder pb =
+					// MacOSの場合
+					(PlatformUtil.isMac()) ? new ProcessBuilder("/usr/local/bin/cabocha", "-f1", "-n1")
+					// Windowsの場合
+					: (PlatformUtil.isWindows()) ? new ProcessBuilder("cmd", "/c", "cabocha", "-f1", "-n1")
+					// 他は実装予定なし
+					: null;
 
 			Process process = pb.start();
 

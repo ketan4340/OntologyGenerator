@@ -92,7 +92,7 @@ public class MainController {
 		try (Stream<String> stream = Files.lines(path, Charset.forName("UTF-8"))) {
 			stream.forEach(line -> writings.add(line));
 		} catch (IOException e) {
-			System.out.println(e);
+			System.err.println(e);
 		}
 		String text = writings.get(new Random().nextInt(writings.size()));	// ファイルからランダムで一文選ぶ
 		text += "\n";
