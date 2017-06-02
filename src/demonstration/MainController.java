@@ -1,8 +1,6 @@
 package demonstration;
 
-import edu.uci.ics.jung.graph.*;
-import edu.uci.ics.jung.algorithms.layout.*;
-
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -15,11 +13,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
@@ -31,6 +27,11 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.html.HTMLDocument;
 
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
@@ -69,7 +70,6 @@ public class MainController {
 		return docModel;
 	}
 
-
 	/** ActionListener **/
 	/* RunGeneratorボタンの実装 */
 	private ActionListener generateAction = (event -> {
@@ -88,19 +88,20 @@ public class MainController {
 		List<String> writings = new LinkedList<String>();
 
 		Path path = Paths.get("writings/gooText生物-動物名-あ.txt");
-		// List<String> strs = Files.readAllLines(path, StandardCharsets.UTF_8); // ファイルが小さければこれでもいい
+		// List<String> strs = Files.readAllLines(path, StandardCharsets.UTF_8);
+		// ファイルが小さければこれでもいい
 		try (Stream<String> stream = Files.lines(path, Charset.forName("UTF-8"))) {
 			stream.forEach(line -> writings.add(line));
 		} catch (IOException e) {
 			System.err.println(e);
 		}
-		String text = writings.get(new Random().nextInt(writings.size()));	// ファイルからランダムで一文選ぶ
+		String text = writings.get(new Random().nextInt(writings.size())); // ファイルからランダムで一文選ぶ
 		text += "\n";
 		Object button = event.getSource();
-		if(button.equals(view.getIptImportBt())) {
+		if (button.equals(view.getIptImportBt())) {
 			view.getIptTextarea().append(text);
-		}else if(button.equals(view.getDocImportBt())) {
-			view.getHTML_PlainTgBt().setSelected(false);	// エディタをplainに変更
+		} else if (button.equals(view.getDocImportBt())) {
+			view.getHTML_PlainTgBt().setSelected(false); // エディタをplainに変更
 			Document document = view.getDocEditorpane().getDocument();
 			try {
 				document.insertString(0, text, new SimpleAttributeSet());
@@ -112,25 +113,25 @@ public class MainController {
 	/* Clearボタンの実装 */
 	private ActionListener clearTextAction = (event -> {
 		Object button = event.getSource();
-		if(button.equals(view.getIptClearBt())) {
+		if (button.equals(view.getIptClearBt())) {
 			view.getIptTextarea().setText("");
-		}else if(button.equals(view.getDocClearBt())) {
+		} else if (button.equals(view.getDocClearBt())) {
 			view.getDocEditorpane().setText("");
-			view.getHTML_PlainTgBt().setSelected(false);	// エディタをplainに変更
+			view.getHTML_PlainTgBt().setSelected(false); // エディタをplainに変更
 		}
 	});
 	/* PlainテキストとHTMLテキストを切り替えるトグルボタンの実装 */
 	private ItemListener switchHTMLPlainAction = (event -> {
 		JEditorPane editorpane = view.getDocEditorpane();
 		JToggleButton tgbt = (JToggleButton) event.getItem();
-		if(tgbt.isSelected()) {						// plain->HTML
-			HTMLDocument htmlDoc = docModel.getHtmlDoc();		// DocumentModelからhtmlDoc取得
-			tgbt.setText("HTML(編集不可)");						// ボタンの表示をHTMLに
-			editorpane.setEditable(false);						// 編集不可に
-			editorpane.setOpaque(false);						// 背景を透過に
-			editorpane.setContentType("text/html");				// editorをHTML仕様に変えてから
-			editorpane.setDocument(htmlDoc);					// HTMLDocumentをセット
-		}else {										// HTML->plain
+		if (tgbt.isSelected()) { // plain->HTML
+			HTMLDocument htmlDoc = docModel.getHtmlDoc();	// DocumentModelからhtmlDoc取得
+			tgbt.setText("HTML(編集不可)"); 					// ボタンの表示をHTMLに
+			editorpane.setEditable(false);					// 編集不可に
+			editorpane.setOpaque(false);					// 背景を透過に
+			editorpane.setContentType("text/html");			// editorをHTML仕様に変えてから
+			editorpane.setDocument(htmlDoc);				// HTMLDocumentをセット
+		} else { // HTML->plain
 			PlainDocument plainDoc = docModel.getPlainDoc();	// DocumentModelからplainDoc取得
 			tgbt.setText("plain(編集可能)");						// ボタンの表示をplainに
 			editorpane.setEditable(true);						// 編集可能に
@@ -142,26 +143,42 @@ public class MainController {
 	});
 	/* Hyperlinkをクリックした時の動作を実装 */
 	private HyperlinkListener hyperlinkAction = (event -> {
-		String subject = event.getDescription();
-		JDialog dialog = new JDialog(view, subject+"のpo");
-		dialog.setBounds(100,100,300,300);
-		dialog.add(new JLabel("hgoehogegehoga"));
+		String clickedWord = event.getDescription();
+		JDialog dialog = new JDialog(view, clickedWord + "のpo");
+		dialog.setBounds(100, 100, 300, 300);
 
+		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) { // クリックした場合
+			List<String[]> relationList = new LinkedList<String[]>();	// クリックした単語をSかOに含むトリプルを集める
+			relationList.addAll(ontModel.getPO(clickedWord));
+			relationList.addAll(ontModel.getSP(clickedWord));
 
-		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {		// クリックした場合
-			List<String[]> poList = ontModel.getPO(subject);
+			// 選び出したオントロジーだけでモデル化
 			OntologyModel selectedOnt = new OntologyModel();
-			selectedOnt.addAllTriples(poList);
+			selectedOnt.addAllTriples(relationList);
+			// 表形式
 			JTable ontTable = new JTable(selectedOnt);
 			JScrollPane scrollpane = new JScrollPane(ontTable);
-			dialog.add(scrollpane);
+			// グラフ表示
+			Graph<MyNode, MyEdge> graph = selectedOnt.createGraph();
+
+			Layout<MyNode, MyEdge> layout = new FRLayout<MyNode, MyEdge>(graph);
+
+			BasicVisualizationServer<MyNode, MyEdge> graphPanel =
+					new BasicVisualizationServer<MyNode, MyEdge>(layout,new Dimension(300, 300));
+
+			graphPanel.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<MyNode>());
+			graphPanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<MyEdge>());
+			// エッジを直線に
+			//graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<MyNode, MyEdge>());
+
+			// ダイアログにセット
+			dialog.add(graphPanel);
 			dialog.setVisible(true);
 
-        }else if(event.getEventType() == HyperlinkEvent.EventType.ENTERED) {	// カーソルを当てた場合
-        }else if(event.getEventType() == HyperlinkEvent.EventType.EXITED) {		// カーソルを外した場合
-        }
-
-    });
+			// }else if(event.getEventType() == HyperlinkEvent.EventType.ENTERED) { // カーソルを当てた場合
+			// }else if(event.getEventType() == HyperlinkEvent.EventType.EXITED) { // カーソルを外した場合
+		}
+	});
 
 	public ActionListener getGenerateAction() {
 		return generateAction;

@@ -645,7 +645,7 @@ public class Sentence {
 		//List<Clause> complementClauses;								// 補部
 		//Word complementWord;											// 補語
 
-		String[][] tag_Not = {{"助動詞", "ない"}};
+		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
 		boolean not = (predicateClause.haveSomeTagWord(tag_Not))? true: false;	// 述語が否定かどうか
 
 		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());

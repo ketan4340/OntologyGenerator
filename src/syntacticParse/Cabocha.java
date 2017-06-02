@@ -92,7 +92,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	}
 	@Override
 	public List<String> executeParser(NaturalLanguage[] nlTexts) {
-		return executeParser(Arrays.asList(nlTexts));
+		return executeParser(Arrays.asList(nlTexts));	// リストにして同名メソッドに投げる
 	}
 
 
