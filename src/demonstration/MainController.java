@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
@@ -27,10 +26,11 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.html.HTMLDocument;
 
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -161,15 +161,15 @@ public class MainController {
 			// グラフ表示
 			Graph<MyNode, MyEdge> graph = selectedOnt.createGraph();
 
-			Layout<MyNode, MyEdge> layout = new FRLayout<MyNode, MyEdge>(graph);
+			Layout<MyNode, MyEdge> layout = new KKLayout<MyNode, MyEdge>(graph);
 
 			BasicVisualizationServer<MyNode, MyEdge> graphPanel =
-					new BasicVisualizationServer<MyNode, MyEdge>(layout,new Dimension(300, 300));
+					new BasicVisualizationServer<MyNode, MyEdge>(layout,new Dimension(500, 500));
 
 			graphPanel.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<MyNode>());
 			graphPanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<MyEdge>());
 			// エッジを直線に
-			//graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<MyNode, MyEdge>());
+			graphPanel.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<MyNode, MyEdge>());
 
 			// ダイアログにセット
 			dialog.add(graphPanel);
