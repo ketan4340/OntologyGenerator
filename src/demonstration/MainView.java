@@ -1,8 +1,8 @@
 package demonstration;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -18,10 +18,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.BadLocationException;
-
-import javafx.embed.swing.JFXPanel;
 
 public class MainView extends JFrame implements Observer{
 	/**** Model ****/
@@ -56,6 +52,7 @@ public class MainView extends JFrame implements Observer{
 	private JButton docImportBt, docClearBt;
 	private JToggleButton html_PlainTgBt;
 	private JEditorPane docEditorpane;
+
 
 	public MainView(MainController ctrl) {
 		super("OntologyGenerator");
@@ -109,6 +106,7 @@ public class MainView extends JFrame implements Observer{
 		pn_menu.add(iptClearBt);
 
 	    iptTextarea = new JTextArea();
+	    iptTextarea.setBackground(new Color(209, 145, 71));	// 背景:駱駝色
 	    iptTextarea.setLineWrap(true);
 	    iptScrollpane = new JScrollPane(iptTextarea);
 
@@ -151,6 +149,7 @@ public class MainView extends JFrame implements Observer{
 		pn_menu.add(docClearBt);
 
 		docEditorpane = new JEditorPane();
+		//docEditorpane.setBackground(new Color(156, 167, 22));	// 背景:スカイブルー
 		docEditorpane.setContentType("text/plain");			// 初期設定:plain
 	    docEditorpane.setEditable(true);					// 初期設定:編集可能
 	    docEditorpane.setDocument(docModel.getPlainDoc());	// DocumentModelのメンバPlainDocをセット
