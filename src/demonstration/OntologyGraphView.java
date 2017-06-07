@@ -1,17 +1,11 @@
 package demonstration;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -28,7 +22,7 @@ public class OntologyGraphView extends JPanel{
 	private UseOntologyController controller;
 
 	/**** View ****/
-
+	Graph<MyNode, MyEdge> graph;
 
 	public OntologyGraphView(UseOntologyController ctrl) {
 		this.controller = ctrl;
@@ -50,7 +44,7 @@ public class OntologyGraphView extends JPanel{
 		selectedOnt.addAllTriples(relationList);
 
 		// グラフ表示
-		Graph<MyNode, MyEdge> graph = selectedOnt.createGraph();
+		graph = selectedOnt.createGraph();
 
 		Layout<MyNode, MyEdge> layout = new KKLayout<MyNode, MyEdge>(graph);
 

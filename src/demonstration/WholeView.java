@@ -19,7 +19,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 
-public class MainView extends JFrame implements Observer{
+public class WholeView extends JFrame implements Observer{
 	/**** Model ****/
 	private InputTextModel iptModel;
 	private OntologyModel ontModel;
@@ -29,10 +29,10 @@ public class MainView extends JFrame implements Observer{
 	private MainController controller;
 
 	/**** View ****/
-	/*** Whole part ***/
+	/*** Whole frame ***/
 	private JSplitPane splitpane;
 
-	/** Left part **/
+	/** Left panel **/
 	private JPanel leftPanel;
 	/* InputText parts */
 	private JPanel iptPanel;
@@ -44,7 +44,8 @@ public class MainView extends JFrame implements Observer{
 	private JScrollPane ontScrollpane;
 	private JButton generateBt;
 	private JTable ontTable;
-	/** Right part **/
+	/** Center panel **/
+	/** Right panel **/
 	//private JPanel rightPanel;
 	/* Document parts */
 	private JPanel docPanel;
@@ -53,8 +54,8 @@ public class MainView extends JFrame implements Observer{
 	private JToggleButton html_PlainTgBt;
 	private JEditorPane docEditorpane;
 
-
-	public MainView(MainController ctrl) {
+	/**** 細かい子ビューの配置を決める ****/
+	public WholeView(MainController ctrl) {
 		super("OntologyGenerator");
 		this.controller = ctrl;
 		// controllerにこのviewインスタンスを持たせる
@@ -64,19 +65,32 @@ public class MainView extends JFrame implements Observer{
 		iptModel = controller.getIptModel();
 		ontModel = controller.getOntModel();
 		docModel = controller.getDocModel();
-		// modelのオブザーバーにこのviewを追加
-		iptModel.addObserver(this);
 
 		designWholeFrame();
 	    setVisible(true);	// 表示
 	}
 
+	public WholeView(InputTextView iptView, OntologyTableView ontView, DocumentView docView) {
+		super("OntologyGenerator");
+
+		/* ウインドウ全体の設定 */
+		setExtendedState(JFrame.MAXIMIZED_BOTH);		// ディスプレイ全体に表示
+		setLocationRelativeTo(null);					// フレームを中央に表示
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// ウインドウを閉じたら終了
+		setLayout(new GridLayout(1, 3));
+
+		/* 子ビュー(JPanel)を配置 */
+		add(iptView);
+		add(ontView);
+		add(docView);
+
+		setVisible(true);
+	}
+
 	private void designWholeFrame() {
-		//setSize(1200,800);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);		// 画面全体の半分のサイズ
 		setLocationRelativeTo(null);					// フレームを中央に表示
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// ウインドウを閉じたら終了
-		//setLayout(new GridLayout(2, 1));
 
 		designInputTextPanel();
 		designOntologyPanel();
@@ -152,7 +166,7 @@ public class MainView extends JFrame implements Observer{
 		//docEditorpane.setBackground(new Color(156, 167, 22));	// 背景:スカイブルー
 		docEditorpane.setContentType("text/plain");			// 初期設定:plain
 	    docEditorpane.setEditable(true);					// 初期設定:編集可能
-	    docEditorpane.setDocument(docModel.getPlainDoc());	// DocumentModelのメンバPlainDocをセット
+	    docEditorpane.setDocument(docModel);	// DocumentModelのメンバPlainDocをセット
 	    docEditorpane.addHyperlinkListener(controller.getHyperlinkAction());
 	    docScrollpane = new JScrollPane(docEditorpane);
 

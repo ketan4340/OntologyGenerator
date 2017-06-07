@@ -17,9 +17,8 @@ import grammar.Sentence;
 import grammar.Word;
 import syntacticParse.Parser;
 
-public class DocumentModel{
-	private PlainDocument plainDoc;
-	private HTMLDocument htmlDoc;
+public class DocumentModel extends AbstractDocumentModel{
+	private HTMLDocument htmlDoc;		// plainDocumentからHTMLに切り替える
 
 	private Parser parser;
 
@@ -30,14 +29,15 @@ public class DocumentModel{
 			+ "<body id=\"body\">"
 			+ "</body>";
 
+
 	public DocumentModel() {
-		plainDoc = new PlainDocument();
+		super();
 		htmlDoc = new HTMLDocument();
 		parser = new Parser("cabocha");
 		htmlDoc.setParser(new ParserDelegator());
 
 		try {
-			plainDoc.insertString(0, defaultPlainText, new SimpleAttributeSet());
+			insertString(0, defaultPlainText, new SimpleAttributeSet());
 			htmlDoc.setInnerHTML(htmlDoc.getDefaultRootElement(), defaultHTMLTags);
 		} catch (BadLocationException | IOException e) {
 			e.printStackTrace();
@@ -56,7 +56,7 @@ public class DocumentModel{
 	private void plain2html() {
 		List<Sentence> sentenceList = new ArrayList<Sentence>();
 		try {
-			sentenceList = getSentences(plainDoc.getText(0, plainDoc.getLength()));
+			sentenceList = getSentences(this.getText(0, this.getLength()));
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
@@ -81,12 +81,6 @@ public class DocumentModel{
 		}
 	}
 
-	public PlainDocument getPlainDoc() {
-		return plainDoc;
-	}
-	public void setPlainDoc(PlainDocument plainDoc) {
-		this.plainDoc = plainDoc;
-	}
 	public HTMLDocument getHtmlDoc() {
 		plain2html();
 		return htmlDoc;

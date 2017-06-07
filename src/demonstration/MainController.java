@@ -42,23 +42,16 @@ public class MainController {
 	private DocumentModel docModel;
 
 	/*** View ***/
-	private MainView view;
-	private MainFXView fxView;
+	private WholeView view;
 
-	public MainController(InputTextModel i, OntologyModel o, DocumentModel d) {
-		iptModel = i;
-		ontModel = o;
-		docModel = d;
-
-		// JavaFX試験運用
-		// fxView = new MainFXView(this);
+	public MainController(InputTextModel im, OntologyModel om, DocumentModel dm) {
+		iptModel = im;
+		ontModel = om;
+		docModel = dm;
 	}
 
-	public void setMainView(MainView v) {
-		this.view = v;
-	}
-	public void setMainFXView(MainFXView v) {
-		this.fxView = v;
+	public void setMainView(WholeView wv) {
+		this.view = wv;
 	}
 	public InputTextModel getIptModel() {
 		return iptModel;
@@ -73,16 +66,10 @@ public class MainController {
 	/** ActionListener **/
 	/* RunGeneratorボタンの実装 */
 	private ActionListener generateAction = (event -> {
-		String text = view.getIptTextarea().getText();
-		List<String[]> triples = iptModel.runGenerator(text);
+		List<String[]> triples = iptModel.runGenerator();
 		ontModel.addAllTriples(triples);
 	});
-	// JavaFX仕様
-	private EventHandler<ActionEvent> generateActionFX = (event -> {
-		String text = view.getIptTextarea().getText();
-		List<String[]> triples = iptModel.runGenerator(text);
-		ontModel.addAllTriples(triples);
-	});
+
 	/* ImportTextボタンの実装 */
 	private ActionListener importTextAction = (event -> {
 		List<String> writings = new LinkedList<String>();
@@ -132,7 +119,7 @@ public class MainController {
 			editorpane.setContentType("text/html");			// editorをHTML仕様に変えてから
 			editorpane.setDocument(htmlDoc);				// HTMLDocumentをセット
 		} else { // HTML->plain
-			PlainDocument plainDoc = docModel.getPlainDoc();	// DocumentModelからplainDoc取得
+			PlainDocument plainDoc = docModel;					// DocumentModelからplainDoc取得
 			tgbt.setText("plain(編集可能)");						// ボタンの表示をplainに
 			editorpane.setEditable(true);						// 編集可能に
 			editorpane.setOpaque(true);							// 背景を非透過に
