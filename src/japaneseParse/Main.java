@@ -1,16 +1,17 @@
 package japaneseParse;
 
-import demonstration.BuildOntologyController;
-import demonstration.DocumentModel;
-import demonstration.DocumentView;
-import demonstration.InputTextModel;
-import demonstration.InputTextView;
-import demonstration.MainController;
-import demonstration.OntologyGraphView;
-import demonstration.WholeView;
-import demonstration.OntologyModel;
-import demonstration.OntologyTableView;
-import demonstration.UseOntologyController;
+import demo.BuildOntologyController;
+import demo.DocumentModel;
+import demo.DocumentView;
+import demo.InputTextModel;
+import demo.InputTextView;
+import demo.MainController;
+import demo.OntologyGraphView;
+import demo.OntologyModel;
+import demo.OntologyTableView;
+import demo.SubOntologyView;
+import demo.UseOntologyController;
+import demo.WholeView;
 
 public class Main{
 	public static void main(String[] args) {

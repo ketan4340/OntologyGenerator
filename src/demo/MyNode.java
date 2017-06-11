@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 public class MyNode {
 	String label;

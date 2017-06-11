@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 import java.awt.BorderLayout;
 
@@ -29,10 +29,7 @@ public abstract class AbstractEditorView extends JPanel{
 	/****** コンストラクタ ******/
 	/*************************/
 	public AbstractEditorView() {
-		/*
-		this.edtController = edtCtrl;
-		this.edtModel = edtCtrl.getDocumentModel();
-		 */
+		super();
 
 		// メニューパネルの初期化
 		menuPanel = new JPanel();

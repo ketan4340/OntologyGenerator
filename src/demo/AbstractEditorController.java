@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 import java.awt.event.ActionListener;
 

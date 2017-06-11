@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,6 +54,10 @@ public class WholeView extends JFrame implements Observer{
 	private JToggleButton html_PlainTgBt;
 	private JEditorPane docEditorpane;
 
+
+	/*************************/
+	/****** コンストラクタ ******/
+	/*************************/
 	/**** 細かい子ビューの配置を決める ****/
 	public WholeView(MainController ctrl) {
 		super("OntologyGenerator");

@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -12,11 +12,14 @@ public class BuildOntologyController extends AbstractEditorController{
 
 	/*** View ***/
 	private InputTextView iptView = (InputTextView) super.edtView;
-	private OntologyTableView ontView;
+	private OntologyTableView ontTable;
 
+
+	/*************************/
+	/****** コンストラクタ ******/
+	/*************************/
 	public BuildOntologyController(AbstractDocumentModel iptModel, OntologyModel ontModel) {
 		super(iptModel);
-		//this.iptModel = (InputTextModel) iptModel;
 		this.ontModel = ontModel;
 	}
 
@@ -35,11 +38,11 @@ public class BuildOntologyController extends AbstractEditorController{
 	public void setInputTextView(InputTextView iptView) {
 		this.iptView = iptView;
 	}
-	public OntologyTableView getOntologyView() {
-		return ontView;
+	public OntologyTableView getOntologyTable() {
+		return ontTable;
 	}
-	public void setOntologyView(OntologyTableView ontView) {
-		this.ontView = ontView;
+	public void setOntologyTable(OntologyTableView ontView) {
+		this.ontTable = ontView;
 	}
 	public InputTextModel getInputTextModel() {
 		return iptModel;

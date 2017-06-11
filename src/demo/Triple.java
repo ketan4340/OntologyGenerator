@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 public class Triple {
 	public static int SUBJECT = 0;

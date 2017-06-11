@@ -1,4 +1,4 @@
-package demonstration;
+package demo;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

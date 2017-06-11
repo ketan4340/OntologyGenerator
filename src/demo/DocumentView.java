@@ -1,4 +1,6 @@
-package demonstration;
+package demo;
+
+import java.awt.BorderLayout;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -15,12 +17,20 @@ public class DocumentView extends AbstractEditorView{
 
 	/**** View ****/
 	private JToggleButton html_PlainTgBt;
+	SubOntologyView subOntView;
 
+
+	/*************************/
+	/****** コンストラクタ ******/
+	/*************************/
 	public DocumentView(UseOntologyController uCtrl) {
 		super();
 		this.useController = uCtrl;
 		this.docModel = uCtrl.getDocumentModel();
 		useController.setDocumentView(this);
+
+		subOntView = new SubOntologyView(uCtrl);
+		this.add(subOntView, BorderLayout.SOUTH);
 
 		setMenu();
 		setDocument();

@@ -1,10 +1,12 @@
-package demonstration;
+package demo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -14,6 +16,9 @@ public class OntologyModel extends DefaultTableModel{
 	private static int TRIPLE = 3;
 	private static String[] columnNames = {"Subject", "Predicate", "Object"};
 
+	/*********************/
+	/**** コンストラクタ ****/
+	/*********************/
 	public OntologyModel() {
 		super(columnNames, 0);
 	}
@@ -51,6 +56,10 @@ public class OntologyModel extends DefaultTableModel{
 		return table;
 	}
 
+	public void clear() {
+		setRowCount(0);
+	}
+
 	private List<String[]> getCommonConcepts(String concept, int s_p_o) {
 		List<String[]> commonRowList = new LinkedList<String[]>();
 		for(final String[] row: getAllTable()) {
@@ -68,29 +77,5 @@ public class OntologyModel extends DefaultTableModel{
 	}
 	public List<String[]> getSP(String object) {
 		return getCommonConcepts(object, Triple.OBJECT);
-	}
-
-	public Graph<MyNode, MyEdge> createGraph() {
-		// 有向グラフ
-		Graph<MyNode, MyEdge> graph = new DirectedSparseGraph<MyNode, MyEdge>();
-
-		List<String[]> table = getAllTable();
-		Map<String, MyNode> nodeMap = new HashMap<String, MyNode>();	// ノードの重複を許さない
-		for(String[] triple : table) {
-			String subject = triple[0];
-			String object = triple[2];
-			MyNode node_s = (nodeMap.containsKey(subject))
-					? nodeMap.get(subject)	// すでにノードが作られていればそれを使い
-					: new MyNode(subject);	// 無ければ新しく作る
-			MyNode node_o = (nodeMap.containsKey(object))
-					? nodeMap.get(object)
-					: new MyNode(object);
-
-			graph.addEdge(new MyEdge(triple[1]), node_s, node_o);
-
-			nodeMap.put(triple[0], node_s);
-			nodeMap.put(triple[2], node_o);
-		}
-		return graph;
 	}
 }
