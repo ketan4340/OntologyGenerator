@@ -1,15 +1,12 @@
-package japaneseParse;
+package main;
 
 import demo.BuildOntologyController;
 import demo.DocumentModel;
 import demo.DocumentView;
 import demo.InputTextModel;
 import demo.InputTextView;
-import demo.MainController;
-import demo.OntologyGraphView;
 import demo.OntologyModel;
 import demo.OntologyTableView;
-import demo.SubOntologyView;
 import demo.UseOntologyController;
 import demo.WholeView;
 

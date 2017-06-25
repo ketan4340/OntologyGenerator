@@ -1,6 +1,7 @@
 package demo;
 
-import javax.jws.soap.SOAPBinding.Use;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -20,18 +21,16 @@ public class SubOntologyView extends JPanel{
 	public SubOntologyView(UseOntologyController uCtrl) {
 		super();
 
-		// タブペインの初期化
-		tabbedpane = new JTabbedPane();
-
 		// 表の初期化
 		ontTable = new OntologyTableView(uCtrl);
 
 		// グラフの初期化
 		ontGraph = new OntologyGraphView(uCtrl);
 
-		tabbedpane.addTab("table", ontTable);
-		tabbedpane.addTab("graph", ontGraph);
-
+		// タブペインの初期化
+		tabbedpane = new JTabbedPane();
+		tabbedpane.addTab("表", ontTable);
+		tabbedpane.addTab("グラフ", ontGraph);
 		add(tabbedpane);
 	}
 }

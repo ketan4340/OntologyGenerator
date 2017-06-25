@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -22,26 +24,16 @@ public class MyGraph extends BasicVisualizationServer<MyNode, MyEdge> implements
 	/**** Model ****/
 	private final OntologyModel ontModel;
 
-	Graph<MyNode, MyEdge> graphModel;
-	Layout<MyNode, MyEdge> layout;
-
 	public MyGraph(OntologyModel om, Dimension area) {
-		// とりあえず空のグラフで初期化した後
-		//super(new KKLayout<MyNode, MyEdge>(new DirectedSparseGraph<MyNode, MyEdge>()), area);
 		super(new KKLayout<MyNode, MyEdge>(ontology2Graph(om)), area);
 
 		this.ontModel = om;
-		// ontModelに私のこと見て(ハート)って伝える
-		om.addTableModelListener(this);
 
-		/*
-		// OntologyModelに基づいて生成したグラフを渡す
-		this.graphModel = ontology2Graph(om);
-		this.layout = new KKLayout<MyNode, MyEdge>(graphModel);
-		this.setGraphLayout(layout);
-		*/
+		om.addTableModelListener(this);	// ontModelに「何かあったら私に教えてよ」って伝える
 
+		// ノードのラベルを表示
 		this.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<MyNode>());
+		// エッジのラベルを表示
 		this.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<MyEdge>());
 		// エッジを直線に
 		this.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<MyNode, MyEdge>());
@@ -52,7 +44,7 @@ public class MyGraph extends BasicVisualizationServer<MyNode, MyEdge> implements
 		List<String[]> table = ontology.getAllTable();
 		Map<String, MyNode> nodeMap = new HashMap<String, MyNode>();	// ノードの重複を許さない
 		for(String[] triple : table) {
-			String subject = triple[0], object = triple[2];
+			String subject = triple[0], predicate = triple[1], object = triple[2];
 			MyNode node_s = (nodeMap.containsKey(subject))
 					? nodeMap.get(subject)	// すでにノードが作られていればそれを使い
 					: new MyNode(subject);	// 無ければ新しく作る
@@ -60,21 +52,20 @@ public class MyGraph extends BasicVisualizationServer<MyNode, MyEdge> implements
 					? nodeMap.get(object)
 					: new MyNode(object);
 
-			g.addEdge(new MyEdge(triple[1]), node_s, node_o);
+			g.addEdge(new MyEdge(predicate), node_s, node_o);
 
-			nodeMap.put(triple[0], node_s);
-			nodeMap.put(triple[2], node_o);
-
-			System.out.println(triple[0] + triple[1] + triple[2]);
+			nodeMap.put(subject, node_s);	// 同じものがあっても上書きなのでOK
+			nodeMap.put(object, node_o);
 		}
 		return g;
 	}
 
+	// OntologyModel(extends TableModel)に変更があったとき呼び出される
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		// グラフ再構築
-		// 毎回ゼロから作り直す
-		this.graphModel = ontology2Graph(ontModel);
+		// 再構築したグラフをセットし直す
+		Layout<MyNode, MyEdge> newLayout = new KKLayout<MyNode, MyEdge>(ontology2Graph(ontModel));
+		this.setGraphLayout(newLayout);
 		System.out.println("tableChanged");
 	}
 }

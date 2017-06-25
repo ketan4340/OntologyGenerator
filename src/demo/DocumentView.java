@@ -29,6 +29,7 @@ public class DocumentView extends AbstractEditorView{
 		this.docModel = uCtrl.getDocumentModel();
 		useController.setDocumentView(this);
 
+		// 抜き出したオントロジーを表とグラフで表示するビュー
 		subOntView = new SubOntologyView(uCtrl);
 		this.add(subOntView, BorderLayout.SOUTH);
 
