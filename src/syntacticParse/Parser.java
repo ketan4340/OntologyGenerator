@@ -108,7 +108,7 @@ public class Parser {
 					sbj_fnc = (wdl.size() <= border)? true: false;
 					Word wd = new Word();
 					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.clauseID, sbj_fnc);
-					wdl.add(wd.wordID);
+					wdl.add(wd.id);
 				}
 			}
 

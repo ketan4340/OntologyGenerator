@@ -68,8 +68,8 @@ public class DocumentModel extends AbstractDocumentModel{
 			for(int wdID : sentence.wordIDs()) {	// 文の単語を走査
 				Word word = Word.get(wdID);
 				htmlText += (word.hasSomeTags(noun))	// 名詞ならアンカータグで囲む
-						? "<a href=\"" + word.wordName + "\">" + word.wordName + "</a>"
-						: word.wordName;
+						? "<a href=\"" + word.name + "\">" + word.name + "</a>"
+						: word.name;
 			}
 			//htmlText += "</font>";
 			htmlText += "</p><br>\n";				// 文末で改行

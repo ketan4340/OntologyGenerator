@@ -2,30 +2,33 @@ package grammar;
 
 import java.util.*;
 
-public class Word {
+public class Word implements GrammarInterface{
 	public static int wordsSum = 0;
 	public static List<Word> allWordsList = new ArrayList<Word>();
 
-	public int wordID;				// 通し番号。Wordを特定する
-	public String wordName;			// 単語の文字列
+	public int id;					// 通し番号。Wordを特定する
+	public String name;				// 単語の文字列
 	public List<String> tags;		// 品詞・活用形、読みなど
-	public int belongClause;				// どのChunkに所属するか
+	public int belongClause;		// どのClauseに所属するか
 	public int originID;			// このWordが別Wordのコピーである場合，そのIDを示す
 	public List<Integer> cloneIDs;	// このWordのクローン達のID
-	public boolean sbj_fnc;			// 主辞か機能語か
+	public boolean isSubject;		// 主辞か機能語か
+
+	// 単語は1つ以上の形態素によって構成される
+	private List<Morpheme> mphs;
 
 	public Word() {
-		wordID = wordsSum++;
+		id = wordsSum++;
 		allWordsList.add(this);
-		wordName = new String();
+		name = new String();
 		tags = new ArrayList<String>();
 		belongClause = -1;
 		originID = -1;
 		cloneIDs = new ArrayList<Integer>();
-		sbj_fnc = false;
+		isSubject = false;
 	}
 	public void setWord(String nWordName, List<String> nWordTags, int chunkID, boolean sf) {
-		wordName = nWordName;
+		name = nWordName;
 		tags.addAll(nWordTags);
 		if(tags.size() < 9) tags.addAll(Arrays.asList("*", "*"));	// tagの数が最低9個になるように
 		if(tags.get(6).equals("*")) {	// 特殊漢字の原形をここで入力してあげる
@@ -33,7 +36,7 @@ public class Word {
 		}
 		if(tags.contains("記号")) sf = false;	// 記号なら明らかに主辞ではない
 		belongClause = chunkID;
-		sbj_fnc = sf;
+		isSubject = sf;
 	}
 
 	public static Word get(int id) {
@@ -84,22 +87,31 @@ public class Word {
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(wordName, tags, belongClause, sbj_fnc);
-		replica.originID = this.wordID;
-		cloneIDs.add(replica.wordID);
+		replica.setWord(name, tags, belongClause, isSubject);
+		replica.originID = this.id;
+		cloneIDs.add(replica.id);
 		return replica;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+	@Override
+	public void printDetail() {
+		System.out.println(name);
 	}
 
 	/* 渡されたIDのリストを一つの文字列に変える */
 	public static String toStringList(List<Integer> wordIDs) {
 		String wordNames = new String();
-		for(final int id: wordIDs) wordNames+=Word.get(id).wordName;
+		for(final int id: wordIDs) wordNames+=Word.get(id).name;
 		return wordNames;
 	}
 
 	public static void printAllWords() {
 		for(Word wd: allWordsList) {
-			System.out.println("W"+wd.wordID + "@(C"+wd.belongClause+"):\t" + wd.wordName + "("+wd.tags+")");
+			System.out.println("W"+wd.id + "@(C"+wd.belongClause+"):\t" + wd.name + "("+wd.tags+")");
 		}
 	}
 }

@@ -1,0 +1,32 @@
+\w1<tag="名詞">
+\w2<tag="係助詞", char="は">
+\w3<char="一種"|"一品種">
+
+\c1<\w1\w2>
+\c2<\w1\w*>
+
+<rule>
+<pattern>
+	<clause>
+		<word tag=“名詞”>
+			<label>sbj</label>
+		</word>
+		<word tag=“係助詞” char=“は”></word>
+	</clause>
+	<clause>
+		<word tag=“名詞”>
+			<label>obj</label>
+		</word>
+		<word>
+		</word>
+	</clause>
+</pattern>
+<triples>
+	<triple>
+		<s>sbj</s>
+		<p>rdfs:subClassOf</p>
+		<o>obj</o>
+	</triple>
+</triples>
+</rule>
+

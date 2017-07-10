@@ -92,7 +92,7 @@ public class GenerateProcess {
 
 			/** Step2: 長文分割 **/
 			/* 長文を分割し複数の短文に分ける */
-			originalSent.print();
+			originalSent.printDetail();
 			for(final Sentence shortSent: originalSent.divide2()) {
 				for(final Sentence partSent: shortSent.divide3()) {
 					partSent.uniteSubject();

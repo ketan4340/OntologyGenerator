@@ -20,10 +20,10 @@ public class Phrase extends Word{
 			int baseID = itr.next();
 			Word wd = Word.get(baseID);
 			origins.add(baseID);
-			phraseName += wd.wordName;
+			phraseName += wd.name;
 			if(wd.tags.size() > 6) {
 				if(itr.hasNext())
-					genkei += wd.wordName;
+					genkei += wd.name;
 				else	// 最後尾は原形
 					genkei += wd.tags.get(6);
 			}

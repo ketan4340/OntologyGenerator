@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class Sentence {
+public class Sentence implements GrammarInterface{
 	public static int sentSum = 0;
 
 	public int sentID;
@@ -150,7 +150,7 @@ public class Sentence {
 		Phrase nph = new Phrase();
 		nph.setPhrase(phraseWords, baseClauseID, false);
 		List<Integer> clauseBaseWords = new ArrayList<Integer>();
-		clauseBaseWords.add(nph.wordID);
+		clauseBaseWords.add(nph.id);
 		clauseBaseWords.addAll(functionWords);
 		Clause.get(baseClauseID).setClause(clauseBaseWords, depto);
 
@@ -334,7 +334,7 @@ public class Sentence {
 				Word no = new Word();	// 助詞・連体化"の"を新たに用意
 				no.setWord("の", Arrays.asList("助詞","連体化","*","*","*","*","の","ノ","ノ"), copySubject.clauseID, false);
 				int index_Ha = copySubject.indexOfW(copySubject.collectAllTagWords(tag_Ha).get(0));
-				copySubject.wordIDs.set(index_Ha, no.wordID);	// "は"の代わりに"の"を挿入
+				copySubject.wordIDs.set(index_Ha, no.id);	// "は"の代わりに"の"を挿入
 
 				headSubjectList.add(copySubject.clauseID);		// 連続した主節は貯め置きしとく
 
@@ -617,7 +617,7 @@ public class Sentence {
 				Word no = new Word();	// 助詞・連体化"の"を新たに用意
 				no.setWord("の", Arrays.asList("助詞","連体化","*","*","*","*","の","ノ","ノ"), subject.clauseID, false);
 				int index_Ha = subject.indexOfW(subject.collectAllTagWords(tag_Ha).get(0));
-				subject.wordIDs.set(index_Ha, no.wordID);	// "は"の代わりに"の"を挿入
+				subject.wordIDs.set(index_Ha, no.id);	// "は"の代わりに"の"を挿入
 			//}
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
@@ -635,7 +635,7 @@ public class Sentence {
 		Clause subjectClause = Clause.get(subjectList.get(0));
 		int sbjMainID = subjectClause.getMainWord();	if(sbjMainID == -1) return relations;
 		Word subjectWord = Word.get(sbjMainID);							// 主語
-		String subject = subjectWord.wordName;
+		String subject = subjectWord.name;
 		// 述節
 		Clause predicateClause = Clause.get(subjectClause.dependUpon);	if(predicateClause == null) return relations;
 		int prdMainID = predicateClause.getMainWord();	if(prdMainID == -1) return relations;
@@ -668,14 +668,14 @@ public class Sentence {
 
 		if(boolLength || boolWeight) {
 			if(boolLength) {
-				String blank = "_:"+subjectWord.wordName+"-length";
-				relations.add( new String[]{subjectWord.wordName, "hasLength", blank} );		// 空白ノード
+				String blank = "_:"+subjectWord.name+"-length";
+				relations.add( new String[]{subjectWord.name, "hasLength", blank} );		// 空白ノード
 				relations.add( new String[]{blank, "rdf:value", mtchLength.group(2)} );			// リテラル
 				relations.add( new String[]{blank, "exterms:units", mtchLength.group(4)} );	// 単位
 			}
 			if(boolWeight) {
-				String blank = "_:"+subjectWord.wordName+"-weight";
-				relations.add( new String[]{subjectWord.wordName, "hasWeight", blank} );		// 空白ノード
+				String blank = "_:"+subjectWord.name+"-weight";
+				relations.add( new String[]{subjectWord.name, "hasWeight", blank} );		// 空白ノード
 				relations.add( new String[]{blank, "rdf:value", mtchWeight.group(2)} );		// リテラル
 				relations.add( new String[]{blank, "exterms:units", mtchWeight.group(4)} );	// 単位
 			}
@@ -693,7 +693,7 @@ public class Sentence {
 			if(boolHave) {			// "~がある","~をもつ"
 				Clause previousClause = Clause.get(previousC(predicateClause.clauseID));	// 動詞の一つ前の文節
 				if(previousClause == null) return relations;
-				String part = Word.get(previousClause.getMainWord()).wordName;	// その主辞の文字列
+				String part = Word.get(previousClause.getMainWord()).name;	// その主辞の文字列
 				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
 				if(previousClause.haveSomeTagWord(tag_Ga_Wo)) {
 					relations.add( new String[]{part, "dcterms:isPartOf", subject} );
@@ -701,7 +701,7 @@ public class Sentence {
 				}
 
 			}else if(boolGnrnm) {	// "~の総称"
-				relations.add( new String[]{subjectWord.wordName, "owl:equivalentClass", mtchGnrnm.group(1)} );
+				relations.add( new String[]{subjectWord.name, "owl:equivalentClass", mtchGnrnm.group(1)} );
 
 			}else {					// その他の動詞
 
@@ -714,7 +714,7 @@ public class Sentence {
 				if(!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
 					Clause chunk_Ni_Wo = Clause.get(clauses_Ni_Wo.get(0));
 					Word word_Ni_Wo = Word.get(chunk_Ni_Wo.getMainWord());	// "に"または"を"の主辞
-					object = word_Ni_Wo.wordName;
+					object = word_Ni_Wo.name;
 				}else {							// 目的語なし
 					object = null;
 				}
@@ -730,7 +730,7 @@ public class Sentence {
 			if(previousClause == null) return relations;
 			String[][] tag_Ga = {{"格助詞", "が"}};
 			if(previousClause.haveSomeTagWord(tag_Ga)) {
-				String part = Word.get(previousClause.getMainWord()).wordName;	// その主辞の文字列
+				String part = Word.get(previousClause.getMainWord()).name;	// その主辞の文字列
 				subject += "の"+part;
 			}
 			relations.add( new String[]{adjective, "attributeOf", subject} );
@@ -752,14 +752,14 @@ public class Sentence {
 			boolean boolAdjective = predicateClause.haveSomeTagWord(tag_Adjective);
 
 			if(boolSynonym) {
-				relations.add( new String[]{subjectWord.wordName, "owl:sameClassAs", mtchSynonym.group(1)} );
+				relations.add( new String[]{subjectWord.name, "owl:sameClassAs", mtchSynonym.group(1)} );
 			}else if(boolKind) {
-				relations.add( new String[]{subjectWord.wordName, "rdf:type", mtchKind.group(1)} );
+				relations.add( new String[]{subjectWord.name, "rdf:type", mtchKind.group(1)} );
 			}else if(boolAdjective) {
 				String adjective = predicateWord.tags.get(6);
 				relations.add( new String[]{adjective, "attributeOf", subject} );
 			}else {
-				relations.add( new String[]{subjectWord.wordName, "rdfs:subClassOf", predicateWord.wordName} );
+				relations.add( new String[]{subjectWord.name, "rdfs:subClassOf", predicateWord.name} );
 			}
 		}
 
@@ -822,6 +822,7 @@ public class Sentence {
 		}
 	}
 
+	@Override
 	public String toString() {
 		String str = new String();
 		for(int clsID: clauseIDs) {
@@ -829,20 +830,22 @@ public class Sentence {
 		}
 		return str;
 	}
-	public void print() {
+	@Override
+	public void printDetail() {
 		System.out.println(toString());
 	}
+
 	public void printW() {
 		for(int wdID: wordIDs()) {
-			System.out.print("("+wdID+")" + Word.get(wdID).wordName);
+			System.out.print("("+wdID+")" + Word.get(wdID).name);
 		}
 		System.out.println();
 	}
 	public void printSF() {
 		for(int wdID: wordIDs()) {
-			boolean sf = Word.get(wdID).sbj_fnc;
+			boolean sf = Word.get(wdID).isSubject;
 			String t_f = sf? "T": "F";
-			System.out.print("("+t_f+")" + Word.get(wdID).wordName);
+			System.out.print("("+t_f+")" + Word.get(wdID).name);
 		}
 		System.out.println();
 	}
@@ -862,7 +865,7 @@ public class Sentence {
 	/* 文を区切りを挿入して出力する */
 	public void printS() {
 		for(int wdID: wordIDs()) { // Word単位で区切る
-			System.out.print(Word.get(wdID).wordName + "|");
+			System.out.print(Word.get(wdID).name + "|");
 		}
 		System.out.println();
 		for(int clsID: clauseIDs) { // Chunk単位で区切る
