@@ -16,15 +16,15 @@ import java.util.HashSet;
 public class Sentence implements GrammarInterface{
 	public static int sentSum = 0;
 
-	public int sentID;
+	public int id;
 	public List<Integer> clauseIDs; // Clauseのリストで文を構成する
 
 	public Sentence() {
-		sentID = sentSum++;
+		id = sentSum++;
 		clauseIDs = new ArrayList<Integer>();
 	}
 	public Sentence(List<Integer> clauseList) {
-		sentID = sentSum++;
+		id = sentSum++;
 		clauseIDs = clauseList;
 	}
 	public void setSentence(List<Integer> clauseList) {
@@ -774,7 +774,7 @@ public class Sentence implements GrammarInterface{
 		spoList.add( new String[]{p, "rdf:type", "rdfs:ObjectProprety"} );
 		spoList.add( new String[]{p, "rdfs:domain", s} );
 		if(o==null) {	// 目的語なし
-			o = "_:" + p+sentID + "-object";
+			o = "_:" + p+id + "-object";
 		}else {			// 目的語あり
 			spoList.add( new String[]{p, "rdfs:range", o} );
 		}
@@ -789,7 +789,7 @@ public class Sentence implements GrammarInterface{
 	private List<String[]> makeNegation(String[] spo) {
 		String s = spo[0], p = spo[1], o = spo[2];
 		List<String[]> spoList = new LinkedList<String[]>();
-		String blank = "_:" + p+sentID + "-not";	// 空白ノードの名前を決める
+		String blank = "_:" + p+id + "-not";	// 空白ノードの名前を決める
 		spoList.add( new String[]{blank, "rdf:type", "owl:NegativePropertyAssertion"} );
 		spoList.add( new String[]{blank, "owl:sourceIndividual", s} );
 		spoList.add( new String[]{blank, "owl:assertionProperty", p} );

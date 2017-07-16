@@ -11,27 +11,37 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractProcessManager {
-	public static final Charset UTF8 = StandardCharsets.UTF_8;
+	protected static final Charset UTF8 = StandardCharsets.UTF_8;
 
-	public Process process;
+	/* 外部プロセスを起動するコマンド */
+	protected Process process;
+	protected List<String> command;
 
 
-	/** 外部プロセスを実行 **/
-	public Process startProcess(List<String> command) {
+	/** 外部プロセス開始 **/
+	protected void startProcess(List<String> command) {
 		try {
-			return new ProcessBuilder(command).start();
+			process = new ProcessBuilder(command).start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return null;
 	};
+	/** 外部プロセス終了 **/
+	protected void finishProcess() {
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/** 実行中，入力待ちの外部プロセスに文字列を入力する **/
-	public void writeInput2Process(String input) {
+	protected void writeInput2Process(String input) {
 		try {
 			OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream(), UTF8);
 			osw.write(input);
@@ -43,23 +53,23 @@ public abstract class AbstractProcessManager {
 		}
 	}
 
-	/** 外部プロセスの標準出力を読み込む **/
-	public List<String> readProcessResult() {
-		List<String> result = null;
+	/** 外部プロセスの標準出力をList<String>として読み込む **/
+	protected List<String> readProcessResult() {
 		try (InputStream is = process.getInputStream()) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(is, UTF8));
-			result = br.lines().collect(Collectors.toList());
+			List<String> result = br.lines().collect(Collectors.toList());
 			is.close();		br.close();
+			return result;
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return result;
+		return new ArrayList<>();
 	}
 
-	/** 外部プロセスの出力をファイルに書き出す **/
-	public Path writeOutput2File(Path path) {
+	/** 外部プロセスの標準出力をファイルに書き出す **/
+	protected Path writeOutput2File(Path path) {
 		try (InputStream is = process.getInputStream()) {
 			Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);	// ファイルが存在するなら上書き
 			is.close();

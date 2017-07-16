@@ -8,11 +8,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import grammar.NaturalLanguage;
 import grammar.Sentence;
 import relationExtract.OntologyBuilder;
+import syntacticParse.Cabocha;
 import syntacticParse.Parser;
 
 public class GenerateProcess {
@@ -70,6 +74,10 @@ public class GenerateProcess {
 			e.printStackTrace();
 		}
 		//*/
+
+		List<NaturalLanguage> nlList = writingList.stream().map(w -> new NaturalLanguage(w)).collect(Collectors.toList());
+		Cabocha cabocha = new Cabocha();
+		//cabocha.executeParser(nlList);
 
 		for(final String writing: writingList) {
 			/*** 構文解析Module ***/

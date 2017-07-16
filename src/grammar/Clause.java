@@ -13,6 +13,7 @@ public class Clause implements GrammarInterface{
 
 	public int clauseID;
 	public List<Integer> wordIDs;		// 構成するWordのidを持つ
+	
 	public int dependUpon;				// どのClauseに係るか
 	public List<Integer> beDepended;	// どのClauseから係り受けるか
 	public int originID;				// このClauseが別Clauseのコピーである場合，そのIDを示す

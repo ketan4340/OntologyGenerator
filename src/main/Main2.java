@@ -1,14 +1,29 @@
 package main;
 
-import japaneseParse.GenerateProcess;
+import java.util.ArrayList;
+import java.util.List;
+
+import grammar.NaturalLanguage;
+import syntacticParse.Cabocha;
+import syntacticParse.ParserInterface;
 
 public class Main2 {
 
 	public static void main(String[] args) {
-		String text = "クジラは水生の哺乳類である。\n"
-					+ "";
+		String text1 = "吾輩は猫である。",
+				text2 = "カニの味噌汁は美味しいぞ。";
 
-		GenerateProcess process = new GenerateProcess();
-		process.run(text);
+		NaturalLanguage nl1 = new NaturalLanguage(text1);
+		NaturalLanguage nl2 = new NaturalLanguage(text2);
+		NaturalLanguage[] nls = new NaturalLanguage[]{nl1, nl2};
+
+		Cabocha cabocha = new Cabocha();
+		List<String> result = cabocha.executeParser(nls);
+
+		//result.forEach(System.out::println);
+
+		for (List<String> list : ParserInterface.splitResultList("EOS", result)) {
+			System.out.println(list.get(0) + "~" + list.get(list.size()-1));
+		}
 	}
 }
