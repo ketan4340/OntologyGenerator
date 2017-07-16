@@ -119,7 +119,19 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 
 	@Override
 	public List<Sentence> readProcessOutput(List<String> outputList) {
-		List<List<String>> outputs4EachSentence = ParserInterface.splitResultList(BORDER, outputList);
+		List<Sentence> sentences = new ArrayList<>();
+		List<List<String>> outputs4EachSentence = StringListUtil.splitStringListEndWith(BORDER, true, outputList);
+
+		for (List<String> output : outputs4EachSentence) {
+			sentences.add(createSentence(output));
+		}
+		return sentences;
+	}
+	@Override
+	public Sentence createSentence(List<String> output) {
+		Sentence sentence;
+
+
 
 		List<Sentence> sentences = new ArrayList<>();
 		Clause clause = null;
@@ -130,7 +142,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		boolean isSubject;	//
 		int nextID = 0;
 
-		for (String line : outputList) {
+		for (String line : output) {
 			if(line.startsWith("EOS")) {		// EOSがきたら終了
 				if(wdl == null) {				// 初手EOSだった場合、文章が正しく渡されていない
 					return null;
@@ -166,17 +178,12 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		// clauseの係り受け関係を更新
 		Clause.updateAllDependency();
 
-		sentences.add(new Sentence(clauseList));
-		return sentences;
+		sentence = new Sentence(clauseList);
+		return sentence;
 	}
 	@Override
-	public Sentence createSentence(List<String> output, List<Clause> clauseList) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-	@Override
-	public Clause createClause(List<String> output, List<Word> wordList) {
-		// TODO 自動生成されたメソッド・スタブ
+	public Clause createClause(List<String> output) {
+
 		return null;
 	}
 	@Override

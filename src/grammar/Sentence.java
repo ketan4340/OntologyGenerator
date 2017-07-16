@@ -682,7 +682,7 @@ public class Sentence implements GrammarInterface{
 		/* 述語が動詞 */
 		}else if( predicateClause.haveSomeTagWord(tagVerb) ) {
 			/* "がある"かどうか */
-			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}};		// 動詞の"ある"(助動詞ではない)
+			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}, {"動詞", "持つ"}};		// 動詞の"ある"(助動詞ではない)
 			boolean boolHave = predicateClause.haveSomeTagWord(tag_Have);
 			/* "~の総称" */
 			String regexGnrnm = "(.*?)(の総称)";				// 「〜の総称」を探す

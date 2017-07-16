@@ -41,20 +41,7 @@ public interface ParserInterface {
 	List<Sentence> readProcessOutput(List<String> outputList);
 
 	/** Sentence(Clause1(Word1,Word2,..),Clause2(),Clause3(),...)の構成に変換 **/
-	Sentence createSentence(List<String> output, List<Clause> clauseList);
-	Clause createClause(List<String> output, List<Word> wordList);
+	Sentence createSentence(List<String> output);
+	Clause createClause(List<String> output);
 	Word createWord(String output);
-
-	static List<List<String>> splitResultList(String mark, List<String> outputList) {
-		List<List<String>> outputs4EachSentence = new ArrayList<>();
-		int fromIndex = 0, toIndex = 0;
-		for (String line : outputList) {
-			if (line.equals(mark)) {		// 解析結果の一文ごとの境界は完全一致で判断(文中にEOSが含まれると誤判定されるので)
-				outputs4EachSentence.add(new ArrayList<String>(outputList.subList(fromIndex, toIndex)));
-				fromIndex = toIndex + 1;
-			}
-			toIndex++;
-		}
-		return outputs4EachSentence;
-	}
 }
