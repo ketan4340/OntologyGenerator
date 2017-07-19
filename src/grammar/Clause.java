@@ -1,64 +1,69 @@
 package grammar;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 public class Clause implements GrammarInterface{
 	public static int clauseSum = 0;
 	public static List<Clause> allClausesList = new ArrayList<Clause>();
 
-	public int clauseID;
-	public List<Integer> wordIDs;		// 構成するWordのidを持つ
-	
-	public int dependUpon;				// どのClauseに係るか
-	public List<Integer> beDepended;	// どのClauseから係り受けるか
+	public int id;
+	public List<Word> words;			// 構成するWordのidを持つ
+
+	public Clause depending;			// どのClauseに係るか
+	public Set<Integer> dependeds;		// どのClauseから係り受けるか
 	public int originID;				// このClauseが別Clauseのコピーである場合，そのIDを示す
 	public List<Integer> cloneIDs;		// このClauseのクローン達のID
 
 	public Clause() {
-		clauseID = clauseSum++;
+		id = clauseSum++;
 		allClausesList.add(this);
-		wordIDs = new ArrayList<Integer>();
-		dependUpon = -1;
-		beDepended = new ArrayList<Integer>();
+		words = new ArrayList<Word>();
+		depending = null;
+		dependeds = new HashSet<Integer>();
 		originID = -1;
 		cloneIDs = new ArrayList<Integer>();
 	}
-	public void setClause(List<Integer> wdl, int depto) {
-		List<Integer> mains = new LinkedList<Integer>();	// 主辞
-		for(Iterator<Integer> itr = wdl.iterator(); itr.hasNext(); ) {
-			int wordID = itr.next();
-			Word word = Word.get(wordID);
+	public Clause(List<Word> words) {
+
+	}
+	public void setClause(List<Word> wdl) {
+		List<Word> mains = new LinkedList<Word>();	// 主辞
+		for(Iterator<Word> itr = wdl.iterator(); itr.hasNext(); ) {
+			Word word = itr.next();
 			if(word.isSubject) {	// 複数の主辞があれば一つにまとめる
-				mains.add(wordID);
+				mains.add(word);
 			}else {
 				int mainsSize = mains.size();
 				switch(mainsSize) {	// mainsの要素数が
 				case 0:				// 0なら
-					break;			// スルー
+					break;						// スルー
 				case 1:				// 1なら
-					wordIDs.addAll(mains);	// そのまま入れる
+					words.addAll(mains);		// そのまま入れる
 					mains.clear();
 					break;
 				default:			// 2以上
 					Phrase main = new Phrase();	// 主辞合成
-					main.setPhrase(mains, this.clauseID, false);
-					wordIDs.add(main.id);	// 生成したPhraseを入れる
+					main.setPhrase(mains, this.id, false);
+					words.add(main);	// 生成したPhraseを入れる
 					mains.clear();
 				}
-				wordIDs.add(wordID);
+				words.add(word);
 			}
 		}
-		wordIDs.addAll(mains);	// 残り物があれば回収
-
-		dependUpon = depto;
+		words.addAll(mains);	// 残り物があれば回収
 	}
-	public int indexOfW(int wordID) {
-		return wordIDs.indexOf(wordID);
+	public void setDepending(Clause depend2Clause) {
+		depending = depend2Clause;
+	}
+	public int indexOfW(Word word) {
+		return words.indexOf(word);
 	}
 
 	public static Clause get(int id) {
@@ -66,113 +71,120 @@ public class Clause implements GrammarInterface{
 		return allClausesList.get(id);
 	}
 
-	/* 主辞だけを返す */
-	public int getMainWord() {
-		int mainID = -1;
-		for(int wordID: wordIDs) {
-			Word word = Word.get(wordID);
-			if(word.isSubject) mainID = wordID;
+	/**
+	 * 主辞だけを返す
+	 * 仕様上，もし1つの文節に複数の主辞があると最後の主辞が選ばれる．
+	 * 1つの文節に主辞は1つなので一応問題ない．
+	 */
+	public Word getMainWord() {
+		Word mainWord = null;
+		for(Word word: words) {
+			if(word.isSubject) mainWord = word;
 		}
-		return mainID;
+		return mainWord;
 	}
-	/* 機能語だけを返す */
-	public List<Integer> getFunctionWords() {
-		List<Integer> functionIDs = new ArrayList<Integer>();
-		for(int wordID: wordIDs) {
-			Word word = Word.get(wordID);
+	/**
+	 * 機能語だけを返す
+	 */
+	public List<Word> getFunctionWords() {
+		List<Word> functions = new ArrayList<Word>();
+		for(Word word: words) {
 			String[] tag_sign = {"記号"};
 			if(word.hasSomeTags(tag_sign))	continue;	// 記号(「」、。など)はスルー
-			if(!word.isSubject) functionIDs.add(wordID);
+			if(!word.isSubject) functions.add(word);
 		}
-		return functionIDs;
+		return functions;
 	}
 
-	public List<Integer> getAllDepending() {
-		List<Integer> allDepending = new ArrayList<Integer>();
-		for(int depto = this.dependUpon; depto != -1; depto = Clause.get(depto).dependUpon) {
+	public List<Clause> getAllDepending() {
+		List<Clause> allDepending = new ArrayList<Clause>();
+		for(Clause depto = this.depending; depto != null; depto = depto.depending) {
 			allDepending.add(depto);
 		}
 		return allDepending;
 	}
 
-	public void uniteClauses(List<Integer> baseClauses) {
+	/**
+	 * 渡されたClauseをつなげて1つのClause(連文節)を作成する．
+	 */
+	public void uniteClauses(List<Clause> baseClauses) {
 		if(baseClauses.size() < 2) return;
-		List<Integer> phraseWords = new ArrayList<Integer>();		// 新しいPhraseの元になるWord
-		List<Integer> conjunctionWords = new ArrayList<Integer>();	// Phrase完成後につなげる接続詞を保持
-		int depto = -1;												// 最後尾のClauseがどのClauseに係るか
+		List<Word> phraseWords = new ArrayList<>();		// 新しいPhraseの元になるWord
+		List<Word> conjunctionWords = new ArrayList<>();	// Phrase完成後につなげる接続詞を保持
+		Clause depto = null;										// 最後尾のClauseがどのClauseに係るか
 
-		for(Iterator<Integer> itr = baseClauses.iterator(); itr.hasNext(); ) {
-			int clauseID = itr.next();
-			Clause clause = Clause.get(clauseID);
-			for(int wdID: clause.wordIDs) {		// 元ClauseのWordはこの新しいChunkに属するように変える
-				Word.get(wdID).belongClause = this.clauseID;
+		for(Iterator<Clause> itr = baseClauses.iterator(); itr.hasNext(); ) {
+			Clause clause = itr.next();
+			for(Word word: clause.words) {		// 元ClauseのWordはこの新しいClauseに属するように変える
+				word.belongClause = this.id;
 			}
 			// 全ての元Clauseの係り先を新しいChunkに変える
-			for(int bedep: clause.beDepended) {
-				Clause.get(bedep).dependUpon = this.clauseID;
+			for(int bedep: clause.dependeds) {
+				Clause.get(bedep).depending = this;
 			}
 
 			if(!itr.hasNext()) {	// 最後尾の場合
 				phraseWords.add(clause.getMainWord());
-				conjunctionWords.addAll(clause.wordIDs);
+				conjunctionWords.addAll(clause.words);
 				conjunctionWords.removeAll(phraseWords);
-				depto = clause.dependUpon;
+				depto = clause.depending;
 			}else {
-				phraseWords.addAll(clause.wordIDs);
+				phraseWords.addAll(clause.words);
 			}
 		}
 
 		// 新しいPhraseを作成
 		Phrase nph = new Phrase();
-		nph.setPhrase(phraseWords, clauseID, false);
-		List<Integer> newWordIDs = new ArrayList<Integer>();
-		newWordIDs.add(nph.id);
-		newWordIDs.addAll(conjunctionWords);
-		setClause(newWordIDs, depto);
+		nph.setPhrase(phraseWords, id, false);
+		List<Word> newWords = new ArrayList<>();
+		newWords.add(nph);
+		newWords.addAll(conjunctionWords);
+		setClause(newWords);
+		setDepending(depto);
 	}
 
 	/* 全く同じClauseを複製する */
 	public Clause clone() {
-		Clause replica = new Clause();
-		List<Integer> subWordIDs = new ArrayList<Integer>(wordIDs.size());
-		for(int id: wordIDs) {
-			Word subWord = Word.get(id).copy();
-			subWord.belongClause = replica.clauseID;
-			subWordIDs.add(subWord.id);
+		Clause replicaClause = new Clause();
+		List<Word> subWords = new ArrayList<>(words.size());
+		for(Word word: words) {
+			Word subWord = word.copy();
+			subWord.belongClause = replicaClause.id;
+			subWords.add(subWord);
 		}
-		replica.setClause(subWordIDs, dependUpon);
-		replica.originID = this.clauseID;
-		cloneIDs.add(replica.clauseID);
-		return replica;
+		replicaClause.setClause(subWords);
+		replicaClause.setDepending(depending);
+		replicaClause.originID = this.id;
+		cloneIDs.add(replicaClause.id);
+		return replicaClause;
 	}
 	/* 複数のClauseを係り受け関係を維持しつつ複製する */
-	public static List<Integer> cloneAll(List<Integer> clauseIDList) {
-		List<Integer> replicaList = new ArrayList<Integer>();
+	public static List<Clause> cloneAll(List<Clause> clauseList) {
+		List<Clause> replicaList = new ArrayList<>();
 		// まず複製
-		for(final int id: clauseIDList) {
-			Clause origin = Clause.get(id);
+		for(final Clause origin : clauseList) {
 			Clause replica = origin.clone();
-			replicaList.add(replica.clauseID);
+			replicaList.add(replica);
 		}
 		// 係り先があれば整え、なければ-1
-		for(final int id: replicaList) {
-			Clause replica = Clause.get(id);
+		for(final Clause replica : replicaList) {
 			Clause origin = Clause.get(replica.originID);
-			int index4Dep = clauseIDList.indexOf(origin.dependUpon);
-			replica.dependUpon = (index4Dep != -1)? replicaList.get(index4Dep): -1;
+			int index4Dep = clauseList.indexOf(origin.depending);
+			replica.depending = (index4Dep != -1)
+					? replicaList.get(index4Dep)
+					: null;
 		}
 		return replicaList;
 	}
 
 	/* 指定の品詞を持つWordが並んでいたら繋げる */
 	public void connect(String[][] tagNames) {
-		if(wordIDs.size() < 2) return;	// ClauseのWordが一つなら意味がない
-		List<Integer> newWordIDs = new ArrayList<Integer>();
-		List<Integer> serialNouns = new ArrayList<Integer>();
+		if(words.size() < 2) return;	// ClauseのWordが一つなら意味がない
+		List<Word> newWords = new ArrayList<>();
+		List<Word> serialNouns = new ArrayList<>();
 
-		while( !wordIDs.isEmpty() ) {
-			int wordID = wordIDs.remove(0);
-			Word word = Word.get(wordID);
+		while( !words.isEmpty() ) {
+			Word word = words.remove(0);
 
 			boolean hasSomeTag = false;
 			for(String[] tagName: tagNames) {
@@ -182,51 +194,48 @@ public class Clause implements GrammarInterface{
 				}
 			}
 			if(hasSomeTag) {	// 指定品詞に該当
-				serialNouns.add(word.id);
+				serialNouns.add(word);
 			}else {				// 該当せず
 				if(!serialNouns.isEmpty()) {
 					Phrase nph = new Phrase();
-					nph.setPhrase(serialNouns, clauseID, false);
-					newWordIDs.add(nph.id);
+					nph.setPhrase(serialNouns, id, false);
+					newWords.add(nph);
 					serialNouns.clear();
 				}
-				newWordIDs.add(wordID);
+				newWords.add(word);
 			}
 		}
 
 		if(!serialNouns.isEmpty()) {	// Clauseの末尾が該当した場合ここで処理
 			Phrase nph = new Phrase();
-			nph.setPhrase(serialNouns, clauseID, false);	// 末尾のWordに依存=false
-			newWordIDs.add(nph.id);
+			nph.setPhrase(serialNouns, id, false);	// 末尾のWordに依存=false
+			newWords.add(nph);
 		}
-		wordIDs = newWordIDs;
+		words = newWords;
 	}
 
 	/* 指定の文字列に一致するWordのIDを返す */
 	public List<Integer> collectWords(String name) {
 		List<Integer> ids = new ArrayList<Integer>();
-		for(final int id: wordIDs) {
-			Word wd = Word.get(id);
-			if(wd.name.equals(name))	ids.add(id);
+		for(final Word word: words) {
+			if(word.name.equals(name))	ids.add(id);
 		}
 		return ids;
 	}
-	/* 指定の品詞を持つWordのIDを返す */
-	public List<Integer> collectAllTagWords(String[][] tagNames) {
+	/* 指定の品詞を持つWordを返す */
+	public List<Word> collectAllTagWords(String[][] tagNames) {
 		List<String[]> tagNameList = Arrays.asList(tagNames);
-		List<Integer> taggedIDs = new ArrayList<Integer>();
-		for(final int wordID: wordIDs) {
-			Word word = Word.get(wordID);
+		List<Word> taggedWords = new ArrayList<>();
+		for(final Word word: words) {
 			for (final String[] tagsArray: tagNameList){
-				if(word.hasAllTags(tagsArray))	taggedIDs.add(wordID);
+				if(word.hasAllTags(tagsArray))	taggedWords.add(word);
 			}
 		}
-		return taggedIDs;
+		return taggedWords;
 	}
 	/* 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean haveSomeTagWord(String[][] tagNames) {
-		for(final int wordID: wordIDs) {
-			Word word = Word.get(wordID);
+		for(final Word word: words) {
 			for (final String[] tagsArray: tagNames){
 				if(word.hasAllTags(tagsArray))	return true;
 			}
@@ -241,9 +250,8 @@ public class Clause implements GrammarInterface{
 		int tagIndex = tagNames.length-1;
 		String[] tagSign = {"記号"};
 
-		for(ListIterator<Integer> li = wordIDs.listIterator(wordIDs.size()); li.hasPrevious(); ) {
-			int wordID = li.previous();				// wordも
-			Word word = Word.get(wordID);
+		for(ListIterator<Word> li = words.listIterator(words.size()); li.hasPrevious(); ) {
+			Word word = li.previous();				// wordも
 			String[] tagName = tagNames[tagIndex];	// tagも後ろから遡る
 			if(ignoreSign && word.hasAllTags(tagSign))
 				continue;	// 記号の場合はスルー
@@ -261,20 +269,20 @@ public class Clause implements GrammarInterface{
 
 	/* このClauseのうち、指定された範囲のWordを繋げて一つの品詞にする */
 	public void nounize(int fromIndex, int toIndex) {
-		List<Integer> mainIDs = wordIDs.subList(fromIndex, toIndex);
+		List<Word> mainIDs = words.subList(fromIndex, toIndex);
 
 		Phrase properNoun = new Phrase();	// 固有名詞として扱う
-		properNoun.setPhrase(mainIDs, clauseID, true);
+		properNoun.setPhrase(mainIDs, id, true);
 		mainIDs.clear();
-		this.wordIDs.add(fromIndex, properNoun.id);
+		this.words.add(fromIndex, properNoun);
 	}
 
 	/* Clauseを文字列で返す */
 	@Override
 	public String toString() {
 		String clauseName = new String();
-		for(int orgid: wordIDs) {
-			clauseName += Word.get(orgid).toString();
+		for(final Word word: words) {
+			clauseName += word.toString();
 		}
 		return clauseName;
 	}
@@ -285,12 +293,12 @@ public class Clause implements GrammarInterface{
 
 
 	/* Clauseの係り受け関係を更新 */
-	/* 全てのChunkインスタンスのdependUponが正しいことが前提の設計 */
+	/* 全てのClauseインスタンスのdependingが正しいことが前提の設計 */
 	public static void updateAllDependency() {
-		for(final Clause cls: Clause.allClausesList) cls.beDepended.clear();	// 一度全ての被係り受けをまっさらにする
+		for(final Clause cls: Clause.allClausesList) cls.dependeds.clear();	// 一度全ての被係り受けをまっさらにする
 		for(final Clause cls: Clause.allClausesList) {
-			int depto = cls.dependUpon;
-			if(depto != -1) Clause.get(depto).beDepended.add(cls.clauseID);
+			Clause depto = cls.depending;
+			if(depto != null) depto.dependeds.add(cls.id);
 		}
 	}
 

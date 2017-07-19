@@ -6,15 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
 import grammar.Clause;
 import grammar.Sentence;
@@ -43,12 +40,13 @@ public class Parser {
 	// 一文だけ渡してもらって解析
 	private Sentence runCabocha(String text) {
 		Clause clause = null;
-		List<Integer> wdl = null;
-		List<Integer> clauseList = new LinkedList<Integer>();
-		int depto = -1;		// clauseの係り先のID
-		int border = 0;		// あるclauseの主たる単語が何番目かを示す
-		boolean sbj_fnc;	//
-		int nextID = 0;
+		List<Word> wordList = null;
+		List<Clause> clauseList = new LinkedList<>();
+		//Clause depto = null;	// clauseの係り先のID
+		int deptoIndex = -1;
+		Map<Clause, Integer> dependingMap = new HashMap<>();
+		int border = 0;			// あるclauseの主辞が何番目かを示す
+		boolean sbj_fnc;		//
 
 		try {
 			//UTF-8のBOMを除去するための準備←textファイルから読み込む場合を考慮
@@ -81,38 +79,48 @@ public class Parser {
 			String line = new String();
 			while ((line = br.readLine()) != null) {
 				if(line.startsWith("EOS")) {		// EOSがきたら終了
-					if(wdl == null) {				// 初手EOSだった場合、文章が正しく渡されていない
+					if(wordList == null) {				// 初手EOSだった場合、文章が正しく渡されていない
 						return null;
 					}else {
-						clause.setClause(wdl, depto);
+						clause.setClause(wordList);
 					}
-					clauseList.add(clause.clauseID);
+					clauseList.add(clause);
 
 				}else if(line.startsWith("* ")) {	// * で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
-					if(wdl != null) {				// 最初は直前までのClauseが存在しないので回避
-						clause.setClause(wdl, depto);
-						clauseList.add(clause.clauseID);
-					}else {
+					if(wordList != null) {				// 最初は直前までのClauseが存在しないので回避
+						clause.setClause(wordList);
+						clauseList.add(clause);
+					}
+					/*
+					else {
 						nextID = Clause.clauseSum;	// *要注意というか汚い*
 					}
-					wdl = new ArrayList<Integer>();
+					 */
+					wordList = new ArrayList<Word>(4);
 					clause = new Clause();
 					String[] clauseInfo = line.split(" ");
 					String dep_str = clauseInfo[2];
-					depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
-					if(depto!=-1) depto += nextID;	// *要注意(上に同じ)*
+					deptoIndex = Integer.decode(dep_str.substring(0, dep_str.length()-1));	// xxDの"xx"部分を切り取る
+					dependingMap.put(clause, deptoIndex);
+					//if(deptoInt!=-1) deptoInt += nextID;	// *要注意(上に同じ)*
 					String[] border_str = clauseInfo[3].split("/");
 					border = Integer.decode(border_str[0]);
 				}else {								// 他は単語の登録
 					String[] wordInfo = line.split("\t");
-					sbj_fnc = (wdl.size() <= border)? true: false;
+					sbj_fnc = (wordList.size() <= border)? true: false;
 					Word wd = new Word();
-					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.clauseID, sbj_fnc);
-					wdl.add(wd.id);
+					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.id, sbj_fnc);
+					wordList.add(wd);
 				}
 			}
 
 			// clauseの係り受け関係を更新
+			for (Map.Entry<Clause, Integer> entry : dependingMap.entrySet()) {
+				Clause cls = entry.getKey();	int dep = entry.getValue();
+				cls.depending = (dep >= 0)
+						?	clauseList.get(dep)
+						:	null;
+			}
 			Clause.updateAllDependency();
 
 			// プロセス終了

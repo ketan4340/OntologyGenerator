@@ -1,4 +1,4 @@
-package demo;
+package demo.graph;
 
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import demo.OntologyModel;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;

@@ -118,76 +118,77 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 
 
 	@Override
-	public List<Sentence> readProcessOutput(List<String> outputList) {
+	public List<Sentence> readProcessOutput(List<String> parsedInfo4all) {
 		List<Sentence> sentences = new ArrayList<>();
-		List<List<String>> outputs4EachSentence = StringListUtil.splitStringListEndWith(BORDER, true, outputList);
+		List<List<String>> sentenceInfoList = StringListUtil.splitStringList(BORDER, true, parsedInfo4all);
 
-		for (List<String> output : outputs4EachSentence) {
-			sentences.add(createSentence(output));
-		}
+		sentenceInfoList.stream().forEach(sentenceInfo -> sentences.add(createSentence(sentenceInfo)));
 		return sentences;
 	}
 	@Override
-	public Sentence createSentence(List<String> output) {
-		Sentence sentence;
+	public Sentence createSentence(List<String> parsedInfo4sentence) {
+		List<Clause> clauses = new ArrayList<>();
+		List<List<String>> clauseInfoList = StringListUtil.splitStringList(BORDER, true, parsedInfo4sentence);
+		clauseInfoList.stream().forEach(clauseInfo -> clauses.add(createClause(clauseInfo)));
 
-
-
-		List<Sentence> sentences = new ArrayList<>();
 		Clause clause = null;
-		List<Integer> wdl = null;
+		List<Word> wdl = null;
 		List<Integer> clauseList = new LinkedList<Integer>();
-		int depto = -1;		// clauseの係り先のID
-		int border = 0;		// あるclauseの主たる単語が何番目かを示す
-		boolean isSubject;	//
+		Clause depto = null;	// clauseの係り先
+		int border = 0;			// あるclauseの主たる単語が何番目かを示す
+		boolean isSubject;		// 主辞か機能語か
 		int nextID = 0;
 
-		for (String line : output) {
+		for (String line : parsedInfo4sentence) {
 			if(line.startsWith("EOS")) {		// EOSがきたら終了
 				if(wdl == null) {				// 初手EOSだった場合、文章が正しく渡されていない
 					return null;
 				}else {
-					clause.setClause(wdl, depto);
+					clause.setClause(wdl);
+					clause.setDepending(depto);
 				}
-				clauseList.add(clause.clauseID);
+				clauseList.add(clause.id);
 
 			}else if(line.startsWith("* ")) {	// * で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
 				if(wdl != null) {				// 最初は直前までのClauseが存在しないので回避
-					clause.setClause(wdl, depto);
-					clauseList.add(clause.clauseID);
+					clause.setClause(wdl);
+					clause.setDepending(depto);
+					clauseList.add(clause.id);
 				}else {
 					nextID = Clause.clauseSum;	// *要注意というか汚い*
 				}
-				wdl = new ArrayList<Integer>();
+				wdl = new ArrayList<>();
 				clause = new Clause();
 				String[] clauseInfo = line.split(" ");
 				String dep_str = clauseInfo[2];
-				depto = Integer.decode(dep_str.substring(0, dep_str.length()-1));
-				if(depto!=-1) depto += nextID;	// *要注意(上に同じ)*
+				int deptoID = Integer.decode(dep_str.substring(0, dep_str.length()-1));
+				if(deptoID!=-1) deptoID += nextID;	// *要注意(上に同じ)*
+				depto = Clause.get(deptoID);
 				String[] border_str = clauseInfo[3].split("/");
 				border = Integer.decode(border_str[0]);
 			}else {								// 他は単語の登録
 				String[] wordInfo = line.split("\t");
 				isSubject = (wdl.size() <= border)? true: false;
-				Word wd = new Word();
-				wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.clauseID, isSubject);
-				wdl.add(wd.id);
+				Word word = new Word();
+				word.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.id, isSubject);
+				wdl.add(word);
 			}
 		}
 
 		// clauseの係り受け関係を更新
 		Clause.updateAllDependency();
 
-		sentence = new Sentence(clauseList);
-		return sentence;
+		return new Sentence(clauses);
 	}
 	@Override
-	public Clause createClause(List<String> output) {
-
-		return null;
+	public Clause createClause(List<String> parsedInfo4clause) {
+		List<Word> words = new ArrayList<>();
+		List<List<String>> wordInfoList = StringListUtil.splitStringList(BORDER, true, parsedInfo4clause);
+		wordInfoList.stream().forEach(wordInfo -> words.add(createWord(wordInfo)));
+		return new Clause(words);
 	}
 	@Override
-	public Word createWord(String output) {
+	public Word createWord(List<String> parsedInfo4word) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}

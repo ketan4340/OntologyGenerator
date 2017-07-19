@@ -74,11 +74,11 @@ public class GenerateProcess {
 			e.printStackTrace();
 		}
 		//*/
-
+		/*スタンバーイ
 		List<NaturalLanguage> nlList = writingList.stream().map(w -> new NaturalLanguage(w)).collect(Collectors.toList());
 		Cabocha cabocha = new Cabocha();
-		//cabocha.executeParser(nlList);
-
+		cabocha.executeParser(nlList);
+		 */
 		for(final String writing: writingList) {
 			/*** 構文解析Module ***/
 			//System.out.println("\n\t Step0");

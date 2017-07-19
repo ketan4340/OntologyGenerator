@@ -1,4 +1,4 @@
-package demo;
+package demo.graph;
 
 public class MyNode {
 	String label;

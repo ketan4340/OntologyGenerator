@@ -38,10 +38,10 @@ public interface ParserInterface {
 	/******** 解析結果階層化部 ********/
 	/*******************************/
 	/*** 出力(List<String>)を分解 ***/
-	List<Sentence> readProcessOutput(List<String> outputList);
+	List<Sentence> readProcessOutput(List<String> parseResult4all);
 
 	/** Sentence(Clause1(Word1,Word2,..),Clause2(),Clause3(),...)の構成に変換 **/
-	Sentence createSentence(List<String> output);
-	Clause createClause(List<String> output);
-	Word createWord(String output);
+	Sentence createSentence(List<String> parseResult4sentence);
+	Clause createClause(List<String> parseResult4clause);
+	Word createWord(List<String> parseResult4word);
 }

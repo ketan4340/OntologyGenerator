@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import demo.graph.MyGraph;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 
 public class OntologyGraphView extends JPanel{
