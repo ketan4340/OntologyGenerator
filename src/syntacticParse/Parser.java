@@ -82,13 +82,13 @@ public class Parser {
 					if(wordList == null) {				// 初手EOSだった場合、文章が正しく渡されていない
 						return null;
 					}else {
-						clause.setClause(wordList);
+						clause.setWords(wordList);
 					}
 					clauseList.add(clause);
 
 				}else if(line.startsWith("* ")) {	// * で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
 					if(wordList != null) {				// 最初は直前までのClauseが存在しないので回避
-						clause.setClause(wordList);
+						clause.setWords(wordList);
 						clauseList.add(clause);
 					}
 					/*
@@ -97,7 +97,7 @@ public class Parser {
 					}
 					 */
 					wordList = new ArrayList<Word>(4);
-					clause = new Clause();
+					clause = new Clause(new ArrayList<Word>(), -1, -1);
 					String[] clauseInfo = line.split(" ");
 					String dep_str = clauseInfo[2];
 					deptoIndex = Integer.decode(dep_str.substring(0, dep_str.length()-1));	// xxDの"xx"部分を切り取る
@@ -108,8 +108,9 @@ public class Parser {
 				}else {								// 他は単語の登録
 					String[] wordInfo = line.split("\t");
 					sbj_fnc = (wordList.size() <= border)? true: false;
-					Word wd = new Word();
-					wd.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.id, sbj_fnc);
+					Word wd = new Word(wordInfo[0], Arrays.asList(wordInfo[1].split(",")));
+					wd.belongClause = clause;
+					wd.isCategorem = sbj_fnc;
 					wordList.add(wd);
 				}
 			}

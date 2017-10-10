@@ -8,67 +8,94 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Clause implements GrammarInterface{
 	public static int clauseSum = 0;
-	public static List<Clause> allClausesList = new ArrayList<Clause>();
+	public static List<Clause> allClauseList = new ArrayList<Clause>();
 
 	public int id;
-	public List<Word> words;			// 構成するWordのidを持つ
+	public List<Word> words;			// 構成するWordのListを持つ
 
-	public Clause depending;			// どのClauseに係るか
-	public Set<Integer> dependeds;		// どのClauseから係り受けるか
-	public int originID;				// このClauseが別Clauseのコピーである場合，そのIDを示す
-	public List<Integer> cloneIDs;		// このClauseのクローン達のID
+	public int depIndex = -1;
+	public Clause depending;			// 係り先文節.どのClauseに係るか
+	public List<Clause> dependeds;		// 係られてる集合.どのClauseから係り受けるか
 
-	public Clause() {
+	private Clause() {
 		id = clauseSum++;
-		allClausesList.add(this);
-		words = new ArrayList<Word>();
-		depending = null;
-		dependeds = new HashSet<Integer>();
-		originID = -1;
-		cloneIDs = new ArrayList<Integer>();
+		allClauseList.add(this);
+		dependeds = new ArrayList<>();
 	}
-	public Clause(List<Word> words) {
-
+	/**
+	 * @param wordList			単語のリスト
+	 * @param depIndex			係る文節の位置
+	 * @param categoremIndex	自立語の位置
+	 */
+	public Clause(List<Word> wordList, int depIndex, int categoremIndex) {
+		this();
+		this.words = wordList;
+		this.depIndex = depIndex;
+		setBelong4Words();
+		setIsCategorem4Words(0, categoremIndex+1, true);	// CaboChaで自立語と判定された単語だけでなく，0番目からその単語まで全て自立語とする
+		uniteCategorems4Words();	// 自立語を全て結合
 	}
-	public void setClause(List<Word> wdl) {
+	public void setWords(List<Word> wordList) {
+		this.words = wordList;
+		setBelong4Words();
+	}
+	public void setDepending(Clause depending) {
+		this.depending = depending;
+		if (depending != null)
+			depending.dependeds.add(this);	// 係り先の'係られてる集合'に自身を追加
+	}
+	/**
+	 * @param fromIndex
+	 * @param toIndex
+	 * fromIndexからtoIndexの範囲(toIndexは含まない)のwordを主辞であるとする．
+	 */
+	private void setIsCategorem4Words(int fromIndex, int toIndex, boolean ctgrm_adjnc) {
+		for (int i=fromIndex; i<toIndex; i++) {
+			Word word = this.words.get(i);
+			word.setIsCategorem(ctgrm_adjnc);
+		}
+	}
+	private void uniteCategorems4Words() {
 		List<Word> mains = new LinkedList<Word>();	// 主辞
-		for(Iterator<Word> itr = wdl.iterator(); itr.hasNext(); ) {
+		for(Iterator<Word> itr = words.iterator(); itr.hasNext(); ) {
 			Word word = itr.next();
-			if(word.isSubject) {	// 複数の主辞があれば一つにまとめる
+			if (word.isCategorem) {	// 複数の主辞があれば一つにまとめる
 				mains.add(word);
-			}else {
+			} else {
 				int mainsSize = mains.size();
 				switch(mainsSize) {	// mainsの要素数が
 				case 0:				// 0なら
 					break;						// スルー
 				case 1:				// 1なら
-					words.addAll(mains);		// そのまま入れる
+					this.words.addAll(mains);		// そのまま入れる
 					mains.clear();
 					break;
 				default:			// 2以上
 					Phrase main = new Phrase();	// 主辞合成
-					main.setPhrase(mains, this.id, false);
-					words.add(main);	// 生成したPhraseを入れる
+					main.setPhrase(mains, this, false);
+					this.words.add(main);	// 生成したPhraseを入れる
 					mains.clear();
 				}
-				words.add(word);
+				this.words.add(word);
 			}
 		}
-		words.addAll(mains);	// 残り物があれば回収
+		this.words.addAll(mains);	// 残り物があれば回収
 	}
-	public void setDepending(Clause depend2Clause) {
-		depending = depend2Clause;
+	private void setBelong4Words() {
+		words.stream().forEach(w -> w.belongClause=this);
 	}
+
 	public int indexOfW(Word word) {
 		return words.indexOf(word);
 	}
 
 	public static Clause get(int id) {
 		if(id < 0) return null;
-		return allClausesList.get(id);
+		return allClauseList.get(id);
 	}
 
 	/**
@@ -79,7 +106,7 @@ public class Clause implements GrammarInterface{
 	public Word getMainWord() {
 		Word mainWord = null;
 		for(Word word: words) {
-			if(word.isSubject) mainWord = word;
+			if(word.isCategorem) mainWord = word;
 		}
 		return mainWord;
 	}
@@ -91,7 +118,7 @@ public class Clause implements GrammarInterface{
 		for(Word word: words) {
 			String[] tag_sign = {"記号"};
 			if(word.hasSomeTags(tag_sign))	continue;	// 記号(「」、。など)はスルー
-			if(!word.isSubject) functions.add(word);
+			if(!word.isCategorem) functions.add(word);
 		}
 		return functions;
 	}
@@ -109,18 +136,20 @@ public class Clause implements GrammarInterface{
 	 */
 	public void uniteClauses(List<Clause> baseClauses) {
 		if(baseClauses.size() < 2) return;
-		List<Word> phraseWords = new ArrayList<>();		// 新しいPhraseの元になるWord
+		List<Word> phraseWords = new ArrayList<>();			// 新しいPhraseの元になるWord
 		List<Word> conjunctionWords = new ArrayList<>();	// Phrase完成後につなげる接続詞を保持
-		Clause depto = null;										// 最後尾のClauseがどのClauseに係るか
+		Clause depto = null;								// 最後尾のClauseがどのClauseに係るか
 
 		for(Iterator<Clause> itr = baseClauses.iterator(); itr.hasNext(); ) {
 			Clause clause = itr.next();
 			for(Word word: clause.words) {		// 元ClauseのWordはこの新しいClauseに属するように変える
-				word.belongClause = this.id;
+				word.belongClause = this;
 			}
-			// 全ての元Clauseの係り先を新しいChunkに変える
-			for(int bedep: clause.dependeds) {
-				Clause.get(bedep).depending = this;
+			// 全ての元Clauseの係り先を新しいClauseに変える
+			if (clause.dependeds != null) {
+				for(Clause bedep: clause.dependeds) {
+					bedep.setDepending(this);
+				}
 			}
 
 			if(!itr.hasNext()) {	// 最後尾の場合
@@ -135,11 +164,11 @@ public class Clause implements GrammarInterface{
 
 		// 新しいPhraseを作成
 		Phrase nph = new Phrase();
-		nph.setPhrase(phraseWords, id, false);
+		nph.setPhrase(phraseWords, this, false);
 		List<Word> newWords = new ArrayList<>();
 		newWords.add(nph);
 		newWords.addAll(conjunctionWords);
-		setClause(newWords);
+		setWords(newWords);
 		setDepending(depto);
 	}
 
@@ -149,30 +178,27 @@ public class Clause implements GrammarInterface{
 		List<Word> subWords = new ArrayList<>(words.size());
 		for(Word word: words) {
 			Word subWord = word.copy();
-			subWord.belongClause = replicaClause.id;
+			subWord.belongClause = replicaClause;
 			subWords.add(subWord);
 		}
-		replicaClause.setClause(subWords);
+		replicaClause.setWords(subWords);
 		replicaClause.setDepending(depending);
-		replicaClause.originID = this.id;
-		cloneIDs.add(replicaClause.id);
 		return replicaClause;
 	}
-	/* 複数のClauseを係り受け関係を維持しつつ複製する */
+	/**
+	 * 複数のClauseを係り受け関係を維持しつつ複製する
+	 */
 	public static List<Clause> cloneAll(List<Clause> clauseList) {
-		List<Clause> replicaList = new ArrayList<>();
-		// まず複製
-		for(final Clause origin : clauseList) {
-			Clause replica = origin.clone();
-			replicaList.add(replica);
-		}
-		// 係り先があれば整え、なければ-1
-		for(final Clause replica : replicaList) {
-			Clause origin = Clause.get(replica.originID);
-			int index4Dep = clauseList.indexOf(origin.depending);
-			replica.depending = (index4Dep != -1)
-					? replicaList.get(index4Dep)
-					: null;
+		// まずは複製
+		List<Clause> replicaList = clauseList.stream().map(origin -> origin.clone()).collect(Collectors.toList());
+		// 係り先があれば整え、なければnull
+		for (int i=0; i<clauseList.size(); i++) {
+			Clause origin = clauseList.get(i);
+			Clause replica = replicaList.get(i);
+			int index2Dep = clauseList.indexOf(origin.depending);
+			replica.setDepending( (index2Dep != -1)
+					? replicaList.get(index2Dep)
+					: null);
 		}
 		return replicaList;
 	}
@@ -198,7 +224,7 @@ public class Clause implements GrammarInterface{
 			}else {				// 該当せず
 				if(!serialNouns.isEmpty()) {
 					Phrase nph = new Phrase();
-					nph.setPhrase(serialNouns, id, false);
+					nph.setPhrase(serialNouns, this, false);
 					newWords.add(nph);
 					serialNouns.clear();
 				}
@@ -208,7 +234,7 @@ public class Clause implements GrammarInterface{
 
 		if(!serialNouns.isEmpty()) {	// Clauseの末尾が該当した場合ここで処理
 			Phrase nph = new Phrase();
-			nph.setPhrase(serialNouns, id, false);	// 末尾のWordに依存=false
+			nph.setPhrase(serialNouns, this, false);	// 末尾のWordに依存=false
 			newWords.add(nph);
 		}
 		words = newWords;
@@ -272,7 +298,7 @@ public class Clause implements GrammarInterface{
 		List<Word> mainIDs = words.subList(fromIndex, toIndex);
 
 		Phrase properNoun = new Phrase();	// 固有名詞として扱う
-		properNoun.setPhrase(mainIDs, id, true);
+		properNoun.setPhrase(mainIDs, this, true);
 		mainIDs.clear();
 		this.words.add(fromIndex, properNoun);
 	}
@@ -295,10 +321,13 @@ public class Clause implements GrammarInterface{
 	/* Clauseの係り受け関係を更新 */
 	/* 全てのClauseインスタンスのdependingが正しいことが前提の設計 */
 	public static void updateAllDependency() {
-		for(final Clause cls: Clause.allClausesList) cls.dependeds.clear();	// 一度全ての被係り受けをまっさらにする
-		for(final Clause cls: Clause.allClausesList) {
+		for(final Clause cls: Clause.allClauseList) {
+			if (cls.dependeds != null)
+				cls.dependeds.clear();	// 一度全ての被係り受けをまっさらにする
+		}
+		for(final Clause cls: Clause.allClauseList) {
 			Clause depto = cls.depending;
-			if(depto != null) depto.dependeds.add(cls.id);
+			if(depto != null && depto.dependeds != null) depto.dependeds.add(cls);
 		}
 	}
 

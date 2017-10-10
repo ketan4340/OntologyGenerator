@@ -81,9 +81,11 @@ public class GenerateProcess {
 		 */
 		for(final String writing: writingList) {
 			/*** 構文解析Module ***/
-			//System.out.println("\n\t Step0");
+			System.out.println("\n\t Step0");
 			Parser parse = new Parser("cabocha");
 			Sentence originalSent = parse.run(writing);
+
+			System.out.println("---------marker 1--------");
 
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/
@@ -97,6 +99,8 @@ public class GenerateProcess {
 			// これらがClauseの末尾につくものを隣のClauseにつなげる
 			String[][] tags_NP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}, {"名詞"}};
 			originalSent.connect2Next(tags_NP, false);
+
+			System.out.println("---------marker 2--------");
 
 			/** Step2: 長文分割 **/
 			/* 長文を分割し複数の短文に分ける */
@@ -115,7 +119,7 @@ public class GenerateProcess {
 		/*** 関係抽出モジュール ***/
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
-		File fileText = new File("texts/text"+sdf.format(c.getTime())+".txt");
+		File fileText = new File("texts/text"+sdf.format(c.getTime())+".txt");	// ついでに分割後のテキストを保存
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileText));
 			for(final Sentence partSent: sentList) {

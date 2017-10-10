@@ -8,15 +8,16 @@ public class Phrase extends Word{
 	public List<Word> originWords;
 
 	public Phrase() {
+		super(new String(), new ArrayList<String>());
 		originWords = new ArrayList<Word>();
 	}
 
-	public void setPhrase(List<Word> baseWordList, int belongClauseID, boolean head_tail) {
+	public void setPhrase(List<Word> baseWords, Clause belongClause, boolean head_tail) {
 		String phraseName = new String();
 		String genkei = new String();
 		String yomi1 = new String();
 		String yomi2 = new String();
-		for(Iterator<Word> itr = baseWordList.iterator(); itr.hasNext(); ) {
+		for(Iterator<Word> itr = baseWords.iterator(); itr.hasNext(); ) {
 			Word word = itr.next();
 			originWords.add(word);
 			phraseName += word.name;
@@ -30,8 +31,8 @@ public class Phrase extends Word{
 			if(word.tags.size() > 8) yomi2 += word.tags.get(8);
 		}
 
-		Word headWord = baseWordList.get(0);
-		Word tailWord = baseWordList.get(baseWordList.size()-1);
+		Word headWord = baseWords.get(0);
+		Word tailWord = baseWords.get(baseWords.size()-1);
 
 		// Tagはhead_tailがtrueなら先頭、falseなら最後尾のWordに依存
 		List<String> phraseTags = head_tail ?headWord.tags :tailWord.tags;
@@ -40,11 +41,11 @@ public class Phrase extends Word{
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
 
-		if(belongClauseID == -1) {
-			belongClauseID = head_tail
-					? headWord.belongClause	// 新しいPhraseの所属するChunkは先頭のWordに依存
-					: tailWord.belongClause;	// 新しいPhraseの所属するChunkは最後尾のWordに依存
+		if(belongClause == null) {
+			belongClause = head_tail
+					? headWord.belongClause		// 新しいPhraseの所属するClauseは先頭のWordに依存
+					: tailWord.belongClause;	// 新しいPhraseの所属するClauseは最後尾のWordに依存
 		}
-		setWord(phraseName, phraseTags, belongClauseID, true);
+		setWord(phraseName, phraseTags, belongClause, true);
 	}
 }

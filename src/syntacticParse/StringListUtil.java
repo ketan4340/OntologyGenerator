@@ -82,7 +82,7 @@ public class StringListUtil {
 	 * markで始まる/と一致する行のindexをListにする
 	 */
 	private static List<Integer> getBorderIndexList(String mark, boolean matchMarkPerfectly, List<String> list) {
-		List<Integer> borderIndexList = new ArrayList<>();
+		List<Integer> borderIndexList = new ArrayList<>(list.size()/2);
 		if (matchMarkPerfectly) {
 			for (int i=0; i<list.size(); i++) {
 				String line = list.get(i);

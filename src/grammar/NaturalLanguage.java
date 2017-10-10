@@ -16,6 +16,7 @@ public class NaturalLanguage {
 	public void setText(String nlText) {
 		this.nlText = nlText;
 	}
+	@Override
 	public String toString() {
 		return nlText;
 	}

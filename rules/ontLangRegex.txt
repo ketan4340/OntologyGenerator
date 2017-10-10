@@ -7,3 +7,4 @@ attributeOf
 hasLength
 hasWeight
 exterms:\w+
+schema:\w+

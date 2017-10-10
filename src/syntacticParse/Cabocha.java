@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import grammar.Clause;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
 import grammar.Word;
+import sun.nio.cs.ext.ISCII91;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/** CaboChaの基本実行コマンド **/
@@ -29,7 +31,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static final String opt_NE_noConstraint = "-n2";	// 文節の整合性を保たずに固有表現解析を行う
 	private static final String opt_output2File = "--output=";	// CaboChaの結果をファイルに書き出す
 
-	private static final String BORDER = "EOS";
 
 	/* parserの入力ファイル，出力ファイルの保存先 */
 	private static final Path inputFilePath = Paths.get("parserIO/parserInput.txt");
@@ -119,17 +120,18 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 
 	@Override
 	public List<Sentence> readProcessOutput(List<String> parsedInfo4all) {
-		List<Sentence> sentences = new ArrayList<>();
-		List<List<String>> sentenceInfoList = StringListUtil.splitStringList(BORDER, true, parsedInfo4all);
-
-		sentenceInfoList.stream().forEach(sentenceInfo -> sentences.add(createSentence(sentenceInfo)));
+		List<List<String>> sentenceInfoList = StringListUtil.splitStringList("EOS", true, parsedInfo4all);	// EOSごとに分割
+		List<Sentence> sentences = sentenceInfoList.stream()
+				.map(sentenceInfo -> createSentence(sentenceInfo))
+				.collect(Collectors.toList());
 		return sentences;
 	}
 	@Override
 	public Sentence createSentence(List<String> parsedInfo4sentence) {
-		List<Clause> clauses = new ArrayList<>();
-		List<List<String>> clauseInfoList = StringListUtil.splitStringList(BORDER, true, parsedInfo4sentence);
-		clauseInfoList.stream().forEach(clauseInfo -> clauses.add(createClause(clauseInfo)));
+		List<List<String>> clauseInfoList = StringListUtil.splitStringListStartWith("*\t", false, parsedInfo4sentence);	// *~ごとに分割
+		List<Clause> clauses = clauseInfoList.stream()
+				.map(clauseInfo -> createClause(clauseInfo))
+				.collect(Collectors.toList());
 
 		Clause clause = null;
 		List<Word> wdl = null;
@@ -144,21 +146,21 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 				if(wdl == null) {				// 初手EOSだった場合、文章が正しく渡されていない
 					return null;
 				}else {
-					clause.setClause(wdl);
+					clause.setWords(wdl);
 					clause.setDepending(depto);
 				}
 				clauseList.add(clause.id);
 
 			}else if(line.startsWith("* ")) {	// * で始まる場合，直前までのClauseを閉じ、新しいClauseを用意
 				if(wdl != null) {				// 最初は直前までのClauseが存在しないので回避
-					clause.setClause(wdl);
+					clause.setWords(wdl);
 					clause.setDepending(depto);
 					clauseList.add(clause.id);
 				}else {
 					nextID = Clause.clauseSum;	// *要注意というか汚い*
 				}
 				wdl = new ArrayList<>();
-				clause = new Clause();
+				clause = new Clause(wdl, -1, -1);
 				String[] clauseInfo = line.split(" ");
 				String dep_str = clauseInfo[2];
 				int deptoID = Integer.decode(dep_str.substring(0, dep_str.length()-1));
@@ -169,8 +171,9 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 			}else {								// 他は単語の登録
 				String[] wordInfo = line.split("\t");
 				isSubject = (wdl.size() <= border)? true: false;
-				Word word = new Word();
-				word.setWord(wordInfo[0], Arrays.asList(wordInfo[1].split(",")), clause.id, isSubject);
+				Word word = new Word(wordInfo[0], Arrays.asList(wordInfo[1].split(",")));
+				word.belongClause = clause;
+				word.isCategorem = isSubject;
 				wdl.add(word);
 			}
 		}
@@ -182,15 +185,28 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	}
 	@Override
 	public Clause createClause(List<String> parsedInfo4clause) {
-		List<Word> words = new ArrayList<>();
-		List<List<String>> wordInfoList = StringListUtil.splitStringList(BORDER, true, parsedInfo4clause);
-		wordInfoList.stream().forEach(wordInfo -> words.add(createWord(wordInfo)));
-		return new Clause(words);
+		// 一要素目は文節に関する情報
+		String clauseInfo = parsedInfo4clause.get(0);
+		String[] clauseInfos = clauseInfo.split(" ");
+		String dep_str = clauseInfos[2];	// 係り先の情報。ex) '2D','-1D'
+		int depIndex = Integer.decode(dep_str.substring(0, dep_str.length()-1));	// -1で'D'の部分を除去
+		int isSbjIndex = Integer.decode(clauseInfos[3].split("/")[0]);
+
+
+		// 残りは単語に関する情報
+		List<List<String>> wordInfoList = parsedInfo4clause.subList(1, parsedInfo4clause.size())
+				.stream().map(info -> Arrays.asList(info)).collect(Collectors.toList());
+
+		List<Word> words = wordInfoList.stream()
+				.map(wordInfo -> createWord(wordInfo))
+				.collect(Collectors.toList());
+		return new Clause(words, depIndex, isSbjIndex);
 	}
 	@Override
+	// 一応Listで受け取るものの，きっと1行だけしかない．
 	public Word createWord(List<String> parsedInfo4word) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		String[] wordInfo = parsedInfo4word.get(0).split("\t");
+		return new Word(wordInfo[0], Arrays.asList(wordInfo[1].split(",")));
 	}
 
 
