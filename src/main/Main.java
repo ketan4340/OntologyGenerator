@@ -12,8 +12,6 @@ import demo.WholeView;
 
 public class Main{
 	public static void main(String[] args) {
-		// JavaFX未使用
-		//new WholeView(new MainController(new InputTextModel(), new OntologyModel(), new DocumentModel()));
 
 		/** Model生成 **/
 		InputTextModel iptModel = new InputTextModel();

@@ -1,11 +1,11 @@
 package demo;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.text.BadLocationException;
 
-import japaneseParse.GenerateProcess;
+import data.RDF.RDFTriple;
+import japaneseParse.Generator;
 
 public class InputTextModel extends AbstractDocumentModel{
 
@@ -14,25 +14,14 @@ public class InputTextModel extends AbstractDocumentModel{
 	}
 
 	// Generator実行
-	public List<String[]> runGenerator() {
-		List<String[]> triples = new LinkedList<String[]>();
-
-		String text = new String();
+	public List<RDFTriple> runGenerator() {
+		Generator generator = new Generator();
 		try {
-			text = getText(0, getLength());
+			String text = getText(0, getLength());
+			generator.run(text);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-
-		GenerateProcess process = new GenerateProcess();
-		process.run(text);
-		for(String[] relation: process.getRelations()) {
-			String[] triple = new String[3];
-			for(int i = 0; i < 3; i++) {
-				triple[i] = relation[i];
-			}
-			triples.add(triple);
-		}
-        return triples;
+		return generator.getTriples();
 	}
 }

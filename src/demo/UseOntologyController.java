@@ -1,26 +1,19 @@
 package demo;
 
-import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 
-import edu.uci.ics.jung.algorithms.layout.KKLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.visualization.BasicVisualizationServer;
-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import data.RDF.RDFTriple;
 
 public class UseOntologyController extends AbstractEditorController{
 	/*** Model ***/
@@ -71,10 +64,10 @@ public class UseOntologyController extends AbstractEditorController{
 	/* Hyperlinkをクリックした時の動作を実装 */
 	private HyperlinkListener hyperlinkAction = (event -> {
 		String clickedWord = event.getDescription();
-		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) { // クリックした場合
-			List<String[]> relationList = new LinkedList<String[]>();	// クリックした単語をSかOに含むトリプルを集める
-			relationList.addAll(ontModel.getPO(clickedWord));
-			relationList.addAll(ontModel.getSP(clickedWord));
+		if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {	// クリックした場合
+			List<RDFTriple> relationList = new LinkedList<RDFTriple>();		// クリックした単語をSかOに含むトリプルを集める
+			relationList.addAll(ontModel.getPO(clickedWord).stream().map(tri -> new RDFTriple(tri)).collect(Collectors.toList()));
+			relationList.addAll(ontModel.getSP(clickedWord).stream().map(tri -> new RDFTriple(tri)).collect(Collectors.toList()));
 
 			// 選び出したオントロジーを追加
 			// モデルを編集

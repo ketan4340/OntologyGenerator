@@ -1,20 +1,15 @@
 package demo;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.Graph;
+import data.RDF.RDFTriple;
 
 public class OntologyModel extends DefaultTableModel{
-	private static int TRIPLE = 3;
-	private static String[] columnNames = {"Subject", "Predicate", "Object"};
+	private static final String[] columnNames = {"Subject", "Predicate", "Object"};
 
 	/*********************/
 	/**** コンストラクタ ****/
@@ -27,25 +22,21 @@ public class OntologyModel extends DefaultTableModel{
 		return columnNames;
 	}
 
-	private void addTriple(String[] newTriple) {
-		if(newTriple.length != TRIPLE) {
-			System.err.println("ERROR: this triple is not composed of 3 concepts." + newTriple);
-		}else {
-			addRow(newTriple);
-		}
+	private void addTriple(RDFTriple newTriple) {
+		addRow(Stream.of(newTriple.toArray()).map(rsc -> rsc.toString()).toArray(String[]::new));
 	}
-	public void addAllTriples(List<String[]> newTriples) {
-		for(String[] newTriple: newTriples) {
+	public void addAllTriples(List<RDFTriple> newTriples) {
+		for(RDFTriple newTriple: newTriples) {
 			addTriple(newTriple);
 		}
 	}
 
 	public String[] getRow(int rowNum) {
-		String[] row = new String[TRIPLE];
-		for(int t = 0; t<TRIPLE; t++) {
-			row[t] = (String) getValueAt(rowNum, t);
-		}
-		return row;
+		return new String[]{
+				(String) getValueAt(rowNum, RDFTriple.S),
+				(String) getValueAt(rowNum, RDFTriple.P),
+				(String) getValueAt(rowNum, RDFTriple.O)
+				};
 	}
 
 	public List<String[]> getAllTable() {
@@ -60,6 +51,12 @@ public class OntologyModel extends DefaultTableModel{
 		setRowCount(0);
 	}
 
+	/**
+	 * トリプルの主語，述語，目的語のいずれか(s_p_oで指定)が入力文字列と一致するトリプルを集める.
+	 * @param concept 検索文字列
+	 * @param s_p_o 主語，述語，目的語に対応する整数(0,1,2)
+	 * @return
+	 */
 	private List<String[]> getCommonConcepts(String concept, int s_p_o) {
 		List<String[]> commonRowList = new LinkedList<String[]>();
 		for(final String[] row: getAllTable()) {
@@ -70,12 +67,12 @@ public class OntologyModel extends DefaultTableModel{
 		return commonRowList;
 	}
 	public List<String[]> getPO(String subject) {
-		return getCommonConcepts(subject, Triple.SUBJECT);
+		return getCommonConcepts(subject, RDFTriple.S);
 	}
 	public List<String[]> getSO(String predicate) {
-		return getCommonConcepts(predicate, Triple.PREDICATE);
+		return getCommonConcepts(predicate, RDFTriple.P);
 	}
 	public List<String[]> getSP(String object) {
-		return getCommonConcepts(object, Triple.OBJECT);
+		return getCommonConcepts(object, RDFTriple.O);
 	}
 }

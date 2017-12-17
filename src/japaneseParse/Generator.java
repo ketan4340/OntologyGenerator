@@ -8,24 +8,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import grammar.NaturalLanguage;
+import data.RDF.RDFTriple;
 import grammar.Sentence;
-import relationExtract.OntologyBuilder;
-import syntacticParse.Cabocha;
+import relationExtract.OntologyWriter;
 import syntacticParse.Parser;
 
-public class GenerateProcess {
+public class Generator {
 	private List<Sentence> sentList;
-	private List<String[]> relations;
+	private List<RDFTriple> triples;
 
-	public GenerateProcess() {
+	public Generator() {
 		sentList = new ArrayList<Sentence>();
-		relations = new ArrayList<String[]>();
+		triples = new ArrayList<RDFTriple>();
 	}
 
 	public List<Sentence> getSentList() {
@@ -34,21 +34,19 @@ public class GenerateProcess {
 	public void setSentList(List<Sentence> sentList) {
 		this.sentList = sentList;
 	}
-	public List<String[]> getRelations() {
-		return relations;
+	public List<RDFTriple> getTriples() {
+		return triples;
 	}
-	public void setRelations(List<String[]> relations) {
-		this.relations = relations;
+	public void setRelations(List<RDFTriple> triples) {
+		this.triples = triples;
 	}
 
 	public void run(String text) {
 		List<String> writingList = new ArrayList<String>();
-		if(text.isEmpty()) {
+		if(text.isEmpty())
 			writingList.add("これはデフォルトの文章です。");
-		}else {
-			String[] writings = text.split("\n");
-			writingList.addAll(Arrays.asList(writings));
-		}
+		else
+			writingList.addAll(Arrays.asList(text.split("\n")));
 		run(writingList);
 	}
 
@@ -82,9 +80,9 @@ public class GenerateProcess {
 		for(final String writing: writingList) {
 			/*** 構文解析Module ***/
 			System.out.println("\n\t Step0");
-			Parser parse = new Parser("cabocha");
-			Sentence originalSent = parse.run(writing);
-
+			Parser parse = new Parser(Parser.CABOCHA);
+			Sentence originalSent = parse.parse(writing);
+			
 			System.out.println("---------marker 1--------");
 
 			/*** 文章整形Module ***/
@@ -104,8 +102,9 @@ public class GenerateProcess {
 
 			/** Step2: 長文分割 **/
 			/* 長文を分割し複数の短文に分ける */
-			originalSent.printDetail();
+			originalSent.printDep();
 			for(final Sentence shortSent: originalSent.divide2()) {
+				//shortSent.printDep();
 				for(final Sentence partSent: shortSent.divide3()) {
 					partSent.uniteSubject();
 					//partSent.printDep();
@@ -126,58 +125,30 @@ public class GenerateProcess {
 				/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
 				bw.write(partSent.toString());		// 分割後の文を出力
 				bw.newLine();
-				List<String[]> relation = partSent.extractRelation();
-				relations.addAll(relation);
+				triples.addAll(partSent.extractRelation());
 			}
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		//重複排除
-		relations = new ArrayList<String[]>(new LinkedHashSet<String[]>(relations));
-
-		// 得られた関係を読み取り，uriとtriplesに入れる
-		List<String> uri = new ArrayList<String>();	// ここに入れた単語はWordとしての情報を失いその後は文字列として扱う
-		uri.add("rdf:type");			// 0
-		uri.add("rdfs:subClassOf");		// 1
-		uri.add("rdfs:subPropertyOf");	// 2
-		uri.add("rdfs:domain");			// 3
-		uri.add("rdfs:range");			// 4
-		List<int[]> triples = new ArrayList<int[]>();
+		triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
 
 		File fileCSV = new File("csvs/relation"+sdf.format(c.getTime())+".csv");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileCSV));
 
-			for(final String[] relation: relations) {
-				String spo = new String();
-	        	for(final String concept: relation) {
-	        		spo += concept+",";
-	        		if( !uri.contains(concept) ) uri.add(concept);
-	        	}
-	        	int uriS = uri.indexOf(relation[0]);
-	        	int uriP= uri.indexOf(relation[0]);
-	        	int uriO= uri.indexOf(relation[0]);
-	        	int[] triple_id = {uriS, uriP, uriO};
-	        	bw.write(spo);
-	        	bw.newLine();
-	        	triples.add(triple_id);
+			for(final RDFTriple triple: triples) {
+				bw.write(triple.toString());
+		        	bw.newLine();
 			}
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//List<Node> nodes = Node.setTriples2Nodes(uri, triples);
-		/*
-		for(int i=0; i<uri.size(); i++) {
-			System.out.println(i + ":\t" + uri.get(i));
-			nodes.get(i).printNode1();
-			nodes.get(i).printNode2();
-		}
-		*/
 
 		/*** OWL DL Axiom Module ***/
-		OntologyBuilder ob = new OntologyBuilder("n3", uri, triples);
+		OntologyWriter ob = new OntologyWriter(OntologyWriter.N_TRIPLES, triples);
 		ob.output("owls/ontology"+sdf.format(c.getTime()));	// 渡すのは保存先のパス(拡張子は含まない)
 
 		System.out.println("Finished.");

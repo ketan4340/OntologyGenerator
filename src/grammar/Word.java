@@ -6,7 +6,7 @@ public class Word implements GrammarInterface{
 	public static int wordsSum = 0;
 	public static List<Word> allWordList = new ArrayList<Word>();
 
-	public int id;					// 通し番号。Wordを特定する
+	public final int id;			// 通し番号。Wordを特定する
 	public String name;				// 単語の文字列
 	public List<String> tags;		// 品詞・活用形、読みなど
 	public boolean isCategorem;		// 主辞か機能語か

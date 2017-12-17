@@ -1,48 +1,50 @@
 package relationExtract;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class OntologyBuilder {
-	//public String body; 		// RDF/XMLの本文
-	public List<String> uri;
-	public List<int[]> triples;
-	public boolean xml_n3;		// RDF/XML形式ならtrue,N-Triples形式ならfalse
-	public String extension;	// 拡張子
+import data.RDF.RDFTriple;
+
+public class OntologyWriter {
+	public static final int N_TRIPLES = 1;
+	public static final int TURTLE = 2;
+	public static final int XML = 3;
+	public static final int JSON_LD = 4;
+
+	private static final Path regexFilePath = Paths.get("rules/ontLangRegex.txt");
+	
+	public List<RDFTriple> triples;
+	public int serialize;		// RDFデータの出力形式
+	public String extension;		// 拡張子
 	private List<String> ontLangRegexes;
 
-	public OntologyBuilder(String xml_n3, List<String> uri, List<int[]> triples) {
-		this.uri = uri;
+	public OntologyWriter(int serialize, List<RDFTriple> triples) {
 		this.triples = triples;
-		if(xml_n3.equals("xml")) {
-			this.xml_n3 = true;
-			extension = ".xmlowl";
-		}else if(xml_n3.equals("n3")) {
-			extension = ".n3owl";
-			this.xml_n3 = false;
+		this.serialize = serialize;
+		
+		switch (serialize) {
+		case N_TRIPLES:
+			extension = ".n-tri.owl";
+		case TURTLE:
+			extension = ".turtle.owl";
+		case XML:
+			extension = ".xml.owl";
+		case JSON_LD:
+			extension = "json.owl";
 		}
-		ontLangRegexes = new ArrayList<String>();
+
 		try {
-			String fileName = "rules/ontLangRegex.txt";
-			File file = new File(fileName);
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			String regex = br.readLine();
-			while(regex != null) {
-				ontLangRegexes.add(regex);
-				regex = br.readLine();
-			}
-			br.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			this.ontLangRegexes = Files.readAllLines(regexFilePath);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 	}
 
@@ -53,7 +55,7 @@ public class OntologyBuilder {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			String rdf = "";
-			if(xml_n3) {
+			if(serialize == XML) {
 				bw.write("<?xml version=\"1.0\"?>"+"\n"
 					+ "<rdf:RDF"+"\n"
 					+ "\t"+"xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""+"\n"
@@ -65,20 +67,21 @@ public class OntologyBuilder {
 					+ ">"+"\n"
 					+ "<owl:Ontology rdf:about=\"\"/>"+"\n");
 				bw.newLine();
-				for(final int[] triple: triples) {
-					rdf = getRDF(triple);
+				for(final RDFTriple triple: triples) {
+					rdf = serializeRDF(triple);
 					bw.write(rdf);
 					bw.newLine();
 				}
 				bw.write("</rdf:RDF>");
-			}else {
+				
+			} else if (serialize == N_TRIPLES) {
 				bw.write("@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>."+"\n"
 				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>."+"\n"
 				+ "@prefix owl: <http://www.w3.org/2002/07/owl#>."+"\n"
 				+ "@prefix dc: <http://purl.org/dc/elements/1.1/>."+"\n");
 				bw.newLine();
-				for(final int[] triple: triples) {
-					rdf = getRDF(triple);
+				for(final RDFTriple triple: triples) {
+					rdf = serializeRDF(triple);
 					//System.out.println("rdf : " + rdf);
 					bw.write(rdf);
 					bw.newLine();
@@ -90,46 +93,22 @@ public class OntologyBuilder {
 		}
 	}
 
-	public String getRDF(int[] triple) {
-		String rdf;
-		int s = triple[0];
-		int p = triple[1];
-		int o = triple[2];
-
-		rdf = setDefaultTriple(uri.get(s), uri.get(p), uri.get(o));
-		/*
-		switch (p) {
-		case 0: // instance
-			rdf = setType(uri.get(o), uri.get(s));
-			break;
-		case 1: // subclasses
-	    	rdf = setSubClassOf(uri.get(o), uri.get(s));
-	    	break;
-	    case 2: // subproperties
-	    	rdf = setSubPropertyOf(uri.get(o), uri.get(s));
-	    	break;
-	  	case 3: // s_domains
-	  		rdf = setPropertyDomain(uri.get(s), uri.get(o));
-	   		break;
-	   	case 4: // s_ranges
-	   		rdf = setPropertyRange(uri.get(s), uri.get(o));
-	   		break;
-	   	default:
-	   		rdf = setProperty(uri.get(p), uri.get(s), uri.get(o));
-	   }
-	   */
-		return rdf;
+	public String serializeRDF(RDFTriple triple) {
+		return setDefaultTriple(
+				triple.getSubject().toString(),
+				triple.getPredicate().toString(),
+				triple.getObject().toString());
 	}
 
 	/*** body(本文に)公理を追記する ***/
 	/* インスタンスの定義 */
 	public String setType(String instance, String mainClass) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<owl:Class rdf:ID=\"" + instance + "\">\n"
 					+ "\t<rdf:type rdf:resource=\"#" + mainClass + "\"/>\n"
 					+ "</owl:Class>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(instance)+" "
 					+ "rdf:type "
 					+ getN3Elem(mainClass)+".";
@@ -139,9 +118,9 @@ public class OntologyBuilder {
 	/* クラスを定義するだけ */
 	public String setClass(String className) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<owl:Class rdf:ID=\"" + className + "\"/>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(className)+" "
 					+ "rdf:type "
 					+ "owl:Class.";
@@ -151,11 +130,11 @@ public class OntologyBuilder {
 	/* サブクラスの定義 */
 	public String setSubClassOf(String mainClass, String subClass) {
 		String axiom = new String();
-		if(xml_n3) {
+		if(serialize == XML) {
 			axiom = "<owl:Class rdf:ID=\"" + mainClass + "\">\n"
 					+ "\t<rdfs:subClassOf rdf:resource=\"#" + subClass + "\"/>\n"
 					+ "</owl:Class>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(mainClass)+" "
 					+ "rdfs:subClassOf "
 					+ getN3Elem(subClass)+".";
@@ -165,12 +144,12 @@ public class OntologyBuilder {
 	/* プロパティの定義(domain,range両方) */
 	public String setProperty(String property, String domain, String range) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<owl:ObjectProperty rdf:ID=\"" + property + "\">\n"
 					+ "\t<rdfs:domain rdf:resource=\"#" + domain + "\"/>\n"
 					+ "\t<rdfs:range rdf:resource=\"#" + range + "\"/>\n"
 	    			+ "</owl:ObjectProperty>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(property)+" "
 					+ "rdfs:domain "+getN3Elem(domain)+"; "
 					+ "rdfs:range "+getN3Elem(range)+".";
@@ -180,11 +159,11 @@ public class OntologyBuilder {
 	/* プロパティの定義(domainのみ) */
 	public String setPropertyDomain(String property, String domain) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<owl:ObjectProperty rdf:ID=\"" + property + "\">\n"
 					+ "\t<rdfs:domain rdf:resource=\"#" + domain + "\"/>\n"
 					+ "</owl:ObjectProperty>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(property)+" "
 					+ "rdfs:domain "
 					+getN3Elem(domain)+".";
@@ -194,11 +173,11 @@ public class OntologyBuilder {
 	/* プロパティの定義(rangeのみ) */
 	public String setPropertyRange(String property, String range) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<owl:ObjectProperty rdf:ID=\"" + property + "\">\n"
 					+ "\t<rdfs:range rdf:resource=\"#" + range + "\"/>\n"
 					+ "</owl:ObjectProperty>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(property)+" "
 					+ "rdfs:range "
 					+ getN3Elem(range)+".";
@@ -208,11 +187,11 @@ public class OntologyBuilder {
 	/* サブプロパティの定義 */
 	public String setSubPropertyOf(String mainProperty, String subProperty) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<owl:ObjectProperty rdf:ID=\"" + mainProperty + "\">\n"
 					+ "\t<rdfs:subPropertyOf rdf:resource=\"#" + subProperty + "\"/>\n"
 					+ "</owl:ObjectProperty>\n";
-		}else {
+		} else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(mainProperty)+" "
 					+ "rdfs:subPropertyOf "
 					+ getN3Elem(subProperty)+".";
@@ -222,11 +201,11 @@ public class OntologyBuilder {
 
 	public String setDefaultTriple(String s, String p, String o) {
 		String axiom = new String();
-		if(xml_n3) {
+		if (serialize == XML) {
 			axiom = "<rdfs:Resource rdf:ID=\""+ s +"\">\n"
 					+ "\t<"+p+" rdf:resource=\"" + o + "\"/>\n"
 					+ "</rdfs:Resource>\n";
-		}else {
+		}else if(serialize == N_TRIPLES) {
 			axiom = getN3Elem(s)+" "
 					+ getN3Elem(p)+" "
 					+ getN3Elem(o)+".";

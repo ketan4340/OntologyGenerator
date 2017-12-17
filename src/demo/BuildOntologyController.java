@@ -3,7 +3,7 @@ package demo;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.text.BadLocationException;
+import data.RDF.RDFTriple;
 
 public class BuildOntologyController extends AbstractEditorController{
 	/*** Model ***/
@@ -27,7 +27,7 @@ public class BuildOntologyController extends AbstractEditorController{
 	/** ActionListener **/
 	/* RunGeneratorボタンの実装 */
 	private ActionListener generateAction = (event -> {
-		List<String[]> triples = iptModel.runGenerator();
+		List<RDFTriple> triples = iptModel.runGenerator();
 		ontModel.addAllTriples(triples);
 	});
 

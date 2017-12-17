@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,13 +15,14 @@ import java.util.List;
 import grammar.Sentence;
 import syntacticParse.Parser;
 
-public class Main3 {
+public class MainOld {
 
 	public static void main(String[] args) {
-
+		Path path = Paths.get("./writings/gooText生物-動物名-さ.txt");
+		
 		List<String> writingList = null;
 		try {
-			writingList = Files.readAllLines(Paths.get("./writings/gooText生物-動物名-さ.txt"));
+			writingList = Files.readAllLines(path);
 		} catch (IOException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
@@ -32,8 +32,8 @@ public class Main3 {
 
 		for(final String writing: writingList) {
 			/*** 構文解析Module ***/
-			Parser parse = new Parser("cabocha");
-			Sentence originalSent = parse.run(writing);
+			Parser parse = new Parser(Parser.CABOCHA);
+			Sentence originalSent = parse.parse(writing);
 
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/

@@ -2,24 +2,22 @@ package grammar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Clause implements GrammarInterface{
 	public static int clauseSum = 0;
 	public static List<Clause> allClauseList = new ArrayList<Clause>();
 
-	public int id;
+	public final int id;
 	public List<Word> words;			// 構成するWordのListを持つ
 
 	public int depIndex = -1;
 	public Clause depending;			// 係り先文節.どのClauseに係るか
-	public List<Clause> dependeds;		// 係られてる集合.どのClauseから係り受けるか
+	public List<Clause> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか
 
 	private Clause() {
 		id = clauseSum++;
@@ -29,14 +27,14 @@ public class Clause implements GrammarInterface{
 	/**
 	 * @param wordList			単語のリスト
 	 * @param depIndex			係る文節の位置
-	 * @param categoremIndex	自立語の位置
+	 * @param categoremIndex		自立語の位置
 	 */
 	public Clause(List<Word> wordList, int depIndex, int categoremIndex) {
 		this();
 		this.words = wordList;
 		this.depIndex = depIndex;
 		setBelong4Words();
-		setIsCategorem4Words(0, categoremIndex+1, true);	// CaboChaで自立語と判定された単語だけでなく，0番目からその単語まで全て自立語とする
+		setCategoremHeadWords(0, categoremIndex+1, true);	// CaboChaで自立語と判定された単語だけでなく，0番目からその単語まで全て自立語とする
 		uniteCategorems4Words();	// 自立語を全て結合
 	}
 	public void setWords(List<Word> wordList) {
@@ -53,37 +51,38 @@ public class Clause implements GrammarInterface{
 	 * @param toIndex
 	 * fromIndexからtoIndexの範囲(toIndexは含まない)のwordを主辞であるとする．
 	 */
-	private void setIsCategorem4Words(int fromIndex, int toIndex, boolean ctgrm_adjnc) {
+	private void setCategoremHeadWords(int fromIndex, int toIndex, boolean ctgrm_adjnc) {
 		for (int i=fromIndex; i<toIndex; i++) {
 			Word word = this.words.get(i);
 			word.setIsCategorem(ctgrm_adjnc);
 		}
 	}
 	private void uniteCategorems4Words() {
-		List<Word> mains = new LinkedList<Word>();	// 主辞
+		List<Word> newWords = new ArrayList<>();
+		List<Word> categorems = new LinkedList<Word>();	// 主辞
 		for(Iterator<Word> itr = words.iterator(); itr.hasNext(); ) {
 			Word word = itr.next();
 			if (word.isCategorem) {	// 複数の主辞があれば一つにまとめる
-				mains.add(word);
+				categorems.add(word);
 			} else {
-				int mainsSize = mains.size();
-				switch(mainsSize) {	// mainsの要素数が
+				switch(categorems.size()) {			// 主辞の数が
 				case 0:				// 0なら
-					break;						// スルー
+					break;							// スルー
 				case 1:				// 1なら
-					this.words.addAll(mains);		// そのまま入れる
-					mains.clear();
+					newWords.addAll(categorems);	// そのまま入れる
+					categorems.clear();
 					break;
-				default:			// 2以上
+				default:				// 2以上
 					Phrase main = new Phrase();	// 主辞合成
-					main.setPhrase(mains, this, false);
-					this.words.add(main);	// 生成したPhraseを入れる
-					mains.clear();
+					main.setPhrase(categorems, this, false);
+					newWords.add(main);	// 生成したPhraseを入れる
+					categorems.clear();
 				}
-				this.words.add(word);
+				newWords.add(word);
 			}
 		}
-		this.words.addAll(mains);	// 残り物があれば回収
+		newWords.addAll(categorems);	// 残り物があれば回収
+		this.words = newWords;
 	}
 	private void setBelong4Words() {
 		words.stream().forEach(w -> w.belongClause=this);
@@ -244,7 +243,7 @@ public class Clause implements GrammarInterface{
 	public List<Integer> collectWords(String name) {
 		List<Integer> ids = new ArrayList<Integer>();
 		for(final Word word: words) {
-			if(word.name.equals(name))	ids.add(id);
+			if(word.name.equals(name))	ids.add(word.id);
 		}
 		return ids;
 	}

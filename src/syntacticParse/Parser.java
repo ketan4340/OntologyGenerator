@@ -18,17 +18,22 @@ import grammar.Sentence;
 import grammar.Word;
 
 public class Parser {
-	private String tool; // どの解析器を使うか(stanford,cabocha,knp)
+	public static final int CABOCHA = 1;
+	public static final int KNP = 2;
+	public static final int STANFORD = 3;
+	
 
-	public Parser(String howto) {
-		tool = howto;
+	private int tool; // どの解析器を使うか(stanford,cabocha,knp)
+
+	public Parser(int tool) {
+		this.tool = tool;
 	}
 
-	public Sentence run(String text) {
+	public Sentence parse(String text) {
 		switch (tool){
-		case "cabocha":
+		case CABOCHA:
 			return runCabocha(text);
-		case "knp":
+		case KNP:
 			System.out.println("KNPは未実装です。");
 			return null;
 		default:
@@ -119,10 +124,12 @@ public class Parser {
 			for (Map.Entry<Clause, Integer> entry : dependingMap.entrySet()) {
 				Clause cls = entry.getKey();	int dep = entry.getValue();
 				cls.depending = (dep >= 0)
-						?	clauseList.get(dep)
-						:	null;
+						? clauseList.get(dep)
+						: null;
+				System.out.println(cls.toString() +" -> "+ cls.depending);
 			}
-			Clause.updateAllDependency();
+			clauseList.stream().forEach(c -> System.out.println(c.depending));
+			//Clause.updateAllDependency();
 
 			// プロセス終了
 			is.close();

@@ -1,34 +1,42 @@
 package grammar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.regex.Matcher;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+
+import data.RDF.Namespace;
+import data.RDF.RDFTriple;
+import data.RDF.Resource;
 
 public class Sentence implements GrammarInterface{
 	public static int sentSum = 0;
 
-	public int id;
+	private final int id;
 	public List<Clause> clauses; // Clauseのリストで文を構成する
 
-	public Sentence() {
+	private Sentence() {
 		id = sentSum++;
 		clauses = new ArrayList<>();
 	}
 	public Sentence(List<Clause> clauseList) {
-		id = sentSum++;
+		this();
 		clauses = clauseList;
 		initializeDepending();
 	}
+	public Sentence(List<Clause> clauseList, Map<Clause, Integer> dependingMap) {
+		this();
+	}
+	
 	/**
 	 * 各clauseのdepIndexを元に係り先dependingをセットする
 	 * @param clauseList
@@ -36,8 +44,8 @@ public class Sentence implements GrammarInterface{
 	private void initializeDepending() {
 		for (Clause clause : clauses) {
 			int depIndex = clause.depIndex;
-			clause.setDepending( (depIndex != -1)
-					? clauses.get(depIndex)
+			clause.setDepending((depIndex != -1)?
+					clauses.get(depIndex)
 					: null);
 		}
 	}
@@ -70,33 +78,31 @@ public class Sentence implements GrammarInterface{
 	}
 
 	public Sentence subSentence(int fromIndex, int toIndex) {
-		Sentence subSent = new Sentence();
 		List<Clause> subClauses = new ArrayList<>(clauses.subList(fromIndex, toIndex));
-		subSent.setSentence(subClauses);
-		return subSent;
+		return new Sentence(subClauses);
 	}
 
 	public List<Integer> collectWords(String name) {
 		List<Integer> words = new ArrayList<Integer>();
 		for(final Clause clause: clauses) {
-			words.addAll(clause.collectWords(name));	// 各Chunk内を探す
+			words.addAll(clause.collectWords(name));	// 各clause内を探す
 		}
 		return words;
 	}
-	/* 渡された品詞に一致するWordを返す */
+	/** 渡された品詞に一致するWordを返す */
 	public List<Word> collectTagWords(String[][] tagNames) {
 		List<Word> taggedWords = new ArrayList<>();
 		for(final Clause clause: clauses) {
-			taggedWords.addAll(clause.collectAllTagWords(tagNames));	// 各Chunk内を探す
+			taggedWords.addAll(clause.collectAllTagWords(tagNames));	// 各clause内を探す
 		}
 		return taggedWords;
 	}
-	/* 渡された品詞に一致するWordを含むChunkのIDを返す */
+	/** 渡された品詞に一致するWordを含むclauseのIDを返す */
 	public List<Clause> collectTagClauses(String[][] tagNames) {
 		List<Clause> taggedClauses = new ArrayList<>();
 		for(final Clause clause: clauses) {
 			if(clause.haveSomeTagWord(tagNames))
-				taggedClauses.add(clause);	// 各Chunk内を探す
+				taggedClauses.add(clause);	// 各clause内を探す
 		}
 		return taggedClauses;
 	}
@@ -105,7 +111,7 @@ public class Sentence implements GrammarInterface{
 		for(final Clause clause: clauses) {
 			for(final String[][] tagNames: tagNamess) {
 				if(clause.endWith(tagNames, true)) {
-					taggedClauses.add(clause);	// 各Chunk内を探す
+					taggedClauses.add(clause);	// 各clause内を探す
 					break;
 				}
 			}
@@ -126,7 +132,7 @@ public class Sentence implements GrammarInterface{
 				return baseClause;
 			}
 		}
-		System.out.println("connectChunkList:"+connectClauseList + "\tbase:" + baseClause.toString());
+		System.out.println("connectclauseList:"+connectClauseList + "\tbase:" + baseClause.toString());
 
 		List<Word> phraseWords = new ArrayList<>();			// 新しいPhraseの元になるWord
 		List<Word> functionWords = new ArrayList<>();		// Phrase完成後につなげる接続詞を保持
@@ -150,7 +156,7 @@ public class Sentence implements GrammarInterface{
 			if(!itr.hasNext()) {		// 最後尾の場合
 				phraseWords.add(connectClause.getMainWord());			// 被修飾語を入れる
 				functionWords.addAll(connectClause.getFunctionWords());	// それに繋がる機能語を入れる
-				//depto = connectChunk.dependUpon;
+				//depto = connectclause.dependUpon;
 			}else {
 				phraseWords.addAll(connectClause.words);
 			}
@@ -165,7 +171,7 @@ public class Sentence implements GrammarInterface{
 		baseClause.setWords(clauseBaseWords);
 		baseClause.setDepending(depto);
 
-		// 古いChunkを削除して新しいChunkを挿入
+		// 古いclauseを削除して新しいclauseを挿入
 		connectClauseList.remove(baseIndex);
 		newClauses.removeAll(connectClauseList);
 
@@ -175,7 +181,7 @@ public class Sentence implements GrammarInterface{
 		return baseClause;
 	}
 
-	/* 渡された品詞の連続にマッチする単語を連結する */
+	/** 渡された品詞の連続にマッチする単語を連結する */
 	public void connectPattern(String[][] pattern, int baseIndex) {
 		if(baseIndex >= pattern.length) System.out.println("index error");
 
@@ -204,7 +210,7 @@ public class Sentence implements GrammarInterface{
 		//printW();
 		//System.out.println(matchingWordsSet);
 
-		// Wordの列からChunkの列に直す
+		// Wordの列からclauseの列に直す
 		Set<List<Clause>> connectClausesSet = new HashSet<>(matchingWordsSet.size());
 		for(final List<Word> matchedWords: matchingWordsSet) {
 			List<Clause> connectClauses = new ArrayList<>(matchingWords.size());
@@ -214,21 +220,21 @@ public class Sentence implements GrammarInterface{
 					connectClauses.add(belong);	// どのClauseに所属するか
 			}
 		}
-		// 複数のChunkを結合して新しいChunkを作成
+		// 複数のclauseを結合して新しいclauseを作成
 		for(final List<Clause> connectClauses: connectClausesSet) {
 			uniteClauses(connectClauses, baseIndex);
 		}
 	}
 
-	/* 渡された品詞を繋げる */
-	/* Clauseを跨いで連結はしない */
+	/** 渡された品詞を繋げる.
+	 * Clauseを跨いで連結はしない */
 	public void connect(String[][] tagNames) {
 		for(final Clause clause: clauses) {
 			clause.connect(tagNames);
 		}
 	}
 
-	/* 渡された品詞で終わるClauseを次のClauseに繋げる */
+	/** 渡された品詞で終わるClauseを次のClauseに繋げる */
 	public void connect2Next(String[][] tags, boolean ignoreSign) {
 		List<Clause> newClauselist = clauses;
 		List<Clause> modifyClauseList = new ArrayList<>();
@@ -236,7 +242,7 @@ public class Sentence implements GrammarInterface{
 		for(final Clause clause: clauses) {
 			for(final String[] tag: tags) {
 				String[][] tagArray = {tag};
-				if(clause.endWith(tagArray, ignoreSign)) {	// 指定の品詞で終わるChunkなら(記号考慮)
+				if(clause.endWith(tagArray, ignoreSign)) {	// 指定の品詞で終わるclauseなら(記号考慮)
 					modifyClauseList.add(clause);
 				}
 			}
@@ -281,7 +287,7 @@ public class Sentence implements GrammarInterface{
 		return phraseBaseClausesList;
 	}
 
-	/* 渡したClauseが文中で連続しているかを<clause, Boolean>のMapで返す */
+	/** 渡したClauseが文中で連続しているかを<clause, Boolean>のMapで返す */
 	/* 例:indexのリストが(2,3,4,6,8,9)なら(T,T,F,F,T,F) */
 	public Map<Clause, Boolean> getContinuity(List<Clause> clauseList) {
 		Map<Clause, Boolean> continuity = new LinkedHashMap<>(clauseList.size());
@@ -544,29 +550,40 @@ public class Sentence implements GrammarInterface{
 		connect2Next(tags_NP, true);
 	}
 
-	/* 文章から関係を見つけtripleにする */
-	public List<String[]> extractRelation() {
-		List<String[]> relations = new ArrayList<String[]>();
+	/** 文章から関係を見つけtripleにする */
+	public List<RDFTriple> extractRelation() {
+		List<RDFTriple> triples = new ArrayList<RDFTriple>();
 
 		List<Clause> subjectList = getSubjectList(true);	// 主語を整えたところで再定義
-		if(subjectList.isEmpty()) return relations;
+		if(subjectList.isEmpty()) return triples;
 
 		Clause subjectClause = subjectList.get(0);			// 主節(!!最初の1つしか使っていない!!)
 		Word subjectWord = subjectClause.getMainWord();					// 主語
-		if(subjectWord == null) return relations;
-		String subject = subjectWord.name;
+		if(subjectWord == null) {
+			System.err.println("subjectWord is null.");
+			return triples;
+		}
+		Resource subject = new Resource(Namespace.GOO, subjectWord.name);
+		this.printDep();
 		// 述節
 		Clause predicateClause = subjectClause.depending;
-		if(predicateClause == null) return relations;
+		if(predicateClause == null) {
+			System.err.println("predicateClause is null.");
+			return triples;
+		}
 		Word predicateWord = predicateClause.getMainWord();				// 述語
-		if(predicateWord == null) return relations;
+		if(predicateWord == null) {
+			System.err.println("predicateWord is null.");
+			return triples;
+		}
 		// 述部(主節に続く全ての節)
 		String predicatePart = subSentence(clauses.indexOf(subjectClause.id)+1, clauses.size()).toString();
+
 		//List<Clause> complementClauses;								// 補部
 		//Word complementWord;											// 補語
 
 		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
-		boolean not = (predicateClause.haveSomeTagWord(tag_Not))? true: false;	// 述語が否定かどうか
+		boolean isNot = (predicateClause.haveSomeTagWord(tag_Not))? true: false;	// 述語が否定かどうか
 
 		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());
 
@@ -587,20 +604,22 @@ public class Sentence implements GrammarInterface{
 		boolean boolWeight = mtchWeight.matches();
 
 		if(boolLength || boolWeight) {
+			System.out.println("リテラル");//TODO
 			if(boolLength) {
-				String blank = "_:"+subjectWord.name+"-length";
-				relations.add( new String[]{subjectWord.name, "hasLength", blank} );		// 空白ノード
-				relations.add( new String[]{blank, "rdf:value", mtchLength.group(2)} );			// リテラル
-				relations.add( new String[]{blank, "exterms:units", mtchLength.group(4)} );	// 単位
+				Resource blank = new Resource(Namespace.EMPTY, subjectWord.name+"-length");
+				triples.add(new RDFTriple(subject, Resource.LENGTH, blank));			// 空白ノード
+				triples.add(new RDFTriple(blank, Resource.VALUE, new Resource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
+				triples.add(new RDFTriple(blank, Resource.UNITS, new Resource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
 			}
 			if(boolWeight) {
-				String blank = "_:"+subjectWord.name+"-weight";
-				relations.add( new String[]{subjectWord.name, "hasWeight", blank} );		// 空白ノード
-				relations.add( new String[]{blank, "rdf:value", mtchWeight.group(2)} );		// リテラル
-				relations.add( new String[]{blank, "exterms:units", mtchWeight.group(4)} );	// 単位
+				Resource blank = new Resource(Namespace.EMPTY, subjectWord.name+"-weight");
+				triples.add(new RDFTriple(subject, Resource.WEIGHT, blank));			// 空白ノード
+				triples.add(new RDFTriple(blank, Resource.VALUE, new Resource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
+				triples.add(new RDFTriple(blank, Resource.UNITS, new Resource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
 			}
 		/* 述語が動詞 */
 		}else if( predicateClause.haveSomeTagWord(tagVerb) ) {
+			System.out.println("動詞");//TODO
 			/* "がある"かどうか */
 			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}, {"動詞", "持つ"}};		// 動詞の"ある"(助動詞ではない)
 			boolean boolHave = predicateClause.haveSomeTagWord(tag_Have);
@@ -612,51 +631,51 @@ public class Sentence implements GrammarInterface{
 
 			if(boolHave) {			// "~がある","~をもつ"
 				Clause previousClause = previousC(predicateClause);		// 動詞の一つ前の文節
-				if(previousClause == null) return relations;
-				String part = previousClause.getMainWord().name;	// その主辞の文字列
+				if(previousClause == null) return triples;
+				Resource part = new Resource(Namespace.GOO, previousClause.getMainWord().name);	// その主辞のリソース
 				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
 				if(previousClause.haveSomeTagWord(tag_Ga_Wo)) {
-					relations.add( new String[]{part, "dcterms:isPartOf", subject} );
-					relations.add( new String[]{subject, "dcterms:hasPart", part} );
+					triples.add(new RDFTriple(part, new Resource(Namespace.DCTERMS, "isPartOf"), subject));
+					triples.add(new RDFTriple(subject, new Resource(Namespace.DCTERMS, "hasPart"), part));
 				}
 
 			}else if(boolGnrnm) {	// "~の総称"
-				relations.add( new String[]{subjectWord.name, "owl:equivalentClass", mtchGnrnm.group(1)} );
+				triples.add(new RDFTriple(subject, Resource.EQUIVALENT_CLASS, new Resource(Namespace.GOO, mtchGnrnm.group(1))));
 
 			}else {					// その他の動詞
-
-				String verb = predicateWord.tags.get(6);	// 原形を取り出すためのget(6)
-				String object = null;
+				Resource verb = new Resource(Namespace.GOO, predicateWord.tags.get(6));	// 原形を取り出すためのget(6)
+				Resource object = null;
 
 				// 格助詞"に","を","へ"などを元に目的語を探す
 				String[][] tag_Ni_Wo = {{"格助詞", "が"}, {"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
 				List<Clause> clauses_Ni_Wo = collectTagClauses(tag_Ni_Wo);
-				if(!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
-					Clause chunk_Ni_Wo = clauses_Ni_Wo.get(0);
-					Word word_Ni_Wo = chunk_Ni_Wo.getMainWord();	// "に"または"を"の主辞
-					object = word_Ni_Wo.name;
-				}else {							// 目的語なし
-					object = null;
-				}
-				String[] spo = {subject, verb, object};
-				relations.addAll(makeObjectiveProperty(spo, not));
+				if (!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
+					Clause clause_Ni_Wo = clauses_Ni_Wo.get(0);
+					Word word_Ni_Wo = clause_Ni_Wo.getMainWord();	// "に"または"を"の主辞
+					object = new Resource(Namespace.GOO, word_Ni_Wo.name);
+				}								// 目的語なしならnullのまま
+				
+				RDFTriple triple = new RDFTriple(subject, verb, object);
+				triples.addAll(makeObjectiveProperty(triple, isNot));
 			}
 
 
 		/* 述語が形容詞 */
 		}else if(predicateClause.haveSomeTagWord(tagAdjective)) {
-			String adjective = predicateWord.tags.get(6);
+			System.out.println("形容詞");//TODO
+			Resource adjective = new Resource(Namespace.GOO, predicateWord.tags.get(6));
 			Clause previousClause = previousC(predicateClause);	// 形容詞の一つ前の文節
-			if(previousClause == null) return relations;
+			if(previousClause == null) return triples;
 			String[][] tag_Ga = {{"格助詞", "が"}};
 			if(previousClause.haveSomeTagWord(tag_Ga)) {
 				String part = previousClause.getMainWord().name;	// その主辞の文字列
-				subject += "の"+part;
+				subject.setFragment(subject.getFragment()+"の"+part);
 			}
-			relations.add( new String[]{adjective, "attributeOf", subject} );
+			triples.add(new RDFTriple(adjective, new Resource(Namespace.EXAMPLE, "attributeOf"), subject));
 
 		/* 述語が名詞または助動詞 */
 		}else {
+			System.out.println("名詞");//TODO
 			/* 別名・同義語かどうか */
 			String regexSynonym = "(.*?)((に同じ)|(の別名)|(の略)|(のこと)|(の異称))";	// 「〜の別名」「〜に同じ」を探す
 			Pattern ptrnSynonym = Pattern.compile(regexSynonym);
@@ -672,55 +691,57 @@ public class Sentence implements GrammarInterface{
 			boolean boolAdjective = predicateClause.haveSomeTagWord(tag_Adjective);
 
 			if(boolSynonym) {
-				//relations.add( new String[]{subjectWord.name, "owl:sameClassAs", mtchSynonym.group(1)} );
-				relations.add( new String[]{mtchSynonym.group(1), "schema:alternateName", subjectWord.name} );
+				//relations.add( new RDFTriple(subjectWord.name, "owl:sameClassAs", mtchSynonym.group(1)));
+				triples.add(new RDFTriple(new Resource(Namespace.GOO, mtchSynonym.group(1)), Resource.ALTER_NAME, subject));
 			}else if(boolKind) {
-				relations.add( new String[]{subjectWord.name, "rdf:type", mtchKind.group(1)} );
+				triples.add( new RDFTriple(subject, Resource.TYPE, new Resource(Namespace.GOO, mtchKind.group(1))));
 			}else if(boolAdjective) {
-				String adjective = predicateWord.tags.get(6);
-				relations.add( new String[]{adjective, "attributeOf", subject} );
+				Resource adjective = new Resource(Namespace.GOO, predicateWord.tags.get(6));
+				triples.add( new RDFTriple(adjective, new Resource(Namespace.EXAMPLE, "attributeOf"), subject));
 			}else {
-				relations.add( new String[]{subjectWord.name, "rdfs:subClassOf", predicateWord.name} );	// 述語が名詞の場合これがデフォ
+				triples.add(new RDFTriple(subject, Resource.SUB_CLASS_OF, new Resource(Namespace.GOO, predicateWord.name)));	// 述語が名詞の場合これがデフォ
 			}
 		}
-
-		return relations;
+		
+		return triples;
 	}
 
-	/* (s,p,o)の三つ組を受け取り、否定のオントロジーにして返す */
-	private List<String[]> makeObjectiveProperty(String[] spo, boolean not) {
-		String s = spo[0], p = spo[1], o = spo[2];
-		List<String[]> spoList = new LinkedList<String[]>();
+	/** (s,p,o)の三つ組を受け取り，domain，rangeの定義をする． */
+	private List<RDFTriple> makeObjectiveProperty(RDFTriple triple, boolean not) {
+		Resource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
+		List<RDFTriple> triples = new LinkedList<RDFTriple>();
 
-		spoList.add( new String[]{p, "rdf:type", "rdfs:ObjectProprety"} );
-		spoList.add( new String[]{p, "rdfs:domain", s} );
-		if(o==null) {	// 目的語なし
-			o = "_:" + p+id + "-object";
-		}else {			// 目的語あり
-			spoList.add( new String[]{p, "rdfs:range", o} );
+		triples.add( new RDFTriple(p, Resource.TYPE, Resource.ACTION) );
+		
+		triples.add( new RDFTriple(p, Resource.AGENT, s));
+		if(o != null) {	// 目的語あり
+			triples.add( new RDFTriple(p, Resource.OBJECT, o));	
+		}else {			// 目的語なし
 		}
+		
 		if(!not) {	// 原形
-			spoList.add( new String[]{s,p,o} );
+			triples.add(new RDFTriple(s,p,o));
 		}else {		// 否定形
-			spoList.addAll(makeNegation(spo));
+			triples.addAll(makeNegation(triple));
 		}
-		return spoList;
+		return triples;
 	}
-	/* (s,p,o)の否定のオントロジーを返す */
-	private List<String[]> makeNegation(String[] spo) {
-		String s = spo[0], p = spo[1], o = spo[2];
-		List<String[]> spoList = new LinkedList<String[]>();
-		String blank = "_:" + p+id + "-not";	// 空白ノードの名前を決める
-		spoList.add( new String[]{blank, "rdf:type", "owl:NegativePropertyAssertion"} );
-		spoList.add( new String[]{blank, "owl:sourceIndividual", s} );
-		spoList.add( new String[]{blank, "owl:assertionProperty", p} );
+	/** (s,p,o)の否定のオントロジーを返す */
+	private List<RDFTriple> makeNegation(RDFTriple triple) {
+		Resource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
+		
+		List<RDFTriple> triples = new LinkedList<RDFTriple>();
+		Resource blank = new Resource(Namespace.EMPTY, id + "-not");	// 空白ノードの名前を決める
+		triples.add(new RDFTriple(blank, Resource.TYPE, new Resource(Namespace.OWL, "NegativePropertyAssertion")));
+		triples.add(new RDFTriple(blank, new Resource(Namespace.OWL, "sourceIndividual"), s));
+		triples.add(new RDFTriple(blank, new Resource(Namespace.OWL, "assertionProperty"), p));
 		if(o!=null)	// 目的語が存在する場合のみ
-			spoList.add( new String[]{blank, "owl:targetIndividual", o} );
+			triples.add( new RDFTriple(blank, new Resource(Namespace.OWL, "targetIndividual"), o));
 
-		return spoList;
+		return triples;
 	}
 
-	/* ClauseのリストからWordのリストにする */
+	/** ClauseのリストからWordのリストにする */
 	public List<Word> getWordList() {
 		List<Word> wordList = new ArrayList<>();
 		for(final Clause clause: clauses) {
@@ -730,12 +751,11 @@ public class Sentence implements GrammarInterface{
 	}
 
 	/**
-	 * Clauseの係り受け関係を更新
-	 * 全てのChunkインスタンスのdependUponが正しいことが前提の設計
+	 * Clauseの係り受け関係を更新する.
+	 * 全てのclauseインスタンスのdependUponが正しいことが前提の設計.
 	 */
 	public void updateDependency() {
-		for(final Clause clause : clauses)
-			clause.dependeds.clear();	// 一度全ての被係り受けをまっさらにする
+		clauses.forEach(c -> c.dependeds.clear());	// 一度全ての被係り受けをまっさらにする
 
 		for(final Clause clause : clauses) {
 			Clause depto = clause.depending;
@@ -760,7 +780,7 @@ public class Sentence implements GrammarInterface{
 
 
 		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
-		boolean not = (predicateClause.haveSomeTagWord(tag_Not))? true: false;	// 述語が否定かどうか
+		boolean not = predicateClause.haveSomeTagWord(tag_Not);	// 述語が否定かどうか
 
 		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
 		String[][] tagVerb = {{"動詞"}, {"サ変接続"}};
@@ -784,12 +804,12 @@ public class Sentence implements GrammarInterface{
 			String predNoun =predicateWord.tags.get(6);
 			values.add(predNoun.substring(predNoun.length()-2));	// 最後の一文字だけ
 		}
-
-
-
 		return values.stream().collect(Collectors.joining(","));
 	}
 
+	/********************************/
+	/************* 出力用 ************/
+	/********************************/
 	@Override
 	public String toString() {
 		String str = new String();
@@ -798,7 +818,7 @@ public class Sentence implements GrammarInterface{
 		}
 		return str;
 	}
-	@Override
+	
 	public void printDetail() {
 		System.out.println(toString());
 	}
@@ -824,20 +844,21 @@ public class Sentence implements GrammarInterface{
 		System.out.println();
 	}
 	public void printDep() {
-		for(final Clause clause : clauses) {
+		for (int i = 0; i < clauses.size(); i++) {
+			Clause clause = clauses.get(i);
 			Clause depto = clause.depending;
-			int depID = (depto == null)? -1	: depto.id;
-			System.out.print("(" + clause.id + ">" + depID + ")" + clause.toString());
+			int depIndex = (depto == null)? -1	: clauses.indexOf(depto);
+			System.out.print("(" + i + ">" + depIndex + ")" + clause.toString());
 		}
 		System.out.println();
 	}
-	/* 文を区切りを挿入して出力する */
+	/** 文を区切りを挿入して出力する */
 	public void printS() {
 		for(final Word word : getWordList()) { // Word単位で区切る
 			System.out.print(word.name + "|");
 		}
 		System.out.println();
-		for(final Clause clause : clauses) { // Chunk単位で区切る
+		for(final Clause clause : clauses) { // Clause単位で区切る
 			System.out.print(clause.toString() + "|");
 		}
 		System.out.println();

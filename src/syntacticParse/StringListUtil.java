@@ -1,19 +1,20 @@
 package syntacticParse;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringListUtil {
 
 	/**
-	 * すべてのListをmarkを境に分割する。
-	 * 分割後のListにmarkの行は含まれない。
+	 * すべてのListをregexを境に分割する。
+	 * 分割後のListにregexの行は含まれない。
 	 */
-	public static List<List<String>> splitStringList(String mark, boolean matchMarkPerfectly, List<String> list) {
+	public static List<List<String>> split(String regex, List<String> list) {
 		List<List<String>> splitedLists = new ArrayList<>();
 
-		List<Integer> borderIndexList = getBorderIndexList(mark, matchMarkPerfectly, list);
+		List<Integer> borderIndexList = getBorderIndexList(regex, list);
 
 		int fromIndex = 0, toIndex = 0;
 
@@ -27,21 +28,23 @@ public class StringListUtil {
 	}
 
 	/**
-	 * markと一致する行から，次のmarkの行の1つ前までを1セットとし分割する．
-	 * 分割後のList<String>はいずれも最初の要素がmarkで始まる/一致する．
-	 * matchMarkPerfectlyがtrueの場合，markの行は完全一致かどうかで判定する．
+	 * regexとマッチする行から,次にregexにマッチする行の1つ前までを1セットとし分割する.
+	 * 分割後のList<String>はいずれも最初の文字列がregexとマッチする.
+	 * @param regex 分割の境界にする文字列の正規表現
+	 * @param list 分割したい文字列リスト
+	 * @return 分割された文字列リストのリスト.
 	 */
-	public static List<List<String>> splitStringListStartWith(String mark, boolean matchMarkPerfectly, List<String> list) {
+	public static List<List<String>> splitStartWith(String regex, List<String> list) {
 		List<List<String>> splitedLists = new ArrayList<>();
 
-		List<Integer> borderIndexList = getBorderIndexList(mark, matchMarkPerfectly, list);
-
-		int fromIndex = -1, toIndex = 0;
+		List<Integer> borderIndexList = getBorderIndexList(regex, list);
+		
+		int fromIndex = 0, toIndex = list.size();
 
 		for (final int borderIndex : borderIndexList) {
 			if (fromIndex == -1) {
 				fromIndex = borderIndex;
-				continue;	// 1つ目のmarkはfromIndexだけ更新して飛ばす
+				continue;	// 1つ目のregexはfromIndexだけ更新して飛ばす
 			}
 
 			toIndex = borderIndex;
@@ -49,7 +52,7 @@ public class StringListUtil {
 				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex;
 		}
-		// 最後のmarkから行末まではここで追加
+		// 最後のregexから行末まではここで追加
 		toIndex = list.size();
 		splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
 
@@ -57,19 +60,22 @@ public class StringListUtil {
 	}
 
 	/**
-	 * markと一致する行の1つ後の行から，次のmarkの行までを1セットとし分割する．
-	 * 分割後のList<String>はいずれも最後の要素がmarkで始まる/一致する．
-	 * matchMarkPerfectlyがtrueの場合，markの行は完全一致かどうかで判定する．
+	 * regexとマッチする行の1つ後の行から,次にregexにマッチする行までを1セットとし分割する.
+	 * 分割後のList<String>はいずれも最後の文字列がregexとマッチする.
+	 * @param regex 分割の境界にする文字列の正規表現
+	 * @param list 分割したい文字列リスト
+	 * @return 分割された文字列リストのリスト.
 	 */
-	public static List<List<String>> splitStringListEndWith(String mark, boolean matchMarkPerfectly, List<String> list) {
+	public static List<List<String>> splitEndWith(String regex, List<String> list) {
 		List<List<String>> splitedLists = new ArrayList<>();
 
-		List<Integer> borderIndexList = getBorderIndexList(mark, matchMarkPerfectly, list);
+		List<Integer> borderIndexList = getBorderIndexList(regex, list);
 
 		int fromIndex = 0, toIndex = 0;
 
 		for (final int borderIndex : borderIndexList) {
 			toIndex = borderIndex + 1;
+			System.out.println("from : " + fromIndex + ", to : " + toIndex);
 			if (fromIndex != toIndex)
 				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex;
@@ -79,22 +85,15 @@ public class StringListUtil {
 
 
 	/**
-	 * markで始まる/と一致する行のindexをListにする
+	 * 正規表現regexとマッチする行のindexをListにする.
 	 */
-	private static List<Integer> getBorderIndexList(String mark, boolean matchMarkPerfectly, List<String> list) {
+	private static List<Integer> getBorderIndexList(String regex, List<String> list) {
 		List<Integer> borderIndexList = new ArrayList<>(list.size()/2);
-		if (matchMarkPerfectly) {
-			for (int i=0; i<list.size(); i++) {
-				String line = list.get(i);
-				if (line.equals(mark))
-					borderIndexList.add(i);
-			}
-		} else {
-			for (int i=0; i<list.size(); i++) {
-				String line = list.get(i);
-				if (line.startsWith(mark))
-					borderIndexList.add(i);
-			}
+		Pattern pattern = Pattern.compile(regex);
+		for (int i=0; i<list.size(); i++) {
+			Matcher matcher = pattern.matcher(list.get(i));
+			if (matcher.matches())
+				borderIndexList.add(i);
 		}
 		return borderIndexList;
 	}

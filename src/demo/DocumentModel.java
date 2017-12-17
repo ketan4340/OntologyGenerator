@@ -33,7 +33,7 @@ public class DocumentModel extends AbstractDocumentModel{
 	public DocumentModel() {
 		super();
 		htmlDoc = new HTMLDocument();
-		parser = new Parser("cabocha");
+		parser = new Parser(Parser.CABOCHA);
 		htmlDoc.setParser(new ParserDelegator());
 
 		try {
@@ -48,7 +48,7 @@ public class DocumentModel extends AbstractDocumentModel{
 		List<Sentence> sentenceList = new LinkedList<Sentence>();
 		// PlainTextを改行を境に分解して解析
 		for(String plainText : plainTexts.split("\n")) {
-			Sentence sentence = parser.run(plainText);
+			Sentence sentence = parser.parse(plainText);
 			if(sentence != null) sentenceList.add(sentence);
 		}
 		return sentenceList;
