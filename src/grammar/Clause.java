@@ -14,7 +14,8 @@ public class Clause implements GrammarInterface{
 
 	public final int id;
 	public List<Word> words;			// 構成するWordのListを持つ
-
+	public int sentenceID;
+	
 	public int depIndex = -1;
 	public Clause depending;			// 係り先文節.どのClauseに係るか
 	public List<Clause> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか

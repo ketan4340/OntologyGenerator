@@ -9,8 +9,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import grammar.Clause;
@@ -19,15 +21,15 @@ import grammar.Sentence;
 import grammar.Word;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface{
-	/** CaboChaの基本実行コマンド **/
+	/* CaboChaの基本実行コマンド */
 	private static final List<String> command4mac = new LinkedList<String>(Arrays.asList("/usr/local/bin/cabocha"));
 	private static final List<String> command4windows = new LinkedList<String>(Arrays.asList("cmd", "/c", "cabocha"));
-	/** CaboChaのオプション **/
+	/* CaboChaのオプション */
 	private static final String opt_Lattice			= "-f1"; 		// 格子状に並べて出力
-	private static final String opt_XML				= "-f3";			// XML形式で出力
-	private static final String opt_nonNE			= "-n0";			// 固有表現解析を行わない
+	//private static final String opt_XML				= "-f3";			// XML形式で出力
+	//private static final String opt_nonNE			= "-n0";			// 固有表現解析を行わない
 	private static final String opt_NE_Constraint	= "-n1";			// 文節の整合性を保ちつつ固有表現解析を行う
-	private static final String opt_NE_noConstraint	= "-n2";			// 文節の整合性を保たずに固有表現解析を行う
+	//private static final String opt_NE_noConstraint	= "-n2";			// 文節の整合性を保たずに固有表現解析を行う
 	private static final String opt_output2File		= "--output=";	// CaboChaの結果をファイルに書き出す
 
 
@@ -35,7 +37,9 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static final Path inputFilePath = Paths.get("parserIO/parserInput.txt");
 	private static final Path outputFilePath = Paths.get("parserIO/parserOutput.txt");
 
-	
+	/* 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap */
+	// 都度clearして使い回す
+	Map<Clause, Integer> dependingMap = new HashMap<>();
 	
 	/*************************/
 	/****** コンストラクタ ******/
@@ -165,7 +169,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 
 	@Override
 	public List<Sentence> decodeProcessOutput(List<String> parsedInfo4all) {
-		List<List<String>> sentenceInfoList = StringListUtil.split("\\AEOS\\z", parsedInfo4all);	// "EOS"ごとに分割
+		List<List<String>> sentenceInfoList = StringListUtil.split("\\AEOS\\z", parsedInfo4all);	// "EOS"ごとに分割. EOSの行はここで消える.
 		List<Sentence> sentences = sentenceInfoList.stream()
 				.map(sentenceInfo -> decode2Sentence(sentenceInfo))
 				.collect(Collectors.toList());
@@ -173,24 +177,22 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	}
 	@Override
 	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
-		parsedInfo4sentence.remove("EOS");		// 解析結果の末尾に付いている文区切り記号EOSを除去
-		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割
+		dependingMap.clear();
+		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割	
 		List<Clause> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
 				.collect(Collectors.toList());
-		return new Sentence(clauses);
+		return new Sentence(clauses, dependingMap);
 	}
 	@Override
 	public Clause decode2Clause(List<String> parsedInfo4clause) {
 		// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
-		String clauseInfo = parsedInfo4clause.get(0);
-		String[] clauseInfos = clauseInfo.split(" ");
-		String dep_str = clauseInfos[2];											// 係り先の情報. ex) '2D','-1D'
+		String clauseInfo = parsedInfo4clause.get(0);							// "* 0 -1D 0/1 0.000000..."
+		String[] clauseInfos = clauseInfo.split(" ");							// "*","0","-1D","0/1","0.000000..."
+		String dep_str = clauseInfos[2];											// 係り先の情報. ex) "2D","-1D"
 		int depIndex = Integer.decode(dep_str.substring(0, dep_str.length()-1));	// -1で'D'の部分を除去. ex) 2,-1
-		int isSbjIndex = Integer.decode(clauseInfos[3].split("/")[0]);
-
-		System.out.println("depto : " + depIndex);
+		int isSbjIndex = Integer.decode(clauseInfos[3].split("/")[0]);			// 主辞の番号. ex)"0/1"の"0"部分
 
 		// 残りは単語に関する情報
 		List<List<String>> wordInfoList = parsedInfo4clause.subList(1, parsedInfo4clause.size())
@@ -199,14 +201,12 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<Word> words = wordInfoList.stream()
 				.map(wordInfo -> decode2Word(wordInfo))
 				.collect(Collectors.toList());
-		return new Clause(words, depIndex, isSbjIndex);
+		Clause clause = new Clause(words, depIndex, isSbjIndex);
+		dependingMap.put(clause, depIndex);
+		return clause;
 	}
 	@Override
 	public Word decode2Word(List<String> parsedInfo4word) {
-		if (parsedInfo4word.size() != 1) {
-			System.err.println("CaboCha's output about a word is not one line.");
-			return null;
-		}
 		// 一応Listで受け取るものの，きっと1行だけしかない．よってget(0)
 		String[] wordInfo = parsedInfo4word.get(0).split("\t");
 		List<String> tags;
@@ -221,7 +221,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	
 
 	/*******************************************/
-	/********** Cabocha専用メソッドの実装 **********/
+	/********** Cabocha専用メソッドの実装 *********/
 	/*******************************************/
 
 	/** 入力したいテキスト(List<NL>)を一旦ファイル(parserInput)に出力 **/

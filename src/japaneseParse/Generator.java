@@ -10,14 +10,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import data.RDF.RDFTriple;
+import grammar.NaturalLanguage;
 import grammar.Sentence;
 import relationExtract.OntologyWriter;
-import syntacticParse.Parser;
+import syntacticParse.Cabocha;
 
 public class Generator {
 	private List<Sentence> sentList;
@@ -57,53 +55,34 @@ public class Generator {
 		/*
 		String readFile = "gooText生物-動物名-All.txt";
 		//String readFile = "writings/gooText生物-動物名-お.txt";
-		File file = new File(readFile);
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line = br.readLine();
-			while(line != null) {
-				writingList.add(line);
-				line = br.readLine();
-			}
-			br.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		File textFile = new File(readFile);
 		//*/
-		/*スタンバーイ
-		List<NaturalLanguage> nlList = writingList.stream().map(w -> new NaturalLanguage(w)).collect(Collectors.toList());
+		/*** 構文解析Module ***/
+		List<NaturalLanguage> nlList = NaturalLanguage.toNaturalLanguageList(writingList);
 		Cabocha cabocha = new Cabocha();
-		cabocha.executeParser(nlList);
-		 */
-		for(final String writing: writingList) {
-			/*** 構文解析Module ***/
+		List<Sentence> sentenceList = cabocha.texts2sentences(nlList);
+		for(Sentence originalSentence : sentenceList) {
 			System.out.println("\n\t Step0");
-			Parser parse = new Parser(Parser.CABOCHA);
-			Sentence originalSent = parse.parse(writing);
 			
-			System.out.println("---------marker 1--------");
-
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/
 			String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}, {"形容詞"}};
 			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
 			String[][] tagDone = {{"動詞"}, {"動詞", "接尾"}};
-			originalSent.connect(tagNouns);
-			originalSent.connect(tagDo);
-			originalSent.connect(tagDone);
+			originalSentence.connect(tagNouns);
+			originalSentence.connect(tagDo);
+			originalSentence.connect(tagDone);
 			/* 名詞と形容詞だけ取り出す */
 			// これらがClauseの末尾につくものを隣のClauseにつなげる
 			String[][] tags_NP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}, {"名詞"}};
-			originalSent.connect2Next(tags_NP, false);
+			originalSentence.connect2Next(tags_NP, false);
 
 			System.out.println("---------marker 2--------");
 
 			/** Step2: 長文分割 **/
 			/* 長文を分割し複数の短文に分ける */
-			originalSent.printDep();
-			for(final Sentence shortSent: originalSent.divide2()) {
+			originalSentence.printDep();
+			for(final Sentence shortSent: originalSentence.divide2()) {
 				//shortSent.printDep();
 				for(final Sentence partSent: shortSent.divide3()) {
 					partSent.uniteSubject();

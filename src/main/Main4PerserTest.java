@@ -5,7 +5,6 @@ import java.util.List;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
 import syntacticParse.Cabocha;
-import syntacticParse.StringListUtil;
 
 public class Main4PerserTest {
 
@@ -27,7 +26,5 @@ public class Main4PerserTest {
 		List<Sentence> sents = cabocha.texts2sentences(nls);
 		
 		sents.forEach(s -> s.printDep());
-		sents.forEach(s -> s.printC());
-		sents.forEach(s -> s.printSF());
 	}
 }

@@ -2,25 +2,23 @@ package demo;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.parser.ParserDelegator;
 
+import grammar.NaturalLanguage;
 import grammar.Sentence;
 import grammar.Word;
-import syntacticParse.Parser;
+import syntacticParse.Cabocha;
 
 public class DocumentModel extends AbstractDocumentModel{
 	private HTMLDocument htmlDoc;		// plainDocumentからHTMLに切り替える
 
-	private Parser parser;
+	private Cabocha parser;
 
 	private static String[] noun = {"名詞"};
 	private static String defaultPlainText = "この文章はデフォルトテキストです。";
@@ -33,7 +31,7 @@ public class DocumentModel extends AbstractDocumentModel{
 	public DocumentModel() {
 		super();
 		htmlDoc = new HTMLDocument();
-		parser = new Parser(Parser.CABOCHA);
+		parser = new Cabocha();
 		htmlDoc.setParser(new ParserDelegator());
 
 		try {
@@ -48,7 +46,7 @@ public class DocumentModel extends AbstractDocumentModel{
 		List<Sentence> sentenceList = new LinkedList<Sentence>();
 		// PlainTextを改行を境に分解して解析
 		for(String plainText : plainTexts.split("\n")) {
-			Sentence sentence = parser.parse(plainText);
+			Sentence sentence = parser.text2sentence(new NaturalLanguage(plainText));
 			if(sentence != null) sentenceList.add(sentence);
 		}
 		return sentenceList;

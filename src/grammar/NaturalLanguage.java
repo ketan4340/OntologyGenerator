@@ -24,8 +24,12 @@ public class NaturalLanguage {
 		return nlText.equals(s);
 	}
 
-	/** List<NaturalLanguage> -> List<String> **/
+	/** List<NaturalLanguage> -> List<String> */
 	public static List<String> toStringList(List<NaturalLanguage> nlList) {
 		return nlList.stream().map(nl -> nl.toString()).collect(Collectors.toList());
 	}
+	/** List<NaturalLanguage> -> List<String> */
+	public static List<NaturalLanguage> toNaturalLanguageList(List<String> stringList) {
+		return stringList.stream().map(str -> new NaturalLanguage(str)).collect(Collectors.toList());
+	}	
 }

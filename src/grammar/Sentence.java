@@ -35,6 +35,8 @@ public class Sentence implements GrammarInterface{
 	}
 	public Sentence(List<Clause> clauseList, Map<Clause, Integer> dependingMap) {
 		this();
+		clauses = clauseList;
+		initializeDepending(dependingMap);
 	}
 	
 	/**
@@ -49,7 +51,15 @@ public class Sentence implements GrammarInterface{
 					: null);
 		}
 	}
-
+	private void initializeDepending(Map<Clause, Integer> dependingMap) {
+		for (Map.Entry<Clause, Integer> entry : dependingMap.entrySet()) {
+			Clause clause = entry.getKey(); int deptoIndex = entry.getValue();
+			clause.setDepending((deptoIndex != -1)?
+					clauses.get(deptoIndex)
+					: null);
+		}
+	}
+	
 	public void setSentence(List<Clause> clauseList) {
 		clauses = clauseList;
 	}
@@ -126,7 +136,7 @@ public class Sentence implements GrammarInterface{
 		// 渡されたClauseがSentence上で連続しているか
 		Map<Clause, Boolean> continuity = getContinuity(connectClauseList);
 		continuity.remove(continuity.size()-1);	// 最後は必ずfalseなので抜いておく
-		for(final Map.Entry<Clause, Boolean> entry: continuity.entrySet()) {
+		for(Map.Entry<Clause, Boolean> entry: continuity.entrySet()) {
 			if(entry.getValue() == false) {
 				System.out.println("error: Not serial in sentence.");
 				return baseClause;

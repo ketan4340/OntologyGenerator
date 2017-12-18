@@ -52,7 +52,7 @@ public interface ParserInterface {
 	/*** 出力(List<String>)を分解 ***/
 	List<Sentence> decodeProcessOutput(List<String> parseResult4all);
 
-	/** Sentence(Clause1(Word1,Word2,..),Clause2(),Clause3(),...)の構成に変換 **/
+	/** Sentence1(Clause1(Word1,Word2,..),Clause2(Word,Word,..),Clause3(..),...)の構成に変換 **/
 	Sentence decode2Sentence(List<String> parseResult4sentence);
 	Clause decode2Clause(List<String> parseResult4clause);
 	Word decode2Word(List<String> parseResult4word);

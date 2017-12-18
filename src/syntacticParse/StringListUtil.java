@@ -1,6 +1,7 @@
 package syntacticParse;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,24 +39,17 @@ public class StringListUtil {
 		List<List<String>> splitedLists = new ArrayList<>();
 
 		List<Integer> borderIndexList = getBorderIndexList(regex, list);
+		borderIndexList.add(list.size());		// 最後尾のインデックスを追加.これが最後のtoIndexになる.
+		// fromIndexは1つ目のregexの位置
+		int fromIndex = borderIndexList.remove(0), toIndex;
 		
-		int fromIndex = 0, toIndex = list.size();
-
 		for (final int borderIndex : borderIndexList) {
-			if (fromIndex == -1) {
-				fromIndex = borderIndex;
-				continue;	// 1つ目のregexはfromIndexだけ更新して飛ばす
-			}
-
 			toIndex = borderIndex;
-			if (fromIndex != toIndex)
+			// System.out.println("from : " + fromIndex + ", to : " + toIndex);
+			if (fromIndex < toIndex)
 				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex;
 		}
-		// 最後のregexから行末まではここで追加
-		toIndex = list.size();
-		splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
-
 		return splitedLists;
 	}
 
@@ -71,12 +65,12 @@ public class StringListUtil {
 
 		List<Integer> borderIndexList = getBorderIndexList(regex, list);
 
-		int fromIndex = 0, toIndex = 0;
+		int fromIndex = 0, toIndex;
 
 		for (final int borderIndex : borderIndexList) {
 			toIndex = borderIndex + 1;
-			System.out.println("from : " + fromIndex + ", to : " + toIndex);
-			if (fromIndex != toIndex)
+			//System.out.println("from : " + fromIndex + ", to : " + toIndex);
+			if (fromIndex < toIndex)
 				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex;
 		}
@@ -88,7 +82,7 @@ public class StringListUtil {
 	 * 正規表現regexとマッチする行のindexをListにする.
 	 */
 	private static List<Integer> getBorderIndexList(String regex, List<String> list) {
-		List<Integer> borderIndexList = new ArrayList<>(list.size()/2);
+		List<Integer> borderIndexList = new LinkedList<>();
 		Pattern pattern = Pattern.compile(regex);
 		for (int i=0; i<list.size(); i++) {
 			Matcher matcher = pattern.matcher(list.get(i));
