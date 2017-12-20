@@ -1,0 +1,4 @@
+?s, gram:subjectWord, ?x.
+?s, gram:include, ?c.
+?c, gram:head, ?o.
+?c, gram:func, "である" -> ?s, rdfs:subClassOf, ?o

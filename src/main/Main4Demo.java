@@ -10,7 +10,7 @@ import demo.OntologyTableView;
 import demo.UseOntologyController;
 import demo.WholeView;
 
-public class Main{
+public class Main4Demo{
 	public static void main(String[] args) {
 
 		/** Model生成 **/

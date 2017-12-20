@@ -6,11 +6,12 @@ public class Word implements GrammarInterface{
 	public static int wordsSum = 0;
 	public static List<Word> allWordList = new ArrayList<Word>();
 
-	public final int id;			// 通し番号。Wordを特定する
+	public final int id;				// 通し番号。Wordを特定する
 	public String name;				// 単語の文字列
 	public List<String> tags;		// 品詞・活用形、読みなど
-	public boolean isCategorem;		// 主辞か機能語か
-	public Clause belongClause;		// どのClauseに所属するか
+	public boolean isCategorem;		// 自立語か付属語か
+	
+	public Clause comeUnder;			// どのClauseに所属するか
 
 	private Word() {
 		id = wordsSum++;
@@ -20,17 +21,18 @@ public class Word implements GrammarInterface{
 		this();
 		this.name = name;
 		this.tags = new ArrayList<>(tags);
-		this.belongClause = belongClause;
+		this.comeUnder = belongClause;
 		this.isCategorem = isCategorem;
 		supplementTags();
 	}
 	public Word(String name, List<String> tags) {
 		this(name, tags, null, false);
 	}
+	
 	public void setWord(String name, List<String> tags, Clause belongClause, boolean isCategorem) {
 		this.name = name;
 		this.tags = new ArrayList<>(tags);
-		this.belongClause = belongClause;
+		this.comeUnder = belongClause;
 		this.isCategorem = isCategorem;
 		supplementTags();
 	}
@@ -96,7 +98,7 @@ public class Word implements GrammarInterface{
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(name, tags, belongClause, isCategorem);
+		replica.setWord(name, tags, comeUnder, isCategorem);
 		return replica;
 	}
 

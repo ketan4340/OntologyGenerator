@@ -14,9 +14,8 @@ public class Clause implements GrammarInterface{
 
 	public final int id;
 	public List<Word> words;			// 構成するWordのListを持つ
-	public int sentenceID;
+	public Sentence comeUnder;
 	
-	public int depIndex = -1;
 	public Clause depending;			// 係り先文節.どのClauseに係るか
 	public List<Clause> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか
 
@@ -30,17 +29,18 @@ public class Clause implements GrammarInterface{
 	 * @param depIndex			係る文節の位置
 	 * @param categoremIndex		自立語の位置
 	 */
-	public Clause(List<Word> wordList, int depIndex, int categoremIndex) {
+	public Clause(List<Word> wordList, int categoremIndex) {
 		this();
 		this.words = wordList;
-		this.depIndex = depIndex;
-		setBelong4Words();
+		
+		setWordsComeUnderItself();
 		setCategoremHeadWords(0, categoremIndex+1, true);	// CaboChaで自立語と判定された単語だけでなく，0番目からその単語まで全て自立語とする
 		uniteCategorems4Words();	// 自立語を全て結合
 	}
+	
 	public void setWords(List<Word> wordList) {
 		this.words = wordList;
-		setBelong4Words();
+		setWordsComeUnderItself();
 	}
 	public void setDepending(Clause depending) {
 		this.depending = depending;
@@ -85,8 +85,8 @@ public class Clause implements GrammarInterface{
 		newWords.addAll(categorems);	// 残り物があれば回収
 		this.words = newWords;
 	}
-	private void setBelong4Words() {
-		words.stream().forEach(w -> w.belongClause=this);
+	private void setWordsComeUnderItself() {
+		words.stream().forEach(w -> w.comeUnder=this);
 	}
 
 	public int indexOfW(Word word) {
@@ -143,7 +143,7 @@ public class Clause implements GrammarInterface{
 		for(Iterator<Clause> itr = baseClauses.iterator(); itr.hasNext(); ) {
 			Clause clause = itr.next();
 			for(Word word: clause.words) {		// 元ClauseのWordはこの新しいClauseに属するように変える
-				word.belongClause = this;
+				word.comeUnder = this;
 			}
 			// 全ての元Clauseの係り先を新しいClauseに変える
 			if (clause.dependeds != null) {
@@ -178,7 +178,7 @@ public class Clause implements GrammarInterface{
 		List<Word> subWords = new ArrayList<>(words.size());
 		for(Word word: words) {
 			Word subWord = word.copy();
-			subWord.belongClause = replicaClause;
+			subWord.comeUnder = replicaClause;
 			subWords.add(subWord);
 		}
 		replicaClause.setWords(subWords);
@@ -303,14 +303,9 @@ public class Clause implements GrammarInterface{
 		this.words.add(fromIndex, properNoun);
 	}
 
-	/* Clauseを文字列で返す */
 	@Override
 	public String toString() {
-		String clauseName = new String();
-		for(final Word word: words) {
-			clauseName += word.toString();
-		}
-		return clauseName;
+		return words.stream().map(w -> w.toString()).collect(Collectors.joining());
 	}
 	@Override
 	public void printDetail() {

@@ -81,6 +81,7 @@ public class OntologyWriter {
 				+ "@prefix dc: <http://purl.org/dc/elements/1.1/>."+"\n");
 				bw.newLine();
 				for(final RDFTriple triple: triples) {
+					System.out.println("triple = " + triple);
 					rdf = serializeRDF(triple);
 					//System.out.println("rdf : " + rdf);
 					bw.write(rdf);

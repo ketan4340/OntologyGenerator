@@ -102,7 +102,7 @@ public class Parser {
 					}
 					 */
 					wordList = new ArrayList<Word>(4);
-					clause = new Clause(new ArrayList<Word>(), -1, -1);
+					clause = new Clause(new ArrayList<Word>(), -1);
 					String[] clauseInfo = line.split(" ");
 					String dep_str = clauseInfo[2];
 					deptoIndex = Integer.decode(dep_str.substring(0, dep_str.length()-1));	// xxDの"xx"部分を切り取る
@@ -114,7 +114,7 @@ public class Parser {
 					String[] wordInfo = line.split("\t");
 					sbj_fnc = (wordList.size() <= border)? true: false;
 					Word wd = new Word(wordInfo[0], Arrays.asList(wordInfo[1].split(",")));
-					wd.belongClause = clause;
+					wd.comeUnder = clause;
 					wd.isCategorem = sbj_fnc;
 					wordList.add(wd);
 				}

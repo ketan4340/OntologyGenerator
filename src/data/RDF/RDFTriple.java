@@ -5,31 +5,31 @@ public class RDFTriple {
 	public static final int P = 1;
 	public static final int O = 2;
 	
-	private Resource subject;
-	private Resource predicate;
-	private Resource object;
+	private MyResource subject;
+	private MyResource predicate;
+	private MyResource object;
 	
-	public RDFTriple(Resource subject, Resource predicate, Resource object) {
+	public RDFTriple(MyResource subject, MyResource predicate, MyResource object) {
 		this.subject = subject;
 		this.predicate = predicate;
 		this.object = object;
 	}
 	public RDFTriple(String[] spo) {
-		this(new Resource(Namespace.EXAMPLE, spo[0]), new Resource(Namespace.EXAMPLE, spo[1]), new Resource(Namespace.EXAMPLE, spo[2]));
+		this(new MyResource(Namespace.EXAMPLE, spo[0]), new MyResource(Namespace.EXAMPLE, spo[1]), new MyResource(Namespace.EXAMPLE, spo[2]));
 	}
 	
-	public RDFTriple(Resource resource, Resource property, String literal) {
+	public RDFTriple(MyResource resource, MyResource property, String literal) {
 		//TODO 目的語がリテラルのRDFトリプル
 	}
 	
 	/* Getter */
-	public Resource getSubject() {
+	public MyResource getSubject() {
 		return subject;
 	}
-	public Resource getPredicate() {
+	public MyResource getPredicate() {
 		return predicate;
 	}
-	public Resource getObject() {
+	public MyResource getObject() {
 		return object;
 	}
 
@@ -37,8 +37,8 @@ public class RDFTriple {
 	 * 主語，述語，目的語の順に並ぶResourceの配列を返す.
 	 * @return トリプルの配列
 	 */
-	public Resource[] toArray() {
-		return new Resource[]{subject, predicate, object};
+	public MyResource[] toArray() {
+		return new MyResource[]{subject, predicate, object};
 	}
 	
 	@Override

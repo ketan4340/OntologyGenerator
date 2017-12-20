@@ -43,8 +43,8 @@ public class Phrase extends Word{
 
 		if(belongClause == null) {
 			belongClause = head_tail
-					? headWord.belongClause		// 新しいPhraseの所属するClauseは先頭のWordに依存
-					: tailWord.belongClause;	// 新しいPhraseの所属するClauseは最後尾のWordに依存
+					? headWord.comeUnder		// 新しいPhraseの所属するClauseは先頭のWordに依存
+					: tailWord.comeUnder;	// 新しいPhraseの所属するClauseは最後尾のWordに依存
 		}
 		setWord(phraseName, phraseTags, belongClause, true);
 	}

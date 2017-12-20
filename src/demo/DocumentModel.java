@@ -2,8 +2,9 @@ package demo;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -18,7 +19,7 @@ import syntacticParse.Cabocha;
 public class DocumentModel extends AbstractDocumentModel{
 	private HTMLDocument htmlDoc;		// plainDocumentからHTMLに切り替える
 
-	private Cabocha parser;
+	private Cabocha cabocha;
 
 	private static String[] noun = {"名詞"};
 	private static String defaultPlainText = "この文章はデフォルトテキストです。";
@@ -31,7 +32,7 @@ public class DocumentModel extends AbstractDocumentModel{
 	public DocumentModel() {
 		super();
 		htmlDoc = new HTMLDocument();
-		parser = new Cabocha();
+		cabocha = new Cabocha();
 		htmlDoc.setParser(new ParserDelegator());
 
 		try {
@@ -43,13 +44,11 @@ public class DocumentModel extends AbstractDocumentModel{
 	}
 
 	public List<Sentence> getSentences(String plainTexts) {
-		List<Sentence> sentenceList = new LinkedList<Sentence>();
+		List<NaturalLanguage> nlList = Stream.of(plainTexts.split("\n"))
+				.map(plainText -> new NaturalLanguage(plainText))
+				.collect(Collectors.toList());		
 		// PlainTextを改行を境に分解して解析
-		for(String plainText : plainTexts.split("\n")) {
-			Sentence sentence = parser.text2sentence(new NaturalLanguage(plainText));
-			if(sentence != null) sentenceList.add(sentence);
-		}
-		return sentenceList;
+		return cabocha.texts2sentences(nlList);
 	}
 	private void plain2html() {
 		List<Sentence> sentenceList = new ArrayList<Sentence>();

@@ -1,23 +1,25 @@
 package data.RDF;
 
-public class Resource {
-	public static final Resource TYPE = new Resource(Namespace.RDF, "type");
-	public static final Resource SUB_CLASS_OF = new Resource(Namespace.RDFS, "subClassOf"); 
-	public static final Resource SUB_PROPERTY_OF = new Resource(Namespace.RDFS, "subPropertyOf"); 
-	public static final Resource RANGE = new Resource(Namespace.RDFS, "range"); 
-	public static final Resource DOMAIN = new Resource(Namespace.RDFS, "domain"); 
-	public static final Resource VALUE = new Resource(Namespace.RDF, "value");
+public class MyResource {
+	public static final MyResource TYPE = new MyResource(Namespace.RDF, "type");
+	public static final MyResource SUB_CLASS_OF = new MyResource(Namespace.RDFS, "subClassOf"); 
+	public static final MyResource SUB_PROPERTY_OF = new MyResource(Namespace.RDFS, "subPropertyOf"); 
+	public static final MyResource RANGE = new MyResource(Namespace.RDFS, "range"); 
+	public static final MyResource DOMAIN = new MyResource(Namespace.RDFS, "domain"); 
+	public static final MyResource VALUE = new MyResource(Namespace.RDF, "value");
 	
-	public static final Resource EQUIVALENT_CLASS = new Resource(Namespace.OWL, "equivalentClass");
+	public static final MyResource EQUIVALENT_CLASS = new MyResource(Namespace.OWL, "equivalentClass");
 	
-	public static final Resource ALTER_NAME = new Resource(Namespace.SCHEMA, "alternateName");
-	public static final Resource ACTION = new Resource(Namespace.SCHEMA, "Action");
-	public static final Resource AGENT = new Resource(Namespace.SCHEMA, "agent");
-	public static final Resource OBJECT = new Resource(Namespace.SCHEMA, "object");
+	public static final MyResource ALTER_NAME = new MyResource(Namespace.SCHEMA, "alternateName");
+	public static final MyResource ACTION = new MyResource(Namespace.SCHEMA, "Action");
+	public static final MyResource AGENT = new MyResource(Namespace.SCHEMA, "agent");
+	public static final MyResource OBJECT = new MyResource(Namespace.SCHEMA, "object");
 	
-	public static final Resource LENGTH = new Resource(Namespace.EXAMPLE, "hasLength");
-	public static final Resource WEIGHT = new Resource(Namespace.EXAMPLE, "hasWeight");
-	public static final Resource UNITS = new Resource(Namespace.EXAMPLE, "units");
+	public static final MyResource LENGTH = new MyResource(Namespace.EXAMPLE, "hasLength");
+	public static final MyResource WEIGHT = new MyResource(Namespace.EXAMPLE, "hasWeight");
+	public static final MyResource UNITS = new MyResource(Namespace.EXAMPLE, "units");
+	
+	public static final MyResource NO_OBJECT = new MyResource(Namespace.EXAMPLE, "no_object");
 	
 	
 	/**
@@ -31,11 +33,11 @@ public class Resource {
 	private String fragment;
 	
 	/* Constractor */
-	public Resource(Namespace namespace, String fragment) {
+	public MyResource(Namespace namespace, String fragment) {
 		this.namespace = namespace;
 		this.fragment = fragment;
 	}
-	public Resource(String fragment) {
+	public MyResource(String fragment) {
 		this(Namespace.LITERAL, fragment);
 	}
 	
@@ -80,7 +82,7 @@ public class Resource {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Resource other = (Resource) obj;
+		MyResource other = (MyResource) obj;
 		if (fragment == null) {
 			if (other.fragment != null)
 				return false;

@@ -16,5 +16,4 @@ public class PlatformUtil {
     public static boolean isSunOS() {
         return OS_NAME.startsWith("sunos");
     }
-
 }

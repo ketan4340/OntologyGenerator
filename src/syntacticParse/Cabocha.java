@@ -201,7 +201,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<Word> words = wordInfoList.stream()
 				.map(wordInfo -> decode2Word(wordInfo))
 				.collect(Collectors.toList());
-		Clause clause = new Clause(words, depIndex, isSbjIndex);
+		Clause clause = new Clause(words, isSbjIndex);
 		dependingMap.put(clause, depIndex);
 		return clause;
 	}
@@ -214,6 +214,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 			tags = Arrays.asList(wordInfo[1].split(","));
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println(wordInfo[0]);
 			tags = new ArrayList<>();
 		}
 		return new Word(wordInfo[0], tags);
