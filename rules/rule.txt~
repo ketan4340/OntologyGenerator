@@ -1,1 +1,0 @@
-?s, subject, ?x. ?s, predicate, "である". -> ?s, rdfs:subClassOf, ?o

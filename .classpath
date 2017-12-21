@@ -4,5 +4,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jsoup1.10.2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jung2-2.0.1"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/apache-jena3.6.0"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

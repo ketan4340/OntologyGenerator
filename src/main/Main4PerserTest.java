@@ -6,7 +6,8 @@ import java.util.List;
 
 import data.RDF.RDFTriple;
 import grammar.Sentence;
-import syntacticParse.Cabocha;
+import modules.Generator;
+import modules.syntacticParse.Cabocha;
 
 public class Main4PerserTest {
 

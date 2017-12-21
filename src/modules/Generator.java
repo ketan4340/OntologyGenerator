@@ -1,4 +1,4 @@
-package main;
+package modules;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +19,8 @@ import java.util.stream.Collectors;
 import data.RDF.RDFTriple;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import relationExtract.OntologyWriter;
-import syntacticParse.Cabocha;
+import modules.relationExtract.OntologyWriter;
+import modules.syntacticParse.Cabocha;
 
 public class Generator {
 	public Generator() {
@@ -42,12 +44,16 @@ public class Generator {
 	 * @param naturalLanguageTexts 自然言語文のリスト
 	 */
 	public List<RDFTriple> generate(List<NaturalLanguage> naturalLanguageTexts) {
-		List<RDFTriple> triples = new ArrayList<RDFTriple>();
-		List<Sentence> editedSentences = new ArrayList<>();
-		
-		/*** 構文解析Module ***/
+		/***************************************/
+		/**          構文解析モジュール          **/
+		/***************************************/
 		List<Sentence> originalSentences = syntacticParse(naturalLanguageTexts);
 		
+		
+		/***************************************/
+		/**          文章整形モジュール          **/
+		/***************************************/
+		List<Sentence> editedSentences = new ArrayList<>();		
 		for(Sentence originalSentence : originalSentences) {
 			System.out.println("\n\t Step0");
 			
@@ -79,22 +85,27 @@ public class Generator {
 
 		System.out.println("------------関係抽出モジュール------------");
 
-		/*** 関係抽出モジュール ***/
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
-		File fileText = new File("texts/text"+sdf.format(c.getTime())+".txt");	// ついでに分割後のテキストを保存
+		List<String> textList = editedSentences.stream().map(s -> s.toString()).collect(Collectors.toList());
+		Path textFile = Paths.get("texts/text"+sdf.format(c.getTime())+".txt");	// ついでに分割後のテキストを保存
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileText));
-			for(final Sentence partSent: editedSentences) {
-				/* 単語間の関係を見つけ，グラフにする(各単語及び関係性をNodeのインスタンスとする) */
-				bw.write(partSent.toString());		// 分割後の文を出力
-				bw.newLine();
-				triples.addAll(partSent.extractRelation());
-			}
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			Files.write(textFile, textList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		
+		/***************************************/
+		/**          関係抽出モジュール          **/
+		/***************************************/
+		List<RDFTriple> triples = new ArrayList<RDFTriple>();
+		/*
+		for(final Sentence partSent: editedSentences) {
+			triples.addAll(partSent.extractRelation());
+		}
+		*/
+		
+		
 		//重複除去
 		triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
 

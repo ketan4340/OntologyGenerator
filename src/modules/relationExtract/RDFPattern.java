@@ -1,4 +1,4 @@
-package relationExtract;
+package modules.relationExtract;
 
 public class RDFPattern {
 

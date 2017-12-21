@@ -1,4 +1,4 @@
-package relationExtract;
+package modules.relationExtract;
 
 import java.util.Set;
 

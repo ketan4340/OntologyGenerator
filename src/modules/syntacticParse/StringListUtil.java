@@ -1,4 +1,4 @@
-package syntacticParse;
+package modules.syntacticParse;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

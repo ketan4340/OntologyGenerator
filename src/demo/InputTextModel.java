@@ -7,7 +7,7 @@ import javax.swing.text.BadLocationException;
 
 import data.RDF.RDFTriple;
 import grammar.NaturalLanguage;
-import main.Generator;
+import modules.Generator;
 
 public class InputTextModel extends AbstractDocumentModel{
 

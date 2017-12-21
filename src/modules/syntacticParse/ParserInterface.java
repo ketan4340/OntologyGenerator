@@ -1,4 +1,4 @@
-package syntacticParse;
+package modules.syntacticParse;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

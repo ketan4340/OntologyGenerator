@@ -1,4 +1,4 @@
-package syntacticParse;
+package modules.syntacticParse;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

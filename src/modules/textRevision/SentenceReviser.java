@@ -1,4 +1,4 @@
-package textRevision;
+package modules.textRevision;
 
 import grammar.Sentence;
 

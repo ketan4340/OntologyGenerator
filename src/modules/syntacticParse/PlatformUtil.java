@@ -1,4 +1,4 @@
-package syntacticParse;
+package modules.syntacticParse;
 
 public class PlatformUtil {
 

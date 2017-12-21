@@ -14,7 +14,7 @@ import javax.swing.text.html.parser.ParserDelegator;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
 import grammar.Word;
-import syntacticParse.Cabocha;
+import modules.syntacticParse.Cabocha;
 
 public class DocumentModel extends AbstractDocumentModel{
 	private HTMLDocument htmlDoc;		// plainDocumentからHTMLに切り替える

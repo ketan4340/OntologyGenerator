@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import grammar.Sentence;
-import syntacticParse.Parser;
+import modules.syntacticParse.Parser;
 
 public class MainOld {
 
