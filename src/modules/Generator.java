@@ -16,6 +16,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.VCARD;
+
 import data.RDF.RDFTriple;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
@@ -104,7 +116,37 @@ public class Generator {
 			triples.addAll(partSent.extractRelation());
 		}
 		*/
+		/* 文構造のRDF化 */
+		String personURI    = "http://somewhere/JohnSmith";
+		String fullName     = "John Smith";
+		// create an empty Model
+		Model model = ModelFactory.createDefaultModel();
+		// create the resource
+		Resource johnSmith = model.createResource(personURI);
+		// add the property
+		johnSmith.addProperty(VCARD.FN, fullName);
+
+		String strQuery = "" +
+				"PREFIX rdf:  " +
+				"PREFIX dc:  " +
+				"SELECT ?rc ?title " +
+				"WHERE {" +
+				"?rc dc:title ?title ." +
+				"}";
+		Query query = QueryFactory.create(strQuery);
+		QueryExecution qexec = QueryExecutionFactory.create(query,model);
+		ResultSet result = qexec.execSelect();
 		
+		while(result.hasNext()) {
+			QuerySolution qsol = result.next();
+			Resource rc = (Resource) qsol.get("rc");
+			Literal title = (Literal) qsol.get("title");
+			System.out.println(rc);
+			System.out.println(title);
+		}
+
+		model.close();
+
 		
 		//重複除去
 		triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));

@@ -1,1 +1,12 @@
-?s,gram:subjectWord,?x. ?s,gram:include,?c. ?c,gram:head,?o. ?c,gram:func,"である" -> ?s,rdfs:subClassOf,?o
+IF{
+?St, jass:subject, ?sCl.
+?sCl, jass:head, ?sWd.
+
+?St, jass:predicate, ?pCl.
+?pCl, jass:head, ?oWd.
+?pCl, jass:function1, 
+}THEN{
+?sWd, <rdfs:subClassOf>, ?oWd.
+}
+IF{
+?St, 

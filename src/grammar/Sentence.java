@@ -521,7 +521,6 @@ public class Sentence implements GrammarInterface{
 	private List<Clause> getSubjectList(boolean useGa) {
 		List<Clause> subjectList;
 
-
 		if (useGa) {	// "が"は最初の一つのみ!!
 			String[][][] tags_Ha_Ga = {{{"係助詞", "は"}}, {{"格助詞", "が"}}};	// "は"
 			String[][][] tags_Ga = {{{"格助詞", "が"}}};	//"が"
@@ -587,10 +586,12 @@ public class Sentence implements GrammarInterface{
 		List<RDFTriple> triples = new ArrayList<RDFTriple>();
 
 		List<Clause> subjectList = getSubjectList(true);	// 主語を整えたところで再定義
-		if(subjectList.isEmpty()) return triples;
-
+		if(subjectList.isEmpty()) {
+			System.err.println("subjectClause is null.");
+			return triples;
+		}
 		Clause subjectClause = subjectList.get(0);			// 主節(!!最初の1つしか使っていない!!)
-		Word subjectWord = subjectClause.getMainWord();					// 主語
+		Word subjectWord = subjectClause.getMainWord();		// 主語
 		if(subjectWord == null) {
 			System.err.println("subjectWord is null.");
 			return triples;
@@ -603,7 +604,7 @@ public class Sentence implements GrammarInterface{
 			System.err.println("predicateClause is null.");
 			return triples;
 		}
-		Word predicateWord = predicateClause.getMainWord();				// 述語
+		Word predicateWord = predicateClause.getMainWord();	// 述語
 		if(predicateWord == null) {
 			System.err.println("predicateWord is null.");
 			return triples;
