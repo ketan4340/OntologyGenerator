@@ -13,7 +13,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 
-import data.RDF.RDFTriple;
+import data.original.RDFTriple;
 
 public class UseOntologyController extends AbstractEditorController{
 	/*** Model ***/

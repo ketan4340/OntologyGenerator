@@ -30,6 +30,5 @@ public class Main4Demo{
 
 		/*** 全体図構築 ***/
 		new WholeView(iptView, ontView, docView);
-
 	}
 }

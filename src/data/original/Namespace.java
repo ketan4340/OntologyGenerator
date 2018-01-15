@@ -1,4 +1,4 @@
-package data.RDF;
+package data.original;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -10,9 +10,9 @@ import grammar.Sentence;
 import grammar.Word;
 
 public interface ParserInterface {
-	/*******************************/
-	/****** 解析階層化呼び出し部 ******/
-	/*******************************/
+	/********************************/
+	/***** 解析器・階層化呼び出し部 *****/
+	/********************************/
 	/** 入力が自然言語文1文のみ */
 	Sentence text2sentence(NaturalLanguage nlText);
 	/** 入力が自然言語文のList */
@@ -23,9 +23,9 @@ public interface ParserInterface {
 	List<Sentence> texts2sentences(Path nlTextFilePath);
 	
 	
-	/*******************************/
+	/********************************/
 	/********** 解析器実行部 **********/
-	/*******************************/
+	/********************************/
 
 	/*** 自然言語文をParserに通し，出力結果をListに保管 ***/
 	/** 入力: Path or NaturalLanguage or List<NaturalLanguage> **/
@@ -39,16 +39,16 @@ public interface ParserInterface {
 	/** 入力がテキストファイル */
 	List<String> parse(Path nlTextFilePath);
 
-	/* 入力されたList<NL>が空だった場合の処理 */
+	/** 入力されたList<NL>が空だった場合の処理 */
 	default List<String> emptyInput() {
 		System.err.println("Input List is Empty!!!");
 		return new ArrayList<String>();
 	}
 
 
-	/*******************************/
-	/******** 解析結果階層化部 ********/
-	/*******************************/
+	/***********************************/
+	/********** 解析結果階層化部 **********/
+	/***********************************/
 	/*** 出力(List<String>)を分解 ***/
 	List<Sentence> decodeProcessOutput(List<String> parseResult4all);
 

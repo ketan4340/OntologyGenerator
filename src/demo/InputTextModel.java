@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.text.BadLocationException;
 
-import data.RDF.RDFTriple;
+import data.original.Ontology;
 import grammar.NaturalLanguage;
 import modules.Generator;
 
@@ -16,7 +16,7 @@ public class InputTextModel extends AbstractDocumentModel{
 	}
 
 	// Generator実行
-	public List<RDFTriple> runGenerator() {
+	public Ontology runGenerator() {
 		String allText;
 		try {
 			allText = getText(0, getLength());

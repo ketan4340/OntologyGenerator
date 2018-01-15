@@ -1,4 +1,4 @@
-package data.RDF;
+package data.original;
 
 public class MyResource {
 	public static final MyResource TYPE = new MyResource(Namespace.RDF, "type");

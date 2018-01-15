@@ -15,9 +15,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import data.RDF.Namespace;
-import data.RDF.RDFTriple;
-import data.RDF.MyResource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+
+import data.original.MyResource;
+import data.original.Namespace;
+import data.original.RDFTriple;
 
 public class Sentence implements GrammarInterface{
 	public static int sentSum = 0;
@@ -579,6 +582,17 @@ public class Sentence implements GrammarInterface{
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
 		connect2Next(tags_NP, true);
+	}
+	
+	/**
+	 * この文の情報をRDFグラフにする.
+	 * @return RDFグラフ
+	 */
+	public Model toJASS() {
+		Model model = ModelFactory.createDefaultModel();
+		
+		
+		return model;
 	}
 
 	/** 文章から関係を見つけtripleにする */

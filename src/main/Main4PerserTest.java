@@ -2,12 +2,9 @@ package main;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
-import data.RDF.RDFTriple;
-import grammar.Sentence;
+import data.original.Ontology;
 import modules.Generator;
-import modules.syntacticParse.Cabocha;
 
 public class Main4PerserTest {
 
@@ -32,8 +29,8 @@ public class Main4PerserTest {
 		 */
 		
 		Generator generator = new Generator();
-		List<RDFTriple> triples = generator.generate(textFile);
-		
-		triples.forEach(System.out::println);
+		Ontology ontology = generator.generate(textFile);
+				
+		ontology.getTriples().forEach(System.out::println);
 	}
 }

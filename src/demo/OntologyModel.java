@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 import javax.swing.table.DefaultTableModel;
 
-import data.RDF.RDFTriple;
+import data.original.RDFTriple;
 
 public class OntologyModel extends DefaultTableModel{
 	private static final String[] columnNames = {"Subject", "Predicate", "Object"};

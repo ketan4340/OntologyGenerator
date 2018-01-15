@@ -16,38 +16,23 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.VCARD;
 
-import data.RDF.RDFTriple;
+import data.original.Ontology;
+import data.original.RDFTriple;
 import grammar.NaturalLanguage;
+import grammar.Paragraph;
 import grammar.Sentence;
 import modules.relationExtract.OntologyWriter;
 import modules.syntacticParse.Cabocha;
+import modules.syntacticParse.StringListUtil;
 
 public class Generator {
 	public Generator() {
 	}
 
-	public List<RDFTriple> generate(Path textFile) {
-		List<NaturalLanguage> naturalLanguageTexts;
-		try {
-			naturalLanguageTexts = Files.readAllLines(textFile).stream()
-					.map(stringText -> new NaturalLanguage(stringText))
-					.collect(Collectors.toList());
-		} catch (IOException e) {
-			e.printStackTrace();
-			naturalLanguageTexts = Arrays.asList(new NaturalLanguage("ジェネレータはファイルからテキストを読み込めませんでした。"));
-		}
+	public Ontology generate(Path textFile) {
+		List<List<NaturalLanguage>> naturalLanguageTexts = loadTextFile(textFile);
 		return generate(naturalLanguageTexts);
 	}
 	
@@ -55,17 +40,23 @@ public class Generator {
 	 * オントロジー構築器の実行
 	 * @param naturalLanguageTexts 自然言語文のリスト
 	 */
-	public List<RDFTriple> generate(List<NaturalLanguage> naturalLanguageTexts) {
+	public Ontology generate(List<List<NaturalLanguage>> naturalLanguageTexts) {
 		/***************************************/
 		/**          構文解析モジュール          **/
 		/***************************************/
-		List<Sentence> originalSentences = syntacticParse(naturalLanguageTexts);
+		List<Paragraph> originalParagraphs = syntacticParse(naturalLanguageTexts);
 		
 		
 		/***************************************/
 		/**          文章整形モジュール          **/
 		/***************************************/
-		List<Sentence> editedSentences = new ArrayList<>();		
+		List<Sentence> editedSentences = new ArrayList<>();
+
+		// 段落を処理に使う予定はまだないので，文のリストに均す
+		List<Sentence> originalSentences = originalParagraphs.stream()
+				.map(par -> par.getSentences())
+				.flatMap(sents -> sents.stream())
+				.collect(Collectors.toList());
 		for(Sentence originalSentence : originalSentences) {
 			System.out.println("\n\t Step0");
 			
@@ -110,13 +101,19 @@ public class Generator {
 		/***************************************/
 		/**          関係抽出モジュール          **/
 		/***************************************/
-		List<RDFTriple> triples = new ArrayList<RDFTriple>();
-		/*
+		List<RDFTriple> triples = new ArrayList<>();
+		List<Model> graphs4JASS = new ArrayList<>();
+		
+		for(final Sentence partSent: editedSentences) {
+			graphs4JASS.add(partSent.toJASS());
+		}
+		
 		for(final Sentence partSent: editedSentences) {
 			triples.addAll(partSent.extractRelation());
 		}
-		*/
+		
 		/* 文構造のRDF化 */
+		/*
 		String personURI    = "http://somewhere/JohnSmith";
 		String fullName     = "John Smith";
 		// create an empty Model
@@ -146,7 +143,7 @@ public class Generator {
 		}
 
 		model.close();
-
+		 */
 		
 		//重複除去
 		triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
@@ -171,14 +168,39 @@ public class Generator {
 		System.out.println("Sentences: " + naturalLanguageTexts.size() + "\t->dividedSentences: " + editedSentences.size());
 		System.out.println("Relations: " + triples.size());
 		
-		return triples;
+		return new Ontology(triples);
 	}
 
-
-	/** 構文解析 */
-	private List<Sentence> syntacticParse(List<NaturalLanguage> naturalLanguageTexts) {
+	/**
+	 * テキストファイル読み込み. テキストは1行一文. 空行を段落の境界とみなす.
+	 * @param textFile テキストファイルのパス
+	 * @return 段落のリスト(段落はNaturalLanguageのリストからなる)
+	 */
+	private List<List<NaturalLanguage>> loadTextFile(Path textFile) {
+		List<String> texts;
+		try {
+			texts = Files.readAllLines(textFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+			texts = new ArrayList<>(Arrays.asList("ジェネレータはファイルからテキストを読み込めませんでした。"));
+		}
+		return StringListUtil.split("", texts).stream()
+				.map(textList -> textList.stream()
+						.map(text -> new NaturalLanguage(text))
+						.collect(Collectors.toList()))
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * 自然言語文のリストのリストを構文解析し，段落のリストを返す.
+	 * @param naturalLanguageTexts 自然言語文を段落ごとにリストしたものをまとめたリスト
+	 * @return 段落のリスト
+	 */
+	private List<Paragraph> syntacticParse(List<List<NaturalLanguage>> naturalLanguageTexts) {
 		Cabocha cabocha = new Cabocha();
-		return cabocha.texts2sentences(naturalLanguageTexts);
+		return naturalLanguageTexts.stream()
+				.map(nlTexts -> cabocha.texts2sentences(nlTexts))
+				.map(sentenceList -> new Paragraph(sentenceList))
+				.collect(Collectors.toList());
 	}
-
 }

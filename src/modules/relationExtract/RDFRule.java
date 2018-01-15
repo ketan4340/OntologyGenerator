@@ -2,7 +2,7 @@ package modules.relationExtract;
 
 import java.util.Set;
 
-import data.RDF.RDFTriple;
+import data.original.RDFTriple;
 
 public class RDFRule {
 

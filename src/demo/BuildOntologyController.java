@@ -1,9 +1,9 @@
 package demo;
 
 import java.awt.event.ActionListener;
-import java.util.List;
 
-import data.RDF.RDFTriple;
+import data.original.Ontology;
+
 
 public class BuildOntologyController extends AbstractEditorController{
 	/*** Model ***/
@@ -27,8 +27,8 @@ public class BuildOntologyController extends AbstractEditorController{
 	/** ActionListener **/
 	/* RunGeneratorボタンの実装 */
 	private ActionListener generateAction = (event -> {
-		List<RDFTriple> triples = iptModel.runGenerator();
-		ontModel.addAllTriples(triples);
+		Ontology ontology = iptModel.runGenerator();
+		ontModel.addAllTriples(ontology.getTriples());
 	});
 
 
