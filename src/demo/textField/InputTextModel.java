@@ -1,5 +1,6 @@
-package demo;
+package demo.textField;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,10 +25,11 @@ public class InputTextModel extends AbstractDocumentModel{
 			allText = "InputTextModelはテキストの取得に失敗しました。";
 			e.printStackTrace();
 		}
-		List<NaturalLanguage> naturalLanguageTexts =
-				NaturalLanguage.toNaturalLanguageList(Arrays.asList(allText.split("\n")));
+		List<List<NaturalLanguage>> naturalLanguageParagraphs =
+				new ArrayList<>(Arrays.asList(
+						NaturalLanguage.toNaturalLanguageList(
+								Arrays.asList(allText.split("\n")))));
 				
-		Generator generator = new Generator();
-		return generator.generate(naturalLanguageTexts);
+		return new Generator().generate(naturalLanguageParagraphs);
 	}
 }

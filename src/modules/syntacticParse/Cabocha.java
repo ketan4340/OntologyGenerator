@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import grammar.Clause;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import grammar.Word;
+import grammar.clause.Clause;
+import grammar.word.Word;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/* CaboChaの基本実行コマンド */
@@ -217,6 +217,8 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 			System.err.println(wordInfo[0]);
 			tags = new ArrayList<>();
 		}
+		
+		
 		return new Word(wordInfo[0], tags);
 	}
 	

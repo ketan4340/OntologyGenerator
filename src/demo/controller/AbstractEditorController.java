@@ -1,6 +1,9 @@
-package demo;
+package demo.controller;
 
 import java.awt.event.ActionListener;
+
+import demo.textField.AbstractDocumentModel;
+import demo.textField.AbstractEditorView;
 
 /*** テキスト入力に関する部分のみ実装 ***/
 public abstract class AbstractEditorController {

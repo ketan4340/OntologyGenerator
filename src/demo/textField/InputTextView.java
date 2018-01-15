@@ -1,4 +1,4 @@
-package demo;
+package demo.textField;
 
 import java.util.List;
 
@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import demo.controller.BuildOntologyController;
 import edu.uci.ics.jung.graph.Graph;
 
 public class InputTextView extends AbstractEditorView{

@@ -21,6 +21,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 import data.original.MyResource;
 import data.original.Namespace;
 import data.original.RDFTriple;
+import grammar.clause.Clause;
+import grammar.word.Phrase;
+import grammar.word.Word;
 
 public class Sentence implements GrammarInterface{
 	public static int sentSum = 0;
@@ -67,7 +70,7 @@ public class Sentence implements GrammarInterface{
 		}
 	}
 	private void setClausesComeUnderItself() {
-		clauses.stream().forEach(c -> c.comeUnder=this);
+		clauses.stream().forEach(c -> c.setParentSentence(this));
 	}
 	
 	public void setSentence(List<Clause> clauseList) {
@@ -102,13 +105,6 @@ public class Sentence implements GrammarInterface{
 		return new Sentence(subClauses);
 	}
 
-	public List<Integer> collectWords(String name) {
-		List<Integer> words = new ArrayList<Integer>();
-		for(final Clause clause: clauses) {
-			words.addAll(clause.collectWords(name));	// 各clause内を探す
-		}
-		return words;
-	}
 	/** 渡された品詞に一致するWordを返す */
 	public List<Word> collectTagWords(String[][] tagNames) {
 		List<Word> taggedWords = new ArrayList<>();
@@ -162,7 +158,7 @@ public class Sentence implements GrammarInterface{
 
 		List<Word> phraseWords = new ArrayList<>();			// 新しいPhraseの元になるWord
 		List<Word> functionWords = new ArrayList<>();		// Phrase完成後につなげる接続詞を保持
-		Clause depto = baseClause.depending;				// 最後尾のClauseがどのClauseに係るか
+		Clause depto = baseClause.getDepending();				// 最後尾のClauseがどのClauseに係るか
 
 		for(Iterator<Clause> itr = connectClauseList.iterator(); itr.hasNext(); ) {
 			Clause connectClause = itr.next();
@@ -171,11 +167,11 @@ public class Sentence implements GrammarInterface{
 
 			}else {
 				// 元ClauseのWordはbaseClauseに属するように変える
-				for(final Word word: connectClause.words) {
-					word.comeUnder = baseClause;
+				for(final Word word: connectClause.getWords()) {
+					word.parentClause = baseClause;
 				}
 				// 全ての元Clauseの係り先をbaseClauseに変える
-				for(final Clause bedep: connectClause.dependeds) {
+				for(final Clause bedep: connectClause.getDependeds()) {
 					bedep.setDepending(baseClause);
 				}
 			}
@@ -184,7 +180,7 @@ public class Sentence implements GrammarInterface{
 				functionWords.addAll(connectClause.getFunctionWords());	// それに繋がる機能語を入れる
 				//depto = connectclause.dependUpon;
 			}else {
-				phraseWords.addAll(connectClause.words);
+				phraseWords.addAll(connectClause.getWords());
 			}
 		}
 
@@ -241,7 +237,7 @@ public class Sentence implements GrammarInterface{
 		for(final List<Word> matchedWords: matchingWordsSet) {
 			List<Clause> connectClauses = new ArrayList<>(matchingWords.size());
 			for(final Word matchedWord: matchedWords) {
-				Clause belong = matchedWord.comeUnder;
+				Clause belong = matchedWord.parentClause;
 				if(!connectClauses.contains(belong))
 					connectClauses.add(belong);	// どのClauseに所属するか
 			}
@@ -351,7 +347,7 @@ public class Sentence implements GrammarInterface{
 		if(subjectList.contains(lastClause)) {	// 文の最後尾が主節の場合
 			// おそらく固有名詞を正しく判定できていないせい
 			// 最後尾の文節は一つの名詞にする
-			lastClause.nounize(0, lastClause.words.size());
+			lastClause.nounize(0, lastClause.getWords().size());
 			subjectList.remove(subjectList.indexOf(lastClause));
 		}
 		if(subjectList.isEmpty()) return shortSentList;	// 文中に主語がなければ終了
@@ -427,7 +423,7 @@ public class Sentence implements GrammarInterface{
 		if(subjectList.contains(lastClause)) {		// 文の最後尾が主節の場合
 			// おそらく固有名詞を正しく判定できていないせい
 			// 最後尾の文節は一つの名詞にする
-			lastClause.nounize(0, lastClause.words.size());
+			lastClause.nounize(0, lastClause.getWords().size());
 			subjectList.remove(lastClause);
 		}
 		// 主節の連続性を表す真偽値のリスト
@@ -444,7 +440,7 @@ public class Sentence implements GrammarInterface{
 		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
 		String[][] tagAdverb = {{"副詞"}};
 		List<Clause> predicates = new ArrayList<>();
-		for(final Clause cls2Last: lastClause.dependeds) {
+		for(final Clause cls2Last: lastClause.getDependeds()) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
 			if( !cls2Last.endWith(tagParticle, true) && !cls2Last.endWith(tagAdverb, true) )
 				predicates.add(cls2Last);
@@ -512,7 +508,7 @@ public class Sentence implements GrammarInterface{
 		for (Iterator<Clause> itr = clauses.iterator(); itr.hasNext(); ) {
 			Clause clause = itr.next();
 			if (!itr.hasNext()) break;	// 最後の述語だけは係り先がnullなのでスルー
-			Clause depto = clause.depending;
+			Clause depto = clause.getDepending();
 			if (!clauses.contains(depto))
 				clause.setDepending(dependedClause);
 		}
@@ -577,7 +573,7 @@ public class Sentence implements GrammarInterface{
 			// 助詞・連体化"の"を新たに用意
 				Word no = new Word("の", Arrays.asList("助詞","連体化","*","*","*","*","の","ノ","ノ"), subject, false);
 				int index_Ha = subject.indexOfW(subject.collectAllTagWords(tag_Ha).get(0));
-				subject.words.set(index_Ha, no);	// "は"の代わりに"の"を挿入
+				subject.getWords().set(index_Ha, no);	// "は"の代わりに"の"を挿入
 			//}
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
@@ -610,10 +606,10 @@ public class Sentence implements GrammarInterface{
 			System.err.println("subjectWord is null.");
 			return triples;
 		}
-		MyResource subject = new MyResource(Namespace.GOO, subjectWord.name);
+		MyResource subject = new MyResource(Namespace.GOO, subjectWord.getName());
 		this.printDep();
 		// 述節
-		Clause predicateClause = subjectClause.depending;
+		Clause predicateClause = subjectClause.getDepending();
 		if(predicateClause == null) {
 			System.err.println("predicateClause is null.");
 			return triples;
@@ -653,13 +649,13 @@ public class Sentence implements GrammarInterface{
 		if(boolLength || boolWeight) {
 			System.out.println("リテラル");//TODO
 			if(boolLength) {
-				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name+"-length");
+				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.getName()+"-length");
 				triples.add(new RDFTriple(subject, MyResource.LENGTH, blank));			// 空白ノード
 				triples.add(new RDFTriple(blank, MyResource.VALUE, new MyResource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
 				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
 			}
 			if(boolWeight) {
-				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name+"-weight");
+				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.getName()+"-weight");
 				triples.add(new RDFTriple(subject, MyResource.WEIGHT, blank));			// 空白ノード
 				triples.add(new RDFTriple(blank, MyResource.VALUE, new MyResource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
 				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
@@ -679,7 +675,7 @@ public class Sentence implements GrammarInterface{
 			if(boolHave) {			// "~がある","~をもつ"
 				Clause previousClause = previousC(predicateClause);		// 動詞の一つ前の文節
 				if(previousClause == null) return triples;
-				MyResource part = new MyResource(Namespace.GOO, previousClause.getMainWord().name);	// その主辞のリソース
+				MyResource part = new MyResource(Namespace.GOO, previousClause.getMainWord().getName());	// その主辞のリソース
 				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
 				if(previousClause.haveSomeTagWord(tag_Ga_Wo)) {
 					triples.add(new RDFTriple(part, new MyResource(Namespace.DCTERMS, "isPartOf"), subject));
@@ -690,7 +686,7 @@ public class Sentence implements GrammarInterface{
 				triples.add(new RDFTriple(subject, MyResource.EQUIVALENT_CLASS, new MyResource(Namespace.GOO, mtchGnrnm.group(1))));
 
 			}else {					// その他の動詞
-				MyResource verb = new MyResource(Namespace.GOO, predicateWord.tags.get(6));	// 原形を取り出すためのget(6)
+				MyResource verb = new MyResource(Namespace.GOO, predicateWord.getTags().get(6));	// 原形を取り出すためのget(6)
 				MyResource object = null;
 
 				// 格助詞"に","を","へ"などを元に目的語を探す
@@ -699,7 +695,7 @@ public class Sentence implements GrammarInterface{
 				if (!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
 					Clause clause_Ni_Wo = clauses_Ni_Wo.get(0);
 					Word word_Ni_Wo = clause_Ni_Wo.getMainWord();	// "に"または"を"の主辞
-					object = new MyResource(Namespace.GOO, word_Ni_Wo.name);
+					object = new MyResource(Namespace.GOO, word_Ni_Wo.getName());
 				} else {								// 目的語なしならnullのまま
 					object = MyResource.NO_OBJECT;
 				}
@@ -711,12 +707,12 @@ public class Sentence implements GrammarInterface{
 		/* 述語が形容詞 */
 		}else if(predicateClause.haveSomeTagWord(tagAdjective)) {
 			System.out.println("形容詞");//TODO
-			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.tags.get(6));
+			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.getTags().get(6));
 			Clause previousClause = previousC(predicateClause);	// 形容詞の一つ前の文節
 			if(previousClause == null) return triples;
 			String[][] tag_Ga = {{"格助詞", "が"}};
 			if(previousClause.haveSomeTagWord(tag_Ga)) {
-				String part = previousClause.getMainWord().name;	// その主辞の文字列
+				String part = previousClause.getMainWord().getName();	// その主辞の文字列
 				subject.setFragment(subject.getFragment()+"の"+part);
 			}
 			triples.add(new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
@@ -739,15 +735,15 @@ public class Sentence implements GrammarInterface{
 			boolean boolAdjective = predicateClause.haveSomeTagWord(tag_Adjective);
 
 			if(boolSynonym) {
-				//relations.add( new RDFTriple(subjectWord.name, "owl:sameClassAs", mtchSynonym.group(1)));
+				//relations.add( new RDFTriple(subjectWord.getName(), "owl:sameClassAs", mtchSynonym.group(1)));
 				triples.add(new RDFTriple(new MyResource(Namespace.GOO, mtchSynonym.group(1)), MyResource.ALTER_NAME, subject));
 			}else if(boolKind) {
 				triples.add( new RDFTriple(subject, MyResource.TYPE, new MyResource(Namespace.GOO, mtchKind.group(1))));
 			}else if(boolAdjective) {
-				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.tags.get(6));
+				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.getTags().get(6));
 				triples.add( new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
 			}else {
-				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.name)));	// 述語が名詞の場合これがデフォ
+				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.getName())));	// 述語が名詞の場合これがデフォ
 			}
 		}
 		
@@ -793,7 +789,7 @@ public class Sentence implements GrammarInterface{
 	public List<Word> getWordList() {
 		List<Word> wordList = new ArrayList<>();
 		for(final Clause clause: clauses) {
-			wordList.addAll(clause.words);
+			wordList.addAll(clause.getWords());
 		}
 		return wordList;
 	}
@@ -803,11 +799,11 @@ public class Sentence implements GrammarInterface{
 	 * 全てのclauseインスタンスのdependUponが正しいことが前提の設計.
 	 */
 	public void updateDependency() {
-		clauses.forEach(c -> c.dependeds.clear());	// 一度全ての被係り受けをまっさらにする
+		clauses.forEach(c -> c.getDependeds().clear());	// 一度全ての被係り受けをまっさらにする
 
 		for(final Clause clause : clauses) {
-			Clause depto = clause.depending;
-			if(depto != null) depto.dependeds.add(clause);
+			Clause depto = clause.getDepending();
+			if(depto != null) depto.getDependeds().add(clause);
 		}
 	}
 
@@ -819,7 +815,7 @@ public class Sentence implements GrammarInterface{
 
 		Clause subjectClause = subjectList.get(0);			// 主節(!!最初の1つしか使っていない!!)
 		// 述節
-		Clause predicateClause = subjectClause.depending;
+		Clause predicateClause = subjectClause.getDepending();
 		if(predicateClause == null) return "";
 		Word predicateWord = predicateClause.getMainWord();	// 述語
 		if(predicateWord == null) return "";
@@ -841,15 +837,15 @@ public class Sentence implements GrammarInterface{
 				values.add("passive");
 			else
 				values.add("verb");
-			values.add(predicateWord.tags.get(6));
+			values.add(predicateWord.getTags().get(6));
 		/* 述語が形容詞 */
 		}else if(predicateClause.haveSomeTagWord(tagAdjective)) {
 			values.add("adjc");
-			values.add(predicateWord.tags.get(6));
+			values.add(predicateWord.getTags().get(6));
 		/* 述語が名詞または助動詞 */
 		}else {
 			values.add("noun");
-			String predNoun =predicateWord.tags.get(6);
+			String predNoun =predicateWord.getTags().get(6);
 			values.add(predNoun.substring(predNoun.length()-2));	// 最後の一文字だけ
 		}
 		return values.stream().collect(Collectors.joining(","));
@@ -869,7 +865,7 @@ public class Sentence implements GrammarInterface{
 
 	public void printW() {
 		for(final Word word : getWordList()) {
-			System.out.print("("+word.id+")" + word.name);
+			System.out.print("("+word.getID()+")" + word.getName());
 		}
 		System.out.println();
 	}
@@ -877,20 +873,20 @@ public class Sentence implements GrammarInterface{
 		for(final Word word : getWordList()) {
 			boolean sf = word.isCategorem;
 			String t_f = sf? "T": "F";
-			System.out.print("("+t_f+")" + word.name);
+			System.out.print("("+t_f+")" + word.getName());
 		}
 		System.out.println();
 	}
 	public void printC() {
 		for(final Clause clause : clauses) {
-			System.out.print("("+clause.id+")" + clause.toString());
+			System.out.print("("+clause.getID()+")" + clause.toString());
 		}
 		System.out.println();
 	}
 	public void printDep() {
 		for (int i = 0; i < clauses.size(); i++) {
 			Clause clause = clauses.get(i);
-			Clause depto = clause.depending;
+			Clause depto = clause.getDepending();
 			int depIndex = (depto == null)? -1	: clauses.indexOf(depto);
 			System.out.print("(" + i + ">" + depIndex + ")" + clause.toString());
 		}
@@ -899,7 +895,7 @@ public class Sentence implements GrammarInterface{
 	/** 文を区切りを挿入して出力する */
 	public void printS() {
 		for(final Word word : getWordList()) { // Word単位で区切る
-			System.out.print(word.name + "|");
+			System.out.print(word.getName() + "|");
 		}
 		System.out.println();
 		for(final Clause clause : clauses) { // Clause単位で区切る

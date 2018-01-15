@@ -32,19 +32,18 @@ public class Generator {
 	}
 
 	public Ontology generate(Path textFile) {
-		List<List<NaturalLanguage>> naturalLanguageTexts = loadTextFile(textFile);
-		return generate(naturalLanguageTexts);
+		return generate(loadTextFile(textFile));
 	}
 	
 	/**
 	 * オントロジー構築器の実行
-	 * @param naturalLanguageTexts 自然言語文のリスト
+	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
 	 */
-	public Ontology generate(List<List<NaturalLanguage>> naturalLanguageTexts) {
+	public Ontology generate(List<List<NaturalLanguage>> naturalLanguageParagraphs) {
 		/***************************************/
 		/**          構文解析モジュール          **/
 		/***************************************/
-		List<Paragraph> originalParagraphs = syntacticParse(naturalLanguageTexts);
+		List<Paragraph> originalParagraphs = syntacticParse(naturalLanguageParagraphs);
 		
 		
 		/***************************************/
@@ -165,7 +164,7 @@ public class Generator {
 		ob.output("owls/ontology"+sdf.format(c.getTime()));	// 渡すのは保存先のパス(拡張子は含まない)
 		
 		System.out.println("Finished.");
-		System.out.println("Sentences: " + naturalLanguageTexts.size() + "\t->dividedSentences: " + editedSentences.size());
+		System.out.println("Sentences: " + naturalLanguageParagraphs.size() + "\t->dividedSentences: " + editedSentences.size());
 		System.out.println("Relations: " + triples.size());
 		
 		return new Ontology(triples);
@@ -193,12 +192,12 @@ public class Generator {
 	
 	/**
 	 * 自然言語文のリストのリストを構文解析し，段落のリストを返す.
-	 * @param naturalLanguageTexts 自然言語文を段落ごとにリストしたものをまとめたリスト
+	 * @param naturalLanguageParagraphs 自然言語文を段落ごとにリストしたものをまとめたリスト
 	 * @return 段落のリスト
 	 */
-	private List<Paragraph> syntacticParse(List<List<NaturalLanguage>> naturalLanguageTexts) {
+	private List<Paragraph> syntacticParse(List<List<NaturalLanguage>> naturalLanguageParagraphs) {
 		Cabocha cabocha = new Cabocha();
-		return naturalLanguageTexts.stream()
+		return naturalLanguageParagraphs.stream()
 				.map(nlTexts -> cabocha.texts2sentences(nlTexts))
 				.map(sentenceList -> new Paragraph(sentenceList))
 				.collect(Collectors.toList());

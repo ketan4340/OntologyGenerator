@@ -1,27 +1,38 @@
-package grammar;
+package grammar.clause;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Clause implements GrammarInterface{
-	public static int clauseSum = 0;
-	public static List<Clause> allClauseList = new ArrayList<Clause>();
+import grammar.GrammarInterface;
+import grammar.Sentence;
+import grammar.word.Adjunct;
+import grammar.word.Categorem;
+import grammar.word.Phrase;
+import grammar.word.Word;
 
-	public final int id;
-	public List<Word> words;			// 構成するWordのListを持つ
-	public Sentence comeUnder;
+public class Clause implements GrammarInterface{
+	public static Set<Clause> allClauses = new HashSet<Clause>();
+
+	private final int id;
+	private List<Word> words;			// 構成するWordのListを持つ
+	private Sentence parentSentence;
 	
-	public Clause depending;			// 係り先文節.どのClauseに係るか
-	public List<Clause> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか
+	private Categorem categorem;			// 自立語
+	private List<Adjunct> modifier; 		// 付属語 
+	
+	private Clause depending;			// 係り先文節.どのClauseに係るか
+	private List<Clause> dependeds;		// 係られてる文節の集合.どのClauseから係り受けるか
 
 	private Clause() {
-		id = clauseSum++;
-		allClauseList.add(this);
+		id = allClauses.size();
+		allClauses.add(this);
 		dependeds = new ArrayList<>();
 	}
 	/**
@@ -86,16 +97,11 @@ public class Clause implements GrammarInterface{
 		this.words = newWords;
 	}
 	private void setWordsComeUnderItself() {
-		words.stream().forEach(w -> w.comeUnder=this);
+		words.stream().forEach(w -> w.parentClause=this);
 	}
 
 	public int indexOfW(Word word) {
 		return words.indexOf(word);
-	}
-
-	public static Clause get(int id) {
-		if(id < 0) return null;
-		return allClauseList.get(id);
 	}
 
 	/**
@@ -143,7 +149,7 @@ public class Clause implements GrammarInterface{
 		for(Iterator<Clause> itr = baseClauses.iterator(); itr.hasNext(); ) {
 			Clause clause = itr.next();
 			for(Word word: clause.words) {		// 元ClauseのWordはこの新しいClauseに属するように変える
-				word.comeUnder = this;
+				word.parentClause = this;
 			}
 			// 全ての元Clauseの係り先を新しいClauseに変える
 			if (clause.dependeds != null) {
@@ -178,7 +184,7 @@ public class Clause implements GrammarInterface{
 		List<Word> subWords = new ArrayList<>(words.size());
 		for(Word word: words) {
 			Word subWord = word.copy();
-			subWord.comeUnder = replicaClause;
+			subWord.parentClause = replicaClause;
 			subWords.add(subWord);
 		}
 		replicaClause.setWords(subWords);
@@ -240,15 +246,7 @@ public class Clause implements GrammarInterface{
 		words = newWords;
 	}
 
-	/* 指定の文字列に一致するWordのIDを返す */
-	public List<Integer> collectWords(String name) {
-		List<Integer> ids = new ArrayList<Integer>();
-		for(final Word word: words) {
-			if(word.name.equals(name))	ids.add(word.id);
-		}
-		return ids;
-	}
-	/* 指定の品詞を持つWordを返す */
+	/** 指定の品詞を持つWordを返す */
 	public List<Word> collectAllTagWords(String[][] tagNames) {
 		List<String[]> tagNameList = Arrays.asList(tagNames);
 		List<Word> taggedWords = new ArrayList<>();
@@ -259,7 +257,7 @@ public class Clause implements GrammarInterface{
 		}
 		return taggedWords;
 	}
-	/* 指定の品詞を"全て"持つWordが含まれているか判定 */
+	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean haveSomeTagWord(String[][] tagNames) {
 		for(final Word word: words) {
 			for (final String[] tagsArray: tagNames){
@@ -303,6 +301,27 @@ public class Clause implements GrammarInterface{
 		this.words.add(fromIndex, properNoun);
 	}
 
+	
+	
+	
+	public int getID() {
+		return id;
+	}
+	public List<Word> getWords() {
+		return words;
+	}
+	public Sentence getParentSentence() {
+		return parentSentence;
+	}
+	public Clause getDepending() {
+		return depending;
+	}
+	public List<Clause> getDependeds() {
+		return dependeds;
+	}
+	public void setParentSentence(Sentence parent) {
+		this.parentSentence = parent;
+	}
 	@Override
 	public String toString() {
 		return words.stream().map(w -> w.toString()).collect(Collectors.joining());
@@ -316,11 +335,11 @@ public class Clause implements GrammarInterface{
 	/* Clauseの係り受け関係を更新 */
 	/* 全てのClauseインスタンスのdependingが正しいことが前提の設計 */
 	public static void updateAllDependency() {
-		for(final Clause cls: Clause.allClauseList) {
+		for(final Clause cls: Clause.allClauses) {
 			if (cls.dependeds != null)
 				cls.dependeds.clear();	// 一度全ての被係り受けをまっさらにする
 		}
-		for(final Clause cls: Clause.allClauseList) {
+		for(final Clause cls: Clause.allClauses) {
 			Clause depto = cls.depending;
 			if(depto != null && depto.dependeds != null) depto.dependeds.add(cls);
 		}

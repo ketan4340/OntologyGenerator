@@ -4,10 +4,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import grammar.Clause;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import grammar.Word;
+import grammar.clause.Clause;
+import grammar.word.Word;
 
 public interface ParserInterface {
 	/********************************/

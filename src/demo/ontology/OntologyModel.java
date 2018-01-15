@@ -1,4 +1,4 @@
-package demo;
+package demo.ontology;
 
 import java.util.LinkedList;
 import java.util.List;

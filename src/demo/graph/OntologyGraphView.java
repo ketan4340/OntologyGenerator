@@ -1,4 +1,4 @@
-package demo;
+package demo.graph;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -6,7 +6,8 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import demo.graph.MyGraph;
+import demo.controller.UseOntologyController;
+import demo.ontology.OntologyModel;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 
 public class OntologyGraphView extends JPanel{

@@ -1,4 +1,4 @@
-package demo;
+package demo.textField;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import javax.swing.text.html.parser.ParserDelegator;
 
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import grammar.Word;
+import grammar.word.Word;
 import modules.syntacticParse.Cabocha;
 
 public class DocumentModel extends AbstractDocumentModel{
@@ -64,8 +64,8 @@ public class DocumentModel extends AbstractDocumentModel{
 
 			for(final Word word : sentence.getWordList()) {	// 文の単語を走査
 				htmlText += (word.hasSomeTags(noun))	// 名詞ならアンカータグで囲む
-						? "<a href=\"" + word.name + "\">" + word.name + "</a>"
-						: word.name;
+						? "<a href=\"" + word.getName() + "\">" + word.getName() + "</a>"
+						: word.getName();
 			}
 			//htmlText += "</font>";
 			htmlText += "</p><br>\n";				// 文末で改行

@@ -1,12 +1,17 @@
-package grammar;
+package grammar.word;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Phrase extends Word{
-	public List<Word> originWords;
+import grammar.clause.Clause;
 
+public class Phrase extends Word{
+	private List<Word> originWords;
+	
+	private Categorem head;			// 主要部
+	private List<Clause> dependent;	// 従属部
+	
 	public Phrase() {
 		super(new String(), new ArrayList<String>());
 		originWords = new ArrayList<Word>();
@@ -20,22 +25,22 @@ public class Phrase extends Word{
 		for(Iterator<Word> itr = baseWords.iterator(); itr.hasNext(); ) {
 			Word word = itr.next();
 			originWords.add(word);
-			phraseName += word.name;
-			if(word.tags.size() > 6) {
+			phraseName += word.getName();
+			if(word.getTags().size() > 6) {
 				if(itr.hasNext())
-					genkei += word.name;
+					genkei += word.getName();
 				else	// 最後尾は原形
-					genkei += word.tags.get(6);
+					genkei += word.getTags().get(6);
 			}
-			if(word.tags.size() > 7) yomi1 += word.tags.get(7);
-			if(word.tags.size() > 8) yomi2 += word.tags.get(8);
+			if(word.getTags().size() > 7) yomi1 += word.getTags().get(7);
+			if(word.getTags().size() > 8) yomi2 += word.getTags().get(8);
 		}
 
 		Word headWord = baseWords.get(0);
 		Word tailWord = baseWords.get(baseWords.size()-1);
 
 		// Tagはhead_tailがtrueなら先頭、falseなら最後尾のWordに依存
-		List<String> phraseTags = head_tail ?headWord.tags :tailWord.tags;
+		List<String> phraseTags = head_tail ?headWord.getTags() :tailWord.getTags();
 		// 原形・読みに関しては元の単語からつなげたもの
 		phraseTags.set(6, genkei);
 		phraseTags.set(7, yomi1);
@@ -43,8 +48,8 @@ public class Phrase extends Word{
 
 		if(belongClause == null) {
 			belongClause = head_tail
-					? headWord.comeUnder		// 新しいPhraseの所属するClauseは先頭のWordに依存
-					: tailWord.comeUnder;	// 新しいPhraseの所属するClauseは最後尾のWordに依存
+					? headWord.parentClause		// 新しいPhraseの所属するClauseは先頭のWordに依存
+					: tailWord.parentClause;	// 新しいPhraseの所属するClauseは最後尾のWordに依存
 		}
 		setWord(phraseName, phraseTags, belongClause, true);
 	}

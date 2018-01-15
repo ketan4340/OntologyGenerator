@@ -1,14 +1,14 @@
 package main;
 
-import demo.BuildOntologyController;
-import demo.DocumentModel;
-import demo.DocumentView;
-import demo.InputTextModel;
-import demo.InputTextView;
-import demo.OntologyModel;
-import demo.OntologyTableView;
-import demo.UseOntologyController;
 import demo.WholeView;
+import demo.controller.BuildOntologyController;
+import demo.controller.UseOntologyController;
+import demo.ontology.OntologyModel;
+import demo.ontology.OntologyTableView;
+import demo.textField.DocumentModel;
+import demo.textField.DocumentView;
+import demo.textField.InputTextModel;
+import demo.textField.InputTextView;
 
 public class Main4Demo{
 	public static void main(String[] args) {

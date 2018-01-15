@@ -14,7 +14,7 @@ public class Paragraph {
 		this(new ArrayList<>());
 	}
 	
-	
+	/* Getter/Setter */
 	public List<Sentence> getSentences() {
 		return sentences;
 	}

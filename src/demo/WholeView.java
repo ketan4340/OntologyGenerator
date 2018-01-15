@@ -4,6 +4,10 @@ import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 
+import demo.ontology.OntologyTableView;
+import demo.textField.DocumentView;
+import demo.textField.InputTextView;
+
 public class WholeView extends JFrame{
 	/**** Model ****/
 

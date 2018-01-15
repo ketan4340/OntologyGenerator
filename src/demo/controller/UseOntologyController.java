@@ -1,4 +1,4 @@
-package demo;
+package demo.controller;
 
 import java.awt.event.ItemListener;
 import java.util.LinkedList;
@@ -14,6 +14,12 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 
 import data.original.RDFTriple;
+import demo.graph.OntologyGraphView;
+import demo.ontology.OntologyModel;
+import demo.ontology.OntologyTableView;
+import demo.textField.AbstractDocumentModel;
+import demo.textField.DocumentModel;
+import demo.textField.DocumentView;
 
 public class UseOntologyController extends AbstractEditorController{
 	/*** Model ***/

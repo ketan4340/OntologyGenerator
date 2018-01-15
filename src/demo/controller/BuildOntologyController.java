@@ -1,8 +1,13 @@
-package demo;
+package demo.controller;
 
 import java.awt.event.ActionListener;
 
 import data.original.Ontology;
+import demo.ontology.OntologyModel;
+import demo.ontology.OntologyTableView;
+import demo.textField.AbstractDocumentModel;
+import demo.textField.InputTextModel;
+import demo.textField.InputTextView;
 
 
 public class BuildOntologyController extends AbstractEditorController{

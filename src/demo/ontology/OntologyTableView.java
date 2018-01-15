@@ -1,4 +1,4 @@
-package demo;
+package demo.ontology;
 
 import javax.swing.JScrollPane;
 
@@ -7,6 +7,9 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+
+import demo.controller.BuildOntologyController;
+import demo.controller.UseOntologyController;
 
 public class OntologyTableView extends JPanel{
 	/**** Model ****/

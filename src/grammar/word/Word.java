@@ -1,27 +1,32 @@
-package grammar;
+package grammar.word;
 
 import java.util.*;
 
+import grammar.Concept;
+import grammar.GrammarInterface;
+import grammar.clause.Clause;
+
 public class Word implements GrammarInterface{
-	public static int wordsSum = 0;
 	public static List<Word> allWordList = new ArrayList<Word>();
 
-	public final int id;				// 通し番号。Wordを特定する
-	public String name;				// 単語の文字列
-	public List<String> tags;		// 品詞・活用形、読みなど
+	private final int id;			// 通し番号。Wordを特定する
+	private String name;				// 単語の文字列
+	private List<String> tags;		// 品詞・活用形、読みなど
 	public boolean isCategorem;		// 自立語か付属語か
 	
-	public Clause comeUnder;			// どのClauseに所属するか
+	public Clause parentClause;		// どのClauseに所属するか
+	
+	private Concept concept;
 
 	private Word() {
-		id = wordsSum++;
+		id = allWordList.size();
 		allWordList.add(this);
 	}
-	public Word(String name, List<String> tags, Clause belongClause, boolean isCategorem) {
+	public Word(String name, List<String> tags, Clause parentClause, boolean isCategorem) {
 		this();
 		this.name = name;
 		this.tags = new ArrayList<>(tags);
-		this.comeUnder = belongClause;
+		this.parentClause = parentClause;
 		this.isCategorem = isCategorem;
 		supplementTags();
 	}
@@ -29,10 +34,17 @@ public class Word implements GrammarInterface{
 		this(name, tags, null, false);
 	}
 	
-	public void setWord(String name, List<String> tags, Clause belongClause, boolean isCategorem) {
+	/** 新型コンストラクタ */
+	public Word(Concept concept, Clause belongClause) {
+		this();
+		this.concept = concept;
+		this.parentClause = belongClause;
+	}
+	
+	public void setWord(String name, List<String> tags, Clause parentClause, boolean isCategorem) {
 		this.name = name;
 		this.tags = new ArrayList<>(tags);
-		this.comeUnder = belongClause;
+		this.parentClause = parentClause;
 		this.isCategorem = isCategorem;
 		supplementTags();
 	}
@@ -50,10 +62,7 @@ public class Word implements GrammarInterface{
 		if(tags.contains("記号")) isCategorem = false;	// 記号なら主辞とはしない
 	}
 
-	public static Word get(int id) {
-		if(id < 0) return null;
-		return allWordList.get(id);
-	}
+
 
 	/* 渡されたTagを"全て"持って入れば真、それ以外は偽を返す */
 	public boolean hasAllTags(String[] tagNames) {
@@ -98,23 +107,35 @@ public class Word implements GrammarInterface{
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(name, tags, comeUnder, isCategorem);
+		replica.setWord(name, tags, parentClause, isCategorem);
 		return replica;
 	}
-
+	
+	
+	public int getID() {
+		return id;
+	}
+	public String getName() {
+		return name;
+	}
+	public List<String> getTags() {
+		return tags;
+	}
+	public boolean isCategorem() {
+		return isCategorem;
+	}
+	public Clause getParentClause() {
+		return parentClause;
+	}
+	public Concept getConcept() {
+		return concept;
+	}
 	@Override
 	public String toString() {
 		return name;
 	}
 	@Override
 	public void printDetail() {
-		System.out.println(name);
-	}
-
-	/* 渡されたIDのリストを一つの文字列に変える */
-	public static String toStringList(List<Integer> wordIDs) {
-		String wordNames = new String();
-		for(final int id: wordIDs) wordNames+=Word.get(id).name;
-		return wordNames;
+		System.out.println(id+":" + name);
 	}
 }
