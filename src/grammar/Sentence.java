@@ -25,42 +25,28 @@ import grammar.clause.Clause;
 import grammar.word.Phrase;
 import grammar.word.Word;
 
-public class Sentence implements GrammarInterface{
-	public static int sentSum = 0;
+public class Sentence extends SyntacticComponent<Paragraph, Clause> implements Identifiable {
+	public static int sentenceSum = 0;
 
 	private final int id;
-	public List<Clause> clauses; // Clauseのリストで文を構成する
+	private List<Clause> clauses; // Clauseのリストで文を構成する
 
-	private Sentence() {
-		id = sentSum++;
-		clauses = new ArrayList<>();
+	public Sentence(List<Clause> clauses) {
+		super(clauses);
+		this.id = sentenceSum++;
 	}
-	public Sentence(List<Clause> clauseList) {
-		this();
-		clauses = clauseList;
-		//initializeDepending();
-	}
-	public Sentence(List<Clause> clauseList, Map<Clause, Integer> dependingMap) {
-		this();
-		clauses = clauseList;
-		setClausesComeUnderItself();
+	public Sentence(List<Clause> clauses, Map<Clause, Integer> dependingMap) {
+		super(clauses);
+		this.clauses = clauses;
+		this.id = sentenceSum++;
+		setItself2Clauses();
 		initializeDepending(dependingMap);
 	}
 	
 	/**
-	 * 各clauseのdepIndexを元に係り先dependingをセットする
-	 * @param clauseList
+	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
+	 * @param dependingMap 各文節がこの文の何番目の文節に係るか記録されたマップ
 	 */
-	/*
-	private void initializeDepending() {
-		for (Clause clause : clauses) {
-			int depIndex = clause.depIndex;
-			clause.setDepending((depIndex != -1)?
-					clauses.get(depIndex)
-					: null);
-		}
-	}
-	*/
 	private void initializeDepending(Map<Clause, Integer> dependingMap) {
 		for (Map.Entry<Clause, Integer> entry : dependingMap.entrySet()) {
 			Clause clause = entry.getKey(); int deptoIndex = entry.getValue();
@@ -69,8 +55,8 @@ public class Sentence implements GrammarInterface{
 					: null);
 		}
 	}
-	private void setClausesComeUnderItself() {
-		clauses.stream().forEach(c -> c.setParentSentence(this));
+	private void setItself2Clauses() {
+		clauses.stream().forEach(c -> c.setParent(this));
 	}
 	
 	public void setSentence(List<Clause> clauseList) {
@@ -168,7 +154,7 @@ public class Sentence implements GrammarInterface{
 			}else {
 				// 元ClauseのWordはbaseClauseに属するように変える
 				for(final Word word: connectClause.getWords()) {
-					word.parentClause = baseClause;
+					word.setParent(baseClause);
 				}
 				// 全ての元Clauseの係り先をbaseClauseに変える
 				for(final Clause bedep: connectClause.getDependeds()) {
@@ -237,7 +223,7 @@ public class Sentence implements GrammarInterface{
 		for(final List<Word> matchedWords: matchingWordsSet) {
 			List<Clause> connectClauses = new ArrayList<>(matchingWords.size());
 			for(final Word matchedWord: matchedWords) {
-				Clause belong = matchedWord.parentClause;
+				Clause belong = (Clause) matchedWord.getParent();
 				if(!connectClauses.contains(belong))
 					connectClauses.add(belong);	// どのClauseに所属するか
 			}
@@ -853,12 +839,7 @@ public class Sentence implements GrammarInterface{
 
 	/********************************/
 	/************* 出力用 ************/
-	/********************************/
-	@Override
-	public String toString() {
-		return clauses.stream().map(c -> c.toString()).collect(Collectors.joining());
-	}
-	
+	/********************************/	
 	public void printDetail() {
 		System.out.println(toString());
 	}
@@ -902,5 +883,28 @@ public class Sentence implements GrammarInterface{
 			System.out.print(clause.toString() + "|");
 		}
 		System.out.println();
+	}
+	
+	
+	/**********************************/
+	/**********    Getter    **********/
+	/**********************************/
+
+	
+	/***********************************/
+	/**********   Interface   **********/
+	/***********************************/
+	@Override
+	public int getID() {
+		return id;
+	}
+	
+
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
+	@Override
+	public String toString() {
+		return clauses.stream().map(c -> c.toString()).collect(Collectors.joining());
 	}
 }

@@ -11,20 +11,25 @@ public class StringListUtil {
 	/**
 	 * すべてのListをregexを境に分割する。
 	 * 分割後のListにregexの行は含まれない。
+	 * @param regex 正規表現の区切り
+	 * @param list 分割したいString型リスト
+	 * @return このリストを指定された正規表現に一致する位置で分割して計算されたリストのリスト
 	 */
 	public static List<List<String>> split(String regex, List<String> list) {
 		List<List<String>> splitedLists = new ArrayList<>();
-
+		
 		List<Integer> borderIndexList = getBorderIndexList(regex, list);
 
 		int fromIndex = 0, toIndex = 0;
-
 		for (final int borderIndex : borderIndexList) {
 			toIndex = borderIndex;
 			if (fromIndex != toIndex)
 				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex + 1;
 		}
+		
+		if (splitedLists.isEmpty())	// もし一度も分割していなければ入力されたリストをそのまま返す
+			splitedLists.add(list);
 		return splitedLists;
 	}
 

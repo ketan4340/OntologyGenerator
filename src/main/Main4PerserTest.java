@@ -2,9 +2,12 @@ package main;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import data.original.Ontology;
+import grammar.Sentence;
 import modules.Generator;
+import modules.syntacticParse.Cabocha;
 
 public class Main4PerserTest {
 
@@ -21,16 +24,17 @@ public class Main4PerserTest {
 		NaturalLanguage nl3 = new NaturalLanguage(text3);
 		NaturalLanguage[] nls = new NaturalLanguage[]{nl1, nl2, nl3};
 		 */
+		
 		/*
 		Cabocha cabocha = new Cabocha();
-	
 		List<Sentence> sents = cabocha.texts2sentences(textFile);
 		sents.forEach(s -> s.printDep());
-		 */
+		//*/
 		
+		///*
 		Generator generator = new Generator();
-		Ontology ontology = generator.generate(textFile);
-				
+		Ontology ontology = generator.generate(textFile);	
 		ontology.getTriples().forEach(System.out::println);
+		//*/
 	}
 }

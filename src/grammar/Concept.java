@@ -1,33 +1,45 @@
 package grammar;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Concept implements GrammarInterface{
-	private static Set<Concept> allConcepts = new HashSet<Concept>();
+	private static Map<String, Concept> allConcepts = new HashMap<>();
 
-	private final int id;				// 通し番号。Conceptを特定する
-	private List<Morpheme> morphemes;	// 形態素たち
+	private final int id;					// 通し番号。Conceptを特定する
+	private final List<Morpheme> morphemes;	// 形態素たち
 	
-	private Concept() {
-		id = allConcepts.size();
-		allConcepts.add(this);
-	}
 	public Concept(List<Morpheme> morphemes) {
-		this();
+		this.id = allConcepts.size();
 		this.morphemes = morphemes;
+		
+		String keyword = morphemes.stream().map(m -> m.getName()).collect(Collectors.joining());
+		allConcepts.put(keyword, this);
+	}
+	
+	public static Concept getOrNewInstance(String keyword, List<Morpheme> morphemes) {
+		return allConcepts.getOrDefault(keyword, new Concept(morphemes));
 	}
 	
 	
 	
+	/**********************************/
+	/**********    Getter    **********/
+	/**********************************/
 	public int getId() {
 		return id;
 	}
 	public List<Morpheme> getMorphemes() {
 		return morphemes;
 	}
+	
+	
+	
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
 	@Override
 	public int hashCode() {
 		final int prime = 31;

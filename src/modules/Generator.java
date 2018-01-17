@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,27 +45,26 @@ public class Generator {
 		/**          構文解析モジュール          **/
 		/***************************************/
 		List<Paragraph> originalParagraphs = syntacticParse(naturalLanguageParagraphs);
-		
+		//originalParagraphs.forEach(System.out::print);
 		
 		/***************************************/
 		/**          文章整形モジュール          **/
 		/***************************************/
-		List<Sentence> editedSentences = new ArrayList<>();
+		List<Sentence> editedSentences = new LinkedList<>();
 
 		// 段落を処理に使う予定はまだないので，文のリストに均す
 		List<Sentence> originalSentences = originalParagraphs.stream()
-				.map(par -> par.getSentences())
-				.flatMap(sents -> sents.stream())
+				.flatMap(p -> p.getSentences().stream())
 				.collect(Collectors.toList());
 		for(Sentence originalSentence : originalSentences) {
 			System.out.println("\n\t Step0");
 			
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/
-			String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}, {"形容詞"}};
+			//String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}, {"形容詞"}};
 			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
 			String[][] tagDone = {{"動詞"}, {"動詞", "接尾"}};
-			originalSentence.connect(tagNouns);
+			//originalSentence.connect(tagNouns);
 			originalSentence.connect(tagDo);
 			originalSentence.connect(tagDone);
 			/* 名詞と形容詞だけ取り出す */
@@ -183,6 +183,7 @@ public class Generator {
 			e.printStackTrace();
 			texts = new ArrayList<>(Arrays.asList("ジェネレータはファイルからテキストを読み込めませんでした。"));
 		}
+		// 空行を見つけたら段落の境界とする
 		return StringListUtil.split("", texts).stream()
 				.map(textList -> textList.stream()
 						.map(text -> new NaturalLanguage(text))

@@ -1,32 +1,35 @@
 package grammar.word;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import grammar.Concept;
 import grammar.GrammarInterface;
+import grammar.Identifiable;
+import grammar.SyntacticComponent;
+import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 
-public class Word implements GrammarInterface{
-	public static List<Word> allWordList = new ArrayList<Word>();
+public class Word extends SyntacticComponent<AbstractClause<?>, Concept> implements GrammarInterface, Identifiable{
+	private static int wordsSum = 0;
 
 	private final int id;			// 通し番号。Wordを特定する
 	private String name;				// 単語の文字列
 	private List<String> tags;		// 品詞・活用形、読みなど
 	public boolean isCategorem;		// 自立語か付属語か
 	
-	public Clause parentClause;		// どのClauseに所属するか
-	
 	private Concept concept;
 
 	private Word() {
-		id = allWordList.size();
-		allWordList.add(this);
+		super(null);		//TODO
+		this.id = wordsSum++;
 	}
 	public Word(String name, List<String> tags, Clause parentClause, boolean isCategorem) {
 		this();
 		this.name = name;
 		this.tags = new ArrayList<>(tags);
-		this.parentClause = parentClause;
+		setParent(parentClause);
 		this.isCategorem = isCategorem;
 		supplementTags();
 	}
@@ -35,16 +38,19 @@ public class Word implements GrammarInterface{
 	}
 	
 	/** 新型コンストラクタ */
-	public Word(Concept concept, Clause belongClause) {
+	public Word(Concept concept, AbstractClause<?> parentClause) {
 		this();
 		this.concept = concept;
-		this.parentClause = belongClause;
+		setParent(parentClause);
+	}
+	public Word(Concept concept) {
+		this(concept, null);
 	}
 	
-	public void setWord(String name, List<String> tags, Clause parentClause, boolean isCategorem) {
+	public void setWord(String name, List<String> tags, AbstractClause<?> parentClause, boolean isCategorem) {
 		this.name = name;
 		this.tags = new ArrayList<>(tags);
-		this.parentClause = parentClause;
+		setParent(parentClause);
 		this.isCategorem = isCategorem;
 		supplementTags();
 	}
@@ -107,14 +113,11 @@ public class Word implements GrammarInterface{
 	/* 全く同じWordを複製する */
 	public Word copy() {
 		Word replica = new Word();
-		replica.setWord(name, tags, parentClause, isCategorem);
+		replica.setWord(name, tags, getParent(), isCategorem);
 		return replica;
 	}
 	
-	
-	public int getID() {
-		return id;
-	}
+
 	public String getName() {
 		return name;
 	}
@@ -124,18 +127,33 @@ public class Word implements GrammarInterface{
 	public boolean isCategorem() {
 		return isCategorem;
 	}
-	public Clause getParentClause() {
-		return parentClause;
-	}
 	public Concept getConcept() {
 		return concept;
 	}
+	
+	
+	/**********************************/
+	/**********    Getter    **********/
+	/**********************************/
 	@Override
-	public String toString() {
-		return name;
+	public int getID() {
+		return id;
 	}
+	
+	/***********************************/
+	/**********   Interface   **********/
+	/***********************************/
 	@Override
 	public void printDetail() {
 		System.out.println(id+":" + name);
+	}
+
+
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
+	@Override
+	public String toString() {
+		return Objects.toString(concept, "nullConcept");
 	}
 }

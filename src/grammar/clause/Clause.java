@@ -2,56 +2,61 @@ package grammar.clause;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import grammar.GrammarInterface;
-import grammar.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Phrase;
 import grammar.word.Word;
 
-public class Clause implements GrammarInterface{
-	public static Set<Clause> allClauses = new HashSet<Clause>();
+public class Clause extends AbstractClause<Categorem>{
+	private static int clausesSum = 0;
 
 	private final int id;
-	private List<Word> words;			// 構成するWordのListを持つ
-	private Sentence parentSentence;
 	
-	private Categorem categorem;			// 自立語
-	private List<Adjunct> modifier; 		// 付属語 
+	private List<Word> words;			// 構成するWordのListを持つ
 	
 	private Clause depending;			// 係り先文節.どのClauseに係るか
-	private List<Clause> dependeds;		// 係られてる文節の集合.どのClauseから係り受けるか
+	private List<Clause> dependeds = new ArrayList<>();		// 係られてる文節の集合.どのClauseから係り受けるか
 
-	private Clause() {
-		id = allClauses.size();
-		allClauses.add(this);
-		dependeds = new ArrayList<>();
+	
+	public Clause() {
+		super(new ArrayList<>());
+		this.id = clausesSum++;
 	}
 	/**
-	 * @param wordList			単語のリスト
-	 * @param depIndex			係る文節の位置
+	 * @param words				単語のリスト
 	 * @param categoremIndex		自立語の位置
 	 */
-	public Clause(List<Word> wordList, int categoremIndex) {
-		this();
-		this.words = wordList;
+	public Clause(List<Word> words, int categoremIndex) {
+		super(words);
+		this.id = clausesSum++;
+
 		
-		setWordsComeUnderItself();
+		this.words = words;		
+		setItself2Words();
 		setCategoremHeadWords(0, categoremIndex+1, true);	// CaboChaで自立語と判定された単語だけでなく，0番目からその単語まで全て自立語とする
 		uniteCategorems4Words();	// 自立語を全て結合
 	}
-	
-	public void setWords(List<Word> wordList) {
-		this.words = wordList;
-		setWordsComeUnderItself();
+	/**
+	 * 新型
+	 * @param categorem
+	 * @param adjuncts
+	 * @param others
+	 */
+	public Clause(Categorem categorem, List<Adjunct> adjuncts, List<Word> others) {
+		super(categorem, adjuncts, others);
+		this.id = clausesSum++;
+	}
+
+
+	public void setWords(List<Word> words) {
+		this.words = words;
+		setItself2Words();
 	}
 	public void setDepending(Clause depending) {
 		this.depending = depending;
@@ -96,8 +101,8 @@ public class Clause implements GrammarInterface{
 		newWords.addAll(categorems);	// 残り物があれば回収
 		this.words = newWords;
 	}
-	private void setWordsComeUnderItself() {
-		words.stream().forEach(w -> w.parentClause=this);
+	private void setItself2Words() {
+		words.stream().forEach(w -> w.setParent(this));
 	}
 
 	public int indexOfW(Word word) {
@@ -149,7 +154,7 @@ public class Clause implements GrammarInterface{
 		for(Iterator<Clause> itr = baseClauses.iterator(); itr.hasNext(); ) {
 			Clause clause = itr.next();
 			for(Word word: clause.words) {		// 元ClauseのWordはこの新しいClauseに属するように変える
-				word.parentClause = this;
+				word.setParent(this);
 			}
 			// 全ての元Clauseの係り先を新しいClauseに変える
 			if (clause.dependeds != null) {
@@ -184,7 +189,7 @@ public class Clause implements GrammarInterface{
 		List<Word> subWords = new ArrayList<>(words.size());
 		for(Word word: words) {
 			Word subWord = word.copy();
-			subWord.parentClause = replicaClause;
+			subWord.setParent(replicaClause);
 			subWords.add(subWord);
 		}
 		replicaClause.setWords(subWords);
@@ -310,39 +315,15 @@ public class Clause implements GrammarInterface{
 	public List<Word> getWords() {
 		return words;
 	}
-	public Sentence getParentSentence() {
-		return parentSentence;
-	}
 	public Clause getDepending() {
 		return depending;
 	}
 	public List<Clause> getDependeds() {
 		return dependeds;
 	}
-	public void setParentSentence(Sentence parent) {
-		this.parentSentence = parent;
-	}
-	@Override
-	public String toString() {
-		return words.stream().map(w -> w.toString()).collect(Collectors.joining());
-	}
-	@Override
-	public void printDetail() {
-		System.out.println(toString());
-	}
-
-
-	/* Clauseの係り受け関係を更新 */
-	/* 全てのClauseインスタンスのdependingが正しいことが前提の設計 */
-	public static void updateAllDependency() {
-		for(final Clause cls: Clause.allClauses) {
-			if (cls.dependeds != null)
-				cls.dependeds.clear();	// 一度全ての被係り受けをまっさらにする
-		}
-		for(final Clause cls: Clause.allClauses) {
-			Clause depto = cls.depending;
-			if(depto != null && depto.dependeds != null) depto.dependeds.add(cls);
-		}
-	}
+	
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
 
 }

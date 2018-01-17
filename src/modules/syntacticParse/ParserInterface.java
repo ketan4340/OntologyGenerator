@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import grammar.Concept;
+import grammar.Morpheme;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
 import grammar.clause.Clause;
@@ -18,7 +20,7 @@ public interface ParserInterface {
 	/** 入力が自然言語文のList */
 	List<Sentence> texts2sentences(List<NaturalLanguage> nlTextList);
 	/** 入力が自然言語文の配列 */
-	List<Sentence> texts2sentences(NaturalLanguage[] nlTexts);
+	Sentence[] texts2sentences(NaturalLanguage[] nlTexts);
 	/** 入力がテキストファイル */
 	List<Sentence> texts2sentences(Path nlTextFilePath);
 	
@@ -55,5 +57,7 @@ public interface ParserInterface {
 	/** Sentence1(Clause1(Word1,Word2,..),Clause2(Word,Word,..),Clause3(..),...)の構成に変換 **/
 	Sentence decode2Sentence(List<String> parseResult4sentence);
 	Clause decode2Clause(List<String> parseResult4clause);
-	Word decode2Word(List<String> parseResult4word);
+	Word decode2Word(List<List<String>> parseResult4word);			// 複数の形態素からなる場合を考慮
+	Concept decode2Concept(List<List<String>> parseResult4concept);	// Wordに同じ
+	Morpheme decode2Morpheme(List<String> parseResult4morpheme);		// 形態素の情報が複数行の場合を考慮
 }

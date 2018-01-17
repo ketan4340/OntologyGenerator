@@ -15,9 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import grammar.Concept;
+import grammar.Morpheme;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
 import grammar.clause.Clause;
+import grammar.word.Adjunct;
+import grammar.word.Categorem;
+import grammar.word.PartOfSpeech;
 import grammar.word.Word;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface{
@@ -37,8 +42,9 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static final Path inputFilePath = Paths.get("parserIO/parserInput.txt");
 	private static final Path outputFilePath = Paths.get("parserIO/parserOutput.txt");
 
-	/* 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap */
-	// 都度clearして使い回す
+	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
+	 * 都度clearして使い回す.
+	 */
 	Map<Clause, Integer> dependingMap = new HashMap<>();
 	
 	/*************************/
@@ -65,6 +71,10 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/*******************************************/
 	/***** ParserInterfaceの抽象メソッドの実装 *****/
 	/*******************************************/
+	
+	/********************************/
+	/***** 解析器・階層化呼び出し部 *****/
+	/********************************/
 	@Override
 	public Sentence text2sentence(NaturalLanguage nlText){
 		List<String> parseOutput = parse(nlText);
@@ -74,27 +84,25 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	public List<Sentence> texts2sentences(List<NaturalLanguage> nlTextList){
 		List<String> parseOutput;
 		
-		int inputSize = nlTextList.size();
+		System.out.println("The number of text is "+nlTextList.size()+".");
 		// サイズが1の時は，内部で同名メソッド(NL)を呼ぶ
 		// サイズが2以上の時は，ファイルに出力してから同名メソッド(Path)を呼ぶ
-		switch (inputSize) {
-		case 0:		// 入力テキスト数:0
-			System.out.println("The number of text is "+inputSize+".");
-			parseOutput = emptyInput();
-		case 1:		// 入力テキスト数:1
-			System.out.println("The number of text is "+inputSize+".");
-			parseOutput = parse(nlTextList.get(0));
-		default:		// 入力テキスト数:2以上
-			System.out.println("The number of text is "+inputSize+".");
+		switch (nlTextList.size()) {
+		case 0:		// 入力テキスト数: 0
+			parseOutput = emptyInput();	break;
+		case 1:		// 入力テキスト数: 1
+			parseOutput = parse(nlTextList.get(0));	break;
+		default:		// 入力テキスト数: 2以上
 			Path textFile = output_ParserInput(nlTextList);	// 一旦ファイルに出力
 			parseOutput = parse(textFile);					// そのファイルを入力として解析
-			//parseOutput = passContinualArguments(nlList);
+			break;
 		}
 		return decodeProcessOutput(parseOutput);
 	}
 	@Override
-	public List<Sentence> texts2sentences(NaturalLanguage[] nlTexts){
-		return texts2sentences(Arrays.asList(nlTexts));
+	public Sentence[] texts2sentences(NaturalLanguage[] nlTexts){
+		List<Sentence> sentences = texts2sentences(Arrays.asList(nlTexts));
+		return sentences.toArray(new Sentence[sentences.size()]);
 	}
 	@Override
 	public List<Sentence> texts2sentences(Path inputFilePath){
@@ -102,7 +110,10 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		return decodeProcessOutput(parseOutput);
 	}
 	
-		
+	
+	/********************************/
+	/********** 解析器実行部 **********/
+	/********************************/
 	@Override
 	public List<String> parse(NaturalLanguage nlText) {
 		startProcess(command);									// プロセス開始
@@ -113,22 +124,8 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	}
 	@Override
 	public List<String> parse(List<NaturalLanguage> nlList) {
-		int inputSize = nlList.size();
-		// サイズが1の時は，内部で同名メソッド(NL)を呼ぶ
-		// サイズが2以上の時は，ファイルに出力してから同名メソッド(Path)を呼ぶ
-		switch (inputSize) {
-		case 0:		// 入力テキスト数:0
-			System.out.println("The number of text is "+inputSize+".");
-			return emptyInput();
-		case 1:		// 入力テキスト数:1
-			System.out.println("The number of text is "+inputSize+".");
-			return parse(nlList.get(0));
-		default:	// 入力テキスト数:2以上
-			System.out.println("The number of text is "+inputSize+".");
-			Path path = output_ParserInput(nlList);	// 一旦ファイルに出力
-			return parse(path);						// そのファイルを入力として解析
-			//return passContinualArguments(nlList);
-		}
+		Path path = output_ParserInput(nlList);	// 一旦ファイルに出力
+		return parse(path);						// そのファイルを入力として解析
 	}
 	@Override
 	public List<String> parse(NaturalLanguage[] nlTexts) {	// 配列の場合
@@ -151,7 +148,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 
 	
 	/**
-	 * プロセスに繰り返し入力し, 出力をまとめて得る. 多分,数が多いと使えない.
+	 * プロセスへの入力を繰り返し出力をまとめて得る. 多分，数が多いと使えない.
 	 * @param nlList
 	 * @return 解析結果の文字列リスト
 	 */
@@ -181,52 +178,92 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割	
 		List<Clause> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
+				.map(clause -> (Clause) clause)
 				.collect(Collectors.toList());
 		return new Sentence(clauses, dependingMap);
 	}
 	@Override
 	public Clause decode2Clause(List<String> parsedInfo4clause) {
-		// 一要素目は文節に関する情報
+		//// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
-		String clauseInfo = parsedInfo4clause.get(0);							// "* 0 -1D 0/1 0.000000..."
-		String[] clauseInfos = clauseInfo.split(" ");							// "*","0","-1D","0/1","0.000000..."
-		String dep_str = clauseInfos[2];											// 係り先の情報. ex) "2D","-1D"
-		int depIndex = Integer.decode(dep_str.substring(0, dep_str.length()-1));	// -1で'D'の部分を除去. ex) 2,-1
-		int isSbjIndex = Integer.decode(clauseInfos[3].split("/")[0]);			// 主辞の番号. ex)"0/1"の"0"部分
-
-		// 残りは単語に関する情報
-		List<List<String>> wordInfoList = parsedInfo4clause.subList(1, parsedInfo4clause.size())
+		int[] cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
+		int depIndex = cabochaClauseIndexes[0];		// 係る先の文節の番号. ex) "-1D"の"-1"部分
+		int subjEndIndex = cabochaClauseIndexes[1];	// 主辞の終端の番号. ex) "0/1"の"0"部分
+		int funcEndIndex = cabochaClauseIndexes[2];	// 機能語の終端の番号. ex) "0/1"の"1"部分
+		
+		//// 残り(Index1以降)は単語に関する情報
+		// CaboChaは形態素の情報は一行 (本来Stringで十分)だが，ParserInterface(を実装するKNP)に合わせてList<String>とする．
+		List<List<String>> wordInfoLists = parsedInfo4clause.subList(1, parsedInfo4clause.size())
 				.stream().map(info -> Arrays.asList(info)).collect(Collectors.toList());
-
-		List<Word> words = wordInfoList.stream()
-				.map(wordInfo -> decode2Word(wordInfo))
+		
+		Categorem categorem = decode2WordWithPoS(
+				wordInfoLists.subList(0, subjEndIndex),
+				PartOfSpeech.Categorem);
+		List<Adjunct> functionWords = wordInfoLists.subList(subjEndIndex, funcEndIndex)
+				.stream()
+				.map(wordInfo -> (Adjunct) decode2WordWithPoS(Arrays.asList(wordInfo), PartOfSpeech.Adjunct))
 				.collect(Collectors.toList());
-		Clause clause = new Clause(words, isSbjIndex);
+		List<Word> otherWords = wordInfoLists.subList(funcEndIndex, wordInfoLists.size())
+				.stream()
+				.map(wordInfo -> (Word) decode2WordWithPoS(Arrays.asList(wordInfo), PartOfSpeech.Other))
+				.collect(Collectors.toList());
+		
+		Clause clause = new Clause(categorem, functionWords, otherWords);
 		dependingMap.put(clause, depIndex);
 		return clause;
 	}
-	@Override
-	public Word decode2Word(List<String> parsedInfo4word) {
-		// 一応Listで受け取るものの，きっと1行だけしかない．よってget(0)
-		String[] wordInfo = parsedInfo4word.get(0).split("\t");
-		List<String> tags;
-		try {
-			tags = Arrays.asList(wordInfo[1].split(","));
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(wordInfo[0]);
-			tags = new ArrayList<>();
-		}
-		
-		
-		return new Word(wordInfo[0], tags);
+	public <W extends Word> W decode2WordWithPoS(List<List<String>> parsedInfo4word, PartOfSpeech pos) {
+		Concept concept = decode2Concept(parsedInfo4word);
+		W extendedWord = pos==PartOfSpeech.Categorem?	(W) new Categorem(concept)
+						:pos==PartOfSpeech.Adjunct?		(W) new Adjunct(concept)
+						:pos==PartOfSpeech.Other?		(W) new Word(concept)
+						:null;
+		return extendedWord;
 	}
-	
+	@Override
+	public Word decode2Word(List<List<String>> parsedInfo4word) {
+		// 一つの単語が複数の形態素からなる場合もあるのでListで渡される
+		Concept concept = decode2Concept(parsedInfo4word);
+		return new Word(concept);
+	}
+	@Override
+	public Concept decode2Concept(List<List<String>> parsedInfo4concept) {
+		List<Morpheme> morphemes = parsedInfo4concept.stream()
+				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
+				.collect(Collectors.toList());
+		String keyword = morphemes.stream().map(m -> m.toString()).collect(Collectors.joining());
+		return Concept.getOrNewInstance(keyword, morphemes);
+	}
+	@Override
+	public Morpheme decode2Morpheme(List<String> parsedInfo4morpheme) {
+		// CaboChaの場合は形態素の情報は必ず一行なのでget(0)
+		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");
+		String name = morphemeInfos[0];
+		List<String> tags = Arrays.asList(morphemeInfos[1].split(","));
+		return Morpheme.getOrNewInstance(name, tags);
+	}
+
 
 	/*******************************************/
 	/********** Cabocha専用メソッドの実装 *********/
 	/*******************************************/
-
+	
+	/**
+	 * CaboCha特有の文節に関するIndex情報3つをまとめた配列を返す.
+	 * @param cabochaClauseInfo CaboChaの文節に関する出力
+	 * @return Indexをまとめた長さ3の配列
+	 */
+	private int[] cabochaClauseIndexes(String cabochaClauseInfo) {
+		int[] indexes = new int[3];
+		String[] clauseInfos = cabochaClauseInfo.split(" ");				// "*","0","-1D","0/1","0.000000..."
+		int depIndex = Integer.decode(clauseInfos[2].substring(0, clauseInfos[2].length()-1));	// -1で'D'を除去.
+		String[] subjFuncIndexes = clauseInfos[3].split("/");				// ex) "0/1"->("0","1")
+		int subjEndIndex = Integer.decode(subjFuncIndexes[0])+1;			// 主辞の終端の番号. ex) "0/1"の"0"部分
+		int funcEndIndex = Integer.decode(subjFuncIndexes[1])+1;			// 機能語の終端の番号. ex) "0/1"の"1"部分
+		indexes[0] = depIndex;	indexes[1] = subjEndIndex;	indexes[2] = funcEndIndex;
+		return indexes;
+	}
+	
 	/** 入力したいテキスト(List<NL>)を一旦ファイル(parserInput)に出力 **/
 	/* List<NL>のサイズが2以上ならこれらを呼び出し、executeParser(Path)に渡される */
 	private static Path output_ParserInput(List<NaturalLanguage> nlTextList) {

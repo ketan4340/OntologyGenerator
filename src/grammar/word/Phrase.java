@@ -4,20 +4,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 
 public class Phrase extends Word{
 	private List<Word> originWords;
 	
-	private Categorem head;			// 主要部
 	private List<Clause> dependent;	// 従属部
+	private Categorem head;			// 主要部
 	
 	public Phrase() {
 		super(new String(), new ArrayList<String>());
 		originWords = new ArrayList<Word>();
 	}
 
-	public void setPhrase(List<Word> baseWords, Clause belongClause, boolean head_tail) {
+	public void setPhrase(List<Word> baseWords, AbstractClause<?> parentClause, boolean head_tail) {
 		String phraseName = new String();
 		String genkei = new String();
 		String yomi1 = new String();
@@ -46,11 +47,11 @@ public class Phrase extends Word{
 		phraseTags.set(7, yomi1);
 		phraseTags.set(8, yomi2);
 
-		if(belongClause == null) {
-			belongClause = head_tail
-					? headWord.parentClause		// 新しいPhraseの所属するClauseは先頭のWordに依存
-					: tailWord.parentClause;	// 新しいPhraseの所属するClauseは最後尾のWordに依存
+		if(parentClause == null) {
+			parentClause = head_tail
+					? headWord.getParent()	// 新しいPhraseの所属するClauseは先頭のWordに依存
+					: tailWord.getParent();	// 新しいPhraseの所属するClauseは最後尾のWordに依存
 		}
-		setWord(phraseName, phraseTags, belongClause, true);
+		setWord(phraseName, phraseTags, parentClause, true);
 	}
 }

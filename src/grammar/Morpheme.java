@@ -1,59 +1,64 @@
 package grammar;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Objects;
 
 public class Morpheme implements GrammarInterface{
-	public static Set<Morpheme> allMorphemes = new HashSet<Morpheme>();
+	private static Map<String, Morpheme> allMorphemes = new HashMap<>();
 
-	private final int id;			// 通し番号。Morphemeを特定する
-	private String name;				// 形態素の文字列
+	private final int id;				// 通し番号。Morphemeを特定する
+	private final String name;			// 形態素の文字列
 	
-	private String partOfSpeech;		// 品詞
-	private String subPoS1;			// 品詞細分類1
-	private String subPoS2;			// 品詞細分類2
-	private String subPoS3;			// 品詞細分類3
-	private String inflection;		// 活用形
-	private String conjugation;		// 活用型
-	private String originalForm;		// 原形 (半角文字にはない)
-	private String kana;				// 読み (半角文字にはない)
-	private String pronunciation;	// 発音 (半角文字にはない)
+	private final String pos;			// 品詞
+	private final String subPoS1;		// 品詞細分類1
+	private final String subPoS2;		// 品詞細分類2
+	private final String subPoS3;		// 品詞細分類3
+	private final String inflection;		// 活用形
+	private final String conjugation;	// 活用型
+	private final String lexeme;			// 原形 (半角文字にはない)
+	private final String kana;			// 読み (半角文字にはない)
+	private final String pronunciation;	// 発音 (半角文字にはない)
 	
 	
-	private Morpheme() {
-		id = allMorphemes.size();
-		allMorphemes.add(this);
-	}
-	public Morpheme(String name, String partOfSpeech, String subPoS1, String subPoS2, String subPoS3, String inflection,
-			String conjugation, String originalForm, String kana, String pronunciation) {
-		this();
+	private Morpheme(String name, String pos, String subPoS1, String subPoS2, String subPoS3, String inflection,
+			String conjugation, String lexeme, String kana, String pronunciation) {
+		this.id = allMorphemes.size();
 		this.name = name;
-		this.partOfSpeech = partOfSpeech;
+		this.pos = pos;
 		this.subPoS1 = subPoS1;
 		this.subPoS2 = subPoS2;
 		this.subPoS3 = subPoS3;
 		this.inflection = inflection;
 		this.conjugation = conjugation;
-		this.originalForm = originalForm;
+		this.lexeme = lexeme;
 		this.kana = kana;
 		this.pronunciation = pronunciation;
+		
+		allMorphemes.put(name, this);
 	}
 	public Morpheme(String name, List<String> tags) {
 		this(name, tags.get(0), tags.get(1), tags.get(2), tags.get(3), tags.get(4), tags.get(5), 
 				tags.size() > 6 ? tags.get(6) : name, tags.size() > 7 ? tags.get(7) : name, tags.size() > 8 ? tags.get(8) : name);
 	}
 	
+	public static Morpheme getOrNewInstance(String keyword, List<String> tags) {
+		return allMorphemes.getOrDefault(keyword,  new Morpheme(keyword, tags));
+	}
 	
-	/* Getter */
+	
+	/**********************************/
+	/**********    Getter    **********/
+	/**********************************/
 	public int getId() {
 		return id;
 	}
 	public String getName() {
 		return name;
 	}
-	public String getPartOfSpeech() {
-		return partOfSpeech;
+	public String getPoS() {
+		return pos;
 	}
 	public String getSubPoS1() {
 		return subPoS1;
@@ -70,8 +75,8 @@ public class Morpheme implements GrammarInterface{
 	public String getConjugation() {
 		return conjugation;
 	}
-	public String getOriginalForm() {
-		return originalForm;
+	public String getLexeme() {
+		return lexeme;
 	}
 	public String getKana() {
 		return kana;
@@ -79,6 +84,11 @@ public class Morpheme implements GrammarInterface{
 	public String getPronunciation() {
 		return pronunciation;
 	}
+	
+	
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -91,8 +101,8 @@ public class Morpheme implements GrammarInterface{
 		result = prime * result + ((inflection == null) ? 0 : inflection.hashCode());
 		result = prime * result + ((kana == null) ? 0 : kana.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((originalForm == null) ? 0 : originalForm.hashCode());
-		result = prime * result + ((partOfSpeech == null) ? 0 : partOfSpeech.hashCode());
+		result = prime * result + ((lexeme == null) ? 0 : lexeme.hashCode());
+		result = prime * result + ((pos == null) ? 0 : pos.hashCode());
 		result = prime * result + ((pronunciation == null) ? 0 : pronunciation.hashCode());
 		return result;
 	}
@@ -142,15 +152,15 @@ public class Morpheme implements GrammarInterface{
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (originalForm == null) {
-			if (other.originalForm != null)
+		if (lexeme == null) {
+			if (other.lexeme != null)
 				return false;
-		} else if (!originalForm.equals(other.originalForm))
+		} else if (!lexeme.equals(other.lexeme))
 			return false;
-		if (partOfSpeech == null) {
-			if (other.partOfSpeech != null)
+		if (pos == null) {
+			if (other.pos != null)
 				return false;
-		} else if (!partOfSpeech.equals(other.partOfSpeech))
+		} else if (!pos.equals(other.pos))
 			return false;
 		if (pronunciation == null) {
 			if (other.pronunciation != null)
@@ -161,7 +171,7 @@ public class Morpheme implements GrammarInterface{
 	}
 	@Override
 	public String toString() {
-		return name;
+		return Objects.toString(name, "nullMorpheme");
 	}
 	@Override
 	public void printDetail() {

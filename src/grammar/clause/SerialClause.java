@@ -4,12 +4,21 @@ import java.util.List;
 
 import grammar.word.Adjunct;
 import grammar.word.Phrase;
+import grammar.word.Word;
 
-public class SerialClause {
-	private Phrase modificand;			// 句
-	private List<Adjunct> modifier;		// 付属語
+public class SerialClause extends AbstractClause<Phrase>{
+	private static int clausesSum = 0;
 
-	public SerialClause() {
+	private final int id;
 	
+	public SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
+		super(categorem, adjuncts, others);
+		id = clausesSum++;
+	}
+
+	
+	@Override
+	public int getID() {
+		return id;
 	}
 }
