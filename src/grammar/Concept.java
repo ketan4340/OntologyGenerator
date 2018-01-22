@@ -1,36 +1,80 @@
 package grammar;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.ListIterator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class Concept implements GrammarInterface{
-	private static Map<String, Concept> allConcepts = new HashMap<>();
+import grammar.morpheme.Morpheme;
+import util.UniqueSet;
+import util.Uniqueness;
 
-	private final int id;					// 通し番号。Conceptを特定する
+public class Concept implements GrammarInterface, Identifiable, Uniqueness<Concept> {
+	private static UniqueSet<Concept> uniqueset = new UniqueSet<>(100);
+
+	private final int id;					// 通し番号
 	private final List<Morpheme> morphemes;	// 形態素たち
 	
-	public Concept(List<Morpheme> morphemes) {
-		this.id = allConcepts.size();
+
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
+	private Concept(List<Morpheme> morphemes) {
+		this.id = uniqueset.size();
 		this.morphemes = morphemes;
 		
-		String keyword = morphemes.stream().map(m -> m.getName()).collect(Collectors.joining());
-		allConcepts.put(keyword, this);
+		uniqueset.add(this);
 	}
 	
-	public static Concept getOrNewInstance(String keyword, List<Morpheme> morphemes) {
-		return allConcepts.getOrDefault(keyword, new Concept(morphemes));
+	/**
+	 * 同一の概念が存在していればそれを，なければ新しいインスタンスを作って返す.
+	 * @param morphemes
+	 * @return 渡された文字列と形態素に一致する概念
+	 */
+	public static Concept getOrNewInstance(List<Morpheme> morphemes) {
+		Concept c = new Concept(morphemes);
+		return uniqueset.getExistingOrIntact(c);
+	}
+	@SafeVarargs
+	public static Concept getOrNewInstance(List<String>... tagLists) {
+		List<Morpheme> morphemes = Stream.of(tagLists)
+				.map(name_tags -> Morpheme.getOrNewInstance(name_tags))
+				.collect(Collectors.toList());
+		Concept c = new Concept(morphemes);
+		return uniqueset.getExistingOrIntact(c);
 	}
 	
+	public String name() {
+		return toString();
+	}
+	
+	/***********************************/
+	/**********   Interface   **********/
+	/***********************************/
+	public int getID() {
+		return id;
+	}
+	public void printDetail() {
+		System.out.println(toString());
+	}
+	public int compareTo(Concept o) {
+		int comparison = 0;
+		ListIterator<Morpheme> itr1 = morphemes.listIterator();
+		ListIterator<Morpheme> itr2 = o.morphemes.listIterator();
+		while (itr1.hasNext() && itr2.hasNext()) {
+			comparison = itr1.next().compareTo(itr2.next());
+			if (comparison != 0)
+				return comparison;
+		}
+		return itr1.hasNext()? 1 
+				: itr2.hasNext()? -1
+				: comparison; // =0
+	}
 	
 	
 	/**********************************/
 	/**********    Getter    **********/
 	/**********************************/
-	public int getId() {
-		return id;
-	}
 	public List<Morpheme> getMorphemes() {
 		return morphemes;
 	}
@@ -44,7 +88,6 @@ public class Concept implements GrammarInterface{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
 		result = prime * result + ((morphemes == null) ? 0 : morphemes.hashCode());
 		return result;
 	}
@@ -57,8 +100,6 @@ public class Concept implements GrammarInterface{
 		if (getClass() != obj.getClass())
 			return false;
 		Concept other = (Concept) obj;
-		if (id != other.id)
-			return false;
 		if (morphemes == null) {
 			if (other.morphemes != null)
 				return false;
@@ -66,12 +107,9 @@ public class Concept implements GrammarInterface{
 			return false;
 		return true;
 	}
+	
 	@Override
 	public String toString() {
 		return morphemes.stream().map(m -> m.toString()).collect(Collectors.joining());
-	}
-	@Override
-	public void printDetail() {
-		System.out.println(toString());
 	}
 }

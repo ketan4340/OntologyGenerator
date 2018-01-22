@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -24,9 +25,10 @@ import data.original.RDFTriple;
 import grammar.NaturalLanguage;
 import grammar.Paragraph;
 import grammar.Sentence;
+import grammar.clause.AbstractClause;
 import modules.relationExtract.OntologyWriter;
 import modules.syntacticParse.Cabocha;
-import modules.syntacticParse.StringListUtil;
+import util.StringListUtil;
 
 public class Generator {
 	public Generator() {
@@ -65,12 +67,13 @@ public class Generator {
 			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
 			String[][] tagDone = {{"動詞"}, {"動詞", "接尾"}};
 			//originalSentence.connect(tagNouns);
-			originalSentence.connect(tagDo);
-			originalSentence.connect(tagDone);
+			originalSentence.getConstituents().forEach(c -> c.uniteAdjunct2Categorem(tagDo[0], tagDo[1]));
+			originalSentence.getConstituents().forEach(c -> c.uniteAdjunct2Categorem(tagDone[0], tagDone[1]));
 			/* 名詞と形容詞だけ取り出す */
 			// これらがClauseの末尾につくものを隣のClauseにつなげる
 			String[][] tags_NP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}, {"名詞"}};
-			originalSentence.connect2Next(tags_NP, false);
+			Set<AbstractClause<?>> clauses_NP = originalSentence.collectClauseHasSome(tags_NP);
+			clauses_NP.forEach(c -> originalSentence.connect2Next(c));
 
 			/** Step2: 長文分割 **/
 			/* 長文を分割し複数の短文に分ける */

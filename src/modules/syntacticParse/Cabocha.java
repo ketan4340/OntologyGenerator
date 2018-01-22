@@ -16,14 +16,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import grammar.Concept;
-import grammar.Morpheme;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
+import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
+import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.PartOfSpeech;
 import grammar.word.Word;
+import util.StringListUtil;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/* CaboChaの基本実行コマンド */
@@ -45,11 +47,12 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
 	 * 都度clearして使い回す.
 	 */
-	Map<Clause, Integer> dependingMap = new HashMap<>();
+	Map<AbstractClause<?>, Integer> dependingMap = new HashMap<>();
 	
-	/*************************/
-	/****** コンストラクタ ******/
-	/*************************/
+	
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
 	/* デフォルトではオプション(-f1,-n1)でセッティング */
 	public Cabocha() {
 		this(opt_Lattice, opt_NE_Constraint);
@@ -176,7 +179,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
 		dependingMap.clear();
 		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割	
-		List<Clause> clauses = clauseInfoList.stream()
+		List<AbstractClause<?>> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
 				.map(clause -> (Clause) clause)
 				.collect(Collectors.toList());
@@ -196,7 +199,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<List<String>> wordInfoLists = parsedInfo4clause.subList(1, parsedInfo4clause.size())
 				.stream().map(info -> Arrays.asList(info)).collect(Collectors.toList());
 		
-		Categorem categorem = decode2WordWithPoS(
+		Categorem categorem = (Categorem) decode2WordWithPoS(
 				wordInfoLists.subList(0, subjEndIndex),
 				PartOfSpeech.Categorem);
 		List<Adjunct> functionWords = wordInfoLists.subList(subjEndIndex, funcEndIndex)
@@ -212,12 +215,13 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		dependingMap.put(clause, depIndex);
 		return clause;
 	}
-	public <W extends Word> W decode2WordWithPoS(List<List<String>> parsedInfo4word, PartOfSpeech pos) {
+	public Word decode2WordWithPoS(List<List<String>> parsedInfo4word, PartOfSpeech pos) {
 		Concept concept = decode2Concept(parsedInfo4word);
-		W extendedWord = pos==PartOfSpeech.Categorem?	(W) new Categorem(concept)
-						:pos==PartOfSpeech.Adjunct?		(W) new Adjunct(concept)
-						:pos==PartOfSpeech.Other?		(W) new Word(concept)
-						:null;
+		Word extendedWord =
+				 pos==PartOfSpeech.Categorem?	new Categorem(concept)
+				:pos==PartOfSpeech.Adjunct?		new Adjunct(concept)
+				:pos==PartOfSpeech.Other?		new Word(concept)
+				:null;
 		return extendedWord;
 	}
 	@Override
@@ -231,8 +235,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<Morpheme> morphemes = parsedInfo4concept.stream()
 				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
 				.collect(Collectors.toList());
-		String keyword = morphemes.stream().map(m -> m.toString()).collect(Collectors.joining());
-		return Concept.getOrNewInstance(keyword, morphemes);
+		return Concept.getOrNewInstance(morphemes);
 	}
 	@Override
 	public Morpheme decode2Morpheme(List<String> parsedInfo4morpheme) {

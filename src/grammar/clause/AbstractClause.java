@@ -1,33 +1,46 @@
 package grammar.clause;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import grammar.Concept;
 import grammar.Identifiable;
 import grammar.Sentence;
-import grammar.SyntacticComponent;
+import grammar.morpheme.Morpheme;
+import grammar.structure.SyntacticComponent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public abstract class AbstractClause<W extends Word> extends SyntacticComponent<Sentence, Word> implements Identifiable{
-	private W categorem;					// 自立語
-	private List<Adjunct> adjuncts; 		// 付属語
-	private List<Word> others;			// 。などの記号
+public abstract class AbstractClause<W extends Word> extends SyntacticComponent<Sentence, Word> 
+implements Identifiable{
+	protected W categorem;				// 自立語
+	protected List<Adjunct> adjuncts; 	// 付属語
+	protected List<Word> others;			// 。などの記号
 	
-	private AbstractClause<?> depending;			// 係り先文節.どのClauseに係るか
-	private List<AbstractClause<?>> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか
+	protected AbstractClause<?> depending;		// 係り先文節.どのClauseに係るか
+	protected List<AbstractClause<?>> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか
 
+
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
 	public AbstractClause(W categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
 		this.categorem = categorem;
 		this.adjuncts = adjuncts;
 		this.others = others;
+		//imprintThisOnChildren();
 	}
 	public AbstractClause(List<Word> constituents) {
 		super(constituents);
 	}
+	
+	
 	
 	public List<Word> words() {
 		List<Word> words = new ArrayList<>(5);
@@ -45,10 +58,178 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 		return words;
 	}
 	
-	/**********************************/
-	/**********    Getter    **********/
-	/**********************************/
+
+	/***********************************/
+	/************* 旧型 ***********/
+	/***********************************/
 	
+	/**
+	 * この文節が係る文節，その文節が係る文節，と辿っていき，経由した全ての文節をリストにして返す.
+	 * @return この文節から係る全ての文節
+	 */
+	public List<AbstractClause<?>> allDependings() {
+		List<AbstractClause<?>> allDepending = new ArrayList<>();
+		AbstractClause<?> depto = depending;
+		while (depto != null) {
+			allDepending.add(depto);
+			depto = depto.getDepending();
+		}
+		return allDepending;
+	}
+
+
+	/* 全く同じClauseを複製する */
+	public abstract AbstractClause<?> clone();
+	
+	/**
+	 * 複数のClauseを係り受け関係を維持しつつ複製する
+	 */
+	public static List<AbstractClause<?>> cloneAll(List<AbstractClause<?>> clauseList) {
+		// まずは複製
+		List<AbstractClause<?>> replicaList = clauseList.stream().map(origin -> origin.clone()).collect(Collectors.toList());
+		// 係り先があれば整え、なければnull
+		for (int i=0; i<clauseList.size(); i++) {
+			AbstractClause<?> origin = clauseList.get(i);
+			AbstractClause<?> replica = replicaList.get(i);
+			int index2Dep = clauseList.indexOf(origin.getDepending());
+			replica.setDepending( (index2Dep != -1)
+					? replicaList.get(index2Dep)
+					: null);
+		}
+		return replicaList;
+	}
+
+	
+	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
+		if (words().size() < 2)
+			return false;	// 文節の単語が一つしかないなら意味がない
+		if (!categorem.hasAllTags(tag4Categorem))
+			return false;
+		if (!adjuncts.get(0).hasAllTags(tag4Adjunct))
+			return false;
+		
+		// 付属語から先頭の単語を取り出す
+		Adjunct headAdjunct = adjuncts.remove(0);
+		
+		List<Morpheme> morphemes = Stream
+				.concat(categorem.getMorphemes().stream(), headAdjunct.getMorphemes().stream())
+				.collect(Collectors.toList());
+		
+		// 統合した新しい概念を用意
+		Concept unitedConcept = Concept.getOrNewInstance(morphemes);
+		// この文節の自立語が参照する概念を更新
+		categorem.setConcept(unitedConcept);
+		return true;
+	}
+	
+	
+	/** 指定の品詞を持つWordを返す */
+	public List<Word> collectWordsHaveAll(String[][] tags) {
+		List<String[]> tagNameList = Arrays.asList(tags);
+		List<Word> taggedWords = new ArrayList<>();
+		for (final Word word: words()) {
+			for (final String[] tagsArray: tagNameList) {
+				if (word.hasAllTags(tagsArray))	taggedWords.add(word);
+			}
+		}
+		return taggedWords;
+	}
+	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
+	public boolean containsWordHasAll(String[][] tags) {
+		for (final Word word: words())
+			for (final String[] tagsArray: tags)
+				if (word.hasAllTags(tagsArray))
+					return true;
+		return false;
+	}
+
+	/**
+	 * このClauseの最後尾が渡された品詞のWordなら真. 複数の単語が連続しているか調べたければ品詞配列を複数指定可能.
+	 * 最後尾が読点"、"の場合は無視
+	 * @param tagNames 品詞
+	 * @param ignoreSign 最後尾が記号の場合無視するか
+	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
+	 */
+	public boolean endWith(String[][] tagNames, boolean ignoreSign) {
+		boolean endWith = true;
+		int tagIndex = tagNames.length-1;
+		String[] tagSign = {"記号"};
+
+		for (ListIterator<Word> li = words().listIterator(words().size()); li.hasPrevious(); ) {
+			Word word = li.previous();				// wordも
+			String[] tagName = tagNames[tagIndex];	// tagも後ろから遡る
+			if(ignoreSign && word.hasAllTags(tagSign))
+				continue;	// 記号の場合はスルー
+
+			if (word.hasAllTags(tagName)) {
+				tagIndex--;
+			} else {
+				endWith = false;
+				break;
+			}
+			if(tagIndex < 0) break;
+		}
+		return endWith;
+	}
+
+	
+
+	/***********************************/
+	/**********   Interface   **********/
+	/***********************************/
+	/*
+	public Sentence getParent() {
+		return parent;
+	}
+	public List<Word> getConstituents() {
+		return constituents;
+	}
+	public <P extends SyntacticParent> void setParent(P parent) {
+		this.parent = (Sentence) parent;
+	}
+	public <C extends SyntacticChild> void setConstituents(List<C> constituents) {
+		this.constituents = (List<Word>) constituents;
+	}
+	*/
+	
+	/***********************************/
+	/********** Getter/Setter **********/
+	/***********************************/
+	public W getCategorem() {
+		return categorem;
+	}
+	public List<Adjunct> getAdjuncts() {
+		return adjuncts;
+	}
+	public List<Word> getOthers() {
+		return others;
+	}
+	public AbstractClause<?> getDepending() {
+		return depending;
+	}
+	public List<AbstractClause<?>> getDependeds() {
+		return dependeds;
+	}
+	public void setCategorem(W categorem) {
+		this.categorem = categorem;
+	}
+	public void setAdjuncts(List<Adjunct> adjuncts) {
+		this.adjuncts = adjuncts;
+	}
+	public void setOthers(List<Word> others) {
+		this.others = others;
+	}
+	public void setDepending(AbstractClause<?> depending) {
+		this.depending = depending;
+		if (depending != null)
+			depending.dependeds.add(this);	// 係り先の'係られてる集合'に自身を追加
+	}
+	public void setDependeds(List<AbstractClause<?>> dependeds) {
+		this.dependeds = dependeds;
+	}
+
+
+
 	
 	/**********************************/
 	/********** Objectメソッド **********/

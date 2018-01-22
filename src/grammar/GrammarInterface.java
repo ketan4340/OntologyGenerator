@@ -2,5 +2,5 @@ package grammar;
 
 public interface GrammarInterface {
 
-	void printDetail();
+	public void printDetail();
 }

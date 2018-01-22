@@ -1,23 +1,31 @@
 package grammar.word;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import grammar.clause.AbstractClause;
-import grammar.clause.Clause;
 
+/**
+ * 名詞句を想定
+ * @author tanabekentaro
+ */
 public class Phrase extends Word{
-	private List<Word> originWords;
+
+	private List<AbstractClause<?>> dependent;	// 従属部
+	private Word	 head;							// 主要部
 	
-	private List<Clause> dependent;	// 従属部
-	private Categorem head;			// 主要部
 	
-	public Phrase() {
-		super(new String(), new ArrayList<String>());
-		originWords = new ArrayList<Word>();
+
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
+	public Phrase(List<AbstractClause<?>> dependent, Word head) {
+		super(head.concept);
+		this.dependent = dependent;
+		this.head = head;
 	}
 
+	/*
 	public void setPhrase(List<Word> baseWords, AbstractClause<?> parentClause, boolean head_tail) {
 		String phraseName = new String();
 		String genkei = new String();
@@ -53,5 +61,26 @@ public class Phrase extends Word{
 					: tailWord.getParent();	// 新しいPhraseの所属するClauseは最後尾のWordに依存
 		}
 		setWord(phraseName, phraseTags, parentClause, true);
+	}
+	*/
+	
+	/**
+	 * 全く同じWordを複製する
+	 */
+	@Override
+	public Phrase clone() {
+		List<AbstractClause<?>> cloneDependent = dependent.stream()
+				.map(c -> c.clone()).collect(Collectors.toList());
+		Word cloneHead = head.clone();
+		return new Phrase(cloneDependent, cloneHead);
+	}
+	
+
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
+	@Override
+	public String toString() {
+		return dependent.stream().map(d -> d.toString()).collect(Collectors.joining()) + head.toString();
 	}
 }
