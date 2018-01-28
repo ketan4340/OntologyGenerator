@@ -6,23 +6,17 @@ import java.util.Objects;
 
 import grammar.Concept;
 import grammar.GrammarInterface;
-import grammar.Identifiable;
 import grammar.clause.AbstractClause;
 import grammar.morpheme.Morpheme;
 import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 
 public class Word extends SyntacticComponent<AbstractClause<?>, Word> 
-implements SyntacticChild, GrammarInterface, Identifiable{
+implements GrammarInterface, SyntacticChild {
 	private static int wordsSum = 0;
 
 	private final int id;
 	protected Concept concept;
-
-	private String name;				// 単語の文字列
-	private List<String> tags;		// 品詞・活用形、読みなど
-	public boolean isCategorem;		// 自立語か付属語か
-	
 
 
 	/***********************************/
@@ -41,7 +35,10 @@ implements SyntacticChild, GrammarInterface, Identifiable{
 		this(concept, null);
 	}
 	
-
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	/**
 	 * 渡されたTagを"全て"持って入れば真、それ以外は偽を返す
 	 */
@@ -54,7 +51,7 @@ implements SyntacticChild, GrammarInterface, Identifiable{
 				tag = tag.substring(1);	// -を消しておく
 			}
 
-			if( tags.contains(tag) ) {
+			if( concept.containsTag(tag) ) {
 				match = (not)? false: true;
 			}else {
 				match = (not)? true: false;
@@ -77,7 +74,7 @@ implements SyntacticChild, GrammarInterface, Identifiable{
 				tag = tag.substring(1);	// -を消しておく
 			}
 
-			if( tags.contains(tag) ) {
+			if( concept.containsTag(tag) ) {
 				match = (not)? false: true;
 			}else {
 				match = (not)? true: false;
@@ -91,37 +88,31 @@ implements SyntacticChild, GrammarInterface, Identifiable{
 	public Word clone() {
 		return new Word(this.concept);
 	}
-	
-	public boolean isCategorem() {
-		return isCategorem;
+	public String lexeme() {
+		return concept.lexeme();
 	}
 	
 	
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	public int getID() {
-		return id;
-	}
-	public void printDetail() {
-		System.out.println(id+":" + name);
+	@Override
+	public String name() {
+		return concept.name();
 	}
 	@Override
-	public List<Word> getConstituents() {
+	public List<Word> getChildren() {
 		return Arrays.asList(this);
 	}
 	@Override
-	public <Ch extends SyntacticChild> void setConstituents(List<Ch> constituents) {}
-	
+	public <Ch extends SyntacticChild> void setChildren(List<Ch> constituents) {}
+
 	
 	/***********************************/
 	/********** Getter/Setter **********/
 	/***********************************/
-	public String getName() {
-		return name;
-	}
-	public List<String> getTags() {
-		return tags;
+	public int getID() {
+		return id;
 	}
 	public Concept getConcept() {
 		return concept;
@@ -135,7 +126,7 @@ implements SyntacticChild, GrammarInterface, Identifiable{
 	
 
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public String toString() {

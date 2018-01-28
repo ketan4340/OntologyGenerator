@@ -29,9 +29,8 @@ import grammar.structure.SyntacticComponent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
-implements Identifiable 
-{
+public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>> 
+	implements GrammarInterface {
 	private static int sentenceSum = 0;
 
 	private final int id;
@@ -46,7 +45,7 @@ implements Identifiable
 	}
 	public Sentence(List<AbstractClause<?>> clauses, Map<AbstractClause<?>, Integer> dependingMap) {
 		super(clauses);
-		setConstituents(clauses);
+		setChildren(clauses);
 		this.id = sentenceSum++;
 		//imprintThisOnChildren();
 		initializeDepending(dependingMap);
@@ -54,15 +53,20 @@ implements Identifiable
 	
 	
 	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	
 	/**
 	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
 	 * @param dependingMap 各文節がこの文の何番目の文節に係るか記録されたマップ
 	 */
 	private void initializeDepending(Map<AbstractClause<?>, Integer> dependingMap) {
-		for (Map.Entry<AbstractClause<?>, Integer> entry : dependingMap.entrySet()) {
-			AbstractClause<?> clause = entry.getKey(); int deptoIndex = entry.getValue();
-			clause.setDepending((deptoIndex != -1)? children.get(deptoIndex): Clause.ROOT);
-		}
+		dependingMap.entrySet().stream().forEach(e -> {
+			AbstractClause<?> c = e.getKey();
+			int idxDep2 = e.getValue();
+			c.setDepending((idxDep2 == -1)? Clause.ROOT: children.get(idxDep2));
+		});
 	}
 	
 	public Sentence subSentence(int fromIndex, int toIndex) {
@@ -81,19 +85,14 @@ implements Identifiable
 	/**
 	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
 	 */
-	public Set<AbstractClause<?>> collectClauseHasSome(String[][] tagNames) {
-		return children.stream().filter(c -> c.containsWordHasAll(tagNames)).collect(Collectors.toSet());
+	public List<AbstractClause<?>> collectClauseHasSome(String[][] tagNames) {
+		return children.stream().filter(c -> c.containsWordHasAll(tagNames)).collect(Collectors.toList());
 	}
 	/**
 	 * 渡された品詞に一致するWordを全て含むclauseを返す.
 	 */
-	public Set<AbstractClause<?>> collectClauseHasAny(String[][] tagNames) {
-		Set<AbstractClause<?>> taggedClauses = new HashSet<>();
-		for (final AbstractClause<?> clause: children) {
-			if (clause.containsWordHasAll(tagNames))	// いずれか一つ含めばよい
-				taggedClauses.add(clause);	// 各clause内を探す
-		}
-		return taggedClauses;
+	public List<AbstractClause<?>> collectClauseHasAll(String[][] tagNames) {
+		return children.stream().filter(c -> c.containsWordHasAll(tagNames)).collect(Collectors.toList());
 	}
 	
 	/*
@@ -131,7 +130,7 @@ implements Identifiable
 		SerialClause sc = new SerialClause(Arrays.asList(frontClause, backClause));
 		
 		Set<AbstractClause<?>> formerDependeds = Stream
-				.concat(frontClause.getDependeds().stream(), backClause.getDependeds().stream())
+				.concat(frontClause.clausesDependThis().stream(), backClause.clausesDependThis().stream())
 				.collect(Collectors.toSet());
 		gatherDepending(sc, formerDependeds);
 		
@@ -200,6 +199,13 @@ implements Identifiable
 		List<AbstractClause<?>> predicates = mainSubject.allDependings();
 		predicates.retainAll(children);
 
+		//TODO
+		System.out.print("predicates : ");
+		System.out.println(predicates.stream()
+				.map(p -> String.valueOf(indexOfChild(p)))
+				.collect(Collectors.joining(",")));
+		
+		
 		if(predicates.size() < 2) {	// 述語が一つならスルー
 			shortSentList.add(this);
 			return shortSentList;
@@ -229,7 +235,6 @@ implements Identifiable
 			}
 			subSent.gatherDepending(predicate);
 			//subSent.gatherDepending(predicate, subSent.children.subList(0, subSent.children.size()-1));
-			subSent.updateDependency();
 			shortSentList.add(subSent);
 
 			int commonSubjectsSize = commonSubjectsOrigin.size();
@@ -275,7 +280,7 @@ implements Identifiable
 		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
 		String[][] tagAdverb = {{"副詞"}};
 		List<AbstractClause<?>> predicates = new ArrayList<>();
-		for(final AbstractClause<?> cls2Last: lastClause.getDependeds()) {
+		for(final AbstractClause<?> cls2Last: lastClause.clausesDependThis()) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
 			if( !cls2Last.endWith(tagParticle, true) && !cls2Last.endWith(tagAdverb, true) )
 				predicates.add(cls2Last);
@@ -285,9 +290,10 @@ implements Identifiable
 		predicates.sort(Comparator.comparing(c -> indexOfChild(c)));
 		
 		//TODO
-		System.out.print("predicats : ");
-		predicates.stream().mapToInt(p -> indexOfChild(p)).forEach(i -> System.out.print(i+","));
-		System.out.println();
+		System.out.print("predicates : ");
+		System.out.println(predicates.stream()
+				.map(p -> String.valueOf(indexOfChild(p)))
+				.collect(Collectors.joining(",")));
 
 
 		//List<Integer> commonObjects = new ArrayList<Integer>();	// 複数の述語にかかる目的語を保管
@@ -321,7 +327,6 @@ implements Identifiable
 			// 係り元の更新
 			subSent.gatherDepending(predicate);
 			//subSent.gatherDepending(predicate, subSent.children.subList(0, subSent.children.size()-1));
-			subSent.updateDependency();
 			partSentList.add(subSent);
 
 			// 述語のあとに主語があれば共通主語の最後尾を切り捨てる
@@ -361,10 +366,10 @@ implements Identifiable
 	/**
 	 * 主語のリストを得る
 	 */
-	private List<AbstractClause<?>> subjectList(boolean useGa) {
+	private List<AbstractClause<?>> subjectList(boolean includeGa) {
 		List<AbstractClause<?>> subjectList;
 
-		if (useGa) {	// "が"は最初の一つのみ!!
+		if (includeGa) {	// "が"は最初の一つのみ!!
 			String[][] tags_Ha_Ga = {{"係助詞", "は"}, {"格助詞", "が"}};	// "は"
 			String[][] tags_Ga = {{"格助詞", "が"}};	//"が"
 			String[][] tag_De = {{"格助詞", "で"}};	// "で"
@@ -373,7 +378,7 @@ implements Identifiable
 			List<AbstractClause<?>> clause_Ga_List = new ArrayList<>(collectClauseHasSome(tags_Ga));	// 係助詞"は"を含むClause
 			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClauseHasSome(tag_De));	// 格助詞"で"を含むClause
 			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClauseHasSome(tag_Ni));	// 格助詞"に"を含むClause
-			if(!clause_Ga_List.isEmpty())	clause_Ga_List.remove(0);
+			if (!clause_Ga_List.isEmpty())	clause_Ga_List.remove(0);
 			clause_Ha_Ga_List.removeAll(clause_Ga_List);
 			clause_Ha_Ga_List.removeAll(clause_De_List);	// "は"と"が"を含むClauseのうち、"で"を含まないものが主語("では"を除外するため)
 			clause_Ha_Ga_List.removeAll(clause_Ni_List);	// "は"と"が"を含むClauseのうち、"に"を含まないものが主語("には"を除外するため)
@@ -402,7 +407,7 @@ implements Identifiable
 		String[][] tag_Ha = {{"係助詞", "は"}};
 		//String[][] tag_Ga = {{"格助詞", "が"}};
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
-		for(Map.Entry<AbstractClause<?>, Boolean> entry: subjectsContinuity.entrySet()) {
+		for (Map.Entry<AbstractClause<?>, Boolean> entry: subjectsContinuity.entrySet()) {
 			AbstractClause<?> subject = entry.getKey();		boolean sbjCnt = entry.getValue();
 			if(!sbjCnt) break;	// 連続した主語の最後尾には必要ない
 
@@ -414,7 +419,7 @@ implements Identifiable
 			//}
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
-		Set<AbstractClause<?>> clauses_NP = collectClauseHasSome(tags_NP);
+		List<AbstractClause<?>> clauses_NP = collectClauseHasSome(tags_NP);
 		clauses_NP.forEach(cnp -> connect2Next(cnp));
 	}
 	
@@ -438,13 +443,13 @@ implements Identifiable
 			System.err.println("subjectClause is null.");
 			return triples;
 		}
-		AbstractClause<?> subjectClause = subjectList.get(0);			// 主節(!!最初の1つしか使っていない!!)
-		Word subjectWord = subjectClause.getCategorem();		// 主語
+		AbstractClause<?> subjectClause = subjectList.get(0);		// 主節(!!最初の1つしか使っていない!!) //TODO
+		Word subjectWord = subjectClause.getCategorem();			// 主語
 		if(subjectWord == null) {
 			System.err.println("subjectWord is null.");
 			return triples;
 		}
-		MyResource subject = new MyResource(Namespace.GOO, subjectWord.getName());
+		MyResource subject = new MyResource(Namespace.GOO, subjectWord.name());
 		this.printDep();
 		// 述節
 		AbstractClause<?> predicateClause = subjectClause.getDepending();
@@ -458,15 +463,15 @@ implements Identifiable
 			return triples;
 		}
 		// 述部(主節に続く全ての節)
-		String predicatePart = subSentence(children.indexOf(subjectClause)+1, children.size()).toString();
+		String predicatePart = subSentence(children.indexOf(subjectClause)+1, children.size()).name();
 
-		//List<AbstractClause<?>> complementClauses;								// 補部
-		//Word complementWord;											// 補語
+		//List<AbstractClause<?>> complementClauses;			// 補部
+		//Word complementWord;								// 補語
+
+		System.out.println(subjectClause.toString() + "->" + predicateClause.toString());
 
 		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
-		boolean isNot = (predicateClause.containsWordHasAll(tag_Not))? true: false;	// 述語が否定かどうか
-
-		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());
+		boolean isNot = predicateClause.containsWordHasAll(tag_Not);	// 述語が否定かどうか
 
 		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
 		String[][] tagVerb = {{"動詞"}, {"サ変接続"}};
@@ -487,13 +492,13 @@ implements Identifiable
 		if(boolLength || boolWeight) {
 			System.out.println("リテラル");//TODO
 			if(boolLength) {
-				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.getName()+"-length");
+				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name()+"-length");
 				triples.add(new RDFTriple(subject, MyResource.LENGTH, blank));			// 空白ノード
 				triples.add(new RDFTriple(blank, MyResource.VALUE, new MyResource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
 				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
 			}
 			if(boolWeight) {
-				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.getName()+"-weight");
+				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name()+"-weight");
 				triples.add(new RDFTriple(subject, MyResource.WEIGHT, blank));			// 空白ノード
 				triples.add(new RDFTriple(blank, MyResource.VALUE, new MyResource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
 				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
@@ -513,7 +518,7 @@ implements Identifiable
 			if(boolHave) {			// "~がある","~をもつ"
 				AbstractClause<?> previousClause = previousChild(predicateClause);		// 動詞の一つ前の文節
 				if(previousClause == null) return triples;
-				MyResource part = new MyResource(Namespace.GOO, previousClause.getCategorem().getName());	// その主辞のリソース
+				MyResource part = new MyResource(Namespace.GOO, previousClause.getCategorem().name());	// その主辞のリソース
 				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
 				if(previousClause.containsWordHasAll(tag_Ga_Wo)) {
 					triples.add(new RDFTriple(part, new MyResource(Namespace.DCTERMS, "isPartOf"), subject));
@@ -524,16 +529,16 @@ implements Identifiable
 				triples.add(new RDFTriple(subject, MyResource.EQUIVALENT_CLASS, new MyResource(Namespace.GOO, mtchGnrnm.group(1))));
 
 			}else {					// その他の動詞
-				MyResource verb = new MyResource(Namespace.GOO, predicateWord.getTags().get(6));	// 原形を取り出すためのget(6)
+				MyResource verb = new MyResource(Namespace.GOO, predicateWord.lexeme());	// 原形を取り出すためのget(6)
 				MyResource object = null;
 
 				// 格助詞"に","を","へ"などを元に目的語を探す
 				String[][] tag_Ni_Wo = {{"格助詞", "が"}, {"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
-				Set<AbstractClause<?>> clauses_Ni_Wo = collectClauseHasSome(tag_Ni_Wo);
+				List<AbstractClause<?>> clauses_Ni_Wo = collectClauseHasSome(tag_Ni_Wo);
 				if (!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
 					AbstractClause<?> clause_Ni_Wo = clauses_Ni_Wo.iterator().next();	//TODO
 					Word word_Ni_Wo = clause_Ni_Wo.getCategorem();	// "に"または"を"の主辞
-					object = new MyResource(Namespace.GOO, word_Ni_Wo.getName());
+					object = new MyResource(Namespace.GOO, word_Ni_Wo.name());
 				} else {								// 目的語なしならnullのまま
 					object = MyResource.NO_OBJECT;
 				}
@@ -545,12 +550,12 @@ implements Identifiable
 		/* 述語が形容詞 */
 		}else if(predicateClause.containsWordHasAll(tagAdjective)) {
 			System.out.println("形容詞");//TODO
-			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.getTags().get(6));
+			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.lexeme());
 			AbstractClause<?> previousClause = previousChild(predicateClause);	// 形容詞の一つ前の文節
 			if(previousClause == null) return triples;
 			String[][] tag_Ga = {{"格助詞", "が"}};
 			if(previousClause.containsWordHasAll(tag_Ga)) {
-				String part = previousClause.getCategorem().getName();	// その主辞の文字列
+				String part = previousClause.getCategorem().name();	// その主辞の文字列
 				subject.setFragment(subject.getFragment()+"の"+part);
 			}
 			triples.add(new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
@@ -578,10 +583,10 @@ implements Identifiable
 			}else if(boolKind) {
 				triples.add( new RDFTriple(subject, MyResource.TYPE, new MyResource(Namespace.GOO, mtchKind.group(1))));
 			}else if(boolAdjective) {
-				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.getTags().get(6));
+				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.lexeme());
 				triples.add( new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
 			}else {
-				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.getName())));	// 述語が名詞の場合これがデフォ
+				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.name())));	// 述語が名詞の場合これがデフォ
 			}
 		}
 		
@@ -632,18 +637,6 @@ implements Identifiable
 		return wordList;
 	}
 
-	/**
-	 * Clauseの係り受け関係を更新する.
-	 * 全てのclauseインスタンスのdependUponが正しいことが前提の設計.
-	 */
-	public void updateDependency() {
-		children.forEach(c -> c.getDependeds().clear());	// 一度全ての被係り受けをまっさらにする
-
-		for(final AbstractClause<?> clause : children) {
-			AbstractClause<?> depto = clause.getDepending();
-			if(depto != null) depto.getDependeds().add(clause);
-		}
-	}
 
 	/**
 	 * 決定木のレコード生成.
@@ -679,15 +672,15 @@ implements Identifiable
 				values.add("passive");
 			else
 				values.add("verb");
-			values.add(predicateWord.getTags().get(6));
+			values.add(predicateWord.lexeme());
 		/* 述語が形容詞 */
 		}else if(predicateClause.containsWordHasAll(tagAdjective)) {
 			values.add("adjc");
-			values.add(predicateWord.getTags().get(6));
+			values.add(predicateWord.lexeme());
 		/* 述語が名詞または助動詞 */
 		}else {
 			values.add("noun");
-			String predNoun =predicateWord.getTags().get(6);
+			String predNoun =predicateWord.lexeme();
 			values.add(predNoun.substring(predNoun.length()-2));	// 最後の一文字だけ
 		}
 		return values.stream().collect(Collectors.joining(","));
@@ -698,7 +691,7 @@ implements Identifiable
 	/********************************/	
 	public void printW() {
 		for(final Word word : getWordList()) {
-			System.out.print("("+word.getID()+")" + word.getName());
+			System.out.print("("+word.getID()+")" + word.name());
 		}
 		System.out.println();
 	}
@@ -720,7 +713,7 @@ implements Identifiable
 	/** 文を区切りを挿入して出力する */
 	public void printS() {
 		for(final Word word : getWordList()) { // Word単位で区切る
-			System.out.print(word.getName() + "|");
+			System.out.print(word.name() + "|");
 		}
 		System.out.println();
 		for(final AbstractClause<?> clause : children) { // Clause単位で区切る
@@ -736,18 +729,16 @@ implements Identifiable
 	public List<AbstractClause<?>> getClauses() {
 		return children;
 	}
-	private void setClauses(List<AbstractClause<?>> clauses) {
+	public void setClauses(List<AbstractClause<?>> clauses) {
 		this.children = clauses;
 	}
 
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	public int getID() {
-		return id;
-	}
-	public void printDetail() {
-		System.out.println(toString());
+	@Override
+	public String name() {
+		return getChildren().stream().map(c -> c.name()).collect(Collectors.joining());
 	}
 
 

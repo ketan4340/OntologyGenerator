@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import grammar.structure.SyntacticComponent;
 import grammar.structure.SyntacticParent;
 
-public class Paragraph extends SyntacticComponent<Paragraph, Sentence>
- implements Identifiable {
+public class Paragraph extends SyntacticComponent<Paragraph, Sentence> 
+	implements GrammarInterface {
 	private static int paragraphSum = 0;
 	
 	private final int id;
@@ -22,16 +22,19 @@ public class Paragraph extends SyntacticComponent<Paragraph, Sentence>
 		super(sentences);
 		this.id = paragraphSum++;
 		this.sentences = sentences;
-		//imprintThisOnChildren();
 	}
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	public int getID() {
-		return id;
+	@Override
+	public String name() {
+		return getChildren().stream().map(s -> s.name()).collect(Collectors.joining());
 	}
-
 	@Override
 	public Paragraph getParent() {return this;}
 	@Override
@@ -41,6 +44,9 @@ public class Paragraph extends SyntacticComponent<Paragraph, Sentence>
 	/***********************************/
 	/********** 	Getter/Setter **********/
 	/***********************************/
+	public int getID() {
+		return id;
+	}
 	public List<Sentence> getSentences() {
 		return sentences;
 	}

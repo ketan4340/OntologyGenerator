@@ -17,6 +17,9 @@ import grammar.word.Word;
 import modules.syntacticParse.Cabocha;
 
 public class DocumentModel extends AbstractDocumentModel{
+
+	private static final long serialVersionUID = 1L;
+
 	private HTMLDocument htmlDoc;		// plainDocumentからHTMLに切り替える
 
 	private Cabocha cabocha;
@@ -64,8 +67,8 @@ public class DocumentModel extends AbstractDocumentModel{
 
 			for(final Word word : sentence.getWordList()) {	// 文の単語を走査
 				htmlText += (word.hasSomeTags(noun))	// 名詞ならアンカータグで囲む
-						? "<a href=\"" + word.getName() + "\">" + word.getName() + "</a>"
-						: word.getName();
+						? "<a href=\"" + word.name() + "\">" + word.name() + "</a>"
+						: word.name();
 			}
 			//htmlText += "</font>";
 			htmlText += "</p><br>\n";				// 文末で改行

@@ -20,7 +20,6 @@ public class Morpheme extends EnMorpheme {
 		this(name_tags.get(0), name_tags.subList(1, name_tags.size()));
 	}
 	
-	
 	public static Morpheme getOrNewInstance(String name, List<String> tags) {
 		Morpheme m = new Morpheme(name, tags);
 		return uniqueset.getExistingOrIntact(m);
@@ -29,6 +28,13 @@ public class Morpheme extends EnMorpheme {
 		Morpheme m = new Morpheme(name_tags);
 		return uniqueset.getExistingOrIntact(m);
 	}
+	
+	
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	
 	
 	
 	/***********************************/
@@ -56,7 +62,7 @@ public class Morpheme extends EnMorpheme {
 	
 	
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	
 }

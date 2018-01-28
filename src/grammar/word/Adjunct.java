@@ -15,7 +15,9 @@ public class Adjunct extends Word {
 		super(concept, null);
 	}
 	
-	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	/* 全く同じWordを複製する */
 	@Override
 	public Adjunct clone() {

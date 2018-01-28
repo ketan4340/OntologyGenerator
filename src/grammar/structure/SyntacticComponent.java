@@ -20,7 +20,9 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 	}
 
 	
-	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	
 	public boolean containsSubConstituents(List<C> subConstituents) {
 		int size = children.size();
@@ -34,7 +36,8 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 	}
 	
 	public void imprintThisOnChildren() {
-		children.forEach(c -> c.setParent(this));
+		if (children != null)
+			children.forEach(c -> c.setParent(this));
 	}
 	
 	public int indexOfChild(C predicate) {
@@ -78,13 +81,13 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 	public P getParent() {
 		return parent;
 	}
-	public List<C> getConstituents() {
+	public List<C> getChildren() {
 		return (List<C>) children;
 	}
 	public <Pr extends SyntacticParent> void setParent(Pr parent) {
 		this.parent = (P) parent;
 	}
-	public <Ch extends SyntacticChild> void setConstituents(List<Ch> constituents) {
+	public <Ch extends SyntacticChild> void setChildren(List<Ch> constituents) {
 		this.children = (List<C>) constituents;
 	}
 	

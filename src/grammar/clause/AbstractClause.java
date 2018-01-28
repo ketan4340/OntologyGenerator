@@ -5,11 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import grammar.Concept;
-import grammar.Identifiable;
+import grammar.GrammarInterface;
 import grammar.Sentence;
 import grammar.morpheme.Morpheme;
 import grammar.structure.SyntacticComponent;
@@ -17,13 +18,16 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public abstract class AbstractClause<W extends Word> extends SyntacticComponent<Sentence, Word> 
-implements Identifiable{
+	implements GrammarInterface {
+	private static int clausesSum = 0;
+	
+	private final int id;
+	
 	protected W categorem;				// 自立語
 	protected List<Adjunct> adjuncts; 	// 付属語
 	protected List<Word> others;			// 。などの記号
 	
 	protected AbstractClause<?> depending;		// 係り先文節.どのClauseに係るか
-	protected List<AbstractClause<?>> dependeds;	// 係られてる文節の集合.どのClauseから係り受けるか
 
 
 	/***********************************/
@@ -31,17 +35,20 @@ implements Identifiable{
 	/***********************************/
 	public AbstractClause(W categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
+		this.id = clausesSum++;
 		this.categorem = categorem;
 		this.adjuncts = adjuncts;
 		this.others = others;
-		//imprintThisOnChildren();
 	}
 	public AbstractClause(List<Word> constituents) {
 		super(constituents);
+		this.id = clausesSum++;
 	}
 	
 	
-	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	public List<Word> words() {
 		List<Word> words = new ArrayList<>(5);
 		words.add(categorem);
@@ -101,8 +108,8 @@ implements Identifiable{
 
 	
 	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
-		if (words().size() < 2)
-			return false;	// 文節の単語が一つしかないなら意味がない
+		if (adjuncts.isEmpty())
+			return false;	// 付属語がないなら意味がない
 		if (!categorem.hasAllTags(tag4Categorem))
 			return false;
 		if (!adjuncts.get(0).hasAllTags(tag4Adjunct))
@@ -172,11 +179,21 @@ implements Identifiable{
 		return endWith;
 	}
 
+
+	public Set<AbstractClause<?>> clausesDependThis() {
+		return parent.getChildren().stream()
+				.filter(c -> c.depending == this)
+				.collect(Collectors.toSet());
+	}
 	
 
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
+	@Override
+	public String name() {
+		return getChildren().stream().map(w -> w.name()).collect(Collectors.joining());
+	}
 	/*
 	public Sentence getParent() {
 		return parent;
@@ -195,6 +212,9 @@ implements Identifiable{
 	/***********************************/
 	/********** Getter/Setter **********/
 	/***********************************/
+	public int getID() {
+		return id;
+	}
 	public W getCategorem() {
 		return categorem;
 	}
@@ -207,9 +227,6 @@ implements Identifiable{
 	public AbstractClause<?> getDepending() {
 		return depending;
 	}
-	public List<AbstractClause<?>> getDependeds() {
-		return dependeds;
-	}
 	public void setCategorem(W categorem) {
 		this.categorem = categorem;
 	}
@@ -221,14 +238,15 @@ implements Identifiable{
 	}
 	public void setDepending(AbstractClause<?> depending) {
 		this.depending = depending;
-		if (depending != null)
-			depending.dependeds.add(this);	// 係り先の'係られてる集合'に自身を追加
 	}
-	public void setDependeds(List<AbstractClause<?>> dependeds) {
-		this.dependeds = dependeds;
+	@Override
+	public List<Word> getChildren() {
+		List<Word> words = new ArrayList<>(5);
+		words.add(categorem);
+		words.addAll(adjuncts);
+		words.addAll(others);
+		return words;
 	}
-
-
 
 	
 	/**********************************/

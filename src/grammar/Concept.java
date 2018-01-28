@@ -1,5 +1,6 @@
 package grammar;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
@@ -9,18 +10,19 @@ import grammar.morpheme.Morpheme;
 import util.UniqueSet;
 import util.Uniqueness;
 
-public class Concept implements GrammarInterface, Identifiable, Uniqueness<Concept> {
+public class Concept implements GrammarInterface, Uniqueness<Concept> {
 	private static UniqueSet<Concept> uniqueset = new UniqueSet<>(100);
 
-	private final int id;					// 通し番号
 	private final List<Morpheme> morphemes;	// 形態素たち
 	
+	
 
+	public static final Concept ZEROCONCEPT = new Concept(new ArrayList<>());
+	
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
 	private Concept(List<Morpheme> morphemes) {
-		this.id = uniqueset.size();
 		this.morphemes = morphemes;
 		
 		uniqueset.add(this);
@@ -44,19 +46,24 @@ public class Concept implements GrammarInterface, Identifiable, Uniqueness<Conce
 		return uniqueset.getExistingOrIntact(c);
 	}
 	
-	public String name() {
-		return toString();
+	
+	
+	public boolean containsTag(String tag) {
+		return getTailMorpheme().containsTag(tag);
+	}
+
+	public String lexeme() {
+		return morphemes.stream().map(m -> m.lexeme()).collect(Collectors.joining());
 	}
 	
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	public int getID() {
-		return id;
+	@Override	
+	public String name() {
+		return morphemes.stream().map(m -> m.name()).collect(Collectors.joining());
 	}
-	public void printDetail() {
-		System.out.println(toString());
-	}
+	@Override
 	public int compareTo(Concept o) {
 		int comparison = 0;
 		ListIterator<Morpheme> itr1 = morphemes.listIterator();
@@ -78,11 +85,15 @@ public class Concept implements GrammarInterface, Identifiable, Uniqueness<Conce
 	public List<Morpheme> getMorphemes() {
 		return morphemes;
 	}
-	
-	
+	public Morpheme getHeadMorpheme() {
+		return morphemes.get(0);
+	}
+	public Morpheme getTailMorpheme() {
+		return morphemes.get(morphemes.size()-1);
+	}
 	
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public int hashCode() {

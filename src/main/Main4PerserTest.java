@@ -2,19 +2,16 @@ package main;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import data.original.Ontology;
-import grammar.Sentence;
 import modules.Generator;
-import modules.syntacticParse.Cabocha;
 
 public class Main4PerserTest {
 
 	public static void main(String[] args) {
 		//String readFile = "gooText生物-動物名-All.txt";
 		//String readFile = "writings/gooText生物-動物名-お.txt";
-		Path textFile = Paths.get("./writings/gooText生物-動物名-さ.txt");
+		Path textFile = Paths.get("./writings/gooText生物-動物名-あ.txt");
 		/*
 		String text1 = "クジラは哺乳類である。";
 		String text2 = "カニの味噌汁は美味しいぞ";

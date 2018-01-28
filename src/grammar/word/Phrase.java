@@ -25,6 +25,10 @@ public class Phrase extends Word{
 		this.head = head;
 	}
 
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	/*
 	public void setPhrase(List<Word> baseWords, AbstractClause<?> parentClause, boolean head_tail) {
 		String phraseName = new String();

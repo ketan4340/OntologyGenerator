@@ -43,6 +43,9 @@ public class SerialClause extends AbstractClause<Phrase> {
 		return clone;
 	}
 	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	
 	/***********************************/
 	/**********   Interface   **********/

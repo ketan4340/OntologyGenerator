@@ -42,7 +42,14 @@ public class Tags implements Comparable<Tags>{
 				lexeme, kana, pronunciation);
 	}
 	
-
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	public boolean contains(String tag) {
+		return tagList.contains(tag);
+	}
+	
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
@@ -98,7 +105,7 @@ public class Tags implements Comparable<Tags>{
 	
 
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public int hashCode() {

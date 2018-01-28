@@ -65,6 +65,10 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		command.addAll(Arrays.asList(options));
 	}
 
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 
 	/********************************************/
 	/** AbstractProcessManagerの抽象メソッドの実装 **/

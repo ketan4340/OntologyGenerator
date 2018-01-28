@@ -1,5 +1,6 @@
 package grammar.clause;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,7 +12,7 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 
 public class Clause extends AbstractClause<Categorem>{
-	public static final Clause ROOT = new Clause(null, null, null);
+	public static final Clause ROOT = new Clause(Categorem.ZEROCATEGOREM, new ArrayList<>(), new ArrayList<>());
 	private static int clausesSum = 0;
 
 	private final int id;
@@ -33,6 +34,9 @@ public class Clause extends AbstractClause<Categorem>{
 	}
 
 	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	
 	/**
 	 * この文節に含まれる単語をOthers以外全て繋げて一つの名詞にする.

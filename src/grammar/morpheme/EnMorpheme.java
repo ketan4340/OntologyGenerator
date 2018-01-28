@@ -4,11 +4,10 @@ import java.util.List;
 import java.util.Objects;
 
 import grammar.GrammarInterface;
-import grammar.Identifiable;
 import util.UniqueSet;
 import util.Uniqueness;
 
-public class EnMorpheme implements GrammarInterface, Identifiable, Uniqueness<EnMorpheme> {
+public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
 	private static UniqueSet<EnMorpheme> uniqueset = new UniqueSet<>(100);
 	
 	protected final int id;			// 通し番号
@@ -39,7 +38,6 @@ public class EnMorpheme implements GrammarInterface, Identifiable, Uniqueness<En
 		this(name_tags.get(0), name_tags.subList(1, name_tags.size()));
 	}
 	
-	
 	public static EnMorpheme getOrNewInstance(String name, List<String> tags) {
 		EnMorpheme em = new EnMorpheme(name, tags);
 		return uniqueset.getExistingOrIntact(em);
@@ -49,16 +47,23 @@ public class EnMorpheme implements GrammarInterface, Identifiable, Uniqueness<En
 		return uniqueset.getExistingOrIntact(em);
 	}
 	
+
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	public boolean containsTag(String tag) {
+		return tags.contains(tag);
+	}
+	
 	
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	public void printDetail() {
-		System.out.println(name);
+	@Override
+	public String name() {
+		return name;
 	}
-	public int getID() {
-		return id;
-	}
+	@Override
 	public int compareTo(EnMorpheme o) {
 		int comparison = name.compareTo(o.name);
 		return comparison!=0? comparison : tags.compareTo(o.tags);
@@ -100,7 +105,7 @@ public class EnMorpheme implements GrammarInterface, Identifiable, Uniqueness<En
 	
 	
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public int hashCode() {

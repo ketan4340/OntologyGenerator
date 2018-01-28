@@ -38,6 +38,10 @@ public class Generator {
 		return generate(loadTextFile(textFile));
 	}
 	
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	/**
 	 * オントロジー構築器の実行
 	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
@@ -67,12 +71,12 @@ public class Generator {
 			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
 			String[][] tagDone = {{"動詞"}, {"動詞", "接尾"}};
 			//originalSentence.connect(tagNouns);
-			originalSentence.getConstituents().forEach(c -> c.uniteAdjunct2Categorem(tagDo[0], tagDo[1]));
-			originalSentence.getConstituents().forEach(c -> c.uniteAdjunct2Categorem(tagDone[0], tagDone[1]));
+			originalSentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tagDo[0], tagDo[1]));
+			originalSentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tagDone[0], tagDone[1]));
 			/* 名詞と形容詞だけ取り出す */
 			// これらがClauseの末尾につくものを隣のClauseにつなげる
 			String[][] tags_NP = {{"形容詞", "-連用テ接続"}, {"連体詞"}, {"助詞", "連体化"}, {"助動詞", "体言接続"}, {"名詞"}};
-			Set<AbstractClause<?>> clauses_NP = originalSentence.collectClauseHasSome(tags_NP);
+			List<AbstractClause<?>> clauses_NP = originalSentence.collectClauseHasSome(tags_NP);
 			clauses_NP.forEach(c -> originalSentence.connect2Next(c));
 
 			/** Step2: 長文分割 **/
