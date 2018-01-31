@@ -12,6 +12,8 @@ import modules.Generator;
 
 public class InputTextModel extends AbstractDocumentModel{
 
+	private static final long serialVersionUID = 1L;
+
 	public InputTextModel() {
 		super();
 	}

@@ -50,8 +50,8 @@ public class Morpheme extends EnMorpheme {
 	public List<String> tags() {
 		return tags.getTagList();
 	}
-	public String lexeme() {
-		return tags.lexeme();
+	public String infinitive() {
+		return tags.infinitive();
 	}
 	public String kana() {
 		return tags.kana();

@@ -13,7 +13,7 @@ public class Tags implements Comparable<Tags>{
 	public static final int SUBPoS3 = 3;			// 品詞細分類3
 	public static final int INFLECTION = 4;		// 活用形
 	public static final int CONJUGATION = 5;		// 活用型
-	public static final int LEXEME = 6;			// 原形 (半角文字にはない)
+	public static final int INFINITIVE = 6;		// 原形 (半角文字にはない)
 	public static final int KANA = 7;			// 読み (半角文字にはない)
 	public static final int PRONUNCIATION = 8;	// 発音 (半角文字にはない)
 	
@@ -35,11 +35,11 @@ public class Tags implements Comparable<Tags>{
 	}
 	public Tags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
 			String inflection, String conjugation, 
-			String lexeme, String kana, String pronunciation) {
+			String infinitive, String kana, String pronunciation) {
 		this.tagList = Arrays.asList(
 				mainPoS, subPoS1, subPoS2, subPoS3, 
 				inflection, conjugation, 
-				lexeme, kana, pronunciation);
+				infinitive, kana, pronunciation);
 	}
 	
 	
@@ -93,8 +93,8 @@ public class Tags implements Comparable<Tags>{
 	protected String conjugation() {
 		return tagList.get(CONJUGATION);
 	}
-	protected String lexeme() {
-		return tagList.get(LEXEME);
+	protected String infinitive() {
+		return tagList.get(INFINITIVE);
 	}
 	protected String kana() {
 		return tagList.get(KANA);

@@ -88,8 +88,8 @@ implements GrammarInterface, SyntacticChild {
 	public Word clone() {
 		return new Word(this.concept);
 	}
-	public String lexeme() {
-		return concept.lexeme();
+	public String infinitive() {
+		return concept.infinitive();
 	}
 	
 	

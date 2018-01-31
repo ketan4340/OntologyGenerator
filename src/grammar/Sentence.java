@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -200,11 +199,12 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		predicates.retainAll(children);
 
 		//TODO
+		/*
 		System.out.print("predicates : ");
 		System.out.println(predicates.stream()
 				.map(p -> String.valueOf(indexOfChild(p)))
 				.collect(Collectors.joining(",")));
-		
+		*/
 		
 		if(predicates.size() < 2) {	// 述語が一つならスルー
 			shortSentList.add(this);
@@ -216,7 +216,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		for(final AbstractClause<?> predicate: predicates) {
 			predicate.setDepending(null);	// 文末の述語となるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;		// 述語も含めて切り取るため+1
-			System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");
+			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
 			Sentence subSent = subSentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
 			List<AbstractClause<?>> commonSubjects = Clause.cloneAll(commonSubjectsOrigin);
@@ -290,11 +290,12 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		predicates.sort(Comparator.comparing(c -> indexOfChild(c)));
 		
 		//TODO
+		/*
 		System.out.print("predicates : ");
 		System.out.println(predicates.stream()
 				.map(p -> String.valueOf(indexOfChild(p)))
 				.collect(Collectors.joining(",")));
-
+		 */
 
 		//List<Integer> commonObjects = new ArrayList<Integer>();	// 複数の述語にかかる目的語を保管
 
@@ -309,7 +310,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			AbstractClause<?> predicate = itr.next();
 			predicate.setDepending(null);	// 分割後、当該述語は文末にくるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;	// 述語も含めて切り取るため+1
-			System.out.println("divide3.subList(" + fromIndex + ", " + toIndex + ")");
+			//System.out.println("divide3.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
 			Sentence subSent = subSentence(fromIndex, toIndex);			//TODO *from>to problem
 			// 文頭の主語は全ての分割後の文に係る
 			List<AbstractClause<?>> commonSubjects = Clause.cloneAll(commonSubjectsOrigin);
@@ -450,7 +451,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			return triples;
 		}
 		MyResource subject = new MyResource(Namespace.GOO, subjectWord.name());
-		this.printDep();
 		// 述節
 		AbstractClause<?> predicateClause = subjectClause.getDepending();
 		if(predicateClause == null) {
@@ -468,7 +468,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		//List<AbstractClause<?>> complementClauses;			// 補部
 		//Word complementWord;								// 補語
 
-		System.out.println(subjectClause.toString() + "->" + predicateClause.toString());
+		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());	//TODO
 
 		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
 		boolean isNot = predicateClause.containsWordHasAll(tag_Not);	// 述語が否定かどうか
@@ -490,7 +490,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		boolean boolWeight = mtchWeight.matches();
 
 		if(boolLength || boolWeight) {
-			System.out.println("リテラル");//TODO
+			//System.out.println("リテラル");//TODO
 			if(boolLength) {
 				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name()+"-length");
 				triples.add(new RDFTriple(subject, MyResource.LENGTH, blank));			// 空白ノード
@@ -505,7 +505,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			}
 		/* 述語が動詞 */
 		}else if( predicateClause.containsWordHasAll(tagVerb) ) {
-			System.out.println("動詞");//TODO
+			//System.out.println("動詞");//TODO
 			/* "がある"かどうか */
 			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}, {"動詞", "持つ"}};		// 動詞の"ある"(助動詞ではない)
 			boolean boolHave = predicateClause.containsWordHasAll(tag_Have);
@@ -529,7 +529,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				triples.add(new RDFTriple(subject, MyResource.EQUIVALENT_CLASS, new MyResource(Namespace.GOO, mtchGnrnm.group(1))));
 
 			}else {					// その他の動詞
-				MyResource verb = new MyResource(Namespace.GOO, predicateWord.lexeme());	// 原形を取り出すためのget(6)
+				MyResource verb = new MyResource(Namespace.GOO, predicateWord.infinitive());	// 原形を取り出すためのget(6)
 				MyResource object = null;
 
 				// 格助詞"に","を","へ"などを元に目的語を探す
@@ -549,8 +549,8 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 
 		/* 述語が形容詞 */
 		}else if(predicateClause.containsWordHasAll(tagAdjective)) {
-			System.out.println("形容詞");//TODO
-			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.lexeme());
+			//System.out.println("形容詞");//TODO
+			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.infinitive());
 			AbstractClause<?> previousClause = previousChild(predicateClause);	// 形容詞の一つ前の文節
 			if(previousClause == null) return triples;
 			String[][] tag_Ga = {{"格助詞", "が"}};
@@ -562,7 +562,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 
 		/* 述語が名詞または助動詞 */
 		}else {
-			System.out.println("名詞");//TODO
+			//System.out.println("名詞");//TODO
 			/* 別名・同義語かどうか */
 			String regexSynonym = "(.*?)((に同じ)|(の別名)|(の略)|(のこと)|(の異称))";	// 「〜の別名」「〜に同じ」を探す
 			Pattern ptrnSynonym = Pattern.compile(regexSynonym);
@@ -583,7 +583,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			}else if(boolKind) {
 				triples.add( new RDFTriple(subject, MyResource.TYPE, new MyResource(Namespace.GOO, mtchKind.group(1))));
 			}else if(boolAdjective) {
-				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.lexeme());
+				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.infinitive());
 				triples.add( new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
 			}else {
 				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.name())));	// 述語が名詞の場合これがデフォ
@@ -672,15 +672,15 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				values.add("passive");
 			else
 				values.add("verb");
-			values.add(predicateWord.lexeme());
+			values.add(predicateWord.infinitive());
 		/* 述語が形容詞 */
 		}else if(predicateClause.containsWordHasAll(tagAdjective)) {
 			values.add("adjc");
-			values.add(predicateWord.lexeme());
+			values.add(predicateWord.infinitive());
 		/* 述語が名詞または助動詞 */
 		}else {
 			values.add("noun");
-			String predNoun =predicateWord.lexeme();
+			String predNoun =predicateWord.infinitive();
 			values.add(predNoun.substring(predNoun.length()-2));	// 最後の一文字だけ
 		}
 		return values.stream().collect(Collectors.joining(","));

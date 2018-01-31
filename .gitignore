@@ -6,10 +6,10 @@ bin/
 
 .DS_Store
 
-csvs/
-dics/
-libs/
-owls/
-texts/
-urls/
-writings/
+csv/
+dic/
+lib/
+owl/
+text/
+url/
+writing/

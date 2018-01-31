@@ -1,0 +1,15 @@
+IF {
+?St	, jass:subject	, ?sCl.
+?sCl	, jass:head		, ?sWd.
+?St	, jass:predicate	, ?pCl.
+?pCl	, jass:head		, ?oWd.
+?pCl	, jass:adjunct_last	, "は".
+}THEN{
+?sWd	, rdfs:subClassOf	, ?oWd.
+}
+?c, jass:adjuncts, _:x.
+_:x, rdf:type, rdf:Seq.
+_:x, rdf:_1, ?w1.
+->
+?c, jass:adjunct_1, ?w1.;
+?c, hoge, moge. -> ?c, rdfs:subClassOf, boke.;

@@ -48,12 +48,15 @@ public class Concept implements GrammarInterface, Uniqueness<Concept> {
 	
 	
 	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	public boolean containsTag(String tag) {
 		return getTailMorpheme().containsTag(tag);
 	}
 
-	public String lexeme() {
-		return morphemes.stream().map(m -> m.lexeme()).collect(Collectors.joining());
+	public String infinitive() {
+		return morphemes.stream().map(m -> m.infinitive()).collect(Collectors.joining());
 	}
 	
 	/***********************************/

@@ -13,6 +13,8 @@ public enum Namespace {
 	DCTERMS("dcterms", "http://purl.org/dc/terms/"),
 	SCHEMA("schema", "http://schema.org/"),
 	
+	JASS("jass", "http://www.uec.ac.jp/k-lab/k-tanabe/jass/"),
+	
 	GOO("goo", "http://dictionary.goo.ne.jp/jn#"),
 	LITERAL("", ""),
 	;
@@ -20,6 +22,9 @@ public enum Namespace {
 	private final String prefix;
 	private URI uri;
 
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
 	private Namespace(String prefix, String uri) {
 		this.prefix = prefix;
 		try {
@@ -29,7 +34,22 @@ public enum Namespace {
 		}
 	}
 
-	/* Getter */
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	public static String getURIofPrefix(String prefix) {
+		for (Namespace ns : values())
+			if (ns.prefix.equals(prefix))
+				return ns.uri.toString();
+		return null;
+	}
+	public String toQueryPrefixDefinition() {
+		return "PREFIX "+ prefix +": <"+ uri +">";
+	}
+	
+	/**********************************/
+	/**********    Getter    **********/
+	/**********************************/
 	public String getPrefix() {
 		return prefix;
 	}
