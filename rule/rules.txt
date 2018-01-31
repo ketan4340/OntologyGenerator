@@ -1,11 +1,11 @@
-﻿IF {
-?St	, jass:subject		, ?sCl.
-?sCl	, jass:categorem	, ?sWd.
-?St	, jass:predicate	, ?pCl.
-?pCl	, jass:categorem	, ?oWd.
-?pCl	, jass:adjunct		, "は".
+﻿IF{
+?St,jass:subject,?sCl.
+?sCl,jass:categorem,?sWd.
+?St,jass:predicate,?pCl.
+?pCl,jass:categorem,?oWd.
+?pCl,jass:adjunct,"は".
 }THEN{
-?sWd	, rdfs:subClassOf	, ?oWd.
+?sWd,rdfs:subClassOf,?oWd.
 }
 ?c, jass:adjuncts, _:x.
 _:x, rdf:type, rdf:Seq.
