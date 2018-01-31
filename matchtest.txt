@@ -1,0 +1,1 @@
+﻿IF{?St,jass:subject,?sCl.?sCl,jass:categorem,?sWd.?St,jass:predicate,?pCl.?pCl,jass:categorem,?oWd.?pCl,jass:adjunct,"は".}THEN{?sWd,rdfs:subClassOf,?oWd.}
