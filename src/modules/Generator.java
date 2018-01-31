@@ -29,6 +29,7 @@ import grammar.NaturalLanguage;
 import grammar.Paragraph;
 import grammar.Sentence;
 import grammar.clause.AbstractClause;
+import modules.relationExtract.JASSFactory;
 import modules.relationExtract.RDFRuleFactory;
 import modules.relationExtract.RDFRules;
 import modules.syntacticParse.Cabocha;
@@ -39,14 +40,14 @@ public class Generator {
 	}
 
 
-	
+
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
 	public Ontology generate(Path textFile) {
 		return generate(loadTextFile(textFile));
 	}
-	
+
 	/**
 	 * オントロジー構築器の実行
 	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
@@ -56,7 +57,7 @@ public class Generator {
 		/**          構文解析モジュール          **/
 		/***************************************/
 		List<Paragraph> originalParagraphs = syntacticParse(naturalLanguageParagraphs);
-		
+
 		/***************************************/
 		/**          文章整形モジュール          **/
 		/***************************************/
@@ -98,7 +99,7 @@ public class Generator {
 
 		Calendar c = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
-		
+
 		List<String> textList = editedSentences.stream().map(s -> s.name()).collect(Collectors.toList());
 		Path textFile = Paths.get("text/text"+sdf.format(c.getTime())+".txt");	// 分割後のテキストを保存
 		try {
@@ -106,7 +107,7 @@ public class Generator {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		/***************************************/
 		/**          関係抽出モジュール          **/
 		/***************************************/
@@ -115,11 +116,12 @@ public class Generator {
 				.flatMap(s -> s.extractRelation().stream())
 				.collect(Collectors.toList());
 		 */
-		
+
 		Model wholeModel = ModelFactory.createDefaultModel();
 		/* 文構造のRDF化 */
+		JASSFactory.commonModelInit();
 		Path rulesFile = Paths.get("rule/rules.txt");
-		RDFRules rdfRules = RDFRuleFactory.readRules(rulesFile);
+		RDFRules rdfRules = RDFRuleFactory.read(rulesFile);
 		for (Sentence s : editedSentences) {
 		  Model sentenceModel = JASSFactory.createJASSModel(s);
 		  wholeModel.add(rdfRules.solve(sentenceModel));
@@ -135,7 +137,7 @@ public class Generator {
 			RDFTriple triple = new RDFTriple(
 					new MyResource(subject.getNameSpace(), subject.getLocalName()),
 					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
-					object instanceof Resource? 
+					object instanceof Resource?
 							new MyResource(((Resource)object).getNameSpace(), ((Resource)object).getLocalName())
 							: new MyResource(object.toString()));
 			triples.add(triple);
@@ -143,7 +145,7 @@ public class Generator {
 		//重複除去
 		//triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
 
-		
+
 		List<String> csvList = triples.stream().map(tri -> tri.toString()).collect(Collectors.toList());
 		Path csvFile = Paths.get("csv/relation"+sdf.format(c.getTime())+".csv");
 		try {
@@ -151,16 +153,16 @@ public class Generator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguageParagraphs.get(0).size() + "\t->dividedSentences: " + editedSentences.size());
 		System.out.println("Relations: " + triples.size() + "\n");
-		
+
 		return new Ontology(triples);
 	}
 
-	
-	
+
+
 	/**
 	 * テキストファイル読み込み. テキストは1行一文. 空行を段落の境界とみなす.
 	 * @param textFile テキストファイルのパス
@@ -181,7 +183,7 @@ public class Generator {
 						.collect(Collectors.toList()))
 				.collect(Collectors.toList());
 	}
-	
+
 	/**
 	 * 自然言語文のリストのリストを構文解析し，段落のリストを返す.
 	 * @param naturalLanguageParagraphs 自然言語文を段落ごとにリストしたものをまとめたリスト

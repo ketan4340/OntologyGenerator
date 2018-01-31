@@ -1,9 +1,9 @@
-IF {
-?St	, jass:subject	, ?sCl.
-?sCl	, jass:head		, ?sWd.
+﻿IF {
+?St	, jass:subject		, ?sCl.
+?sCl	, jass:categorem	, ?sWd.
 ?St	, jass:predicate	, ?pCl.
-?pCl	, jass:head		, ?oWd.
-?pCl	, jass:adjunct_last	, "は".
+?pCl	, jass:categorem	, ?oWd.
+?pCl	, jass:adjunct		, "は".
 }THEN{
 ?sWd	, rdfs:subClassOf	, ?oWd.
 }

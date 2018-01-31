@@ -8,11 +8,12 @@ import grammar.Concept;
 import grammar.GrammarInterface;
 import grammar.clause.AbstractClause;
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 
-public class Word extends SyntacticComponent<AbstractClause<?>, Word> 
-implements GrammarInterface, SyntacticChild {
+public class Word extends SyntacticComponent<AbstractClause<?>, Word>
+implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	private static int wordsSum = 0;
 
 	public final int id;
@@ -25,7 +26,7 @@ implements GrammarInterface, SyntacticChild {
 	private Word() {
 		super(null);		//TODO 子要素はないってことでいいでしょう
 		this.id = wordsSum++;
-	}	
+	}
 	public Word(Concept concept, AbstractClause<?> parentClause) {
 		this();
 		this.concept = concept;
@@ -34,8 +35,8 @@ implements GrammarInterface, SyntacticChild {
 	public Word(Concept concept) {
 		this(concept, null);
 	}
-	
-	
+
+
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
@@ -60,7 +61,7 @@ implements GrammarInterface, SyntacticChild {
 		}
 		return match;
 	}
-	
+
 	/**
 	 * 渡されたTagをどれか"1つでも"持って入れば真、それ以外は偽を返す
 	 */
@@ -88,26 +89,59 @@ implements GrammarInterface, SyntacticChild {
 	public Word clone() {
 		return new Word(this.concept);
 	}
-	public String infinitive() {
-		return concept.infinitive();
-	}
-	
-	
+
+
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	@Override
-	public String name() {
-		return concept.name();
-	}
 	@Override
 	public List<Word> getChildren() {
 		return Arrays.asList(this);
 	}
 	@Override
 	public <Ch extends SyntacticChild> void setChildren(List<Ch> constituents) {}
+	@Override
+	public String name() {
+		return concept.name();
+	}
+	@Override
+	public String mainPoS() {
+		return concept.mainPoS();
+	}
+	@Override
+	public String subPoS1() {
+		return concept.subPoS1();
+	}
+	@Override
+	public String subPoS2() {
+		return concept.subPoS2();
+	}
+	@Override
+	public String subPoS3() {
+		return concept.subPoS3();
+	}
+	@Override
+	public String inflection() {
+		return concept.inflection();
+	}
+	@Override
+	public String conjugation() {
+		return concept.conjugation();
+	}
+	@Override
+	public String infinitive() {
+		return concept.infinitive();
+	}
+	@Override
+	public String kana() {
+		return concept.kana();
+	}
+	@Override
+	public String pronunciation() {
+		return concept.pronunciation();
+	}
 
-	
+
 	/***********************************/
 	/********** Getter/Setter **********/
 	/***********************************/
@@ -123,7 +157,7 @@ implements GrammarInterface, SyntacticChild {
 	public void setConcept(Concept concept) {
 		this.concept = concept;
 	}
-	
+
 
 	/**********************************/
 	/********** ObjectMethod **********/

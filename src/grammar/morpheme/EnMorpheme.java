@@ -7,14 +7,18 @@ import grammar.GrammarInterface;
 import util.UniqueSet;
 import util.Uniqueness;
 
-public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
+/**
+ * もう使ってませーん。
+ * @author kentarotanabe
+ */
+public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme>, PartOfSpeechInterface {
 	private static UniqueSet<EnMorpheme> uniqueset = new UniqueSet<>(100);
-	
+
 	protected final int id;			// 通し番号
 	protected final String name;		// 形態素の文字列
 	protected final Tags tags;		// 品詞リスト
-	
-	
+
+
 
 	/***********************************/
 	/**********  Constructor  **********/
@@ -28,7 +32,7 @@ public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
 		this.id = uniqueset.size();
 		this.name = name;
 		this.tags = tags;
-		
+
 		EnMorpheme.uniqueset.add(this);
 	}
 	protected EnMorpheme(String name, List<String> tagList) {
@@ -37,7 +41,7 @@ public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
 	protected EnMorpheme(List<String> name_tags) {
 		this(name_tags.get(0), name_tags.subList(1, name_tags.size()));
 	}
-	
+
 	public static EnMorpheme getOrNewInstance(String name, List<String> tags) {
 		EnMorpheme em = new EnMorpheme(name, tags);
 		return uniqueset.getExistingOrIntact(em);
@@ -46,7 +50,7 @@ public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
 		EnMorpheme em = new EnMorpheme(name_tags);
 		return uniqueset.getExistingOrIntact(em);
 	}
-	
+
 
 	/***********************************/
 	/**********  MemberMethod **********/
@@ -54,22 +58,58 @@ public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
 	public boolean containsTag(String tag) {
 		return tags.contains(tag);
 	}
-	
-	
+
+
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	@Override
-	public String name() {
-		return name;
-	}
 	@Override
 	public int compareTo(EnMorpheme o) {
 		int comparison = name.compareTo(o.name);
 		return comparison!=0? comparison : tags.compareTo(o.tags);
 	}
+	@Override
+	public String name() {
+		return name;
+	}
+	@Override
+	public String mainPoS() {
+		return tags.mainPoS();
+	}
+	@Override
+	public String subPoS1() {
+		return tags.subPoS1();
+	}
+	@Override
+	public String subPoS2() {
+		return tags.subPoS2();
+	}
+	@Override
+	public String subPoS3() {
+		return tags.subPoS3();
+	}
+	@Override
+	public String inflection() {
+		return tags.inflection();
+	}
+	@Override
+	public String conjugation() {
+		return tags.conjugation();
+	}
+	@Override
+	public String infinitive() {
+		return tags.infinitive();
+	}
+	@Override
+	public String kana() {
+		return tags.kana();
+	}
+	@Override
+	public String pronunciation() {
+		return tags.pronunciation();
+	}
 
-	
+
 	/**********************************/
 	/**********    Getter    **********/
 	/**********************************/
@@ -83,27 +123,8 @@ public class EnMorpheme implements GrammarInterface, Uniqueness<EnMorpheme> {
 	public List<String> tags() {
 		return tags.getTagList().subList(0, Tags.CONJUGATION+1);
 	}
-	public String mainPoS() {
-		return tags.mainPoS();
-	}
-	public String subPoS1() {
-		return tags.subPoS1();
-	}
-	public String subPoS2() {
-		return tags.subPoS2();
-	}
-	public String subPoS3() {
-		return tags.subPoS3();
-	}
-	public String inflection() {
-		return tags.inflection();
-	}
-	public String conjugation() {
-		return tags.conjugation();
-	}
 
-	
-	
+
 	/**********************************/
 	/********** ObjectMethod **********/
 	/**********************************/

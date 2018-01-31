@@ -7,27 +7,28 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.PartOfSpeechInterface;
 import util.UniqueSet;
 import util.Uniqueness;
 
-public class Concept implements GrammarInterface, Uniqueness<Concept> {
+public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface {
 	private static UniqueSet<Concept> uniqueset = new UniqueSet<>(100);
 
 	private final List<Morpheme> morphemes;	// 形態素たち
-	
-	
+
+
 
 	public static final Concept ZEROCONCEPT = new Concept(new ArrayList<>());
-	
+
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
 	private Concept(List<Morpheme> morphemes) {
 		this.morphemes = morphemes;
-		
+
 		uniqueset.add(this);
 	}
-	
+
 	/**
 	 * 同一の概念が存在していればそれを，なければ新しいインスタンスを作って返す.
 	 * @param morphemes
@@ -42,12 +43,11 @@ public class Concept implements GrammarInterface, Uniqueness<Concept> {
 		List<Morpheme> morphemes = Stream.of(tagLists)
 				.map(name_tags -> Morpheme.getOrNewInstance(name_tags))
 				.collect(Collectors.toList());
-		Concept c = new Concept(morphemes);
-		return uniqueset.getExistingOrIntact(c);
+		return getOrNewInstance(morphemes);
 	}
-	
-	
-	
+
+
+
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
@@ -55,17 +55,10 @@ public class Concept implements GrammarInterface, Uniqueness<Concept> {
 		return getTailMorpheme().containsTag(tag);
 	}
 
-	public String infinitive() {
-		return morphemes.stream().map(m -> m.infinitive()).collect(Collectors.joining());
-	}
-	
+
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
-	@Override	
-	public String name() {
-		return morphemes.stream().map(m -> m.name()).collect(Collectors.joining());
-	}
 	@Override
 	public int compareTo(Concept o) {
 		int comparison = 0;
@@ -76,12 +69,52 @@ public class Concept implements GrammarInterface, Uniqueness<Concept> {
 			if (comparison != 0)
 				return comparison;
 		}
-		return itr1.hasNext()? 1 
+		return itr1.hasNext()? 1
 				: itr2.hasNext()? -1
 				: comparison; // =0
 	}
-	
-	
+	@Override
+	public String name() {
+		return morphemes.stream().map(m -> m.name()).collect(Collectors.joining());
+	}
+	@Override
+	public String mainPoS() {
+		return getTailMorpheme().mainPoS();
+	}
+	@Override
+	public String subPoS1() {
+		return getTailMorpheme().subPoS1();
+	}
+	@Override
+	public String subPoS2() {
+		return getTailMorpheme().subPoS2();
+	}
+	@Override
+	public String subPoS3() {
+		return getTailMorpheme().subPoS3();
+	}
+	@Override
+	public String inflection() {
+		return getTailMorpheme().inflection();
+	}
+	@Override
+	public String conjugation() {
+		return getTailMorpheme().conjugation();
+	}
+	@Override
+	public String infinitive() {
+		return morphemes.stream().map(m -> m.infinitive()).collect(Collectors.joining());
+	}
+	@Override
+	public String kana() {
+		return morphemes.stream().map(m -> m.kana()).collect(Collectors.joining());
+	}
+	@Override
+	public String pronunciation() {
+		return morphemes.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
+	}
+
+
 	/**********************************/
 	/**********    Getter    **********/
 	/**********************************/
@@ -94,7 +127,7 @@ public class Concept implements GrammarInterface, Uniqueness<Concept> {
 	public Morpheme getTailMorpheme() {
 		return morphemes.get(morphemes.size()-1);
 	}
-	
+
 	/**********************************/
 	/********** ObjectMethod **********/
 	/**********************************/
@@ -121,7 +154,7 @@ public class Concept implements GrammarInterface, Uniqueness<Concept> {
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return morphemes.stream().map(m -> m.toString()).collect(Collectors.joining());
