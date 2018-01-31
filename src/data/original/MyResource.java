@@ -32,10 +32,16 @@ public class MyResource {
 	 */
 	private String fragment;
 	
-	/* Constractor */
+	
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
 	public MyResource(Namespace namespace, String fragment) {
 		this.namespace = namespace;
 		this.fragment = fragment;
+	}
+	public MyResource(String namespace, String fragment) {
+		this(Namespace.valueOfPrefix(namespace), fragment);
 	}
 	public MyResource(String fragment) {
 		this(Namespace.LITERAL, fragment);

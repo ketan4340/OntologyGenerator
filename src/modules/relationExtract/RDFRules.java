@@ -11,7 +11,7 @@ import org.apache.jena.rdf.model.Statement;
 
 public class RDFRules {
 
-	Set<RDFRule> rules;
+	private Set<RDFRule> rules;
 	
 	/***********************************/
 	/**********  Constructor  **********/
@@ -27,4 +27,14 @@ public class RDFRules {
 	public List<Statement> solve(Model targetModel) {
 		return rules.stream().flatMap(r -> r.solve(targetModel).stream()).collect(Collectors.toList());
 	}
+
+
+
+	/**********************************/
+	/**********    Getter    **********/
+	/**********************************/
+	public Set<RDFRule> getRules() {
+		return rules;
+	}
+		
 }

@@ -16,8 +16,13 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 
+import data.original.MyResource;
 import data.original.Ontology;
 import data.original.RDFTriple;
 import grammar.NaturalLanguage;
@@ -105,9 +110,11 @@ public class Generator {
 		/***************************************/
 		/**          関係抽出モジュール          **/
 		/***************************************/
+		/*
 		List<RDFTriple> triples = editedSentences.stream()
 				.flatMap(s -> s.extractRelation().stream())
 				.collect(Collectors.toList());
+		 */
 		
 		Model wholeModel = ModelFactory.createDefaultModel();
 		/* 文構造のRDF化 */
@@ -118,10 +125,25 @@ public class Generator {
 		  wholeModel.add(rdfRules.solve(sentenceModel));
 		}
 
-		
+		List<RDFTriple> triples = new LinkedList<>();
+		StmtIterator stmtIter = wholeModel.listStatements();
+		while (stmtIter.hasNext()) {
+			Statement stmt = stmtIter.nextStatement(); // get next statement
+			Resource subject = stmt.getSubject(); // get the subject
+			Property predicate = stmt.getPredicate(); // get the predicate
+			RDFNode object = stmt.getObject(); // get the object
+			RDFTriple triple = new RDFTriple(
+					new MyResource(subject.getNameSpace(), subject.getLocalName()),
+					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
+					object instanceof Resource? 
+							new MyResource(((Resource)object).getNameSpace(), ((Resource)object).getLocalName())
+							: new MyResource(object.toString()));
+			triples.add(triple);
+		}
 		//重複除去
-		triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
+		//triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
 
+		
 		List<String> csvList = triples.stream().map(tri -> tri.toString()).collect(Collectors.toList());
 		Path csvFile = Paths.get("csv/relation"+sdf.format(c.getTime())+".csv");
 		try {

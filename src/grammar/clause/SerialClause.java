@@ -10,7 +10,7 @@ import grammar.word.Word;
 public class SerialClause extends AbstractClause<Phrase> {
 	private static int clausesSum = 0;
 
-	private final int id;
+	//private final int id;
 	
 
 	/***********************************/
@@ -18,8 +18,7 @@ public class SerialClause extends AbstractClause<Phrase> {
 	/***********************************/
 	public SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
-		id = clausesSum++;
-		//imprintThisOnChildren();
+		//id = clausesSum++;
 	}
 	public SerialClause(List<AbstractClause<?>> clauses) {
 		this(new Phrase(clauses.subList(0, clauses.size()), clauses.get(clauses.size()-1).categorem), 
@@ -50,10 +49,11 @@ public class SerialClause extends AbstractClause<Phrase> {
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
+	/*
 	public int getID() {
 		return id;
 	}
-
+	 */
 	
 	/**********************************/
 	/**********    Getter    **********/

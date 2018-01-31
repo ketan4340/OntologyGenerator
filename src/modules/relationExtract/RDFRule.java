@@ -22,9 +22,11 @@ public class RDFRule {
 	private static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();
 	private static final String prefixRDFS = Namespace.RDFS.toQueryPrefixDefinition();
 	private static final String prefixOWL = Namespace.OWL.toQueryPrefixDefinition();
+	private static final String prefixDC = Namespace.DC.toQueryPrefixDefinition();
 	private static final String prefixDCTERM = Namespace.DCTERMS.toQueryPrefixDefinition();
 	private static final String prefixSCHEMA = Namespace.SCHEMA.toQueryPrefixDefinition();
 	private static final String prefixJASS = Namespace.JASS.toQueryPrefixDefinition();
+	private static final String prefixGOO = Namespace.GOO.toQueryPrefixDefinition();
 	
 	private Map<String, String> varURIMap;
 	
@@ -37,15 +39,15 @@ public class RDFRule {
 	public RDFRule(String[][] ifs, String[][] thens) {
 		this.varURIMap = Stream.concat(Stream.of(ifs), Stream.of(thens))
 				.flatMap(Stream::of)
-				.collect(Collectors.toMap(s -> s, s -> s));
+				.collect(Collectors.toMap(s -> s, s -> s, (k1, k2) -> k1));
 		mapInit();
 		String queryString = 
-						prefixRDF+prefixRDFS+prefixOWL+prefixDCTERM+prefixSCHEMA+prefixJASS +
+						prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO +
 						"SELECT * " +
 						"WHERE {" +
 						Stream.of(ifs).map(Stream::of)
 						.map(stm -> stm.collect(Collectors.joining(" ")))
-						.collect(Collectors.joining(".")) +
+						.collect(Collectors.joining(" .")) +
 						"}";
 		this.ifStmt = QueryFactory.create(queryString);
 		this.thenStmt = Stream.of(thens)
@@ -86,5 +88,15 @@ public class RDFRule {
 				}
 			}	
 		});
+	}
+
+	
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
+	@Override
+	public String toString() {
+		return ifStmt.toString() + "->" + 
+				thenStmt.stream().map(tp -> tp.toString()).collect(Collectors.joining("."));
 	}
 }

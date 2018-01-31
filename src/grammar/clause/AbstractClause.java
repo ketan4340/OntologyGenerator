@@ -21,7 +21,7 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	implements GrammarInterface {
 	private static int clausesSum = 0;
 	
-	private final int id;
+	public final int id;
 	
 	protected W categorem;				// 自立語
 	protected List<Adjunct> adjuncts; 	// 付属語

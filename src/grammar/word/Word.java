@@ -15,7 +15,7 @@ public class Word extends SyntacticComponent<AbstractClause<?>, Word>
 implements GrammarInterface, SyntacticChild {
 	private static int wordsSum = 0;
 
-	private final int id;
+	public final int id;
 	protected Concept concept;
 
 

@@ -15,7 +15,7 @@ public class Clause extends AbstractClause<Categorem>{
 	public static final Clause ROOT = new Clause(Categorem.ZEROCATEGOREM, new ArrayList<>(), new ArrayList<>());
 	private static int clausesSum = 0;
 
-	private final int id;
+	//private final int id;
 	
 
 	/***********************************/
@@ -29,7 +29,7 @@ public class Clause extends AbstractClause<Categorem>{
 	 */
 	public Clause(Categorem categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
-		this.id = clausesSum++;
+		//this.id = clausesSum++;
 		imprintThisOnChildren();
 	}
 
@@ -74,10 +74,11 @@ public class Clause extends AbstractClause<Categorem>{
 	/***********************************/
 	/**********   Interface   **********/
 	/***********************************/
+	/*
 	public int getID() {
 		return id;
 	}
-	
+	*/
 	
 	/**********************************/
 	/**********    Getter    **********/

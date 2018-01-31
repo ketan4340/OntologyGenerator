@@ -2,6 +2,9 @@ package data.original;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum Namespace {
 	EXAMPLE("ex", "http://www.uec.ac.jp/example#"),
@@ -45,6 +48,16 @@ public enum Namespace {
 	}
 	public String toQueryPrefixDefinition() {
 		return "PREFIX "+ prefix +": <"+ uri +">";
+	}
+	public static Map<String, String> prefixMap(String... names) {
+		return Stream.of(names).map(n -> valueOf(n))
+				.collect(Collectors.toMap(ns -> ns.prefix, ns -> ns.uri.toString()));
+	}
+	public static Namespace valueOfPrefix(String prefix) {
+		for (Namespace ns : values())
+			if (ns.prefix.equals(prefix))
+				return ns;
+		return null;
 	}
 	
 	/**********************************/

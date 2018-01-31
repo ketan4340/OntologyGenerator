@@ -32,7 +32,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	implements GrammarInterface {
 	private static int sentenceSum = 0;
 
-	private final int id;
+	public final int id;
 
 
 	/***********************************/
@@ -726,12 +726,8 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	/***********************************/
 	/********** Getter/Setter **********/
 	/***********************************/
-	public List<AbstractClause<?>> getClauses() {
-		return children;
-	}
-	public void setClauses(List<AbstractClause<?>> clauses) {
-		this.children = clauses;
-	}
+
+	
 
 	/***********************************/
 	/**********   Interface   **********/

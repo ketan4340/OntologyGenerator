@@ -3,8 +3,6 @@ package modules.relationExtract;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,13 +24,6 @@ public class RDFRuleFactory {
 	private static final Pattern commaPattern = Pattern.compile("(?<!\\\\),");
 	/** "."にマッチ。ただし"\."は無視する。 */
 	private static final Pattern periodPattern = Pattern.compile("(?<!\\\\)"+Pattern.quote("."));
-	
-	
-	public static void main(String[] args) {
-		Path path = Paths.get("rule/rules.txt");
-		
-		RDFRules rules = readRules(path);
-	}
 	
 	
 	public static RDFRules readRules(Path rulesFile) {
@@ -85,8 +76,8 @@ public class RDFRuleFactory {
 	}
 	
 	private static String[][] split2vals(String triples) {
-		return Stream.of(triples.split(Pattern.quote(".")))
-				.map(tri -> tri.split(","))
+		return Stream.of(periodPattern.split(triples))
+				.map(commaPattern::split)
 				.toArray(String[][]::new);
 	}
 }
