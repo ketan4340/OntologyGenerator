@@ -1,5 +1,6 @@
 package modules.relationExtract;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,12 @@ public class RDFRule {
 	private static final String prefixSCHEMA = Namespace.SCHEMA.toQueryPrefixDefinition();
 	private static final String prefixJASS = Namespace.JASS.toQueryPrefixDefinition();
 	private static final String prefixGOO = Namespace.GOO.toQueryPrefixDefinition();
-	
+
 	private Map<String, String> varURIMap;
-	
-	private Query ifStmt;	
+
+	private Query ifStmt;
 	private Set<RDFTriplePattern> thenStmt;
-	
+
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
@@ -41,7 +42,7 @@ public class RDFRule {
 				.flatMap(Stream::of)
 				.collect(Collectors.toMap(s -> s, s -> s, (k1, k2) -> k1));
 		mapInit();
-		String queryString = 
+		String queryString =
 						prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO +
 						"SELECT * " +
 						"WHERE {" +
@@ -53,9 +54,10 @@ public class RDFRule {
 		this.thenStmt = Stream.of(thens)
 				.map(tri -> new RDFTriplePattern(tri[0], tri[1], tri[2]))
 				.collect(Collectors.toSet());
+		thenStmt.forEach(System.out::println);
 	}
-	
-	
+
+
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
@@ -64,39 +66,45 @@ public class RDFRule {
 		QueryExecution qexec = QueryExecutionFactory.create(ifStmt, targetModel);
 		ResultSet resultSet = qexec.execSelect();
 		List<String> varNames = resultSet.getResultVars();
-		
+
+		System.out.print("varNames : ");varNames.forEach(System.out::print);System.out.println();	//TODO
+
 		while (resultSet.hasNext()) {
 			QuerySolution qsol = resultSet.next();
 			varNames.stream().forEach(s -> varURIMap.put(s, qsol.getResource(s).getURI()));
-			
+
 			statements.addAll(thenStmt.stream()
 					.map(tp -> tp.fillStatement(targetModel, varURIMap))
 					.collect(Collectors.toList()));
 		}
 		return statements;
 	}
-	
+
 	private void mapInit() {
+		Map<String, String> newmap = new HashMap<>();
 		varURIMap.keySet().stream().forEach(s -> {
 			if (s.startsWith("?")) {
-				varURIMap.put(s, null);
+				newmap.put(s.substring(1, s.length()), null);
 			} else {
 				String[] ns =  s.split(":");
 				if (ns.length == 2) {
 					String uri = Namespace.getURIofPrefix(ns[0]);
-					varURIMap.put(s, uri);
+					newmap.put(s, uri+ns[1]);
+				} else {
+					newmap.put(s, s);
 				}
-			}	
+			}
 		});
+		varURIMap = newmap;
 	}
 
-	
+
 	/**********************************/
 	/********** Objectメソッド **********/
 	/**********************************/
 	@Override
 	public String toString() {
-		return ifStmt.toString() + "->" + 
+		return ifStmt.toString() + "->" +
 				thenStmt.stream().map(tp -> tp.toString()).collect(Collectors.joining("."));
 	}
 }

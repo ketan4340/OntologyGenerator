@@ -119,11 +119,11 @@ public class Generator {
 
 		Model wholeModel = ModelFactory.createDefaultModel();
 		/* 文構造のRDF化 */
-		JASSFactory.commonModelInit();
 		Path rulesFile = Paths.get("rule/rules.txt");
 		RDFRules rdfRules = RDFRuleFactory.read(rulesFile);
 		for (Sentence s : editedSentences) {
 		  Model sentenceModel = JASSFactory.createJASSModel(s);
+		  sentenceModel.write(System.out, "N-TRIPLE");	//TODO
 		  wholeModel.add(rdfRules.solve(sentenceModel));
 		}
 
@@ -134,6 +134,7 @@ public class Generator {
 			Resource subject = stmt.getSubject(); // get the subject
 			Property predicate = stmt.getPredicate(); // get the predicate
 			RDFNode object = stmt.getObject(); // get the object
+			System.out.println(subject.getURI());
 			RDFTriple triple = new RDFTriple(
 					new MyResource(subject.getNameSpace(), subject.getLocalName()),
 					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
