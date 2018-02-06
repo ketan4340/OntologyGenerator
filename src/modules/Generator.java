@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -124,6 +126,22 @@ public class Generator {
 		RDFRules rdfRules = RDFRuleFactory.read(rulesFile);
 		for (Sentence s : editedSentences) {
 		  Model sentenceModel = JASSFactory.createJASSModel(s);
+		  StmtIterator itr = sentenceModel.listStatements();
+			while (itr.hasNext()) {
+				Statement stmt = itr.nextStatement();
+				Resource subject = stmt.getSubject(); // get the subject
+				Property predicate = stmt.getPredicate(); // get the predicate
+				RDFNode object = stmt.getObject(); // get the object
+
+				System.out.print(subject.toString());
+				System.out.print(" " + predicate.toString() + " ");
+				if (object instanceof Resource) {
+					System.out.println(object.toString());
+				} else {
+					// object is a literal
+					System.out.println(" \"" + object.toString() + "\"");
+				}
+			}
 		  wholeModel.add(rdfRules.solve(sentenceModel));
 		}
 
