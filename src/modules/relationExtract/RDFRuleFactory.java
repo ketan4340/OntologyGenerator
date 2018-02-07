@@ -51,7 +51,8 @@ public class RDFRuleFactory {
 				wholeIF_THENPattern.matcher(ruleString).matches()?
 						triplePatternsOfIF_THEN(ruleString) :
 				wholeArrowPattern.matcher(ruleString).matches()?
-						triplePatternsOfArrow(ruleString) : new String[2];
+						triplePatternsOfArrow(ruleString) :
+				new String[2];
 
 		String[][] ifTriples = split2vals(triplePatterns[0]);
 		String[][] thenTriples = split2vals(triplePatterns[1]);

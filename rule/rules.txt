@@ -13,4 +13,7 @@ _:x, rdf:type, rdf:Seq.
 _:x, rdf:_1, ?w1.
 ->
 ?c, jass:adjunct_1, ?w1.;
-?c, jass:hoge, jass:moge. -> ?c, rdfs:subClassOf, jass:boke.;
+?c, jass:hoge, jass:moge.
+ -> ?c, rdfs:subClassOf, jass:boke.;
+?Wd, jass:pos, "名詞"
+	-> ?Wd, rdfs:subClassOf, "名詞".;

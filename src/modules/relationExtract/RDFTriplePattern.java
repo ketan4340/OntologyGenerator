@@ -13,8 +13,8 @@ public class RDFTriplePattern {
 	private String subjectURI;
 	private String predicateURI;
 	private String objectURI;
-	
-	
+
+
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
@@ -23,24 +23,30 @@ public class RDFTriplePattern {
 		this.predicateURI = predicateURI;
 		this.objectURI = objectURI;
 	}
-	
-	
+
+
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
 	public Statement fillStatement(Model targetModel, Map<String, String> varURIMap) {
+		System.out.println(subjectURI +", " + predicateURI + ", " + objectURI);
+		varURIMap.entrySet().forEach(e -> System.out.println(e.getKey() + "<->" + e.getValue()));	//TODO
+
 		Resource subject = targetModel.getResource(varURIMap.get(subjectURI));
 		Property predicate = targetModel.getProperty(varURIMap.get(predicateURI));
 		RDFNode object = targetModel.getResource(varURIMap.get(objectURI));
+
+		System.out.println(subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());	//TODO
+
 		return targetModel.createStatement(subject, predicate, object);
 	}
-	
+
 
 	/**********************************/
 	/********** Objectメソッド **********/
 	/**********************************/
 	@Override
 	public String toString() {
-		return subjectURI + " " + predicateURI + " " + objectURI;
+		return subjectURI + " " + predicateURI + " " + objectURI + ".";
 	}
 }
