@@ -9,13 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -32,7 +29,7 @@ import grammar.Paragraph;
 import grammar.Sentence;
 import grammar.clause.AbstractClause;
 import modules.relationExtract.JASSFactory;
-import modules.relationExtract.RDFRuleFactory;
+import modules.relationExtract.RDFRuleReader;
 import modules.relationExtract.RDFRules;
 import modules.syntacticParse.Cabocha;
 import util.StringListUtil;
@@ -119,34 +116,39 @@ public class Generator {
 				.collect(Collectors.toList());
 		 */
 
-		Model wholeModel = ModelFactory.createDefaultModel();
+		Model ontologyModel = ModelFactory.createDefaultModel();
 		/* 文構造のRDF化 */
-		Path rulesFile = Paths.get("rule/rules.txt");
-		RDFRules rdfRules = RDFRuleFactory.read(rulesFile);
+		// RDFルール生成 (読み込み)
+		RDFRules rdfRules = RDFRuleReader.read(Paths.get("rule/rules.txt"));
+		System.out.println("All RDFRules\n"+rdfRules.toString());
+		
 		for (Sentence s : editedSentences) {
-		  Model sentenceModel = JASSFactory.createJASSModel(s);
-		  StmtIterator itr = sentenceModel.listStatements();
+			Model sentenceModel = JASSFactory.createJASSModel(s);
+			StmtIterator itr = sentenceModel.listStatements();
+			/*
 			while (itr.hasNext()) {
 				Statement stmt = itr.nextStatement();
 				Resource subject = stmt.getSubject(); // get the subject
 				Property predicate = stmt.getPredicate(); // get the predicate
 				RDFNode object = stmt.getObject(); // get the object
 
-				System.out.print(subject.toString());
-				System.out.print(" " + predicate.toString() + " ");
+				System.out.print(subject.toString()); // TODO
+				System.out.print(" " + predicate.toString() + " "); // TODO
 				if (object instanceof Resource) {
-					System.out.println(object.toString());
+					System.out.println(object.toString()); // TODO
 				} else {
 					// object is a literal
-					System.out.println(" \"" + object.toString() + "\"");
+					System.out.println("\"" + object.toString() + "\""); // TODO
 				}
 			}
-		  sentenceModel.write(System.out, "N-TRIPLE");	//TODO
-		  wholeModel.add(rdfRules.solve(sentenceModel));
+			*/
+			//
+			sentenceModel.write(System.out, "N-TRIPLE"); // TODO
+			ontologyModel.add(rdfRules.solve(sentenceModel));
 		}
 
 		List<RDFTriple> triples = new LinkedList<>();
-		StmtIterator stmtIter = wholeModel.listStatements();
+		StmtIterator stmtIter = ontologyModel.listStatements();
 		while (stmtIter.hasNext()) {
 			Statement stmt = stmtIter.nextStatement(); // get next statement
 			Resource subject = stmt.getSubject(); // get the subject

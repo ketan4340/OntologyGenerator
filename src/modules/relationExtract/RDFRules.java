@@ -36,5 +36,15 @@ public class RDFRules {
 	public Set<RDFRule> getRules() {
 		return rules;
 	}
-		
+	
+	
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
+	@Override
+	public String toString() {
+		return rules.stream()
+				.map(r -> r.toString())
+				.collect(Collectors.joining("\n", "\t", ""));
+	}	
 }

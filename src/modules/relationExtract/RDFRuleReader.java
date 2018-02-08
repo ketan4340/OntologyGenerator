@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RDFRuleFactory {
+public class RDFRuleReader {
 	/** 空白文字,半角スペース,全角スペースにマッチ。ただしバックスラッシュが直前に付くものは対象外。 */
 	private static final Pattern removeSpacePattern = Pattern.compile("(?<!\\\\)[\\s 　]");
 	/** 直後に"THEN"がない"}"と、直前に"."がある";"の位置にマッチ。"}"も";"も残る。 */
@@ -42,7 +42,7 @@ public class RDFRuleFactory {
 	public static RDFRules createRules(String rulesString) {
 		rulesString = removeSpacePattern.matcher(rulesString).replaceAll("");
 		return new RDFRules(splitRulesPattern.splitAsStream(rulesString)
-				.map(RDFRuleFactory::createRule)
+				.map(RDFRuleReader::createRule)
 				.collect(Collectors.toSet()));
 	}
 
@@ -54,8 +54,8 @@ public class RDFRuleFactory {
 						triplePatternsOfArrow(ruleString) :
 				new String[2];
 
-		String[][] ifTriples = split2vals(triplePatterns[0]);
-		String[][] thenTriples = split2vals(triplePatterns[1]);
+		String[][] ifTriples = split2values(triplePatterns[0]);
+		String[][] thenTriples = split2values(triplePatterns[1]);
 		return new RDFRule(ifTriples, thenTriples);
 	}
 
@@ -78,11 +78,11 @@ public class RDFRuleFactory {
 		return triplePatterns;
 	}
 
-	private static String[][] split2vals(String triples) {
-		return Stream.of(triples)
-				.map(periodPattern::split)
-				.flatMap(Stream::of)
-				.map(commaPattern::split)
-				.toArray(String[][]::new);
+	private static String[][] split2values(String triples) {
+		return Stream.of(triples)			// Stream<String> (1)
+				.map(periodPattern::split)	// Stream<String[]> (1)
+				.flatMap(Stream::of)			// Stream<String> (n)
+				.map(commaPattern::split)	// Stream<String[]> (n)
+				.toArray(String[][]::new);	// String[][] (n)
 	}
 }

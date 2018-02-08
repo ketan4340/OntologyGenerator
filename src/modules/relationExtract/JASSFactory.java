@@ -3,7 +3,6 @@ package modules.relationExtract;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -14,7 +13,6 @@ import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 import grammar.word.Adjunct;
 import grammar.word.Word;
-import jena.rdfcat;
 
 public class JASSFactory {
 	private static final Model commonModel = ModelFactory.createDefaultModel();
