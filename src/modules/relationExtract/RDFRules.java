@@ -45,6 +45,6 @@ public class RDFRules {
 	public String toString() {
 		return rules.stream()
 				.map(r -> r.toString())
-				.collect(Collectors.joining("\n", "\t", ""));
+				.collect(Collectors.joining("\n"));
 	}	
 }

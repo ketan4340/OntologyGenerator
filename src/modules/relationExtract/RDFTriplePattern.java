@@ -1,6 +1,7 @@
 package modules.relationExtract;
 
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -31,13 +32,16 @@ public class RDFTriplePattern {
 	public String[] toArray() {
 		return new String[]{subjectURI, predicateURI, objectURI};
 	}
-	public String join(CharSequence delimiter) {
-		return String.join(delimiter, subjectURI, predicateURI, objectURI);
+	public String join(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
+		return new StringJoiner(delimiter, prefix, suffix)
+				.add(subjectURI).add(predicateURI).add(objectURI).toString();
 	}
 	
 	public Statement fillStatement(Model targetModel, Map<String, String> varURIMap) {
-		System.out.println(subjectURI +", " + predicateURI + ", " + objectURI);
-		varURIMap.entrySet().forEach(e -> System.out.println(e.getKey() + "\t : " + e.getValue()));	//TODO
+		System.out.println("filling");
+		System.out.println("  "+subjectURI +", " + predicateURI + ", " + objectURI);
+		System.out.println("varmap");
+		varURIMap.entrySet().forEach(e -> System.out.println("| "+e.getKey() + "\t : " + e.getValue()));	//TODO
 
 		Resource subject = targetModel.getResource(varURIMap.get(subjectURI));
 		Property predicate = targetModel.getProperty(varURIMap.get(predicateURI));
@@ -55,6 +59,6 @@ public class RDFTriplePattern {
 	/**********************************/
 	@Override
 	public String toString() {
-		return join(" ") + ".";
+		return join(" ", "", ".");
 	}
 }

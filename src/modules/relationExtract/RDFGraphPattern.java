@@ -39,10 +39,11 @@ public class RDFGraphPattern {
 	public String[][] toArray() {
 		return triplePatterns.stream().map(tp -> tp.toArray()).toArray(String[][]::new);
 	}
-	public String joins(CharSequence tripleDelimiter, CharSequence graphDelimiter) {
+	public String joins(CharSequence graphDelimiter, CharSequence graphPrefix, CharSequence graphSuffix,
+			CharSequence tripleDelimiter, CharSequence triplePrefix, CharSequence tripleSuffix) {
 		return triplePatterns.stream()
-				.map(tp -> tp.join(tripleDelimiter))
-				.collect(Collectors.joining(graphDelimiter));
+				.map(tp -> tp.join(tripleDelimiter, triplePrefix, tripleSuffix))
+				.collect(Collectors.joining(graphDelimiter, graphPrefix, graphSuffix));
 	}
 	
 	public Query toQuery() {
@@ -50,7 +51,7 @@ public class RDFGraphPattern {
 				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO +
 				"SELECT * " +
 				"WHERE {" +
-				joins(" ", " .") +
+				joins("", "", "", " ", "", " .") +
 				"}";
 		return QueryFactory.create(queryString);
 	}
@@ -72,6 +73,6 @@ public class RDFGraphPattern {
 	/**********************************/
 	@Override
 	public String toString() {
-		return joins(" ", ".\n");
+		return joins("\n", "{", "}", ", ", "", ".");
 	}
 }

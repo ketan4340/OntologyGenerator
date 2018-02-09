@@ -1,6 +1,6 @@
 package modules.relationExtract;
 
-import java.util.HashMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +32,17 @@ public class RDFRule {
 	public RDFRule(String[][] ifs, String[][] thens) {
 		this.varURIMap = Stream.concat(Stream.of(ifs), Stream.of(thens))
 				.flatMap(Stream::of)
-				.map(s -> s.startsWith("?")? s.substring(0, s.length()-1) : s)
-				.collect(Collectors.toMap(s -> s, s -> s, (k1, k2) -> k1));
-		mapInit();
+				.map(s -> new SimpleEntry<>(s, s))
+				.map(e -> {
+					String s = e.getKey();
+					String[] ns = s.split(":");
+					if (ns.length == 2  && !s.startsWith("<") && !s.startsWith("\"")) {
+						String uri = Namespace.getURIofPrefix(ns[0]);
+						e.setValue(uri + ns[1]);
+					}
+					return e;
+				})
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (k1, k2) -> k1));
 		this.ifPattern = new RDFGraphPattern(
 				Stream.of(ifs)
 				.map(tri -> new RDFTriplePattern(tri[0], tri[1], tri[2]))
@@ -60,7 +68,7 @@ public class RDFRule {
 
 		while (resultSet.hasNext()) {
 			QuerySolution qsol = resultSet.next();
-			varNames.stream().forEach(s -> varURIMap.put(s, qsol.getResource(s).getURI()));
+			varNames.stream().forEach(s -> varURIMap.put("?"+s, qsol.getResource(s).getURI()));
 
 			statements.addAll(thenPattern.getTriplePatterns().stream()
 					.map(tp -> tp.fillStatement(targetModel, varURIMap))
@@ -69,23 +77,6 @@ public class RDFRule {
 		return statements;
 	}
 
-	private void mapInit() {
-		Map<String, String> newmap = new HashMap<>();
-		varURIMap.keySet().stream().forEach(s -> {
-			if (s.startsWith("?")) {
-				newmap.put(s.substring(1, s.length()), null);
-			} else {
-				String[] ns =  s.split(":");
-				if (ns.length == 2) {
-					String uri = Namespace.getURIofPrefix(ns[0]);
-					newmap.put(s, uri+ns[1]);
-				} else {
-					newmap.put(s, s);
-				}
-			}
-		});
-		varURIMap = newmap;
-	}
 
 
 	/**********************************/
@@ -93,6 +84,6 @@ public class RDFRule {
 	/**********************************/
 	@Override
 	public String toString() {
-		return ifPattern.toString() +"\n\t -> "+ thenPattern.toString();
+		return "IF "+ ifPattern.toString() +"\nTHEN "+ thenPattern.toString();
 	}
 }

@@ -146,7 +146,10 @@ public class Generator {
 			sentenceModel.write(System.out, "N-TRIPLE"); // TODO
 			ontologyModel.add(rdfRules.solve(sentenceModel));
 		}
-
+		
+		System.out.println("\n\n Resolved Model");
+		ontologyModel.write(System.out, "N-TRIPLE"); // TODO
+		
 		List<RDFTriple> triples = new LinkedList<>();
 		StmtIterator stmtIter = ontologyModel.listStatements();
 		while (stmtIter.hasNext()) {
@@ -154,7 +157,7 @@ public class Generator {
 			Resource subject = stmt.getSubject(); // get the subject
 			Property predicate = stmt.getPredicate(); // get the predicate
 			RDFNode object = stmt.getObject(); // get the object
-			System.out.println(subject.getURI());
+			System.out.println(subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());
 			RDFTriple triple = new RDFTriple(
 					new MyResource(subject.getNameSpace(), subject.getLocalName()),
 					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
