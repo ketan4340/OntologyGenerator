@@ -121,7 +121,7 @@ public class Generator {
 		// RDFルール生成 (読み込み)
 		RDFRules rdfRules = RDFRuleReader.read(Paths.get("rule/rules.txt"));
 		System.out.println("All RDFRules\n"+rdfRules.toString());
-		
+
 		for (Sentence s : editedSentences) {
 			Model sentenceModel = JASSFactory.createJASSModel(s);
 			StmtIterator itr = sentenceModel.listStatements();
@@ -146,10 +146,10 @@ public class Generator {
 			sentenceModel.write(System.out, "N-TRIPLE"); // TODO
 			ontologyModel.add(rdfRules.solve(sentenceModel));
 		}
-		
+
 		System.out.println("\n\n Resolved Model");
 		ontologyModel.write(System.out, "N-TRIPLE"); // TODO
-		
+
 		List<RDFTriple> triples = new LinkedList<>();
 		StmtIterator stmtIter = ontologyModel.listStatements();
 		while (stmtIter.hasNext()) {

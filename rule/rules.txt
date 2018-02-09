@@ -1,4 +1,4 @@
-IF{
+﻿IF{
 ?Stc, rdf:type, jass:Sentence.
 ?Stc,jass:subject,?sCls.
 ?sCls,jass:categorem,?sWod.
