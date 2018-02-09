@@ -42,6 +42,7 @@ public class MyResource {
 	}
 	public MyResource(String namespace, String fragment) {
 		this(Namespace.valueOfPrefix(namespace), fragment);
+		System.out.println("\t\tmade new MyResource >" + namespace + ":" + fragment);
 	}
 	public MyResource(String fragment) {
 		this(Namespace.LITERAL, fragment);

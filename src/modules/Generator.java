@@ -114,6 +114,8 @@ public class Generator {
 		List<RDFTriple> triples = editedSentences.stream()
 				.flatMap(s -> s.extractRelation().stream())
 				.collect(Collectors.toList());
+		//重複除去
+		//triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
 		 */
 
 		Model ontologyModel = ModelFactory.createDefaultModel();
@@ -124,25 +126,6 @@ public class Generator {
 
 		for (Sentence s : editedSentences) {
 			Model sentenceModel = JASSFactory.createJASSModel(s);
-			StmtIterator itr = sentenceModel.listStatements();
-			/*
-			while (itr.hasNext()) {
-				Statement stmt = itr.nextStatement();
-				Resource subject = stmt.getSubject(); // get the subject
-				Property predicate = stmt.getPredicate(); // get the predicate
-				RDFNode object = stmt.getObject(); // get the object
-
-				System.out.print(subject.toString()); // TODO
-				System.out.print(" " + predicate.toString() + " "); // TODO
-				if (object instanceof Resource) {
-					System.out.println(object.toString()); // TODO
-				} else {
-					// object is a literal
-					System.out.println("\"" + object.toString() + "\""); // TODO
-				}
-			}
-			*/
-			//
 			sentenceModel.write(System.out, "N-TRIPLE"); // TODO
 			ontologyModel.add(rdfRules.solve(sentenceModel));
 		}
@@ -150,25 +133,7 @@ public class Generator {
 		System.out.println("\n\n Resolved Model");
 		ontologyModel.write(System.out, "N-TRIPLE"); // TODO
 
-		List<RDFTriple> triples = new LinkedList<>();
-		StmtIterator stmtIter = ontologyModel.listStatements();
-		while (stmtIter.hasNext()) {
-			Statement stmt = stmtIter.nextStatement(); // get next statement
-			Resource subject = stmt.getSubject(); // get the subject
-			Property predicate = stmt.getPredicate(); // get the predicate
-			RDFNode object = stmt.getObject(); // get the object
-			System.out.println(subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());
-			RDFTriple triple = new RDFTriple(
-					new MyResource(subject.getNameSpace(), subject.getLocalName()),
-					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
-					object instanceof Resource?
-							new MyResource(((Resource)object).getNameSpace(), ((Resource)object).getLocalName())
-							: new MyResource(object.toString()));
-			triples.add(triple);
-		}
-		//重複除去
-		//triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
-
+		List<RDFTriple> triples = convertJena2Original(ontologyModel);
 
 		List<String> csvList = triples.stream().map(tri -> tri.toString()).collect(Collectors.toList());
 		Path csvFile = Paths.get("csv/relation"+sdf.format(c.getTime())+".csv");
@@ -185,7 +150,27 @@ public class Generator {
 		return new Ontology(triples);
 	}
 
-
+	
+	private List<RDFTriple> convertJena2Original(Model model) {
+		List<RDFTriple> triples = new LinkedList<>();
+		StmtIterator stmtIter = model.listStatements();
+		while (stmtIter.hasNext()) {
+			Statement stmt = stmtIter.nextStatement(); // get next statement
+			Resource subject = stmt.getSubject(); // get the subject
+			Property predicate = stmt.getPredicate(); // get the predicate
+			RDFNode object = stmt.getObject(); // get the object
+			System.out.println(subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());
+			RDFTriple triple = new RDFTriple(
+					new MyResource(subject.getNameSpace(), subject.getLocalName()),
+					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
+					object instanceof Resource?
+							new MyResource(((Resource)object).getNameSpace(), ((Resource)object).getLocalName())
+							: new MyResource(object.toString()));
+			triples.add(triple);
+		}
+		return triples;
+	}
+	
 
 	/**
 	 * テキストファイル読み込み. テキストは1行一文. 空行を段落の境界とみなす.

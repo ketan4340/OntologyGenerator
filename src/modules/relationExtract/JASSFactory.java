@@ -62,17 +62,17 @@ public class JASSFactory {
 			Word categorem = clause.getCategorem();
 			Resource categoremR = jassModel.createResource("Ctg"+categorem.id)
 					.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Word"))
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createResource("inf"+categorem.id))
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), categorem.mainPoS());
+					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createLiteral(categorem.infinitive()))
+					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(categorem.mainPoS()));
 			clauseR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "categorem"), categoremR)
 					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "contains_word"), categoremR);
 				// 付属語
 			if (!clause.getAdjuncts().isEmpty()) {
-				Adjunct adjunct = clause.getAdjuncts().get(clause.getAdjuncts().size() - 1);
+				Adjunct adjunct = clause.getAdjuncts().get(clause.getAdjuncts().size() - 1);	// 最後尾の付属語しか見ない
 				Resource adjunctR = jassModel.createResource("Ajc" + adjunct.id)
 						.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Word"))
-						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createResource("inf" + adjunct.id))
-						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), adjunct.mainPoS());
+						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createLiteral(adjunct.infinitive()))
+						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(adjunct.mainPoS()));
 				clauseR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "adjunct"), adjunctR)
 						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "contains_word"), adjunctR);
 

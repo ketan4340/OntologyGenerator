@@ -43,7 +43,7 @@ public class RDFTriple {
 	
 	@Override
 	public String toString() {
-		return subject + ", " + predicate + ", " + object;
+		return subject + ", " + predicate + ", " + object + ".";
 	}
 
 	@Override

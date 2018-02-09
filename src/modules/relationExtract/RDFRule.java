@@ -68,7 +68,7 @@ public class RDFRule {
 
 		while (resultSet.hasNext()) {
 			QuerySolution qsol = resultSet.next();
-			varNames.stream().forEach(s -> varURIMap.put("?"+s, qsol.getResource(s).getURI()));
+			varNames.stream().forEach(s -> varURIMap.put("?"+s, qsol.get(s).toString()));
 
 			statements.addAll(thenPattern.getTriplePatterns().stream()
 					.map(tp -> tp.fillStatement(targetModel, varURIMap))
