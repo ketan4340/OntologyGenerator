@@ -22,6 +22,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import data.original.MyResource;
+import data.original.Namespace;
 import data.original.Ontology;
 import data.original.RDFTriple;
 import grammar.NaturalLanguage;
@@ -161,10 +162,10 @@ public class Generator {
 			RDFNode object = stmt.getObject(); // get the object
 			System.out.println(subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());
 			RDFTriple triple = new RDFTriple(
-					new MyResource(subject.getNameSpace(), subject.getLocalName()),
-					new MyResource(predicate.getNameSpace(), predicate.getLocalName()),
+					new MyResource(Namespace.specify(subject.getURI()), subject.getLocalName()),
+					new MyResource(Namespace.specify(predicate.getURI()), predicate.getLocalName()),
 					object instanceof Resource?
-							new MyResource(((Resource)object).getNameSpace(), ((Resource)object).getLocalName())
+							new MyResource(Namespace.specify(((Resource)object).getURI()), ((Resource)object).getLocalName())
 							: new MyResource(object.toString()));
 			triples.add(triple);
 		}

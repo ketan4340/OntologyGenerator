@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 public enum Namespace {
 	EXAMPLE("ex", "http://www.uec.ac.jp/example#"),
-	EMPTY("_", ""),
 	RDF("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
 	RDFS("rdfs", "http://www.w3.org/2000/01/rdf-schema#"),
 	OWL("owl", "http://www.w3.org/2002/07/owl#"),
@@ -19,6 +18,8 @@ public enum Namespace {
 	JASS("jass", "http://www.uec.ac.jp/k-lab/k-tanabe/jass/"),
 	
 	GOO("goo", "http://dictionary.goo.ne.jp/jn#"),
+	
+	EMPTY("_", "_"),
 	LITERAL("", ""),
 	;
 	
@@ -46,9 +47,6 @@ public enum Namespace {
 				return ns.uri.toString();
 		return null;
 	}
-	public String toQueryPrefixDefinition() {
-		return "PREFIX "+ prefix +": <"+ uri +">";
-	}
 	public static Map<String, String> prefixMap(String... names) {
 		return Stream.of(names).map(n -> valueOf(n))
 				.collect(Collectors.toMap(ns -> ns.prefix, ns -> ns.uri.toString()));
@@ -59,6 +57,17 @@ public enum Namespace {
 				return ns;
 		return null;
 	}
+	public static Namespace specify(String uri) {
+		for (Namespace ns : values())
+			if (uri.startsWith(ns.uri.toString()))
+				return ns;
+		return EMPTY;
+	}
+	
+	public String toQueryPrefixDefinition() {
+		return "PREFIX "+ prefix +": <"+ uri +">";
+	}
+
 	
 	/**********************************/
 	/**********    Getter    **********/

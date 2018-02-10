@@ -27,6 +27,7 @@ public class JASSFactory {
 	private static final Resource CLAUSE = commonModel.createResource(Namespace.JASS.getURI() + "Clause");
 	private static final Resource WORD = commonModel.createResource(Namespace.JASS.getURI() + "Word");
 	private static final Resource PoS = commonModel.createResource(Namespace.JASS.getURI() + "PoS");
+	private static final Resource CONCEPT = commonModel.createResource(Namespace.JASS.getURI() + "Concept");
 
 	/* プロパティResource */
 		/* 文用 */
@@ -41,38 +42,41 @@ public class JASSFactory {
     	/* 単語用 */
     private static final Property INFINITIVE = commonModel.createProperty(Namespace.JASS.getURI() + "infinitive");
     private static final Property POS = commonModel.createProperty(Namespace.JASS.getURI() + "pos");
+    private static final Property MEANS = commonModel.createProperty(Namespace.JASS.getURI() + "means");
 
 
 	public static Model createJASSModel(Sentence sentence) {
 		Model jassModel = createDefaultJASSModel();
 
 		// 文
-		Resource sentenceR = jassModel.createResource("Stc"+sentence.id)
+		Resource sentenceR = jassModel.createResource(Namespace.JASS.getURI()+"Stc"+sentence.id)
 				.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Sentence"));
 
 
 		// 文節
 		for (AbstractClause<?> clause : sentence.getChildren()) {
-			Resource clauseR = jassModel.createResource("Cls"+clause.id)
+			Resource clauseR = jassModel.createResource(Namespace.JASS.getURI()+"Cls"+clause.id)
 					.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Clause"));
 			sentenceR.addProperty(CONTAINS_CLAUSE, clauseR);
 
 			// 単語
 				// 自立語
 			Word categorem = clause.getCategorem();
-			Resource categoremR = jassModel.createResource("Ctg"+categorem.id)
+			Resource categoremR = jassModel.createResource(Namespace.JASS.getURI()+"Ctg"+categorem.id)
 					.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Word"))
 					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createLiteral(categorem.infinitive()))
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(categorem.mainPoS()));
+					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(categorem.mainPoS()))
+					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "means"), jassModel.createResource(Namespace.GOO.getURI() + categorem.name()));
 			clauseR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "categorem"), categoremR)
 					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "contains_word"), categoremR);
 				// 付属語
 			if (!clause.getAdjuncts().isEmpty()) {
 				Adjunct adjunct = clause.getAdjuncts().get(clause.getAdjuncts().size() - 1);	// 最後尾の付属語しか見ない
-				Resource adjunctR = jassModel.createResource("Ajc" + adjunct.id)
+				Resource adjunctR = jassModel.createResource(Namespace.JASS.getURI()+"Ajc" + adjunct.id)
 						.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Word"))
 						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createLiteral(adjunct.infinitive()))
-						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(adjunct.mainPoS()));
+						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(adjunct.mainPoS()))
+				.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "means"), jassModel.createResource(Namespace.GOO.getURI() + categorem.name()));
 				clauseR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "adjunct"), adjunctR)
 						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "contains_word"), adjunctR);
 
@@ -82,7 +86,7 @@ public class JASSFactory {
 						sentenceR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "subject"), clauseR);
 						if (clause.getDepending() != Clause.ROOT && clause.getDepending() != null) {
 							sentenceR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "predicate"),
-									jassModel.createResource("Cls"+clause.getDepending().id)
+									jassModel.createResource(Namespace.JASS.getURI()+"Cls"+clause.getDepending().id)
 											.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Clause")));
 						}
 					}
@@ -130,6 +134,7 @@ public class JASSFactory {
 		Resource Clause = defaultModel.createResource(Namespace.JASS.getURI() + "Clause").addProperty(RDF.type, RDFS.Class);
 		Resource Word = defaultModel.createResource(Namespace.JASS.getURI() + "Word").addProperty(RDF.type, RDFS.Class);
 		Resource Pos = defaultModel.createResource(Namespace.JASS.getURI() + "PoS").addProperty(RDF.type, RDFS.Class);
+		Resource Concept = defaultModel.createResource(Namespace.JASS.getURI() + "Concept").addProperty(RDF.type, RDFS.Class);
 
 		/* プロパティResource */
 		/* 文用 */
@@ -153,7 +158,9 @@ public class JASSFactory {
 		infinitive.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
 		Property pos = defaultModel.createProperty(Namespace.JASS.getURI() + "pos");
 		pos.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
-
+		Property means = defaultModel.createProperty(Namespace.JASS.getURI() + "means");
+		means.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, Concept);
+		
 		return defaultModel;
 	}
 }
