@@ -2,12 +2,11 @@ package modules.relationExtract;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.ModelFactory;
 
 public class RDFRules {
 
@@ -24,10 +23,24 @@ public class RDFRules {
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
-	public List<Statement> solve(Model targetModel) {
-		return rules.stream().flatMap(r -> r.solve(targetModel).stream()).collect(Collectors.toList());
+	public Model extend(Model targetModel) {
+		rules.stream()
+			.map(r -> r.expands(targetModel))
+			.forEach(targetModel::union);
+		return targetModel;
 	}
 
+	public Model convert(Model targetModel) {
+		Model model = ModelFactory.createDefaultModel();
+		rules.stream()
+			.map(r -> r.converts(targetModel))
+			.forEach(model::add);
+		/*
+		System.out.println("in RDFRules#convert");
+		model.write(System.out, "N-TRIPLE"); // TODO
+		*/
+		return model;
+	}
 
 
 	/**********************************/

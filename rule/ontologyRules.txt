@@ -1,22 +1,12 @@
 IF{
-?Stc, rdf:type, jass:Sentence.
-?Stc,jass:subject,?sCls.
-?sCls,jass:categorem,?sWod.
-?Stc,jass:predicate,?pCls.
-?pCls,jass:categorem,?oWod.
-?pCls,jass:adjunct,"は".
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:subject, ?Cls_S.
+  ?Cls_S, jass:categorem, ?Wrd_S.
+  ?Wrd_S, jass:means, ?Cpt_S.
+  ?Stc, jass:predicate, ?Cls_P.
+  ?Cls_P, jass:categorem, ?Wrd_P.
+  ?Wrd_P, jass:pos, "名詞".
+  ?Wrd_P, jass:means, ?Cpt_P.  
 }THEN{
-?sWd,rdfs:subClassOf,?oWd.
+  ?Cpt_S, rdfs:subClassOf, ?Cpt_P.
 }
-
-?c, jass:adjuncts, _:x.
-_:x, rdf:type, rdf:Seq.
-_:x, rdf:_1, ?w1.
-->
-?c, jass:adjunct_1, ?w1.;
-
-?c, jass:hoge, jass:moge.
- -> ?c, rdfs:subClassOf, jass:boke.;
-
-?Wd, jass:pos, "名詞". ?Wd, jass:means, ?Cpt.
-	-> ?Cpt, rdfs:subClassOf, jass:Meishi.;

@@ -1,5 +1,6 @@
 package grammar.clause;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,7 +9,7 @@ import grammar.word.Phrase;
 import grammar.word.Word;
 
 public class SerialClause extends AbstractClause<Phrase> {
-	private static int clausesSum = 0;
+	//private static int clausesSum = 0;
 
 	//private final int id;
 	
@@ -16,14 +17,19 @@ public class SerialClause extends AbstractClause<Phrase> {
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
+	private SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
 		//id = clausesSum++;
 	}
-	public SerialClause(List<AbstractClause<?>> clauses) {
-		this(new Phrase(clauses.subList(0, clauses.size()), clauses.get(clauses.size()-1).categorem), 
-				clauses.get(clauses.size()-1).adjuncts, 
-				clauses.get(clauses.size()-1).others);
+	
+	public static SerialClause connectClauses(AbstractClause<?>... clauses) {
+		int tailIndex = clauses.length-1;
+		List<AbstractClause<?>> dependent = Arrays.asList(Arrays.copyOfRange(clauses, 0, tailIndex));
+		Word head = clauses[tailIndex].categorem;
+		Phrase categorem = new Phrase(dependent, head); 
+		List<Adjunct> adjuncts = clauses[tailIndex].adjuncts;
+		List<Word> others = clauses[tailIndex].others;
+		return new SerialClause(categorem, adjuncts, others);
 	}
 
 	

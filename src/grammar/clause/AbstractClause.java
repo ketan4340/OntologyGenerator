@@ -85,7 +85,7 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	}
 
 
-	/* 全く同じClauseを複製する */
+	/** 全く同じClauseを複製する */
 	public abstract AbstractClause<?> clone();
 	
 	/**
@@ -106,7 +106,12 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 		return replicaList;
 	}
 
-	
+	/**
+	 * 自立語と先頭の付属語がそれぞれ指定の品詞を持つ場合，結合する.
+	 * @param tag4Categorem
+	 * @param tag4Adjunct
+	 * @return
+	 */
 	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
 		if (adjuncts.isEmpty())
 			return false;	// 付属語がないなら意味がない
@@ -194,20 +199,7 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	public String name() {
 		return getChildren().stream().map(w -> w.name()).collect(Collectors.joining());
 	}
-	/*
-	public Sentence getParent() {
-		return parent;
-	}
-	public List<Word> getConstituents() {
-		return constituents;
-	}
-	public <P extends SyntacticParent> void setParent(P parent) {
-		this.parent = (Sentence) parent;
-	}
-	public <C extends SyntacticChild> void setConstituents(List<C> constituents) {
-		this.constituents = (List<Word>) constituents;
-	}
-	*/
+
 	
 	/***********************************/
 	/********** Getter/Setter **********/

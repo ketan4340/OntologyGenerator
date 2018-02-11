@@ -119,23 +119,25 @@ public class Generator {
 		//triples = new ArrayList<RDFTriple>(new LinkedHashSet<RDFTriple>(triples));
 		 */
 
-		Model ontologyModel = ModelFactory.createDefaultModel();
 		/* 文構造のRDF化 */
+		Model ontologyModel = ModelFactory.createDefaultModel();
 		// RDFルール生成 (読み込み)
-		RDFRules rdfRules = RDFRuleReader.read(Paths.get("rule/rules.txt"));
-		System.out.println("All RDFRules\n"+rdfRules.toString());
+		RDFRules extensionRules = RDFRuleReader.read(Paths.get("rule/extensionRules.txt"));
+		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("rule/ontologyRules.txt"));
+	
+		editedSentences.stream()
+			.map(JASSFactory::createJASSModel)
+			.map(extensionRules::extend)
+			.map(ontologyRules::convert)
+			.forEach(ontologyModel::add);
 
-		for (Sentence s : editedSentences) {
-			Model sentenceModel = JASSFactory.createJASSModel(s);
-			sentenceModel.write(System.out, "N-TRIPLE"); // TODO
-			ontologyModel.add(rdfRules.solve(sentenceModel));
-		}
-
+		/*
 		System.out.println("\n\n Resolved Model");
 		ontologyModel.write(System.out, "N-TRIPLE"); // TODO
-
+		 */
 		List<RDFTriple> triples = convertJena2Original(ontologyModel);
-
+		ontologyModel.close();
+		
 		List<String> csvList = triples.stream().map(tri -> tri.toString()).collect(Collectors.toList());
 		Path csvFile = Paths.get("csv/relation"+sdf.format(c.getTime())+".csv");
 		try {
@@ -143,7 +145,8 @@ public class Generator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
+		//List<RDFTriple> triples = new ArrayList<>();
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguageParagraphs.get(0).size() + "\t->dividedSentences: " + editedSentences.size());
 		System.out.println("Relations: " + triples.size() + "\n");
@@ -151,8 +154,12 @@ public class Generator {
 		return new Ontology(triples);
 	}
 
-	
-	private List<RDFTriple> convertJena2Original(Model model) {
+	/**
+	 * JenaのModelを独自クラスRDFTripleのリストに置き換える.
+	 * @param model JenaのModel
+	 * @return RDFTripleのリスト
+	 */
+	private List<RDFTriple> convertJena2Original(Model model) {	
 		List<RDFTriple> triples = new LinkedList<>();
 		StmtIterator stmtIter = model.listStatements();
 		while (stmtIter.hasNext()) {
@@ -160,7 +167,7 @@ public class Generator {
 			Resource subject = stmt.getSubject(); // get the subject
 			Property predicate = stmt.getPredicate(); // get the predicate
 			RDFNode object = stmt.getObject(); // get the object
-			System.out.println(subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());
+
 			RDFTriple triple = new RDFTriple(
 					new MyResource(Namespace.specify(subject.getURI()), subject.getLocalName()),
 					new MyResource(Namespace.specify(predicate.getURI()), predicate.getLocalName()),

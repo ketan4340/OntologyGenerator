@@ -1,7 +1,6 @@
 package modules.relationExtract;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,7 +11,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.ModelFactory;
 
 import data.original.Namespace;
 
@@ -57,27 +56,40 @@ public class RDFRule {
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
-	public List<Statement> solve(Model targetModel) {
-		List<Statement> statements = new LinkedList<>();
+	public Model expands(Model targetModel) {
+		targetModel.add(solve(targetModel));
+		return targetModel;
+	}
+
+	public Model converts(Model targetModel) {
+		return solve(targetModel);
+	}
+
+	private Model solve(Model targetModel) {
+		Model model = ModelFactory.createDefaultModel();
 		QueryExecution qexec = QueryExecutionFactory.create(ifPattern.toQuery(), targetModel);
 		ResultSet resultSet = qexec.execSelect();
 		List<String> varNames = resultSet.getResultVars();
 
-		System.out.println("\n Rule : " + toString());
-		System.out.println("varNames : " + String.join(",",	 varNames));	//TODO
-
+		/*
+		System.out.println("\n ontologyRule : " + toString());
+		System.out.println("varNames : " + String.join(", ", varNames));	//TODO
+		*/
+		
 		while (resultSet.hasNext()) {
 			QuerySolution qsol = resultSet.next();
 			varNames.stream().forEach(s -> varURIMap.put("?"+s, qsol.get(s).toString()));
 
-			statements.addAll(thenPattern.getTriplePatterns().stream()
-					.map(tp -> tp.fillStatement(targetModel, varURIMap))
-					.collect(Collectors.toList()));
+			thenPattern.getTriplePatterns().stream()
+				.map(tp -> tp.fillStatement(targetModel, varURIMap))
+				.forEach(model::add);
 		}
-		return statements;
+		/*
+		System.out.println("in RDFRule#convert");
+		model.write(System.out, "N-TRIPLE"); // TODO
+		*/
+		return model;
 	}
-
-
 
 	/**********************************/
 	/********** Objectメソッド **********/

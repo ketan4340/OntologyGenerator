@@ -124,16 +124,16 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		if (!children.contains(frontClause)) return false;
 		
 		AbstractClause<?> backClause = nextChild(frontClause);
-		if (backClause == null) return false;
+		if (backClause == null || backClause == Clause.ROOT) return false;
 		
-		SerialClause sc = new SerialClause(Arrays.asList(frontClause, backClause));
+		SerialClause sc = SerialClause.connectClauses(frontClause, backClause);
 		
 		Set<AbstractClause<?>> formerDependeds = Stream
 				.concat(frontClause.clausesDependThis().stream(), backClause.clausesDependThis().stream())
 				.collect(Collectors.toSet());
 		gatherDepending(sc, formerDependeds);
 		
-		if(!replace(backClause, sc)) return false;
+		if (!replace(backClause, sc)) return false;
 		return children.removeAll(formerDependeds);
 	}
 	
@@ -147,7 +147,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		Iterator<AbstractClause<?>> liID = clauseList.listIterator();
 		Iterator<Integer> liIdx = clauseIndexList.listIterator();
 		int currentIdx = liIdx.next();
-		while(liIdx.hasNext() && liID.hasNext()) {
+		while (liIdx.hasNext() && liID.hasNext()) {
 			int nextIdx = liIdx.next();
 			AbstractClause<?> clause = liID.next();
 			if(currentIdx+1 == nextIdx) {	// indexが連続しているか
@@ -206,7 +206,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				.collect(Collectors.joining(",")));
 		*/
 		
-		if(predicates.size() < 2) {	// 述語が一つならスルー
+		if(predicates.size() <= 1) {	// 述語が一つならスルー
 			shortSentList.add(this);
 			return shortSentList;
 		}
@@ -214,7 +214,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;
 		for(final AbstractClause<?> predicate: predicates) {
-			predicate.setDepending(null);	// 文末の述語となるので係り先はなし(null)
+			predicate.setDepending(Clause.ROOT);	// 文末の述語となるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;		// 述語も含めて切り取るため+1
 			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
 			Sentence subSent = subSentence(fromIndex, toIndex);
@@ -256,7 +256,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		List<Sentence> partSentList = new ArrayList<Sentence>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<AbstractClause<?>> subjectList = subjectList(false);	// 主語のリスト
-		if(subjectList.isEmpty()) return partSentList;		// 文中に主語がなければ終了
+		if (subjectList.isEmpty()) return partSentList;		// 文中に主語がなければ終了
 
 		AbstractClause<?> lastClause = tailChild();	// 文の最後尾Clause
 		if ((lastClause instanceof Clause) && 			// 最後尾の文節がClauseインスタンスで
@@ -270,8 +270,8 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		LinkedHashMap<AbstractClause<?>, Boolean> subjectsContinuity = getContinuity(subjectList);
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		List<AbstractClause<?>> commonSubjectsOrigin = new ArrayList<>(subjectList.size());
-		for(Map.Entry<AbstractClause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
-			commonSubjectsOrigin.add(entry.getKey());
+		for (Map.Entry<AbstractClause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
+		 	commonSubjectsOrigin.add(entry.getKey());
 			if(!entry.getValue())	// 主語の連続が途切れたら
 				break;				// 核主語集め完了
 		}
@@ -279,10 +279,13 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		/* 述語を収集 */
 		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
 		String[][] tagAdverb = {{"副詞"}};
+		String[][] tagAuxiliary = {{"助動詞", "体言接続"}};
 		List<AbstractClause<?>> predicates = new ArrayList<>();
-		for(final AbstractClause<?> cls2Last: lastClause.clausesDependThis()) {
+		for (final AbstractClause<?> cls2Last: lastClause.clausesDependThis()) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if( !cls2Last.endWith(tagParticle, true) && !cls2Last.endWith(tagAdverb, true) )
+			if ( !cls2Last.endWith(tagParticle, true) && 
+					!cls2Last.endWith(tagAdverb, true) && 
+					!cls2Last.endWith(tagAuxiliary, true) )
 				predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);
@@ -295,20 +298,20 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		System.out.println(predicates.stream()
 				.map(p -> String.valueOf(indexOfChild(p)))
 				.collect(Collectors.joining(",")));
-		 */
+		*/
 
 		//List<Integer> commonObjects = new ArrayList<Integer>();	// 複数の述語にかかる目的語を保管
 
-		if(predicates.size() < 2) { // 述語が一つならスルー
+		if(predicates.size() <= 1) { // 述語が一つならスルー
 			partSentList.add(this);
 			return partSentList;
 		}
 		
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;
-		for(Iterator<AbstractClause<?>> itr = predicates.iterator(); itr.hasNext(); ) {
+		for (Iterator<AbstractClause<?>> itr = predicates.iterator(); itr.hasNext(); ) {
 			AbstractClause<?> predicate = itr.next();
-			predicate.setDepending(null);	// 分割後、当該述語は文末にくるので係り先はなし(null)
+			predicate.setDepending(Clause.ROOT);	// 分割後、当該述語は文末にくるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;	// 述語も含めて切り取るため+1
 			//System.out.println("divide3.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
 			Sentence subSent = subSentence(fromIndex, toIndex);			//TODO *from>to problem
@@ -337,7 +340,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				if(subjectList.contains(nextClause))	// 次が主語
 					commonSubjectsOrigin.remove(commonSubjectsSize-1);
 			}
-
 			fromIndex = toIndex;
 		}
 		return partSentList;

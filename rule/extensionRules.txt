@@ -1,0 +1,22 @@
+# 主語(jass:subject)
+IF{
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:containsClause, ?Cls.
+  ?Cls, jass:containsWord, ?Adj.
+  ?Adj, jass:pos, "助詞".
+  ?Adj, jass:infinitive, "は".
+}THEN{
+  ?Stc, jass:subject, ?Cls.
+}
+
+# 述語(jass:predicate)
+IF{
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:containsClause, ?Cls_S.
+  ?Cls_S, jass:containsWord, ?Adj.
+  ?Adj, jass:pos, "助詞".
+  ?Adj, jass:infinitive, "は".
+  ?Cls_S, jass:depend, ?Cls_P.
+}THEN{
+  ?Stc, jass:predicate, ?Cls_P.
+}

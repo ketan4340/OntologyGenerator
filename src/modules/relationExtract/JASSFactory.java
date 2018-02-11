@@ -10,118 +10,89 @@ import org.apache.jena.vocabulary.RDFS;
 import data.original.Namespace;
 import grammar.Sentence;
 import grammar.clause.AbstractClause;
-import grammar.clause.Clause;
-import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class JASSFactory {
 	private static final Model commonModel = ModelFactory.createDefaultModel();
-	private static boolean isReady = false;
 
 	/********************************************/
 	/********** JASS Schema Definition **********/
 	/********************************************/
 	/* クラスResource */
-    private static final Resource PARAGRAPH = commonModel.createResource(Namespace.JASS.getURI() + "Paragraph");
-	private static final Resource SENTENCE = commonModel.createResource(Namespace.JASS.getURI() + "Sentence");
-	private static final Resource CLAUSE = commonModel.createResource(Namespace.JASS.getURI() + "Clause");
-	private static final Resource WORD = commonModel.createResource(Namespace.JASS.getURI() + "Word");
-	private static final Resource PoS = commonModel.createResource(Namespace.JASS.getURI() + "PoS");
-	private static final Resource CONCEPT = commonModel.createResource(Namespace.JASS.getURI() + "Concept");
+    private static final String PARAGRAPH = Namespace.JASS.getURI() + "Paragraph";
+	private static final String SENTENCE = Namespace.JASS.getURI() + "Sentence";
+	private static final String CLAUSE = Namespace.JASS.getURI() + "Clause";
+	private static final String WORD = Namespace.JASS.getURI() + "Word";
+	private static final String CONCEPT = Namespace.JASS.getURI() + "Concept";
 
 	/* プロパティResource */
-		/* 文用 */
-	private static final Property CONTAINS_CLAUSE = commonModel.createProperty(Namespace.JASS.getURI() + "containsClause");
-	private static final Property SUBJECT = commonModel.createProperty(Namespace.JASS.getURI() + "subject");
-    private static final Property PREDICATE = commonModel.createProperty(Namespace.JASS.getURI() + "predicate");
-    private static final Property MODIFIER = commonModel.createProperty(Namespace.JASS.getURI() + "object");
+	/* 文用 */
+	private static final String CONTAINS_CLAUSE = Namespace.JASS.getURI() + "containsClause";
+	private static final String SUBJECT = Namespace.JASS.getURI() + "subject";
+    private static final String PREDICATE = Namespace.JASS.getURI() + "predicate";
+    private static final String OBJECT = Namespace.JASS.getURI() + "object";
+    private static final String MODIFIER = Namespace.JASS.getURI() + "object";
     	/* 文節用 */
-    private static final Property CONTAINS_WORD = commonModel.createProperty(Namespace.JASS.getURI() + "containsWord");
-    private static final Property CATEGOREM = commonModel.createProperty(Namespace.JASS.getURI() + "categorem");
-    private static final Property ADJUNCT = commonModel.createProperty(Namespace.JASS.getURI() + "adjunct");
+    private static final String CONTAINS_WORD = Namespace.JASS.getURI() + "containsWord";
+    private static final String CATEGOREM = Namespace.JASS.getURI() + "categorem";
+    private static final String ADJUNCT = Namespace.JASS.getURI() + "adjunct";
+    private static final String DEPEND = Namespace.JASS.getURI() + "depend";
     	/* 単語用 */
-    private static final Property INFINITIVE = commonModel.createProperty(Namespace.JASS.getURI() + "infinitive");
-    private static final Property POS = commonModel.createProperty(Namespace.JASS.getURI() + "pos");
-    private static final Property MEANS = commonModel.createProperty(Namespace.JASS.getURI() + "means");
+    private static final String INFINITIVE = Namespace.JASS.getURI() + "infinitive";
+    private static final String POS = Namespace.JASS.getURI() + "pos";
+    private static final String MEANS = Namespace.JASS.getURI() + "means";
 
 
 	public static Model createJASSModel(Sentence sentence) {
-		Model jassModel = createDefaultJASSModel();
-
-		// 文
-		Resource sentenceR = jassModel.createResource(Namespace.JASS.getURI()+"Stc"+sentence.id)
-				.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Sentence"));
-
-
-		// 文節
-		for (AbstractClause<?> clause : sentence.getChildren()) {
-			Resource clauseR = jassModel.createResource(Namespace.JASS.getURI()+"Cls"+clause.id)
-					.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Clause"));
-			sentenceR.addProperty(CONTAINS_CLAUSE, clauseR);
-
-			// 単語
-				// 自立語
-			Word categorem = clause.getCategorem();
-			Resource categoremR = jassModel.createResource(Namespace.JASS.getURI()+"Ctg"+categorem.id)
-					.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Word"))
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createLiteral(categorem.infinitive()))
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(categorem.mainPoS()))
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "means"), jassModel.createResource(Namespace.GOO.getURI() + categorem.name()));
-			clauseR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "categorem"), categoremR)
-					.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "contains_word"), categoremR);
-				// 付属語
-			if (!clause.getAdjuncts().isEmpty()) {
-				Adjunct adjunct = clause.getAdjuncts().get(clause.getAdjuncts().size() - 1);	// 最後尾の付属語しか見ない
-				Resource adjunctR = jassModel.createResource(Namespace.JASS.getURI()+"Ajc" + adjunct.id)
-						.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Word"))
-						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "infinitive"), jassModel.createLiteral(adjunct.infinitive()))
-						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "pos"), jassModel.createLiteral(adjunct.mainPoS()))
-				.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "means"), jassModel.createResource(Namespace.GOO.getURI() + categorem.name()));
-				clauseR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "adjunct"), adjunctR)
-						.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "contains_word"), adjunctR);
-
-				// 主語と述語
-				if (!sentenceR.hasProperty(jassModel.getProperty(Namespace.JASS.getURI() + "subject"))) {
-					if (adjunct.infinitive().equals("は") && adjunct.subPoS1().equals("係助詞")) {
-						sentenceR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "subject"), clauseR);
-						if (clause.getDepending() != Clause.ROOT && clause.getDepending() != null) {
-							sentenceR.addProperty(jassModel.getProperty(Namespace.JASS.getURI() + "predicate"),
-									jassModel.createResource(Namespace.JASS.getURI()+"Cls"+clause.getDepending().id)
-											.addProperty(RDF.type, jassModel.getResource(Namespace.JASS.getURI() + "Clause")));
-						}
-					}
-				}
-			}
-
-
+		return convertSentence2jass(createDefaultJASSModel(), sentence);
+	}
+	
+	private static Model convertSentence2jass(Model model, Sentence sentence) {
+		Resource sentenceR = model.createResource(Namespace.JASS.getURI()+"Stc"+sentence.id)
+				.addProperty(RDF.type, model.getResource(SENTENCE));
+		sentence.getChildren().forEach(c -> convertClause2jass(model, c, sentenceR));
+		
+		sentence.getChildren().forEach(c -> {
+			AbstractClause<?> depc = c.getDepending();
+			if (depc == null) return;
+			Resource cR = model.getResource(Namespace.JASS.getURI()+"Cls"+c.id);
+			Resource depcR = model.getResource(Namespace.JASS.getURI()+"Cls"+depc.id);
+			cR.addProperty(model.getProperty(DEPEND), depcR);
+		});
+		
+		return model;
+	}
+	
+	private static Model convertClause2jass(Model model, AbstractClause<?> clause, Resource sentenceR) {
+		Resource clauseR = model.createResource(Namespace.JASS.getURI()+"Cls"+clause.id)
+				.addProperty(RDF.type, model.getResource(CLAUSE));
+		
+		sentenceR.addProperty(model.getProperty(CONTAINS_CLAUSE), clauseR);
+		
+		clause.getChildren().forEach(w -> convertWord2jass(model, w, clauseR));
+		
+		Resource categoremR = model.getResource(Namespace.JASS.getURI()+"Ctg"+clause.getCategorem().id);
+		clauseR.addProperty(model.getProperty(CATEGOREM), categoremR);
+		if (!clause.getAdjuncts().isEmpty()) {
+			Resource adjunctR = model.getResource(Namespace.JASS.getURI()+"Adj"+clause.getAdjuncts().get(clause.getAdjuncts().size()-1).id);
+			clauseR.addProperty(model.getProperty(ADJUNCT), adjunctR);			
 		}
-
-		return polishJASSModel(jassModel);
+		return model;
 	}
 
-	private static Model polishJASSModel(Model jassModel) {
-		//TODO
-		return jassModel;
+	private static Model convertWord2jass(Model model, Word word, Resource clauseR) {
+		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Ctg"+word.id)
+				.addProperty(RDF.type, model.getResource(WORD))
+				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))
+				.addProperty(model.getProperty(POS), model.createLiteral(word.mainPoS()))
+				.addProperty(model.getProperty(MEANS), 
+						model.createResource(Namespace.GOO.getURI() + word.name())
+							.addProperty(RDF.type, model.getResource(CONCEPT)));
+
+		clauseR.addProperty(model.getProperty(CONTAINS_WORD), wordR);
+		return model;
 	}
 
-	public static boolean commonModelInit() {
-		commonModel.setNsPrefixes(Namespace.prefixMap("RDF", "RDFS", "OWL", "DC", "DCTERMS", "SCHEMA", "JASS", "GOO"));
-
-		SENTENCE.addProperty(RDF.type, RDFS.Class);
-		CLAUSE.addProperty(RDF.type, RDFS.Class);
-		WORD.addProperty(RDF.type, RDFS.Class);
-
-		CONTAINS_CLAUSE.addProperty(RDF.type, RDF.Property);
-		SUBJECT.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, CONTAINS_CLAUSE);
-		PREDICATE.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, CONTAINS_CLAUSE);
-		MODIFIER.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, CONTAINS_CLAUSE);
-
-		CONTAINS_WORD.addProperty(RDF.type, RDF.Property);
-		CATEGOREM.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, CONTAINS_WORD);
-		ADJUNCT.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, CONTAINS_WORD);
-
-		return isReady = true;
-	}
 
 	private static Model createDefaultJASSModel() {
 		Model defaultModel =ModelFactory.createDefaultModel();
@@ -129,36 +100,37 @@ public class JASSFactory {
 
 
 		/* クラスResource */
-		Resource Paragraph = defaultModel.createResource(Namespace.JASS.getURI() + "Paragraph").addProperty(RDF.type, RDFS.Class);
-		Resource Sentence = defaultModel.createResource(Namespace.JASS.getURI() + "Sentence").addProperty(RDF.type, RDFS.Class);
-		Resource Clause = defaultModel.createResource(Namespace.JASS.getURI() + "Clause").addProperty(RDF.type, RDFS.Class);
-		Resource Word = defaultModel.createResource(Namespace.JASS.getURI() + "Word").addProperty(RDF.type, RDFS.Class);
-		Resource Pos = defaultModel.createResource(Namespace.JASS.getURI() + "PoS").addProperty(RDF.type, RDFS.Class);
-		Resource Concept = defaultModel.createResource(Namespace.JASS.getURI() + "Concept").addProperty(RDF.type, RDFS.Class);
+		Resource Paragraph = defaultModel.createResource(PARAGRAPH).addProperty(RDF.type, RDFS.Class);
+		Resource Sentence = defaultModel.createResource(SENTENCE).addProperty(RDF.type, RDFS.Class);
+		Resource Clause = defaultModel.createResource(CLAUSE).addProperty(RDF.type, RDFS.Class);
+		Resource Word = defaultModel.createResource(WORD).addProperty(RDF.type, RDFS.Class);
+		Resource Concept = defaultModel.createResource(CONCEPT).addProperty(RDF.type, RDFS.Class);
 
 		/* プロパティResource */
 		/* 文用 */
-		Property contains_clause = defaultModel.createProperty(Namespace.JASS.getURI() + "containsClause");
+		Property contains_clause = defaultModel.createProperty(CONTAINS_CLAUSE);
 		contains_clause.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Sentence).addProperty(RDFS.range, Clause);
-		Property subject = defaultModel.createProperty(Namespace.JASS.getURI() + "subject");
+		Property subject = defaultModel.createProperty(SUBJECT);
 		subject.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
-		Property predicate = defaultModel.createProperty(Namespace.JASS.getURI() + "predicate");
+		Property predicate = defaultModel.createProperty(PREDICATE);
 		predicate.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
-		Property object = defaultModel.createProperty(Namespace.JASS.getURI() + "object");
+		Property object = defaultModel.createProperty(OBJECT);
 		object.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
 		/* 文節用 */
-		Property contains_word = defaultModel.createProperty(Namespace.JASS.getURI() + "containsWord");
+		Property contains_word = defaultModel.createProperty(CONTAINS_WORD);
 		contains_word.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Word);
-		Property categorem = defaultModel.createProperty(Namespace.JASS.getURI() + "categorem");
+		Property categorem = defaultModel.createProperty(CATEGOREM);
 		categorem.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_word);
-		Property adjunct = defaultModel.createProperty(Namespace.JASS.getURI() + "adjunct");
+		Property adjunct = defaultModel.createProperty(ADJUNCT);
 		adjunct.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_word);
+		Property depend = defaultModel.createProperty(DEPEND);
+		depend.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
 		/* 単語用 */
-		Property infinitive = defaultModel.createProperty(Namespace.JASS.getURI() + "infinitive");
+		Property infinitive = defaultModel.createProperty(INFINITIVE);
 		infinitive.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
-		Property pos = defaultModel.createProperty(Namespace.JASS.getURI() + "pos");
+		Property pos = defaultModel.createProperty(POS);
 		pos.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
-		Property means = defaultModel.createProperty(Namespace.JASS.getURI() + "means");
+		Property means = defaultModel.createProperty(MEANS);
 		means.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, Concept);
 		
 		return defaultModel;

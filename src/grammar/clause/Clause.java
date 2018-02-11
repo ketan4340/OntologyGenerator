@@ -13,7 +13,7 @@ import grammar.word.Word;
 
 public class Clause extends AbstractClause<Categorem>{
 	public static final Clause ROOT = new Clause(Categorem.ZEROCATEGOREM, new ArrayList<>(), new ArrayList<>());
-	private static int clausesSum = 0;
+	//private static int clausesSum = 0;
 
 	//private final int id;
 	
