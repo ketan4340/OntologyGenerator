@@ -31,15 +31,12 @@ public class RDFRule {
 	public RDFRule(String[][] ifs, String[][] thens) {
 		this.varURIMap = Stream.concat(Stream.of(ifs), Stream.of(thens))
 				.flatMap(Stream::of)
-				.map(s -> new SimpleEntry<>(s, s))
-				.map(e -> {
-					String s = e.getKey();
-					String[] ns = s.split(":");
-					if (ns.length == 2  && !s.startsWith("<") && !s.startsWith("\"")) {
-						String uri = Namespace.getURIofPrefix(ns[0]);
-						e.setValue(uri + ns[1]);
-					}
-					return e;
+				.map(k -> {
+					String v = k;
+					String[] ns = k.split(":");
+					if (ns.length == 2  && !k.startsWith("<") && !k.startsWith("\"")) 
+						v = Namespace.getURIofPrefix(ns[0]) + ns[1];
+					return new SimpleEntry<>(k, v);
 				})
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (k1, k2) -> k1));
 		this.ifPattern = new RDFGraphPattern(

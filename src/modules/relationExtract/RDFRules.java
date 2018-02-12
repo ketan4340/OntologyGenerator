@@ -1,7 +1,7 @@
 package modules.relationExtract;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -10,13 +10,13 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 public class RDFRules {
 
-	private Set<RDFRule> rules;
+	private List<RDFRule> rules;
 	
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public RDFRules(Collection<? extends RDFRule> c) {
-		this.rules = new HashSet<>(c);
+	public RDFRules(List<RDFRule> c) {
+		this.rules = new ArrayList<>(c);
 	}
 	
 	
@@ -46,7 +46,7 @@ public class RDFRules {
 	/**********************************/
 	/**********    Getter    **********/
 	/**********************************/
-	public Set<RDFRule> getRules() {
+	public List<RDFRule> getRules() {
 		return rules;
 	}
 	

@@ -37,6 +37,7 @@ public class JASSFactory {
     private static final String CATEGOREM = Namespace.JASS.getURI() + "categorem";
     private static final String ADJUNCT = Namespace.JASS.getURI() + "adjunct";
     private static final String DEPEND = Namespace.JASS.getURI() + "depend";
+    private static final String NEXT_CLAUSE = Namespace.JASS.getURI() + "nextClause";
     	/* 単語用 */
     private static final String INFINITIVE = Namespace.JASS.getURI() + "infinitive";
     private static final String POS = Namespace.JASS.getURI() + "pos";
@@ -44,32 +45,39 @@ public class JASSFactory {
 
 
 	public static Model createJASSModel(Sentence sentence) {
-		return convertSentence2jass(createDefaultJASSModel(), sentence);
+		return sentence2jass(createDefaultJASSModel(), sentence);
 	}
 	
-	private static Model convertSentence2jass(Model model, Sentence sentence) {
+	private static Model sentence2jass(Model model, Sentence sentence) {
 		Resource sentenceR = model.createResource(Namespace.JASS.getURI()+"Stc"+sentence.id)
 				.addProperty(RDF.type, model.getResource(SENTENCE));
-		sentence.getChildren().forEach(c -> convertClause2jass(model, c, sentenceR));
+		sentence.getChildren().forEach(c -> clause2jass(model, c, sentenceR));
 		
 		sentence.getChildren().forEach(c -> {
 			AbstractClause<?> depc = c.getDepending();
-			if (depc == null) return;
+			AbstractClause<?> nextc = sentence.nextChild(c);
 			Resource cR = model.getResource(Namespace.JASS.getURI()+"Cls"+c.id);
+
+			if (depc != null) {
 			Resource depcR = model.getResource(Namespace.JASS.getURI()+"Cls"+depc.id);
 			cR.addProperty(model.getProperty(DEPEND), depcR);
+			}
+			if (nextc != null) {
+			Resource nextcR = model.getResource(Namespace.JASS.getURI()+"Cls"+nextc.id);
+			cR.addProperty(model.getProperty(NEXT_CLAUSE), nextcR);
+			}
 		});
 		
 		return model;
 	}
 	
-	private static Model convertClause2jass(Model model, AbstractClause<?> clause, Resource sentenceR) {
+	private static Model clause2jass(Model model, AbstractClause<?> clause, Resource sentenceR) {
 		Resource clauseR = model.createResource(Namespace.JASS.getURI()+"Cls"+clause.id)
 				.addProperty(RDF.type, model.getResource(CLAUSE));
 		
 		sentenceR.addProperty(model.getProperty(CONTAINS_CLAUSE), clauseR);
 		
-		clause.getChildren().forEach(w -> convertWord2jass(model, w, clauseR));
+		clause.getChildren().forEach(w -> word2jass(model, w, clauseR));
 		
 		Resource categoremR = model.getResource(Namespace.JASS.getURI()+"Ctg"+clause.getCategorem().id);
 		clauseR.addProperty(model.getProperty(CATEGOREM), categoremR);
@@ -80,7 +88,7 @@ public class JASSFactory {
 		return model;
 	}
 
-	private static Model convertWord2jass(Model model, Word word, Resource clauseR) {
+	private static Model word2jass(Model model, Word word, Resource clauseR) {
 		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Ctg"+word.id)
 				.addProperty(RDF.type, model.getResource(WORD))
 				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))
@@ -125,6 +133,8 @@ public class JASSFactory {
 		adjunct.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_word);
 		Property depend = defaultModel.createProperty(DEPEND);
 		depend.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
+		Property next_clause = defaultModel.createProperty(DEPEND);
+		next_clause.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
 		/* 単語用 */
 		Property infinitive = defaultModel.createProperty(INFINITIVE);
 		infinitive.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
