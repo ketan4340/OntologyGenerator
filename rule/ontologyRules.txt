@@ -1,3 +1,4 @@
+# subClassOf
 IF{
   ?Stc, rdf:type, jass:Sentence.
   ?Stc, jass:subject, ?Cls_S.
@@ -10,6 +11,8 @@ IF{
 }THEN{
   ?Cpt_S, rdfs:subClassOf, ?Cpt_P.
 }
+
+# 総称= owl:sameAs
 IF{
   ?Stc, rdf:type, jass:Sentence.
   ?Stc, jass:subject, ?Cls_S.
@@ -21,7 +24,7 @@ IF{
   ?Wrd_P, jass:infinitive, "総称".
   ?Cls_Pprev, jass:nextClause, ?Cls_P.
   ?Cls_Pprev, jass:categorem, ?Wrd_Pprev.
-  ?Wrd_Pprev, jass:means, ?Cpt.
+  ?Wrd_Pprev, jass:means, ?Cpt_Pprev.
 }THEN{
-  ?Cpt_S, owl:sameAs, ?Cpt.
+  ?Cpt_S, owl:sameAs, ?Cpt_Pprev.
 }

@@ -91,19 +91,20 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	/**
 	 * 複数のClauseを係り受け関係を維持しつつ複製する
 	 */
-	public static List<AbstractClause<?>> cloneAll(List<AbstractClause<?>> clauseList) {
+	public static List<AbstractClause<?>> cloneAll(List<AbstractClause<?>> originClauses) {
 		// まずは複製
-		List<AbstractClause<?>> replicaList = clauseList.stream().map(origin -> origin.clone()).collect(Collectors.toList());
+		List<AbstractClause<?>> cloneClauses = originClauses.stream().map(origin -> origin.clone()).collect(Collectors.toList());
+
 		// 係り先があれば整え、なければnull
-		for (int i=0; i<clauseList.size(); i++) {
-			AbstractClause<?> origin = clauseList.get(i);
-			AbstractClause<?> replica = replicaList.get(i);
-			int index2Dep = clauseList.indexOf(origin.getDepending());
-			replica.setDepending( (index2Dep != -1)
-					? replicaList.get(index2Dep)
+		for (int i=0; i<originClauses.size(); i++) {
+			AbstractClause<?> origin = originClauses.get(i);
+			AbstractClause<?> clone = cloneClauses.get(i);
+			int index2Dep = originClauses.indexOf(origin.getDepending());
+			clone.setDepending( (index2Dep != -1)
+					? cloneClauses.get(index2Dep)
 					: null);
 		}
-		return replicaList;
+		return cloneClauses;
 	}
 
 	/**
@@ -246,6 +247,6 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	/**********************************/
 	@Override
 	public String toString() {
-		return words().stream().map(w -> Objects.toString(w, "nullWord")).collect(Collectors.joining());
+		return words().stream().map(w -> Objects.toString(w, "nullWord")+".").collect(Collectors.joining());
 	}
 }

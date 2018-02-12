@@ -272,10 +272,11 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		List<AbstractClause<?>> commonSubjectsOrigin = new ArrayList<>(subjectList.size());
 		for (Map.Entry<AbstractClause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
 		 	commonSubjectsOrigin.add(entry.getKey());
-			if(!entry.getValue())	// 主語の連続が途切れたら
+			if (!entry.getValue())	// 主語の連続が途切れたら
 				break;				// 核主語集め完了
 		}
-
+		
+		
 		/* 述語を収集 */
 		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
 		String[][] tagAdverb = {{"副詞"}};
@@ -317,8 +318,8 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			Sentence subSent = subSentence(fromIndex, toIndex);			//TODO *from>to problem
 			// 文頭の主語は全ての分割後の文に係る
 			List<AbstractClause<?>> commonSubjects = Clause.cloneAll(commonSubjectsOrigin);
-
-			if(fromIndex!=0) {		// 最初の分割文は、新たに主語を挿入する必要ない
+			
+			if (fromIndex != 0) {		// 最初の分割文は、新たに主語を挿入する必要ない
 				AbstractClause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭
 				if(subjectList.contains(subSentFirst)) {		// それが主語なら
 					commonSubjectsOrigin.add(subSentFirst);		// 後続の短文にも係るので保管
@@ -326,18 +327,17 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				subSent.children.addAll(0, commonSubjects);	// 共通の主語を挿入
 			}
 			// 主語の係り先を正す
-			for(final AbstractClause<?> sbjClause : subSent.subjectList(false))
+			for (final AbstractClause<?> sbjClause : subSent.subjectList(false))
 				sbjClause.setDepending(predicate);
-			// 係り元の更新
 			subSent.gatherDepending(predicate);
-			//subSent.gatherDepending(predicate, subSent.children.subList(0, subSent.children.size()-1));
+
 			partSentList.add(subSent);
 
 			// 述語のあとに主語があれば共通主語の最後尾を切り捨てる
 			int commonSubjectsSize = commonSubjectsOrigin.size();
-			if(commonSubjectsSize > 1) {
+			if (commonSubjectsSize > 1) {
 				AbstractClause<?> nextClause = nextChild(predicate);
-				if(subjectList.contains(nextClause))	// 次が主語
+				if (subjectList.contains(nextClause))	// 次が主語
 					commonSubjectsOrigin.remove(commonSubjectsSize-1);
 			}
 			fromIndex = toIndex;

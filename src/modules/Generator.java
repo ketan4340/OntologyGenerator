@@ -89,7 +89,7 @@ public class Generator {
 				//shortSent.printDep();	//TODO
 				for(final Sentence partSent: shortSent.divide3()) {
 					partSent.uniteSubject();
-					//partSent.printDep();	//TODO
+					partSent.printDep();	//TODO
 					editedSentences.add(partSent);
 				}
 			}

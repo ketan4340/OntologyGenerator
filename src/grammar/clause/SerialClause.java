@@ -41,7 +41,7 @@ public class SerialClause extends AbstractClause<Phrase> {
 	public SerialClause clone() {
 		Phrase cloneCategorem = this.categorem.clone();
 		List<Adjunct> cloneAdjuncts = this.adjuncts.stream().map(a -> a.clone()).collect(Collectors.toList());
-		List<Word> cloneOthers = this.adjuncts.stream().map(o -> o.clone()).collect(Collectors.toList());
+		List<Word> cloneOthers = this.others.stream().map(o -> o.clone()).collect(Collectors.toList());
 
 		SerialClause clone = new SerialClause(cloneCategorem, cloneAdjuncts, cloneOthers);
 		clone.setDepending(getDepending());

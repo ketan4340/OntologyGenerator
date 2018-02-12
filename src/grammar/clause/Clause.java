@@ -63,7 +63,7 @@ public class Clause extends AbstractClause<Categorem>{
 	public Clause clone() {
 		Categorem cloneCategorem = this.categorem.clone();
 		List<Adjunct> cloneAdjuncts = this.adjuncts.stream().map(a -> a.clone()).collect(Collectors.toList());
-		List<Word> cloneOthers = this.adjuncts.stream().map(o -> o.clone()).collect(Collectors.toList());
+		List<Word> cloneOthers = this.others.stream().map(o -> o.clone()).collect(Collectors.toList());
 		
 		Clause clone = new Clause(cloneCategorem, cloneAdjuncts, cloneOthers);
 		clone.setDepending(getDepending());
