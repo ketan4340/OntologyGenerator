@@ -23,7 +23,7 @@ import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
-import grammar.word.PartOfSpeech;
+import grammar.word.ClauseElement;
 import grammar.word.Word;
 import util.StringListUtil;
 
@@ -203,28 +203,26 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<List<String>> wordInfoLists = parsedInfo4clause.subList(1, parsedInfo4clause.size())
 				.stream().map(info -> Arrays.asList(info)).collect(Collectors.toList());
 		
-		Categorem categorem = (Categorem) decode2WordWithPoS(
-				wordInfoLists.subList(0, subjEndIndex),
-				PartOfSpeech.Categorem);
+		Categorem headWord = decode2Categorem(wordInfoLists.subList(0, subjEndIndex));
 		List<Adjunct> functionWords = wordInfoLists.subList(subjEndIndex, funcEndIndex)
 				.stream()
-				.map(wordInfo -> (Adjunct) decode2WordWithPoS(Arrays.asList(wordInfo), PartOfSpeech.Adjunct))
+				.map(wordInfo -> decode2Adjunct(Arrays.asList(wordInfo)))
 				.collect(Collectors.toList());
 		List<Word> otherWords = wordInfoLists.subList(funcEndIndex, wordInfoLists.size())
 				.stream()
-				.map(wordInfo -> (Word) decode2WordWithPoS(Arrays.asList(wordInfo), PartOfSpeech.Other))
+				.map(wordInfo -> decode2Word(Arrays.asList(wordInfo)))
 				.collect(Collectors.toList());
 		
-		Clause clause = new Clause(categorem, functionWords, otherWords);
+		Clause clause = new Clause(headWord, functionWords, otherWords);
 		dependingMap.put(clause, depIndex);
 		return clause;
 	}
-	public Word decode2WordWithPoS(List<List<String>> parsedInfo4word, PartOfSpeech pos) {
+	public Word decode2WordWithPoS(List<List<String>> parsedInfo4word, ClauseElement pos) {
 		Concept concept = decode2Concept(parsedInfo4word);
 		Word extendedWord =
-				 pos==PartOfSpeech.Categorem?	new Categorem(concept)
-				:pos==PartOfSpeech.Adjunct?		new Adjunct(concept)
-				:pos==PartOfSpeech.Other?		new Word(concept)
+				 pos==ClauseElement.Categorem?	new Categorem(concept)
+				:pos==ClauseElement.Adjunct?		new Adjunct(concept)
+				:pos==ClauseElement.Other?		new Word(concept)
 				:null;
 		return extendedWord;
 	}
@@ -233,6 +231,14 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		// 一つの単語が複数の形態素からなる場合もあるのでListで渡される
 		Concept concept = decode2Concept(parsedInfo4word);
 		return new Word(concept);
+	}
+	public Categorem decode2Categorem(List<List<String>> parsedInfo4word) {
+		Concept concept = decode2Concept(parsedInfo4word);
+		return new Categorem(concept);
+	}
+	public Adjunct decode2Adjunct(List<List<String>> parsedInfo4word) {
+		Concept concept = decode2Concept(parsedInfo4word);
+		return new Adjunct(concept);
 	}
 	@Override
 	public Concept decode2Concept(List<List<String>> parsedInfo4concept) {

@@ -1,4 +1,12 @@
-# 主語(jass:subject)
+# 文節からその自立語を得るショートカット
+IF {
+  ?Cls, jass:categorem, ?Wrd.
+  ?Wrd, jass:means, ?Cpt.
+} THEN {
+  ?Cls, jass:categoremMeans, ?Cpt.
+}
+
+# 主語 (jass:subject)
 IF{
   ?Stc, rdf:type, jass:Sentence.
   ?Stc, jass:containsClause, ?Cls.
@@ -9,14 +17,48 @@ IF{
   ?Stc, jass:subject, ?Cls.
 }
 
-# 述語(jass:predicate)
+# 述語 (jass:predicate)
 IF{
   ?Stc, rdf:type, jass:Sentence.
-  ?Stc, jass:containsClause, ?Cls_S.
-  ?Cls_S, jass:containsWord, ?Adj.
-  ?Adj, jass:pos, "助詞".
-  ?Adj, jass:infinitive, "は".
+  ?Stc, jass:subject, ?Cls_S.
   ?Cls_S, jass:depend, ?Cls_P.
 }THEN{
   ?Stc, jass:predicate, ?Cls_P.
+}
+
+# 目的語 (jass:object)
+IF{
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:subject, ?Cls_S.
+  ?Stc, jass:predicate, ?Cls_P.
+  ?Stc, jass:containsClause, ?Cls_O.
+  ?Cls_O, jass:depend, ?Cls_P.
+  ?Cls_O, jass:containsWord, ?Adj.
+  ?Adj, jass:pos, "助詞".
+}THEN{
+  ?Stc, jass:objectSub, ?Cls_O.
+}
+IF{
+  ?Stc, jass:objectSub, ?Cls_O.
+  ?Cls_O, jass:containsWord, ?Adj.
+  ?Adj, jass:pos, "格助詞".
+  ?Adj, jass:infinitive, "に".
+}THEN{
+  ?Stc, jass:object, ?Cls_O.
+}
+IF{
+  ?Stc, jass:objectSub, ?Cls_O.
+  ?Cls_O, jass:containsWord, ?Adj.
+  ?Adj, jass:pos, "格助詞".
+  ?Adj, jass:infinitive, "へ".
+}THEN{
+  ?Stc, jass:object, ?Cls_O.
+}
+IF{
+  ?Stc, jass:objectSub, ?Cls_O.
+  ?Cls_O, jass:containsWord, ?Adj.
+  ?Adj, jass:pos, "格助詞".
+  ?Adj, jass:infinitive, "を".
+}THEN{
+  ?Stc, jass:object, ?Cls_O.
 }

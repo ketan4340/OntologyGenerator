@@ -5,7 +5,15 @@ import grammar.Sentence;
 public class SentenceReviser {
 
 	
-	public void simplify(Sentence sentence) {
+	
+	
+	public SentenceReviser() {
 		
+	}
+	
+	
+	public Sentence connectWord(Sentence sentence) {
+		
+		return sentence;
 	}
 }

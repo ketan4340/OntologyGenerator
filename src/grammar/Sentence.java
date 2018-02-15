@@ -197,14 +197,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		}
 		List<AbstractClause<?>> predicates = mainSubject.allDependings();
 		predicates.retainAll(children);
-
-		//TODO
-		/*
-		System.out.print("predicates : ");
-		System.out.println(predicates.stream()
-				.map(p -> String.valueOf(indexOfChild(p)))
-				.collect(Collectors.joining(",")));
-		*/
 		
 		if(predicates.size() <= 1) {	// 述語が一つならスルー
 			shortSentList.add(this);
@@ -234,7 +226,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				commonSubject.setDepending(predicate);	// 係り先を正す
 			}
 			subSent.gatherDepending(predicate);
-			//subSent.gatherDepending(predicate, subSent.children.subList(0, subSent.children.size()-1));
 			shortSentList.add(subSent);
 
 			int commonSubjectsSize = commonSubjectsOrigin.size();
@@ -276,7 +267,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				break;				// 核主語集め完了
 		}
 		
-		
 		/* 述語を収集 */
 		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
 		String[][] tagAdverb = {{"副詞"}};
@@ -292,14 +282,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		predicates.add(lastClause);
 		predicates.retainAll(children);
 		predicates.sort(Comparator.comparing(c -> indexOfChild(c)));
-		
-		//TODO
-		/*
-		System.out.print("predicates : ");
-		System.out.println(predicates.stream()
-				.map(p -> String.valueOf(indexOfChild(p)))
-				.collect(Collectors.joining(",")));
-		*/
 
 		//List<Integer> commonObjects = new ArrayList<Integer>();	// 複数の述語にかかる目的語を保管
 

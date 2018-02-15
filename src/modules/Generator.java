@@ -61,19 +61,19 @@ public class Generator {
 		/***************************************/
 		/**          文章整形モジュール          **/
 		/***************************************/
-		List<Sentence> editedSentences = new LinkedList<>();
-
 		// 段落を処理に使う予定はまだないので，文のリストに均す
 		List<Sentence> originalSentences = originalParagraphs.stream()
 				.flatMap(p -> p.getSentences().stream())
 				.collect(Collectors.toList());
 
+		List<Sentence> editedSentences = new LinkedList<>();
 		for (Sentence originalSentence : originalSentences) {
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/
-			//String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}, {"形容詞"}};
+			String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}};
 			String[][] tagDo = {{"名詞"}, {"動詞", "する"}};
 			String[][] tagDone = {{"動詞"}, {"動詞", "接尾"}};
+			originalSentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tagNouns[0], tagNouns[1]));
 			originalSentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tagDo[0], tagDo[1]));
 			originalSentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tagDone[0], tagDone[1]));
 			/* 名詞と形容詞だけ取り出す */
