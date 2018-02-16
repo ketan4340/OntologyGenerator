@@ -1,18 +1,9 @@
-bin/
+*.class
 
-.classpath
-.project
-.settings/
+/.classpath
+/.project
+/.settings/
+/.DS_Store
 
-.DS_Store
 
-csv/
-dic/
-lib/
-owl/
-text/
-url/
-writing/
-parserIO/
-
-.gradle/
+/.gradle/

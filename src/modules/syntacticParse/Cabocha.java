@@ -23,7 +23,6 @@ import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
-import grammar.word.ClauseElement;
 import grammar.word.Word;
 import util.StringListUtil;
 
@@ -216,15 +215,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		Clause clause = new Clause(headWord, functionWords, otherWords);
 		dependingMap.put(clause, depIndex);
 		return clause;
-	}
-	public Word decode2WordWithPoS(List<List<String>> parsedInfo4word, ClauseElement pos) {
-		Concept concept = decode2Concept(parsedInfo4word);
-		Word extendedWord =
-				 pos==ClauseElement.Categorem?	new Categorem(concept)
-				:pos==ClauseElement.Adjunct?		new Adjunct(concept)
-				:pos==ClauseElement.Other?		new Word(concept)
-				:null;
-		return extendedWord;
 	}
 	@Override
 	public Word decode2Word(List<List<String>> parsedInfo4word) {

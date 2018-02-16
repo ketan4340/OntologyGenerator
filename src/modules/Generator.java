@@ -33,6 +33,7 @@ import modules.relationExtract.JASSFactory;
 import modules.relationExtract.RDFRuleReader;
 import modules.relationExtract.RDFRules;
 import modules.syntacticParse.Cabocha;
+import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
@@ -68,6 +69,7 @@ public class Generator {
 
 		List<Sentence> editedSentences = new LinkedList<>();
 		for (Sentence originalSentence : originalSentences) {
+			SentenceReviser sr = new SentenceReviser();
 			/*** 文章整形Module ***/
 			/** Step1: 単語結合 **/
 			String[][] tagNouns = {{"接頭詞"}, {"名詞"}, {"接尾"}};
