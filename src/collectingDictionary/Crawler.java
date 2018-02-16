@@ -7,11 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,13 +42,13 @@ public class Crawler {
 	public String urlSyl;
 	public String idxURL;
 
-	public String urlDir = "urls/";
+	public String urlDir = "./resource/url/";
 	public String urlFile;
 	public String urlPath;
-	public String dicDir = "dics/";
+	public String dicDir = "./resource/dic/";
 	public String dicFile;
 	public String dicPath;
-	public String textDir = "writings/";
+	public String textDir = "./resource/writing/";
 	public String textFile;
 	public String textPath;
 	public String expansion = ".txt";

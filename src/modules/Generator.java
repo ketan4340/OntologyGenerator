@@ -99,11 +99,8 @@ public class Generator {
 
 		System.out.println("------------関係抽出モジュール------------");
 
-		Calendar c = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
-
 		List<String> textList = editedSentences.stream().map(s -> s.name()).collect(Collectors.toList());
-		Path textFile = Paths.get("text/text"+sdf.format(c.getTime())+".txt");	// 分割後のテキストを保存
+		Path textFile = Paths.get("tmp/log/text/dividedText.txt");	// 分割後のテキストを保存
 		try {
 			Files.write(textFile, textList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (IOException e1) {
@@ -124,8 +121,8 @@ public class Generator {
 		/* 文構造のRDF化 */
 		Model ontologyModel = ModelFactory.createDefaultModel();
 		// RDFルール生成 (読み込み)
-		RDFRules extensionRules = RDFRuleReader.read(Paths.get("rule/extensionRules.txt"));
-		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("rule/ontologyRules.txt"));
+		RDFRules extensionRules = RDFRuleReader.read(Paths.get("resource/rule/extensionRules.txt"));
+		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
 	
 		editedSentences.stream()
 			.map(JASSFactory::createJASSModel)
@@ -141,7 +138,9 @@ public class Generator {
 		ontologyModel.close();
 		
 		List<String> csvList = triples.stream().map(tri -> tri.toString()).collect(Collectors.toList());
-		Path csvFile = Paths.get("csv/relation"+sdf.format(c.getTime())+".csv");
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
+		Path csvFile = Paths.get("dest/csv/relation"+sdf.format(Calendar.getInstance().getTime())+".csv");
 		try {
 			Files.write(csvFile, csvList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (IOException e) {
