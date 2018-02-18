@@ -29,7 +29,9 @@ public class SerialClause extends AbstractClause<Phrase> {
 		Phrase categorem = new Phrase(dependent, head); 
 		List<Adjunct> adjuncts = clauses[tailIndex].adjuncts;
 		List<Word> others = clauses[tailIndex].others;
-		return new SerialClause(categorem, adjuncts, others);
+		SerialClause sc = new SerialClause(categorem, adjuncts, others);
+		sc.setDepending(clauses[tailIndex].depending);
+		return sc;
 	}
 
 	

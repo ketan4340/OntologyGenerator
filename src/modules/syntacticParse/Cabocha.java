@@ -243,6 +243,8 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");
 		String name = morphemeInfos[0];
 		List<String> tags = Arrays.asList(morphemeInfos[1].split(","));
+		if (tags.get(6).equals("*"))		// CaboChaの半角は7番目が原形になっていないので補完
+			tags.set(6, name);
 		return Morpheme.getOrNewInstance(name, tags);
 	}
 

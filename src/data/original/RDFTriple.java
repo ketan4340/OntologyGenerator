@@ -8,7 +8,10 @@ public class RDFTriple {
 	private MyResource subject;
 	private MyResource predicate;
 	private MyResource object;
-	
+
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
 	public RDFTriple(MyResource subject, MyResource predicate, MyResource object) {
 		this.subject = subject;
 		this.predicate = predicate;
@@ -19,10 +22,26 @@ public class RDFTriple {
 	}
 	
 	public RDFTriple(MyResource resource, MyResource property, String literal) {
-		//TODO 目的語がリテラルのRDFトリプル
+		this(resource, property, new MyResource(Namespace.LITERAL, literal));
 	}
 	
-	/* Getter */
+	
+
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	/**
+	 * 主語，述語，目的語の順に並ぶResourceの配列を返す.
+	 * @return トリプルの配列
+	 */
+	public MyResource[] toArray() {
+		return new MyResource[]{subject, predicate, object};
+	}
+	
+	
+	/***********************************/
+	/********** Getter/Setter **********/
+	/***********************************/
 	public MyResource getSubject() {
 		return subject;
 	}
@@ -33,14 +52,10 @@ public class RDFTriple {
 		return object;
 	}
 
-	/**
-	 * 主語，述語，目的語の順に並ぶResourceの配列を返す.
-	 * @return トリプルの配列
-	 */
-	public MyResource[] toArray() {
-		return new MyResource[]{subject, predicate, object};
-	}
-	
+
+	/**********************************/
+	/********** Objectメソッド **********/
+	/**********************************/
 	@Override
 	public String toString() {
 		return subject + ", " + predicate + ", " + object + ".";

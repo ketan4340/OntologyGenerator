@@ -20,7 +20,7 @@ public enum Namespace {
 	GOO("goo", "http://dictionary.goo.ne.jp/jn#"),
 	
 	EMPTY("_", "_"),
-	LITERAL("", ""),
+	LITERAL("literal", ""),
 	;
 	
 	private final String prefix;
@@ -39,31 +39,40 @@ public enum Namespace {
 	}
 
 	/***********************************/
-	/**********  MemberMethod **********/
+	/**********  StaticMethod **********/
 	/***********************************/
-	public static String getURIofPrefix(String prefix) {
+	public static Map<String, String> prefixMap(String... names) {
+		return Stream.of(names).map(n -> valueOf(n))
+				.collect(Collectors.toMap(ns -> ns.prefix, ns -> ns.uri.toString()));
+	}
+	public static String getURIFromPrefix(String prefix) {
 		for (Namespace ns : values())
 			if (ns.prefix.equals(prefix))
 				return ns.uri.toString();
 		return null;
 	}
-	public static Map<String, String> prefixMap(String... names) {
-		return Stream.of(names).map(n -> valueOf(n))
-				.collect(Collectors.toMap(ns -> ns.prefix, ns -> ns.uri.toString()));
-	}
-	public static Namespace valueOfPrefix(String prefix) {
+	public static Namespace getNamespaceFromPrefix(String prefix) {
 		for (Namespace ns : values())
 			if (ns.prefix.equals(prefix))
 				return ns;
 		return null;
 	}
-	public static Namespace specify(String uri) {
+	public static Namespace getNamespaceFromURI(String uri) {
 		for (Namespace ns : values())
 			if (uri.startsWith(ns.uri.toString()))
 				return ns;
 		return EMPTY;
 	}
+	public static String getFragmentFromURI(String uri) {
+		for (Namespace ns : values())
+			if (uri.startsWith(ns.uri.toString()))
+				return uri.replaceFirst(ns.uri.toString(), "");
+		return uri;
+	}
 	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
 	public String toQueryPrefixDefinition() {
 		return "PREFIX "+ prefix +": <"+ uri +">";
 	}
@@ -79,6 +88,10 @@ public enum Namespace {
 		return uri;
 	}
 	
+	
+	/**********************************/
+	/********** ObjectMethod **********/
+	/**********************************/
 	@Override
 	public String toString() {
 		return prefix;

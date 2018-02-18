@@ -1,8 +1,11 @@
 package modules.relationExtract;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -27,19 +30,24 @@ public class RDFRules {
 		rules.stream()
 			.map(r -> r.expands(targetModel))
 			.forEach(targetModel::union);
+		
+		//TODO
+		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/JASSModel.nt"))) {
+			targetModel.write(os, "N-TRIPLE"); // TODO			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		//TODO
+		
 		return targetModel;
 	}
 
 	public Model convert(Model targetModel) {
-		Model model = ModelFactory.createDefaultModel();
+		Model convertedModel = ModelFactory.createDefaultModel();
 		rules.stream()
 			.map(r -> r.converts(targetModel))
-			.forEach(model::add);
-		/*
-		System.out.println("in RDFRules#convert");
-		model.write(System.out, "N-TRIPLE"); // TODO
-		*/
-		return model;
+			.forEach(convertedModel::add);
+		return convertedModel;
 	}
 
 

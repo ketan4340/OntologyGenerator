@@ -66,7 +66,7 @@ public class DocumentModel extends AbstractDocumentModel{
 			//htmlText += "<font size=\"+1\">";
 
 			for(final Word word : sentence.getWordList()) {	// 文の単語を走査
-				htmlText += (word.hasSomeTags(noun))	// 名詞ならアンカータグで囲む
+				htmlText += (word.hasTagAll(noun))	// 名詞ならアンカータグで囲む
 						? "<a href=\"" + word.name() + "\">" + word.name() + "</a>"
 						: word.name();
 			}

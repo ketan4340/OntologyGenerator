@@ -41,9 +41,7 @@ public class RDFTriplePattern {
 		/*
 		System.out.println("filling");
 		System.out.println("  "+subjectURI +", " + predicateURI + ", " + objectURI);
-		//System.out.println("varmap");
-		//varURIMap.entrySet().forEach(e -> System.out.println("| "+e.getKey() + "\t : " + e.getValue()));	//TODO
-		 */
+		 //*/
 		Resource subject = targetModel.getResource(varURIMap.get(subjectURI));
 		Property predicate = targetModel.getProperty(varURIMap.get(predicateURI));
 		RDFNode object = targetModel.getResource(varURIMap.get(objectURI));
@@ -51,7 +49,7 @@ public class RDFTriplePattern {
 		/*
 		System.out.println("filled");
 		System.out.println("  "+subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());	//TODO
-		 */
+		//*/
 		
 		return targetModel.createStatement(subject, predicate, object);
 	}

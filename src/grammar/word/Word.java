@@ -43,44 +43,18 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	/**
 	 * 渡されたTagを"全て"持って入れば真、それ以外は偽を返す
 	 */
-	public boolean hasAllTags(String[] tagNames) {
+	public boolean hasTagAll(String[] tags) {
 		boolean match = true;	// デフォがtrueなので空の配列は任意の品詞とみなされる
-		for(String tag: tagNames) {
+		for (String tag: tags) {
 			boolean not = false;	// NOT検索用のフラグ
-			if(tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
+			if (tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
 				not = true;
 				tag = tag.substring(1);	// -を消しておく
 			}
-
-			if( concept.containsTag(tag) ) {
-				match = (not)? false: true;
-			}else {
-				match = (not)? true: false;
-			}
-			if(!match) break;	// falseなら即終了
-		}
-		return match;
-	}
-
-	/**
-	 * 渡されたTagをどれか"1つでも"持って入れば真、それ以外は偽を返す
-	 */
-	public boolean hasSomeTags(String[] tagNames) {
-		if(tagNames.length == 0) return true;	// 空の品詞を渡されたらtrue
-		boolean match = false;
-		for(String tag: tagNames) {
-			boolean not = false;	// NOT検索用のフラグ
-			if(tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
-				not = true;
-				tag = tag.substring(1);	// -を消しておく
-			}
-
-			if( concept.containsTag(tag) ) {
-				match = (not)? false: true;
-			}else {
-				match = (not)? true: false;
-			}
-			if(match) break;	// trueなら即終了
+			match = concept.containsTag(tag);
+			match = not? !match : match; 
+			
+			if (!match) break;	// falseなら即終了
 		}
 		return match;
 	}

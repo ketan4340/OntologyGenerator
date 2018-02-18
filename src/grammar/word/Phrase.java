@@ -2,8 +2,11 @@ package grammar.word;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import grammar.Concept;
 import grammar.clause.AbstractClause;
+import grammar.morpheme.Morpheme;
 
 /**
  * 名詞句を想定
@@ -20,11 +23,19 @@ public class Phrase extends Word{
 	/**********  Constructor  **********/
 	/***********************************/
 	public Phrase(List<AbstractClause<?>> dependent, Word head) {
-		super(head.concept);
+		super(concatConcept(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
 	}
-
+	private static Concept concatConcept(List<AbstractClause<?>> dependent, Word head) {
+		Stream<Morpheme> dependentMorphemes = dependent.stream()
+				.flatMap(c -> c.getChildren().stream())
+				.map(w -> w.concept)
+				.flatMap(c -> c.getMorphemes().stream());
+		Stream<Morpheme> headMorphemes = head.concept.getMorphemes().stream();
+		 List<Morpheme> morphemes = Stream.concat(dependentMorphemes, headMorphemes).collect(Collectors.toList());
+		return Concept.getOrNewInstance(morphemes);
+	}
 	
 	/***********************************/
 	/**********  MemberMethod **********/

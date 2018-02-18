@@ -35,7 +35,7 @@ public class RDFRule {
 					String v = k;
 					String[] ns = k.split(":");
 					if (ns.length == 2  && !k.startsWith("<") && !k.startsWith("\"")) 
-						v = Namespace.getURIofPrefix(ns[0]) + ns[1];
+						v = Namespace.getURIFromPrefix(ns[0]) + ns[1];
 					return new SimpleEntry<>(k, v);
 				})
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (k1, k2) -> k1));

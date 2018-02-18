@@ -280,7 +280,7 @@ public class Crawler {
 				serialInterpretation = cleanText2(serialInterpretation);		// 残しておいたスペースを消す
 				String[] interpretations = serialInterpretation.split("。", 0);
 				for(String interpretation: interpretations) {
-					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成)
+					String writing = entry+"は"+interpretation;			// *要注意*(雑な日本語文形成) //TODO
 					System.out.println(writing);
 					bw.write(writing);
 					bw.newLine();

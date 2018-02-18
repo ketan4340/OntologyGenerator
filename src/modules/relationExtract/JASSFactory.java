@@ -103,7 +103,7 @@ public class JASSFactory {
 
 
 	private static Model createDefaultJASSModel() {
-		Model defaultModel =ModelFactory.createDefaultModel();
+		Model defaultModel = ModelFactory.createDefaultModel();
 		defaultModel.setNsPrefixes(Namespace.prefixMap("RDF", "RDFS", "OWL", "DC", "DCTERMS", "SCHEMA", "JASS", "GOO"));
 
 

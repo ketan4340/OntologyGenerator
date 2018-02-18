@@ -73,41 +73,37 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		return new Sentence(subClauses);
 	}
 
-	/** 渡された品詞に一致するWordを返す */
-	public List<Word> collectTagWords(String[][] tagNames) {
-		List<Word> taggedWords = new ArrayList<>();
-		for(final AbstractClause<?> clause: children) {
-			taggedWords.addAll(clause.collectWordsHaveAll(tagNames));	// 各clause内を探す
-		}
-		return taggedWords;
-	}
+
 	/**
 	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
 	 */
-	public List<AbstractClause<?>> collectClauseHasSome(String[][] tagNames) {
-		return children.stream().filter(c -> c.containsWordHasAll(tagNames)).collect(Collectors.toList());
+	public List<AbstractClause<?>> collectClausesHaveSome(String[][] tags) {
+		return children.stream()
+				.filter(c -> c.containsAnyWordsHave(tags))
+				.collect(Collectors.toList());
 	}
+
 	/**
-	 * 渡された品詞に一致するWordを全て含むclauseを返す.
+	 * 指定の品詞が末尾に並んでいる文節を集める.
+	 * @param tags
+	 * @return
 	 */
-	public List<AbstractClause<?>> collectClauseHasAll(String[][] tagNames) {
-		return children.stream().filter(c -> c.containsWordHasAll(tagNames)).collect(Collectors.toList());
+	public List<AbstractClause<?>> collectClausesEndWith(String[][] tags) {
+		return children.stream().filter(c -> c.endWith(tags)).collect(Collectors.toList());
 	}
 	
-	/*
-	public List<AbstractClause<?>> collectClausesEndWith(String[][][] tagss) {
-		List<AbstractClause<?>> taggedClauses = new ArrayList<>();
-		for (final AbstractClause<?> clause: children) {
-			for (final String[][] tags: tagss) {
-				if (clause.endWith(tags, true)) {
-					taggedClauses.add(clause);	// 各clause内を探す
-					break;
-				}
-			}
-		}
-		return taggedClauses;
+	/**
+	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
+	 * @param tags
+	 * @return
+	 */
+	public AbstractClause<?> findFirstClauseEndWith(String[][] tags) {
+		for (AbstractClause<?> clause : children)
+			if (clause.endWith(tags))
+				return clause;
+		return null;
 	}
-	//*/
+
 
 	@Override
 	public Sentence clone() {
@@ -122,19 +118,20 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	 */
 	public boolean connect2Next(AbstractClause<?> frontClause) {
 		if (!children.contains(frontClause)) return false;
+		if (!frontClause.getOthers().isEmpty()) return false;		// 前の文節に接辞(句読点など)があれば繋げない
 		
 		AbstractClause<?> backClause = nextChild(frontClause);
 		if (backClause == null || backClause == Clause.ROOT) return false;
-		
+
 		SerialClause sc = SerialClause.connectClauses(frontClause, backClause);
-		
+		if (!replace(backClause, sc)) return false;
+
 		Set<AbstractClause<?>> formerDependeds = Stream
 				.concat(frontClause.clausesDependThis().stream(), backClause.clausesDependThis().stream())
 				.collect(Collectors.toSet());
 		gatherDepending(sc, formerDependeds);
 		
-		if (!replace(backClause, sc)) return false;
-		return children.removeAll(formerDependeds);
+		return children.remove(frontClause) && children.remove(backClause);
 	}
 	
 
@@ -181,31 +178,30 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			subjectList.remove(lastClause);
 		}
 		
-		if(subjectList.isEmpty()) return shortSentList;	// 文中に主語がなければ終了
+		if (subjectList.isEmpty()) return shortSentList;	// 文中に主語がなければ終了
 
 		// 主節の連続性を表す真偽値のリスト
 		Map<AbstractClause<?>, Boolean> subjectsContinuity = getContinuity(subjectList);
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		List<AbstractClause<?>> commonSubjectsOrigin = new ArrayList<>(subjectList.size());
-		AbstractClause<?> mainSubject = null;
-		for(Map.Entry<AbstractClause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
+		for (Map.Entry<AbstractClause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
 			commonSubjectsOrigin.add(entry.getKey());
-			if(!entry.getValue()) {	// 主語の連続が途切れたら
-				mainSubject = entry.getKey();	// 後続の多くの述語に係る、核たる主語
+			if (!entry.getValue())	// 主語の連続が途切れたら
 				break;				// 核主語集め完了
-			}
 		}
+		// 後続の多くの述語に係る、核たる主語
+		AbstractClause<?> mainSubject = commonSubjectsOrigin.get(commonSubjectsOrigin.size()-1);
 		List<AbstractClause<?>> predicates = mainSubject.allDependings();
 		predicates.retainAll(children);
 		
-		if(predicates.size() <= 1) {	// 述語が一つならスルー
+		if (predicates.size() <= 1) {	// 述語が一つならスルー
 			shortSentList.add(this);
 			return shortSentList;
 		}
 
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;
-		for(final AbstractClause<?> predicate: predicates) {
+		for (final AbstractClause<?> predicate: predicates) {
 			predicate.setDepending(Clause.ROOT);	// 文末の述語となるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;		// 述語も含めて切り取るため+1
 			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
@@ -274,9 +270,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		List<AbstractClause<?>> predicates = new ArrayList<>();
 		for (final AbstractClause<?> cls2Last: lastClause.clausesDependThis()) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !cls2Last.endWith(tagParticle, true) && 
-					!cls2Last.endWith(tagAdverb, true) && 
-					!cls2Last.endWith(tagAuxiliary, true) )
+			if ( !cls2Last.endWith(tagParticle) && 
+					!cls2Last.endWith(tagAdverb) && 
+					!cls2Last.endWith(tagAuxiliary) )
 				predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);
@@ -359,10 +355,10 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			String[][] tags_Ga = {{"格助詞", "が"}};	//"が"
 			String[][] tag_De = {{"格助詞", "で"}};	// "で"
 			String[][] tag_Ni = {{"格助詞", "に"}};	// "に"
-			List<AbstractClause<?>> clause_Ha_Ga_List = new ArrayList<>(collectClauseHasSome(tags_Ha_Ga));	// 係助詞"は"を含むClause
-			List<AbstractClause<?>> clause_Ga_List = new ArrayList<>(collectClauseHasSome(tags_Ga));	// 係助詞"は"を含むClause
-			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClauseHasSome(tag_De));	// 格助詞"で"を含むClause
-			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClauseHasSome(tag_Ni));	// 格助詞"に"を含むClause
+			List<AbstractClause<?>> clause_Ha_Ga_List = new ArrayList<>(collectClausesHaveSome(tags_Ha_Ga));	// 係助詞"は"を含むClause
+			List<AbstractClause<?>> clause_Ga_List = new ArrayList<>(collectClausesHaveSome(tags_Ga));	// 係助詞"は"を含むClause
+			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClausesHaveSome(tag_De));	// 格助詞"で"を含むClause
+			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClausesHaveSome(tag_Ni));	// 格助詞"に"を含むClause
 			if (!clause_Ga_List.isEmpty())	clause_Ga_List.remove(0);
 			clause_Ha_Ga_List.removeAll(clause_Ga_List);
 			clause_Ha_Ga_List.removeAll(clause_De_List);	// "は"と"が"を含むClauseのうち、"で"を含まないものが主語("では"を除外するため)
@@ -372,9 +368,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			String[][] tags_Ha = {{"係助詞", "は"}};	// "は"
 			String[][] tag_De = {{"格助詞", "で"}};	// "で"
 			String[][] tag_Ni = {{"格助詞", "に"}};	// "に"
-			List<AbstractClause<?>> clause_Ha_List = new ArrayList<>(collectClauseHasSome(tags_Ha));	// 係助詞"は"を含むClause
-			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClauseHasSome(tag_De));	// 格助詞"で"を含むClause
-			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClauseHasSome(tag_Ni));	// 格助詞"に"を含むClause
+			List<AbstractClause<?>> clause_Ha_List = new ArrayList<>(collectClausesHaveSome(tags_Ha));	// 係助詞"は"を含むClause
+			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClausesHaveSome(tag_De));	// 格助詞"で"を含むClause
+			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClausesHaveSome(tag_Ni));	// 格助詞"に"を含むClause
 			clause_Ha_List.removeAll(clause_De_List);		// "は"を含むClauseのうち、"で"を含まないものが主語
 			clause_Ha_List.removeAll(clause_Ni_List);		// "は"を含むClauseのうち、"に"を含まないものが主語
 			subjectList = clause_Ha_List;		// 主語のリスト
@@ -384,7 +380,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 
 	public void uniteSubject() {
 		List<AbstractClause<?>> subjectList = subjectList(false);
-		if(subjectList.isEmpty()) return;
+		if (subjectList.isEmpty()) return;
 
 		// 主節の連続性を表す真偽値のリスト
 		Map<AbstractClause<?>, Boolean> subjectsContinuity = getContinuity(subjectList);
@@ -394,18 +390,17 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		for (Map.Entry<AbstractClause<?>, Boolean> entry: subjectsContinuity.entrySet()) {
 			AbstractClause<?> subject = entry.getKey();		boolean sbjCnt = entry.getValue();
-			if(!sbjCnt) break;	// 連続した主語の最後尾には必要ない
+			if (!sbjCnt) break;	// 連続した主語の最後尾には必要ない
 
 			// 助詞・連体化"の"を新たに用意
 			Concept noCp = Concept.getOrNewInstance(Arrays.asList("の","助詞","連体化","*","*","*","*","の","ノ","ノ"));
 			Adjunct no = new Adjunct(noCp);
 			int index_Ha = subject.indexOfChild(subject.collectWordsHaveAll(tag_Ha).get(0));
 			subject.words().set(index_Ha, no);	// "は"の代わりに"の"を挿入
-			//}
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
-		List<AbstractClause<?>> clauses_NP = collectClauseHasSome(tags_NP);
-		clauses_NP.forEach(cnp -> connect2Next(cnp));
+		List<AbstractClause<?>> clauses_NP = collectClausesHaveSome(tags_NP);
+		clauses_NP.forEach(this::connect2Next);
 	}
 	
 	/**
@@ -455,11 +450,11 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());	//TODO
 
 		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
-		boolean isNot = predicateClause.containsWordHasAll(tag_Not);	// 述語が否定かどうか
+		boolean isNot = predicateClause.containsAnyWordsHave(tag_Not);	// 述語が否定かどうか
 
 		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
 		String[][] tagVerb = {{"動詞"}, {"サ変接続"}};
-		String[][] tagAdjective = {{"形容詞"}};
+		String[] tagAdjective = {"形容詞"};
 
 		/* リテラル情報かどうか */
 		/* 長さ */
@@ -488,11 +483,11 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
 			}
 		/* 述語が動詞 */
-		}else if( predicateClause.containsWordHasAll(tagVerb) ) {
+		}else if( predicateClause.containsAnyWordsHave(tagVerb) ) {
 			//System.out.println("動詞");//TODO
 			/* "がある"かどうか */
 			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}, {"動詞", "持つ"}};		// 動詞の"ある"(助動詞ではない)
-			boolean boolHave = predicateClause.containsWordHasAll(tag_Have);
+			boolean boolHave = predicateClause.containsAnyWordsHave(tag_Have);
 			/* "~の総称" */
 			String regexGnrnm = "(.*?)(の総称)";				// 「〜の総称」を探す
 			Pattern ptrnGnrnm = Pattern.compile(regexGnrnm);
@@ -504,7 +499,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 				if(previousClause == null) return triples;
 				MyResource part = new MyResource(Namespace.GOO, previousClause.getCategorem().name());	// その主辞のリソース
 				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
-				if(previousClause.containsWordHasAll(tag_Ga_Wo)) {
+				if(previousClause.containsAnyWordsHave(tag_Ga_Wo)) {
 					triples.add(new RDFTriple(part, new MyResource(Namespace.DCTERMS, "isPartOf"), subject));
 					triples.add(new RDFTriple(subject, new MyResource(Namespace.DCTERMS, "hasPart"), part));
 				}
@@ -518,7 +513,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 
 				// 格助詞"に","を","へ"などを元に目的語を探す
 				String[][] tag_Ni_Wo = {{"格助詞", "が"}, {"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
-				List<AbstractClause<?>> clauses_Ni_Wo = collectClauseHasSome(tag_Ni_Wo);
+				List<AbstractClause<?>> clauses_Ni_Wo = collectClausesHaveSome(tag_Ni_Wo);
 				if (!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
 					AbstractClause<?> clause_Ni_Wo = clauses_Ni_Wo.iterator().next();	//TODO
 					Word word_Ni_Wo = clause_Ni_Wo.getCategorem();	// "に"または"を"の主辞
@@ -532,13 +527,13 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 
 
 		/* 述語が形容詞 */
-		}else if(predicateClause.containsWordHasAll(tagAdjective)) {
+		}else if(predicateClause.containsWordHas(tagAdjective)) {
 			//System.out.println("形容詞");//TODO
 			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.infinitive());
 			AbstractClause<?> previousClause = previousChild(predicateClause);	// 形容詞の一つ前の文節
 			if(previousClause == null) return triples;
-			String[][] tag_Ga = {{"格助詞", "が"}};
-			if(previousClause.containsWordHasAll(tag_Ga)) {
+			String[] tag_Ga = {"格助詞", "が"};
+			if(previousClause.containsWordHas(tag_Ga)) {
 				String part = previousClause.getCategorem().name();	// その主辞の文字列
 				subject.setFragment(subject.getFragment()+"の"+part);
 			}
@@ -558,8 +553,8 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			Matcher mtchKind = ptrnKind.matcher(predicatePart);
 			boolean boolKind = mtchKind.matches();
 			/* 形容動詞語幹を含むか */
-			String[][] tag_Adjective = {{"形容動詞語幹"}};
-			boolean boolAdjective = predicateClause.containsWordHasAll(tag_Adjective);
+			String[] tag_Adjective = {"形容動詞語幹"};
+			boolean boolAdjective = predicateClause.containsWordHas(tag_Adjective);
 
 			if(boolSynonym) {
 				//relations.add( new RDFTriple(subjectWord.getName(), "owl:sameClassAs", mtchSynonym.group(1)));
@@ -650,15 +645,15 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		String[][] tagAdjective = {{"形容詞"}, {"形容動詞語幹"}};
 
 		/* 述語が動詞 */
-		if( predicateClause.containsWordHasAll(tagVerb) ) {
+		if( predicateClause.containsAnyWordsHave(tagVerb) ) {
 			String[][] tagPassive = {{"接尾", "れる"}, {"接尾", "られる"}};
-			if(predicateClause.containsWordHasAll(tagPassive))
+			if(predicateClause.containsAnyWordsHave(tagPassive))
 				values.add("passive");
 			else
 				values.add("verb");
 			values.add(predicateWord.infinitive());
 		/* 述語が形容詞 */
-		}else if(predicateClause.containsWordHasAll(tagAdjective)) {
+		}else if(predicateClause.containsAnyWordsHave(tagAdjective)) {
 			values.add("adjc");
 			values.add(predicateWord.infinitive());
 		/* 述語が名詞または助動詞 */

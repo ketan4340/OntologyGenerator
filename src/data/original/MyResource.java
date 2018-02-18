@@ -1,5 +1,9 @@
 package data.original;
 
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+
 public class MyResource {
 	public static final MyResource TYPE = new MyResource(Namespace.RDF, "type");
 	public static final MyResource SUB_CLASS_OF = new MyResource(Namespace.RDFS, "subClassOf"); 
@@ -40,14 +44,35 @@ public class MyResource {
 		this.namespace = namespace;
 		this.fragment = fragment;
 	}
-	public MyResource(String namespace, String fragment) {
-		this(Namespace.valueOfPrefix(namespace), fragment);
-		System.out.println("\t\tmade new MyResource >" + namespace + ":" + fragment);
-	}
-	public MyResource(String fragment) {
-		this(Namespace.LITERAL, fragment);
+	
+	public MyResource(String uri) {
+		this(Namespace.getNamespaceFromURI(uri), Namespace.getFragmentFromURI(uri));
 	}
 	
+	public MyResource(Resource jenaResource) {
+		this(jenaResource.getURI());
+	}
+	public MyResource(Property jenaProperty) {
+		this(jenaProperty.getURI());
+	}
+	public MyResource(RDFNode jenaRDFNode) {
+		this(jenaRDFNode.asResource().getURI());
+	}
+	
+	
+	/***********************************/
+	/**********  MemberMethod **********/
+	/***********************************/
+	public String uri() {
+		return namespace == Namespace.LITERAL ?
+				"\"" + fragment + "\"" :
+				namespace.getURI() + fragment;
+	}
+
+	
+	/***********************************/
+	/********** Getter/Setter **********/
+	/***********************************/
 	public Namespace getNamespace() {
 		return namespace;
 	}
@@ -61,12 +86,10 @@ public class MyResource {
 		this.fragment = fragment;
 	}
 	
-	public String uri() {
-		return namespace == Namespace.LITERAL ?
-				"\"" + fragment + "\"" :
-				namespace.getURI() + fragment;
-	}
-	
+
+	/**********************************/
+	/********** ObjectMethod **********/
+	/**********************************/
 	@Override
 	public String toString() {
 		return namespace == Namespace.LITERAL ? 

@@ -35,9 +35,11 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 		return false;
 	}
 	
-	public void imprintThisOnChildren() {
-		if (children != null)
-			children.forEach(c -> c.setParent(this));
+	public boolean imprintThisOnChildren() {
+		if (children == null)
+			return false;
+		children.forEach(c -> c.setParent(this));
+		return true;
 	}
 	
 	public int indexOfChild(C predicate) {
@@ -70,7 +72,8 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 	}
 	
 	public boolean replace(C before, C after) {
-		if (!children.contains(before) || !children.contains(after)) return false;
+		if (!children.contains(before)) return false;
+		after.setParent(this);
 		int beforeIndex = children.indexOf(before);
 		return before == children.set(beforeIndex, after);
 	}

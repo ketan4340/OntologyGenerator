@@ -1,7 +1,6 @@
 package grammar.clause;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
@@ -50,10 +49,9 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	/**********  MemberMethod **********/
 	/***********************************/
 	public List<Word> words() {
-		List<Word> words = new ArrayList<>(5);
+		List<Word> words = new ArrayList<>(4);
 		words.add(categorem);
 		words.addAll(adjuncts);
-		words.addAll(others);
 		return words;
 	}
 	
@@ -116,9 +114,9 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
 		if (adjuncts.isEmpty())
 			return false;	// 付属語がないなら意味がない
-		if (!categorem.hasAllTags(tag4Categorem))
+		if (!categorem.hasTagAll(tag4Categorem))
 			return false;
-		if (!adjuncts.get(0).hasAllTags(tag4Adjunct))
+		if (!adjuncts.get(0).hasTagAll(tag4Adjunct))
 			return false;
 		
 		// 付属語から先頭の単語を取り出す
@@ -138,51 +136,52 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	
 	/** 指定の品詞を持つWordを返す */
 	public List<Word> collectWordsHaveAll(String[][] tags) {
-		List<String[]> tagNameList = Arrays.asList(tags);
 		List<Word> taggedWords = new ArrayList<>();
 		for (final Word word: words()) {
-			for (final String[] tagsArray: tagNameList) {
-				if (word.hasAllTags(tagsArray))	taggedWords.add(word);
+			for (final String[] tag: tags) {
+				if (word.hasTagAll(tag)) 
+					taggedWords.add(word);
 			}
 		}
 		return taggedWords;
 	}
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
-	public boolean containsWordHasAll(String[][] tags) {
+	public boolean containsWordHas(String[] tag) {
 		for (final Word word: words())
-			for (final String[] tagsArray: tags)
-				if (word.hasAllTags(tagsArray))
-					return true;
+			if (word.hasTagAll(tag))
+				return true;
+		return false;
+	}
+	/** 指定の品詞配列の"全て"の品詞を，"全て"持つWordが含まれているか判定 */
+	public boolean containsAllWordsHave(String[][] tags) {
+		for (String[] tag : tags)
+			if (!containsWordHas(tag))
+				return false;
+		return true;
+	}
+	/** 指定の品詞配列の"ある"品詞を，"全て"持つWordが含まれているか判定 */
+	public boolean containsAnyWordsHave(String[][] tags) {
+		for (String[] tag : tags)
+			if (containsWordHas(tag))
+				return true;
 		return false;
 	}
 
 	/**
 	 * このClauseの最後尾が渡された品詞のWordなら真. 複数の単語が連続しているか調べたければ品詞配列を複数指定可能.
-	 * 最後尾が読点"、"の場合は無視
 	 * @param tagNames 品詞
-	 * @param ignoreSign 最後尾が記号の場合無視するか
 	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
 	 */
-	public boolean endWith(String[][] tagNames, boolean ignoreSign) {
-		boolean endWith = true;
-		int tagIndex = tagNames.length-1;
-		String[] tagSign = {"記号"};
-
-		for (ListIterator<Word> li = words().listIterator(words().size()); li.hasPrevious(); ) {
-			Word word = li.previous();				// wordも
-			String[] tagName = tagNames[tagIndex];	// tagも後ろから遡る
-			if(ignoreSign && word.hasAllTags(tagSign))
-				continue;	// 記号の場合はスルー
-
-			if (word.hasAllTags(tagName)) {
-				tagIndex--;
-			} else {
-				endWith = false;
-				break;
-			}
-			if(tagIndex < 0) break;
+	public boolean endWith(String[][] tags) {
+		int tagIndex = tags.length-1;
+		for (ListIterator<Word> li = words().listIterator(words().size()); 
+				li.hasPrevious() && tagIndex>=0; tagIndex--) {
+			Word word = li.previous();		// wordも
+			String[] tag = tags[tagIndex];	// tagも後ろから遡る
+			if (!word.hasTagAll(tag))
+				return false;
 		}
-		return endWith;
+		return true;
 	}
 
 
@@ -234,19 +233,15 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	}
 	@Override
 	public List<Word> getChildren() {
-		List<Word> words = new ArrayList<>(5);
-		words.add(categorem);
-		words.addAll(adjuncts);
-		words.addAll(others);
-		return words;
+		return linedupWords(categorem, adjuncts, others);
 	}
 
 	
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public String toString() {
-		return words().stream().map(w -> Objects.toString(w, "nullWord")+".").collect(Collectors.joining());
+		return getChildren().stream().map(w -> Objects.toString(w, "nullWord")+".").collect(Collectors.joining());
 	}
 }

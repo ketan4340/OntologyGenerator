@@ -32,13 +32,14 @@ public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfS
 		this(name_tags.get(0), name_tags.subList(1, name_tags.size()));
 	}
 
+	public static Morpheme getOrNewInstance(String name, Tags tags) {
+		return uniqueset.getExistingOrIntact(new Morpheme(name, tags));
+	}
 	public static Morpheme getOrNewInstance(String name, List<String> tags) {
-		Morpheme m = new Morpheme(name, tags);
-		return uniqueset.getExistingOrIntact(m);
+		return uniqueset.getExistingOrIntact(new Morpheme(name, tags));
 	}
 	public static Morpheme getOrNewInstance(List<String> name_tags) {
-		Morpheme m = new Morpheme(name_tags);
-		return uniqueset.getExistingOrIntact(m);
+		return uniqueset.getExistingOrIntact(new Morpheme(name_tags));
 	}
 
 
