@@ -32,8 +32,30 @@ IF{
 IF{
   ?Stc, rdf:type, jass:Sentence.
   ?Stc, jass:subject, ?Cls_S.
-  ?Stc, jass:object, ?Cls_O.
   ?Stc, jass:predicate, ?Cls_P.
+  ?Cls_P, jass:categorem, ?Wrd_P.
+  ?Wrd_P, jass:pos, "動詞".
+  ?Wrd_P, jass:means, ?Cpt_vb.
+}THEN{
+  ?Cpt_vb, rdf:type, jass:Action.
+  ?Cpt_vb, jass:domain, ?Cpt_S.
+}
+IF{
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:subject, ?Cls_S.
+  ?Stc, jass:predicate, ?Cls_P.
+  ?Cls_P, jass:categorem, ?Wrd_P.
+  ?Wrd_P, jass:pos, "サ変接続".
+  ?Wrd_P, jass:means, ?Cpt_vb.
+}THEN{
+  ?Cpt_vb, rdf:type, jass:Action.
+  ?Cpt_vb, jass:domain, ?Cpt_S.
+}
+IF{
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:subject, ?Cls_S.
+  ?Stc, jass:predicate, ?Cls_P.
+  ?Stc, jass:object, ?Cls_O.
   ?Cls_P, jass:categorem, ?Wrd_P.
   ?Wrd_P, jass:pos, "動詞".
   ?Wrd_P, jass:means, ?Cpt_vb.
@@ -45,8 +67,8 @@ IF{
 IF{
   ?Stc, rdf:type, jass:Sentence.
   ?Stc, jass:subject, ?Cls_S.
-  ?Stc, jass:object, ?Cls_O.
   ?Stc, jass:predicate, ?Cls_P.
+  ?Stc, jass:object, ?Cls_O.
   ?Cls_P, jass:categorem, ?Wrd_P.
   ?Wrd_P, jass:pos, "サ変接続".
   ?Wrd_P, jass:means, ?Cpt_vb.
@@ -56,3 +78,16 @@ IF{
   ?Cpt_vb, jass:range, ?Cpt_O.
 }
 
+# 形容詞
+IF{
+?Stc, rdf:type, jass:Sentence.
+?Stc, jass:subject, ?Cls_S.
+?Stc, jass:predicate, ?Cls_P.
+?Cls_S, jass:categorem, ?Wrd_S.
+?Wrd_S, jass:means, ?Cpt_S.
+?Cls_P, jass:categorem, ?Wrd_P.
+?Wrd_P, jass:pos, "形容詞".
+?Wrd_P, jass:means, ?Cpt_ad.
+}THEN{
+?Cpt_ad, rdf:type, jass:keiyo.
+}

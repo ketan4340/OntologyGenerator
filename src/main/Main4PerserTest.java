@@ -18,7 +18,7 @@ public class Main4PerserTest {
 		///*
 
 		NaturalLanguage nl1 = new NaturalLanguage("クジラは哺乳類である。");
-		//NaturalLanguage nl2 = new NaturalLanguage("カニの味噌汁は美味しいぞ");
+		NaturalLanguage nl2 = new NaturalLanguage("カニの味噌汁は美味しいぞ");
 		//NaturalLanguage nl3 = new NaturalLanguage("葵貝は雌は貝殻を持ち、殻は扁平で直径10〜25センチ、白色で放射状のひだがある。");
 		NaturalLanguage nl4 = new NaturalLanguage("アイアイはアイアイ科の原始的な猿");
 		NaturalLanguage[] nls = new NaturalLanguage[]{nl1, nl4};
