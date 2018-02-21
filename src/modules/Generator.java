@@ -117,11 +117,11 @@ public class Generator {
 			e.printStackTrace();
 		} 
 		
+		Ontology ontology = new Ontology(convertJena2Original(ontologyModel));
 
-		List<RDFTriple> triples = convertJena2Original(ontologyModel);
 		ontologyModel.close();
 		
-		List<String> csvList = triples.stream().map(tri -> tri.toString()).collect(Collectors.toList());
+		List<String> csvList = ontology.getTriples().stream().map(tri -> tri.toString()).collect(Collectors.toList());
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
 		Path csvFile = Paths.get("dest/csv/relation"+sdf.format(Calendar.getInstance().getTime())+".csv");
@@ -133,9 +133,9 @@ public class Generator {
 		
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguageParagraphs.get(0).size() + "\t->dividedSentences: " + editedSentences.size());
-		System.out.println("Relations: " + triples.size() + "\n");
+		System.out.println("Relations: " + ontology.getTriples().size() + "\n");
 
-		return new Ontology(triples);
+		return ontology;
 	}
 
 	/**

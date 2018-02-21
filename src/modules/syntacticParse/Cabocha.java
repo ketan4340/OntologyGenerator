@@ -33,7 +33,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static final List<String> command4windows = new LinkedList<String>(Arrays.asList("cmd", "/c", "cabocha"));
 	/* CaboChaのオプション */
 	private static final String opt_Lattice			= "-f1"; 		// 格子状に並べて出力
-	//private static final String opt_XML				= "-f3";			// XML形式で出力
+	//private static final String opt_XML			= "-f3";			// XML形式で出力
 	//private static final String opt_nonNE			= "-n0";			// 固有表現解析を行わない
 	private static final String opt_NE_Constraint	= "-n1";			// 文節の整合性を保ちつつ固有表現解析を行う
 	//private static final String opt_NE_noConstraint	= "-n2";			// 文節の整合性を保たずに固有表現解析を行う

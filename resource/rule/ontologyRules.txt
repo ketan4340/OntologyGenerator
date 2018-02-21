@@ -55,3 +55,4 @@ IF{
   ?Cpt_vb, jass:domain, ?Cpt_S.
   ?Cpt_vb, jass:range, ?Cpt_O.
 }
+

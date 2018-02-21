@@ -54,7 +54,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	
 	
 	/***********************************/
-	/**********  MemberMethod **********/
+	/********** Member Method **********/
 	/***********************************/
 	
 	/**

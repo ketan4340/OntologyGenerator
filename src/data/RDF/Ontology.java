@@ -7,6 +7,10 @@ import java.util.List;
 public class Ontology {
 	private List<RDFTriple> triples;
 	
+
+	/***********************************/
+	/**********  Constructor  **********/
+	/***********************************/
 	public Ontology(ArrayList<RDFTriple> triples) {
 		this.triples = triples;
 	}
@@ -18,7 +22,10 @@ public class Ontology {
 	}
 	
 	
-	/* Getter/Setter */
+
+	/***********************************/
+	/********** Getter/Setter **********/
+	/***********************************/
 	public List<RDFTriple> getTriples() {
 		return triples;
 	}

@@ -115,7 +115,8 @@ public class JASSFactory {
 		Resource Concept = defaultModel.createResource(CONCEPT).addProperty(RDF.type, RDFS.Class);
 
 		/* プロパティResource */
-		/* 文用 */
+		/*
+		// 文用
 		Property contains_clause = defaultModel.createProperty(CONTAINS_CLAUSE);
 		contains_clause.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Sentence).addProperty(RDFS.range, Clause);
 		Property subject = defaultModel.createProperty(SUBJECT);
@@ -124,7 +125,7 @@ public class JASSFactory {
 		predicate.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
 		Property object = defaultModel.createProperty(OBJECT);
 		object.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
-		/* 文節用 */
+		// 文節用
 		Property contains_word = defaultModel.createProperty(CONTAINS_WORD);
 		contains_word.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Word);
 		Property categorem = defaultModel.createProperty(CATEGOREM);
@@ -135,14 +136,14 @@ public class JASSFactory {
 		depend.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
 		Property next_clause = defaultModel.createProperty(DEPEND);
 		next_clause.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
-		/* 単語用 */
+		// 単語用
 		Property infinitive = defaultModel.createProperty(INFINITIVE);
 		infinitive.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
 		Property pos = defaultModel.createProperty(POS);
 		pos.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
 		Property means = defaultModel.createProperty(MEANS);
 		means.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, Concept);
-		
+		*/
 		return defaultModel;
 	}
 }
