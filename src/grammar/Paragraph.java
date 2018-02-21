@@ -3,6 +3,7 @@ package grammar;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import grammar.structure.GrammarInterface;
 import grammar.structure.SyntacticComponent;
 import grammar.structure.SyntacticParent;
 

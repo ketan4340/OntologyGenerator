@@ -18,12 +18,13 @@ import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
-import data.original.MyResource;
-import data.original.Namespace;
-import data.original.RDFTriple;
+import data.RDF.MyResource;
+import data.RDF.Namespace;
+import data.RDF.RDFTriple;
 import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
+import grammar.structure.GrammarInterface;
 import grammar.structure.SyntacticComponent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
@@ -345,9 +346,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	}
 
 	/**
-	 * 主語のリストを得る
+	 * 主語のリストを得る.
 	 */
-	private List<AbstractClause<?>> subjectList(boolean includeGa) {
+	public List<AbstractClause<?>> subjectList(boolean includeGa) {
 		List<AbstractClause<?>> subjectList;
 
 		if (includeGa) {	// "が"は最初の一つのみ!!
@@ -355,10 +356,10 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			String[][] tags_Ga = {{"格助詞", "が"}};	//"が"
 			String[][] tag_De = {{"格助詞", "で"}};	// "で"
 			String[][] tag_Ni = {{"格助詞", "に"}};	// "に"
-			List<AbstractClause<?>> clause_Ha_Ga_List = new ArrayList<>(collectClausesHaveSome(tags_Ha_Ga));	// 係助詞"は"を含むClause
-			List<AbstractClause<?>> clause_Ga_List = new ArrayList<>(collectClausesHaveSome(tags_Ga));	// 係助詞"は"を含むClause
-			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClausesHaveSome(tag_De));	// 格助詞"で"を含むClause
-			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClausesHaveSome(tag_Ni));	// 格助詞"に"を含むClause
+			List<AbstractClause<?>> clause_Ha_Ga_List = collectClausesHaveSome(tags_Ha_Ga);	// 係助詞"は"を含むClause
+			List<AbstractClause<?>> clause_Ga_List = collectClausesHaveSome(tags_Ga);	// 係助詞"は"を含むClause
+			List<AbstractClause<?>> clause_De_List = collectClausesHaveSome(tag_De);	// 格助詞"で"を含むClause
+			List<AbstractClause<?>> clause_Ni_List = collectClausesHaveSome(tag_Ni);	// 格助詞"に"を含むClause
 			if (!clause_Ga_List.isEmpty())	clause_Ga_List.remove(0);
 			clause_Ha_Ga_List.removeAll(clause_Ga_List);
 			clause_Ha_Ga_List.removeAll(clause_De_List);	// "は"と"が"を含むClauseのうち、"で"を含まないものが主語("では"を除外するため)
@@ -368,11 +369,11 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			String[][] tags_Ha = {{"係助詞", "は"}};	// "は"
 			String[][] tag_De = {{"格助詞", "で"}};	// "で"
 			String[][] tag_Ni = {{"格助詞", "に"}};	// "に"
-			List<AbstractClause<?>> clause_Ha_List = new ArrayList<>(collectClausesHaveSome(tags_Ha));	// 係助詞"は"を含むClause
-			List<AbstractClause<?>> clause_De_List = new ArrayList<>(collectClausesHaveSome(tag_De));	// 格助詞"で"を含むClause
-			List<AbstractClause<?>> clause_Ni_List = new ArrayList<>(collectClausesHaveSome(tag_Ni));	// 格助詞"に"を含むClause
-			clause_Ha_List.removeAll(clause_De_List);		// "は"を含むClauseのうち、"で"を含まないものが主語
-			clause_Ha_List.removeAll(clause_Ni_List);		// "は"を含むClauseのうち、"に"を含まないものが主語
+			List<AbstractClause<?>> clause_Ha_List = collectClausesHaveSome(tags_Ha);	// 係助詞"は"を含むClause
+			List<AbstractClause<?>> clause_De_List = collectClausesHaveSome(tag_De);	// 格助詞"で"を含むClause
+			List<AbstractClause<?>> clause_Ni_List = collectClausesHaveSome(tag_Ni);	// 格助詞"に"を含むClause
+			clause_Ha_List.removeAll(clause_De_List);	// "は"を含むClauseのうち、"で"を含まないものが主語
+			clause_Ha_List.removeAll(clause_Ni_List);	// "は"を含むClauseのうち、"に"を含まないものが主語
 			subjectList = clause_Ha_List;		// 主語のリスト
 		}
 		return subjectList;

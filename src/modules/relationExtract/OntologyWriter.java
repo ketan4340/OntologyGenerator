@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import data.original.RDFTriple;
+import data.RDF.RDFTriple;
 
 public class OntologyWriter {
 	public static final int N_TRIPLES = 1;

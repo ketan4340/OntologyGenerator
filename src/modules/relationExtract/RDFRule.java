@@ -13,7 +13,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
-import data.original.Namespace;
+import data.RDF.Namespace;
 
 public class RDFRule {
 	/**

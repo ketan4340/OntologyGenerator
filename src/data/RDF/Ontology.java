@@ -1,4 +1,4 @@
-package data.original;
+package data.RDF;
 
 import java.util.ArrayList;
 import java.util.Collection;

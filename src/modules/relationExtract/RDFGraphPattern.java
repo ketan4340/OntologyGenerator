@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 
-import data.original.Namespace;
+import data.RDF.Namespace;
 
 public class RDFGraphPattern {
 	private static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();

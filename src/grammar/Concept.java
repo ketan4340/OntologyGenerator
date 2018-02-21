@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
+import grammar.structure.GrammarInterface;
 import util.UniqueSet;
 import util.Uniqueness;
 

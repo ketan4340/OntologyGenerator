@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,14 +78,13 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/*******************************************/
 	/***** ParserInterfaceの抽象メソッドの実装 *****/
 	/*******************************************/
-	
 	/********************************/
 	/***** 解析器・階層化呼び出し部 *****/
 	/********************************/
 	@Override
 	public Sentence text2sentence(NaturalLanguage nlText){
 		List<String> parseOutput = parse(nlText);
-		return decode2Sentence(parseOutput);
+		return decodeProcessOutput(parseOutput).get(0);
 	}
 	@Override
 	public List<Sentence> texts2sentences(List<NaturalLanguage> nlTextList){
@@ -120,7 +120,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/********************************/
 	/********** 解析器実行部 **********/
 	/********************************/
-	@Override
 	public List<String> parse(NaturalLanguage nlText) {
 		startProcess(command);									// プロセス開始
 		writeInput2Process(nlText.toString());					// 入力待ちプロセスにテキスト入力
@@ -128,16 +127,13 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		finishProcess();											// プロセス終了
 		return result;
 	}
-	@Override
 	public List<String> parse(List<NaturalLanguage> nlList) {
 		Path path = output_ParserInput(nlList);	// 一旦ファイルに出力
 		return parse(path);						// そのファイルを入力として解析
 	}
-	@Override
 	public List<String> parse(NaturalLanguage[] nlTexts) {	// 配列の場合
 		return parse(Arrays.asList(nlTexts));	// リストにして同名メソッドに投げる
 	}
-	@Override
 	public List<String> parse(Path inputFilePath) {
 		// CaboChaの入力も出力もファイルになるよう，コマンドを用意
 		command.add(inputFilePath.toString());					// 入力テキストのファイル名
@@ -145,7 +141,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		startProcess(command);									// プロセス開始
 		finishProcess();											// プロセス終了
 		try {
-			return Files.readAllLines(outputFilePath, UTF8);
+			return Files.readAllLines(outputFilePath, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -160,7 +156,8 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	 */
 	public List<String> passContinualArguments(List<NaturalLanguage> nlList) {
 		startProcess(command);
-		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), UTF8)));
+		PrintWriter pw = new PrintWriter(new BufferedWriter(
+				new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8)));
 		nlList.forEach(nl -> pw.println(nl.toString()));
 		pw.close();
 		List<String> result = readProcessResult();		// 結果を読み込む
@@ -169,8 +166,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	}
 
 	
-
-	@Override
 	public List<Sentence> decodeProcessOutput(List<String> parsedInfo4all) {
 		List<List<String>> sentenceInfoList = StringListUtil.split("\\AEOS\\z", parsedInfo4all);	// "EOS"ごとに分割. EOSの行はここで消える.
 		List<Sentence> sentences = sentenceInfoList.stream()
@@ -178,7 +173,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 				.collect(Collectors.toList());
 		return sentences;
 	}
-	@Override
 	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
 		dependingMap.clear();
 		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割	
@@ -188,7 +182,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 				.collect(Collectors.toList());
 		return new Sentence(clauses, dependingMap);
 	}
-	@Override
 	public Clause decode2Clause(List<String> parsedInfo4clause) {
 		//// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
@@ -216,7 +209,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		dependingMap.put(clause, depIndex);
 		return clause;
 	}
-	@Override
 	public Word decode2Word(List<List<String>> parsedInfo4word) {
 		// 一つの単語が複数の形態素からなる場合もあるのでListで渡される
 		Concept concept = decode2Concept(parsedInfo4word);
@@ -230,14 +222,12 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		Concept concept = decode2Concept(parsedInfo4word);
 		return new Adjunct(concept);
 	}
-	@Override
 	public Concept decode2Concept(List<List<String>> parsedInfo4concept) {
 		List<Morpheme> morphemes = parsedInfo4concept.stream()
 				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
 				.collect(Collectors.toList());
 		return Concept.getOrNewInstance(morphemes);
 	}
-	@Override
 	public Morpheme decode2Morpheme(List<String> parsedInfo4morpheme) {
 		// CaboChaの場合は形態素の情報は必ず一行なのでget(0)
 		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");

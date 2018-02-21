@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import grammar.Concept;
-import grammar.GrammarInterface;
 import grammar.Sentence;
 import grammar.morpheme.Morpheme;
+import grammar.structure.GrammarInterface;
 import grammar.structure.SyntacticComponent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
@@ -29,9 +29,9 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	protected AbstractClause<?> depending;		// 係り先文節.どのClauseに係るか
 
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/************************************/
+	/**********   Constructor  **********/
+	/************************************/
 	public AbstractClause(W categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
 		this.id = clausesSum++;
@@ -45,9 +45,9 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	}
 	
 	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/************************************/
+	/**********  MemberMethod  **********/
+	/************************************/
 	public List<Word> words() {
 		List<Word> words = new ArrayList<>(4);
 		words.add(categorem);
@@ -64,10 +64,7 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	}
 	
 
-	/***********************************/
-	/************* 旧型 ***********/
-	/***********************************/
-	
+	/**********　  　　旧型　　　  **********/
 	/**
 	 * この文節が係る文節，その文節が係る文節，と辿っていき，経由した全ての文節をリストにして返す.
 	 * @return この文節から係る全ての文節
@@ -192,18 +189,18 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	}
 	
 
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/*************************************/
+	/********** InterfaceMethod **********/
+	/*************************************/
 	@Override
 	public String name() {
 		return getChildren().stream().map(w -> w.name()).collect(Collectors.joining());
 	}
 
 	
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	/*************************************/
+	/**********  Getter/Setter  **********/
+	/*************************************/
 	public int getID() {
 		return id;
 	}
@@ -237,9 +234,9 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	}
 
 	
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/
+	/*************************************/
+	/**********   ObjectMethod  **********/
+	/*************************************/
 	@Override
 	public String toString() {
 		return getChildren().stream().map(w -> Objects.toString(w, "nullWord")+".").collect(Collectors.joining());

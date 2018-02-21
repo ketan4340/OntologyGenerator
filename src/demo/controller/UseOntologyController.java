@@ -13,7 +13,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 
-import data.original.RDFTriple;
+import data.RDF.RDFTriple;
 import demo.graph.OntologyGraphView;
 import demo.ontology.OntologyModel;
 import demo.ontology.OntologyTableView;

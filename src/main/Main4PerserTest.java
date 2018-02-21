@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import data.original.Ontology;
+import data.RDF.Ontology;
 import grammar.NaturalLanguage;
 import modules.Generator;
 

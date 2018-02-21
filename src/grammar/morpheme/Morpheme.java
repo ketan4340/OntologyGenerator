@@ -3,7 +3,7 @@ package grammar.morpheme;
 import java.util.List;
 import java.util.Objects;
 
-import grammar.GrammarInterface;
+import grammar.structure.GrammarInterface;
 import util.UniqueSet;
 import util.Uniqueness;
 

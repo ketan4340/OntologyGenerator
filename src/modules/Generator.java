@@ -22,10 +22,10 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-import data.original.MyResource;
-import data.original.Namespace;
-import data.original.Ontology;
-import data.original.RDFTriple;
+import data.RDF.MyResource;
+import data.RDF.Namespace;
+import data.RDF.Ontology;
+import data.RDF.RDFTriple;
 import grammar.NaturalLanguage;
 import grammar.Paragraph;
 import grammar.Sentence;

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import grammar.Concept;
-import grammar.GrammarInterface;
 import grammar.clause.AbstractClause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
+import grammar.structure.GrammarInterface;
 import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 

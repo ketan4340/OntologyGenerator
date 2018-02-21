@@ -2,7 +2,7 @@ package demo.controller;
 
 import java.awt.event.ActionListener;
 
-import data.original.Ontology;
+import data.RDF.Ontology;
 import demo.ontology.OntologyModel;
 import demo.ontology.OntologyTableView;
 import demo.textField.AbstractDocumentModel;

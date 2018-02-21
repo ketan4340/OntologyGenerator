@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import data.original.Namespace;
+import data.RDF.Namespace;
 import grammar.Sentence;
 import grammar.clause.AbstractClause;
 import grammar.word.Word;

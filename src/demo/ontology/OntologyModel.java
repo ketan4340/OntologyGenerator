@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 import javax.swing.table.DefaultTableModel;
 
-import data.original.RDFTriple;
+import data.RDF.RDFTriple;
 
 public class OntologyModel extends DefaultTableModel{
 	private static final long serialVersionUID = 1L;

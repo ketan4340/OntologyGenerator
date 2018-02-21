@@ -1,4 +1,4 @@
-package data.original;
+package data.RDF;
 
 public class RDFTriple {
 	public static final int S = 0;

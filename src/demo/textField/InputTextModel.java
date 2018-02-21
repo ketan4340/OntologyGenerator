@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.swing.text.BadLocationException;
 
-import data.original.Ontology;
+import data.RDF.Ontology;
 import grammar.NaturalLanguage;
 import modules.Generator;
 
