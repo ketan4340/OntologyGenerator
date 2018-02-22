@@ -93,6 +93,8 @@ public class JASSFactory {
 				.addProperty(RDF.type, model.getResource(WORD))
 				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.mainPoS()))
+				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS1()))
+				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS2()))
 				.addProperty(model.getProperty(MEANS), 
 						model.createResource(Namespace.GOO.getURI() + word.name())
 							.addProperty(RDF.type, model.getResource(CONCEPT)));

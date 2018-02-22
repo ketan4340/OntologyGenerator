@@ -1,4 +1,4 @@
-# 文節からその自立語を得るショートカット
+# 文節からその自立語の概念を得るショートカット
 IF {
   ?Cls, jass:categorem, ?Wrd.
   ?Wrd, jass:means, ?Cpt.

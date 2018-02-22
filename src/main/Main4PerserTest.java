@@ -20,7 +20,9 @@ public class Main4PerserTest {
 		String[] texts = {
 			"クジラは泳ぐ。",
 			"カニの味噌汁は美味しいぞ",
-			"アイアイはアイアイ科の原始的な猿"
+			"アイアイはアイアイ科の原始的な猿",
+			"ミュウは南アメリカに分布",
+			"馬は体長1メートルほど。"
 		};
 		NaturalLanguage[] nls = NaturalLanguage.toNaturalLanguageArray(texts);
 		List<List<NaturalLanguage>> nlLists = Arrays.asList(Arrays.asList(nls));

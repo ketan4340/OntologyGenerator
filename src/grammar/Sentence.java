@@ -89,8 +89,8 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	 * @param tags
 	 * @return
 	 */
-	public List<AbstractClause<?>> collectClausesEndWith(String[][] tags) {
-		return children.stream().filter(c -> c.endWith(tags)).collect(Collectors.toList());
+	public List<AbstractClause<?>> collectClausesEndWith(String[][] tags, boolean ignoreSign) {
+		return children.stream().filter(c -> c.endWith(tags, ignoreSign)).collect(Collectors.toList());
 	}
 	
 	/**
@@ -98,9 +98,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	 * @param tags
 	 * @return
 	 */
-	public AbstractClause<?> findFirstClauseEndWith(String[][] tags) {
+	public AbstractClause<?> findFirstClauseEndWith(String[][] tags, boolean ignoreSign) {
 		for (AbstractClause<?> clause : children)
-			if (clause.endWith(tags))
+			if (clause.endWith(tags, ignoreSign))
 				return clause;
 		return null;
 	}
@@ -271,9 +271,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		List<AbstractClause<?>> predicates = new ArrayList<>();
 		for (final AbstractClause<?> cls2Last: lastClause.clausesDependThis()) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !cls2Last.endWith(tagParticle) && 
-					!cls2Last.endWith(tagAdverb) && 
-					!cls2Last.endWith(tagAuxiliary) )
+			if ( !cls2Last.endWith(tagParticle, true) && 
+					!cls2Last.endWith(tagAdverb, true) && 
+					!cls2Last.endWith(tagAuxiliary, true) )
 				predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);

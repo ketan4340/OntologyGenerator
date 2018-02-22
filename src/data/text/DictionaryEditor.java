@@ -1,20 +1,16 @@
 package data.text;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import grammar.NaturalLanguage;
 import grammar.Sentence;
@@ -65,7 +61,12 @@ public class DictionaryEditor {
 			for (String interpretation : interpretations) {
 				Sentence sentence = cabocha.text2sentence(new NaturalLanguage(interpretation));
 				List<AbstractClause<?>> subjects = sentence.subjectList(false);
-				String text = (!subjects.isEmpty() && subjects.get(0) == sentence.head())?
+				AbstractClause<?> firstSubjects = (subjects.isEmpty())? null : subjects.get(0);
+				int subjectIndex = sentence.indexOfChild(firstSubjects); 
+				AbstractClause<?> firstCommaClause = sentence.findFirstClauseEndWith(new String[][]{{"、"}}, false);
+				int commaIndex = sentence.indexOfChild(firstCommaClause);
+				String text = (subjectIndex != -1 &&
+						(commaIndex == -1 || subjectIndex <= commaIndex))?
 						headword + "の" + interpretation:
 						headword + "は" + interpretation;
 				texts.add(text);
@@ -132,30 +133,36 @@ public class DictionaryEditor {
 	/**
 	 * ディレクトリ内のファイルの内容を全て纏めた一つのファイルを出力する
 	 */
-	public void gatheringTexts(String dirName, String opFileName) {
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(opFileName));
-
-			File dir = new File(dirName);
-			File[] files = dir.listFiles();
+	public void gatheringTexts(Path dirPath, Path opFile) {
+		try (BufferedWriter bw = Files.newBufferedWriter(opFile)) {
+			Stream<Path> files = Files.list(dirPath);
+			
 			if ( files == null )
-				System.out.println("There is not a file.");
-			for (File file: files) {
-				if (!file.exists())
-					continue;
-				if (file.isFile()) {
-					if (file.getName().equals(".gitignore"))
-						continue;
-					BufferedReader br = new BufferedReader(new FileReader(file));
-			        String line = br.readLine();
-			        while (line != null) {
-			        		bw.write(line);
-			        		bw.newLine();
-			        		line = br.readLine();
-			        }
-			        br.close();
+				System.err.println("There is no file.");
+			files.sorted((file1, file2) -> file1.compareTo(file2))
+			.forEach(file -> {
+				if (!Files.exists(file))
+					return;
+				if (Files.isRegularFile(file)) {
+					if (file.getFileName().toString().equals(".gitignore") ||
+						file.getFileName().toString().equals(".DS_Store") ||
+						file.equals(opFile))
+						return;
+					try {
+						Files.lines(file).forEach(line -> {
+							try {
+								bw.write(line);
+								bw.newLine();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						});
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			}
+			});
+			files.close();
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -169,9 +169,10 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	 * @param tagNames 品詞
 	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
 	 */
-	public boolean endWith(String[][] tags) {
+	public boolean endWith(String[][] tags, boolean ignoreSign) {
 		int tagIndex = tags.length-1;
-		for (ListIterator<Word> li = words().listIterator(words().size()); 
+		List<Word> words = ignoreSign? words() : getChildren();
+		for (ListIterator<Word> li = words.listIterator(words.size()); 
 				li.hasPrevious() && tagIndex>=0; tagIndex--) {
 			Word word = li.previous();		// wordも
 			String[] tag = tags[tagIndex];	// tagも後ろから遡る

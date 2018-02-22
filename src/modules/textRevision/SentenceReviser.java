@@ -33,11 +33,11 @@ public class SentenceReviser {
 		/* 名詞と形容詞だけ取り出す */
 		// これらがClauseの末尾につくものを隣のClauseにつなげる
 		Stream.of(tags_NP).forEach(tag_NP -> {
-			for (AbstractClause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP); 
+			for (AbstractClause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true); 
 					matchedClause != null; ) {
 				if (!sentence.connect2Next(matchedClause)) 
 					break;
-				matchedClause = sentence.findFirstClauseEndWith(tag_NP);
+				matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
 			}
 		});
 		return sentence;
