@@ -28,9 +28,9 @@ public class InputTextModel extends AbstractDocumentModel{
 			e.printStackTrace();
 		}
 		List<List<NaturalLanguage>> naturalLanguageParagraphs =
-				new ArrayList<>(Arrays.asList(
-						NaturalLanguage.toNaturalLanguageList(
-								Arrays.asList(allText.split("\n")))));
+				new ArrayList<>(Arrays.asList(Arrays.asList(
+						NaturalLanguage.toNaturalLanguageArray(allText.split("\n"))
+						)));
 				
 		return new Generator().generate(naturalLanguageParagraphs);
 	}

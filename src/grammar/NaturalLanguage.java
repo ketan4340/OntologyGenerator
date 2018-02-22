@@ -2,6 +2,7 @@ package grammar;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class NaturalLanguage {
 	private static int sum;
@@ -30,11 +31,18 @@ public class NaturalLanguage {
 	public static List<String> toStringList(List<NaturalLanguage> nlList) {
 		return nlList.stream().map(nl -> nl.toString()).collect(Collectors.toList());
 	}
-	/** List<NaturalLanguage> -> List<String> */
+	/** List<String> -> List<NaturalLanguage> */
 	public static List<NaturalLanguage> toNaturalLanguageList(List<String> stringList) {
 		return stringList.stream().map(str -> new NaturalLanguage(str)).collect(Collectors.toList());
 	}	
-	
+	/** NaturalLanguage[] -> String[] */
+	public static String[] toStringArray(NaturalLanguage[] nls) {
+		return Stream.of(nls).map(nl -> nl.toString()).toArray(String[]::new);
+	}
+	/** String[] -> NaturalLanguage[] */
+	public static NaturalLanguage[] toNaturalLanguageArray(String[] strings) {
+		return Stream.of(strings).map(str -> new NaturalLanguage(str)).toArray(NaturalLanguage[]::new);
+	}
 	
 	/***********************************/
 	/********** Getter/Setter **********/

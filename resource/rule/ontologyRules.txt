@@ -80,14 +80,14 @@ IF{
 
 # 形容詞
 IF{
-?Stc, rdf:type, jass:Sentence.
-?Stc, jass:subject, ?Cls_S.
-?Stc, jass:predicate, ?Cls_P.
-?Cls_S, jass:categorem, ?Wrd_S.
-?Wrd_S, jass:means, ?Cpt_S.
-?Cls_P, jass:categorem, ?Wrd_P.
-?Wrd_P, jass:pos, "形容詞".
-?Wrd_P, jass:means, ?Cpt_ad.
+  ?Stc, rdf:type, jass:Sentence.
+  ?Stc, jass:subject, ?Cls_S.
+  ?Stc, jass:predicate, ?Cls_P.
+  ?Cls_S, jass:categorem, ?Wrd_S.
+  ?Wrd_S, jass:means, ?Cpt_S.
+  ?Cls_P, jass:categorem, ?Wrd_P.
+  ?Wrd_P, jass:pos, "形容詞".
+  ?Wrd_P, jass:means, ?Cpt_ad.
 }THEN{
-?Cpt_ad, rdf:type, jass:keiyo.
+  ?Cpt_ad, rdf:type, jass:keiyo.
 }

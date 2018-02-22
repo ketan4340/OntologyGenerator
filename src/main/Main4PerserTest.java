@@ -17,11 +17,12 @@ public class Main4PerserTest {
 		Path textFile = Paths.get("./resource/input/goo/text/gooText生物-動物名-あ2.txt");
 		///*
 
-		NaturalLanguage nl1 = new NaturalLanguage("クジラは哺乳類である。");
-		NaturalLanguage nl2 = new NaturalLanguage("カニの味噌汁は美味しいぞ");
-		//NaturalLanguage nl3 = new NaturalLanguage("葵貝は雌は貝殻を持ち、殻は扁平で直径10〜25センチ、白色で放射状のひだがある。");
-		NaturalLanguage nl4 = new NaturalLanguage("アイアイはアイアイ科の原始的な猿");
-		NaturalLanguage[] nls = new NaturalLanguage[]{nl1, nl4};
+		String[] texts = {
+			"クジラは泳ぐ。",
+			"カニの味噌汁は美味しいぞ",
+			"アイアイはアイアイ科の原始的な猿"
+		};
+		NaturalLanguage[] nls = NaturalLanguage.toNaturalLanguageArray(texts);
 		List<List<NaturalLanguage>> nlLists = Arrays.asList(Arrays.asList(nls));
 		//*/
 
