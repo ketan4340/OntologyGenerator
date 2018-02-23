@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
 import data.RDF.Namespace;
+import modules.Generator;
 
 public class RDFRule {
 	/**
@@ -32,10 +33,9 @@ public class RDFRule {
 		this.varURIMap = Stream.concat(Stream.of(ifs), Stream.of(thens))
 				.flatMap(Stream::of)
 				.map(k -> {
-					String v = k;
 					String[] ns = k.split(":");
-					if (ns.length == 2  && !k.startsWith("<") && !k.startsWith("\"")) 
-						v = Namespace.getURIFromPrefix(ns[0]) + ns[1];
+					String v = (ns.length == 2  && !k.startsWith("<") && !k.startsWith("\""))? 
+						v = Namespace.getURIFromPrefix(ns[0]) + ns[1] : k;
 					return new SimpleEntry<>(k, v);
 				})
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (k1, k2) -> k1));
@@ -54,7 +54,16 @@ public class RDFRule {
 	/**********  MemberMethod **********/
 	/***********************************/
 	public Model expands(Model targetModel) {
-		targetModel.add(solve(targetModel));
+		Model m = solve(targetModel);
+		
+		//TODO
+		/*
+		new Generator().convertJena2Original(m).stream()
+		.map(tri -> tri.toString()).forEach(System.out::println);
+		System.out.println();
+		*/
+		
+		targetModel.add(m);
 		return targetModel;
 	}
 
@@ -67,11 +76,6 @@ public class RDFRule {
 		QueryExecution qexec = QueryExecutionFactory.create(ifPattern.toQuery(), targetModel);
 		ResultSet resultSet = qexec.execSelect();
 		List<String> varNames = resultSet.getResultVars();
-
-		/*
-		System.out.println("\n ontologyRule : " + toString());
-		System.out.println("varNames : " + String.join(", ", varNames));	//TODO
-		*/
 		
 		while (resultSet.hasNext()) {
 			QuerySolution qsol = resultSet.next();
@@ -81,10 +85,6 @@ public class RDFRule {
 				.map(tp -> tp.fillStatement(targetModel, varURIMap))
 				.forEach(model::add);
 		}
-		/*
-		System.out.println("in RDFRule#convert");
-		model.write(System.out, "N-TRIPLE"); // TODO
-		*/
 		return model;
 	}
 

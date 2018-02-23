@@ -14,6 +14,7 @@ public enum Namespace {
 	DC("dc","http://purl.org/dc/elements/1.1/"),
 	DCTERMS("dcterms", "http://purl.org/dc/terms/"),
 	SCHEMA("schema", "http://schema.org/"),
+	SIO("sio", "http://semanticscience.org/resource/"),
 	
 	JASS("jass", "http://www.uec.ac.jp/k-lab/k-tanabe/jass/"),
 	
@@ -24,18 +25,21 @@ public enum Namespace {
 	;
 	
 	private final String prefix;
-	private URI uri;
+	private final String uri;
 
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
 	private Namespace(String prefix, String uri) {
 		this.prefix = prefix;
+		this.uri = uri;
+		/*
 		try {
 			this.uri = new URI(uri);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	/***********************************/
@@ -70,28 +74,28 @@ public enum Namespace {
 		return uri;
 	}
 	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/************************************/
+	/**********  Member Method **********/
+	/************************************/
 	public String toQueryPrefixDefinition() {
 		return "PREFIX "+ prefix +": <"+ uri +">";
 	}
 
 	
-	/**********************************/
-	/**********    Getter    **********/
-	/**********************************/
+	/***********************************/
+	/**********     Getter    **********/
+	/***********************************/
 	public String getPrefix() {
 		return prefix;
 	}
-	public URI getURI() {
+	public String getURI() {
 		return uri;
 	}
 	
 	
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/
+	/***********************************/
+	/********** Object Method **********/
+	/***********************************/
 	@Override
 	public String toString() {
 		return prefix;

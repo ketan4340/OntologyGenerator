@@ -56,7 +56,7 @@ public class MyResource {
 		this(jenaProperty.getURI());
 	}
 	public MyResource(RDFNode jenaRDFNode) {
-		this(jenaRDFNode.asResource().getURI());
+		this(jenaRDFNode.toString());
 	}
 	
 	

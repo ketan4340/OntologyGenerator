@@ -143,7 +143,7 @@ public class Generator {
 	 * @param model JenaのModel
 	 * @return RDFTripleのリスト
 	 */
-	private List<RDFTriple> convertJena2Original(Model model) {	
+	public List<RDFTriple> convertJena2Original(Model model) {	
 		List<RDFTriple> triples = new LinkedList<>();
 		StmtIterator stmtIter = model.listStatements();
 		while (stmtIter.hasNext()) {

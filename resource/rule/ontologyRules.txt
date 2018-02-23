@@ -33,9 +33,11 @@ IF{
   ?Cls_S, jass:categoremMeans, ?Cpt_S.
   ?Stc, jass:predicate, ?Cls_P.
   ?Cls_P, jass:categorem, ?Wrd_P.
-  ?Wrd_P, jass:pos, "数".
+  ?Wrd_P, jass:pos, "助数詞".
 }THEN{
-  
+  ?Cpt_S, sio:SIO_000216, _:.
+  _:, rdf:value, ?val.
+  _:, sio:SIO_000221, ?unit.
 }
 
 # 動詞 (jass:Action)

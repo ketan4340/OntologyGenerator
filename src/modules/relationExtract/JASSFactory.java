@@ -11,6 +11,7 @@ import data.RDF.Namespace;
 import grammar.Sentence;
 import grammar.clause.AbstractClause;
 import grammar.word.Word;
+import modules.Generator;
 
 public class JASSFactory {
 	private static final Model commonModel = ModelFactory.createDefaultModel();
@@ -45,7 +46,15 @@ public class JASSFactory {
 
 
 	public static Model createJASSModel(Sentence sentence) {
-		return sentence2jass(createDefaultJASSModel(), sentence);
+		Model m = sentence2jass(createDefaultJASSModel(), sentence);
+		/*
+		//TODO
+		new Generator().convertJena2Original(m).stream()
+		.map(tri -> tri.toString()).sorted().forEach(System.out::println);
+		
+		System.out.println();
+		*/
+		return m;
 	}
 	
 	private static Model sentence2jass(Model model, Sentence sentence) {
@@ -79,21 +88,21 @@ public class JASSFactory {
 		
 		clause.getChildren().forEach(w -> word2jass(model, w, clauseR));
 		
-		Resource categoremR = model.getResource(Namespace.JASS.getURI()+"Ctg"+clause.getCategorem().id);
+		Resource categoremR = model.getResource(Namespace.JASS.getURI()+"Wrd"+clause.getCategorem().id);
 		clauseR.addProperty(model.getProperty(CATEGOREM), categoremR);
 		if (!clause.getAdjuncts().isEmpty()) {
-			Resource adjunctR = model.getResource(Namespace.JASS.getURI()+"Adj"+clause.getAdjuncts().get(clause.getAdjuncts().size()-1).id);
+			Resource adjunctR = model.getResource(Namespace.JASS.getURI()+"Wrd"+clause.getAdjuncts().get(clause.getAdjuncts().size()-1).id);
 			clauseR.addProperty(model.getProperty(ADJUNCT), adjunctR);			
 		}
 		return model;
 	}
 
 	private static Model word2jass(Model model, Word word, Resource clauseR) {
-		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Ctg"+word.id)
+		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Wrd"+word.id)
 				.addProperty(RDF.type, model.getResource(WORD))
 				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.mainPoS()))
-				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS1()))
+				.addProperty( model.getProperty(POS), model.createLiteral(word.subPoS1()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS2()))
 				.addProperty(model.getProperty(MEANS), 
 						model.createResource(Namespace.GOO.getURI() + word.name())
