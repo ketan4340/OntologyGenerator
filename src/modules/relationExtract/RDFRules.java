@@ -31,13 +31,12 @@ public class RDFRules {
 			.map(r -> r.expands(targetModel))
 			.forEach(targetModel::union);
 		
-		//TODO
+		//TODO log
 		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/JASSModel.nt"))) {
-			targetModel.write(os, "N-TRIPLE"); // TODO			
+			targetModel.write(os, "N-TRIPLE");			
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-		//TODO
+		}
 		
 		return targetModel;
 	}

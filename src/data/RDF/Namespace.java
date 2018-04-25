@@ -1,7 +1,5 @@
 package data.RDF;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,12 +60,14 @@ public enum Namespace {
 		return null;
 	}
 	public static Namespace getNamespaceFromURI(String uri) {
+		if (uri == null) return EMPTY;
 		for (Namespace ns : values())
 			if (uri.startsWith(ns.uri.toString()))
 				return ns;
 		return EMPTY;
 	}
 	public static String getFragmentFromURI(String uri) {
+		if (uri == null) return "";
 		for (Namespace ns : values())
 			if (uri.startsWith(ns.uri.toString()))
 				return uri.replaceFirst(ns.uri.toString(), "");

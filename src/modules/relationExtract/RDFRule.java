@@ -1,28 +1,26 @@
 package modules.relationExtract;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 
 import data.RDF.Namespace;
-import modules.Generator;
 
 public class RDFRule {
-	/**
-	 * キーが変数名あるいはRDFノードの省略名
-	 * 値が代入されるリソースのURI
-	 */
-	private Map<String, String> varURIMap;
-
+	private static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();
+	private static final String prefixRDFS = Namespace.RDFS.toQueryPrefixDefinition();
+	private static final String prefixOWL = Namespace.OWL.toQueryPrefixDefinition();
+	private static final String prefixDC = Namespace.DC.toQueryPrefixDefinition();
+	private static final String prefixDCTERM = Namespace.DCTERMS.toQueryPrefixDefinition();
+	private static final String prefixSCHEMA = Namespace.SCHEMA.toQueryPrefixDefinition();
+	private static final String prefixJASS = Namespace.JASS.toQueryPrefixDefinition();
+	private static final String prefixGOO = Namespace.GOO.toQueryPrefixDefinition();
+	private static final String prefixSIO = Namespace.SIO.toQueryPrefixDefinition();
+	
 	private RDFGraphPattern ifPattern;
 	private RDFGraphPattern thenPattern;
 
@@ -30,15 +28,6 @@ public class RDFRule {
 	/**********  Constructor  **********/
 	/***********************************/
 	public RDFRule(String[][] ifs, String[][] thens) {
-		this.varURIMap = Stream.concat(Stream.of(ifs), Stream.of(thens))
-				.flatMap(Stream::of)
-				.map(k -> {
-					String[] ns = k.split(":");
-					String v = (ns.length == 2  && !k.startsWith("<") && !k.startsWith("\""))? 
-						v = Namespace.getURIFromPrefix(ns[0]) + ns[1] : k;
-					return new SimpleEntry<>(k, v);
-				})
-				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (k1, k2) -> k1));
 		this.ifPattern = new RDFGraphPattern(
 				Stream.of(ifs)
 				.map(tri -> new RDFTriplePattern(tri[0], tri[1], tri[2]))
@@ -72,20 +61,19 @@ public class RDFRule {
 	}
 
 	private Model solve(Model targetModel) {
-		Model model = ModelFactory.createDefaultModel();
-		QueryExecution qexec = QueryExecutionFactory.create(ifPattern.toQuery(), targetModel);
-		ResultSet resultSet = qexec.execSelect();
-		List<String> varNames = resultSet.getResultVars();
-		
-		while (resultSet.hasNext()) {
-			QuerySolution qsol = resultSet.next();
-			varNames.stream().forEach(s -> varURIMap.put("?"+s, qsol.get(s).toString()));
-
-			thenPattern.getTriplePatterns().stream()
-				.map(tp -> tp.fillStatement(targetModel, varURIMap))
-				.forEach(model::add);
-		}
-		return model;
+		return QueryExecutionFactory.create(toQuery(), targetModel).execConstruct();
+	}
+	
+	private Query toQuery() {
+		String queryString = 
+				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO+prefixSIO +
+				"CONSTRUCT {" +
+					thenPattern.joins(".", "", "", " ", "", " ") +
+				"}" +
+				"WHERE {" +
+					ifPattern.joins(".", "", "", " ", "", " ") +
+				"}";
+		return QueryFactory.create(queryString);
 	}
 
 	/**********************************/

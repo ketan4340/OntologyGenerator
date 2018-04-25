@@ -30,7 +30,11 @@ public class RDFRuleReader {
 	/** コメントアウトの"#"以降にマッチ. "#"から行末まで削除する. */
 	private static final Pattern commentPattern = Pattern.compile("#.*\\z");
 
-	
+	/**
+	 * RDFルールを記述したファイルを読み込む. コメントアウトとBOMを削除
+	 * @param rulesFile
+	 * @return
+	 */
 	public static RDFRules read(Path rulesFile) {
 		String rulesString;
 		try {
@@ -43,10 +47,15 @@ public class RDFRuleReader {
 			e.printStackTrace();
 		}
 		if (rulesString.startsWith("\uFEFF"))
-			rulesString = rulesString.substring(1);	// BOM除去
+			rulesString = rulesString.substring(1);	// BOM削除
 		return createRules(rulesString);
 	}
 
+	/**
+	 * 文字列から一連のRDFルールを生成.
+	 * @param rulesString
+	 * @return
+	 */
 	public static RDFRules createRules(String rulesString) {
 		rulesString = removeSpacePattern.matcher(rulesString).replaceAll("");
 		return new RDFRules(splitRulesPattern.splitAsStream(rulesString)
@@ -54,6 +63,11 @@ public class RDFRuleReader {
 				.collect(Collectors.toList()));
 	}
 
+	/**
+	 * 文字列から1つのRDFルールを生成.
+	 * @param ruleString
+	 * @return
+	 */
 	public static RDFRule createRule(String ruleString) {
 		String[] triplePatterns =
 				wholeIF_THENPattern.matcher(ruleString).matches()?
@@ -62,13 +76,13 @@ public class RDFRuleReader {
 						triplePatternsOfArrow(ruleString) :
 				new String[2];
 
-		String[][] ifTriples = split2values(triplePatterns[0]);
-		String[][] thenTriples = split2values(triplePatterns[1]);
-		return new RDFRule(ifTriples, thenTriples);
+		String[][] triplePattern_IF = split2values(triplePatterns[0]);
+		String[][] triplePattern_THEN = split2values(triplePatterns[1]);
+		return new RDFRule(triplePattern_IF, triplePattern_THEN);
 	}
 
 	private static String[] triplePatternsOfIF_THEN(String ruleString) {
-		// 先頭に"IF{"、末尾に"}"が付いていることは確認済みなので切り取ってから、"}THEN{"で分割。
+		// 先頭に"IF{"、末尾に"}"が付いていることは確認済みなので，切り取ってから"}THEN{"で分割。
 		String[] triplePatterns = middleTHENPattern.split(ruleString.substring(3, ruleString.length()-2));
 		if (triplePatterns.length != 2) {
 			System.err.println("Rule's format error by IF_THEN style. : "+ruleString);
@@ -77,7 +91,7 @@ public class RDFRuleReader {
 		return triplePatterns;
 	}
 	private static String[] triplePatternsOfArrow(String ruleString) {
-		// 末尾に";"が付いていることは確認済みなので切り取ってから、"->"で分割。
+		// 末尾に";"が付いていることは確認済みなので，切り取ってから"->"で分割。
 		String[] triplePatterns = middleArrowPattern.split(ruleString.substring(0, ruleString.length()-2));
 		if (triplePatterns.length != 2) {
 			System.err.println("Rule's format error by Arrow style. : "+ruleString);

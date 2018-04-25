@@ -5,22 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
-
-import data.RDF.Namespace;
-
 public class RDFGraphPattern {
-	private static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();
-	private static final String prefixRDFS = Namespace.RDFS.toQueryPrefixDefinition();
-	private static final String prefixOWL = Namespace.OWL.toQueryPrefixDefinition();
-	private static final String prefixDC = Namespace.DC.toQueryPrefixDefinition();
-	private static final String prefixDCTERM = Namespace.DCTERMS.toQueryPrefixDefinition();
-	private static final String prefixSCHEMA = Namespace.SCHEMA.toQueryPrefixDefinition();
-	private static final String prefixJASS = Namespace.JASS.toQueryPrefixDefinition();
-	private static final String prefixGOO = Namespace.GOO.toQueryPrefixDefinition();
-
-	
 	
 	private Set<RDFTriplePattern> triplePatterns;
 
@@ -39,23 +24,23 @@ public class RDFGraphPattern {
 	public String[][] toArray() {
 		return triplePatterns.stream().map(tp -> tp.toArray()).toArray(String[][]::new);
 	}
+	/**
+	 * 指定の区切り文字や接頭辞，接尾辞で区切ったグラフパターン，トリプルパターンの文字列を返す.
+	 * @param graphDelimiter		グラフパターンの区切り文字
+	 * @param graphPrefix		グラフパターンの接頭辞
+	 * @param graphSuffix		グラフパターンの接尾辞
+	 * @param tripleDelimiter	トリプルパターンの区切り文字
+	 * @param triplePrefix		トリプルパターンの接頭辞
+	 * @param tripleSuffix		トリプルパターンの接尾辞
+	 * @return
+	 */
 	public String joins(CharSequence graphDelimiter, CharSequence graphPrefix, CharSequence graphSuffix,
 			CharSequence tripleDelimiter, CharSequence triplePrefix, CharSequence tripleSuffix) {
 		return triplePatterns.stream()
 				.map(tp -> tp.join(tripleDelimiter, triplePrefix, tripleSuffix))
 				.collect(Collectors.joining(graphDelimiter, graphPrefix, graphSuffix));
 	}
-	
-	public Query toQuery() {
-		String queryString =
-				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO +
-				"SELECT * " +
-				"WHERE {" +
-				joins("", "", "", " ", "", " .") +
-				"}";
-		return QueryFactory.create(queryString);
-	}
-	
+		
 	
 	/***********************************/
 	/********** Getter/Setter **********/

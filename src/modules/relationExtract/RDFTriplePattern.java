@@ -1,18 +1,8 @@
 package modules.relationExtract;
 
-import java.util.Map;
 import java.util.StringJoiner;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-
 public class RDFTriplePattern {
-
-	private static final String BLANK = "_:";
-	
 	private String subjectVar;
 	private String predicateVar;
 	private String objectVar;
@@ -34,33 +24,18 @@ public class RDFTriplePattern {
 	public String[] toArray() {
 		return new String[]{subjectVar, predicateVar, objectVar};
 	}
+	/**
+	 * 区切り文字，先頭挿入文字，末尾挿入文字を指定してトリプルを繋げる. 
+	 * @param delimiter	区切り文字
+	 * @param prefix		接頭辞
+	 * @param suffix		接尾辞
+	 * @return
+	 */
 	public String join(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
 		return new StringJoiner(delimiter, prefix, suffix)
 				.add(subjectVar).add(predicateVar).add(objectVar).toString();
 	}
 	
-	public Statement fillStatement(Model targetModel, Map<String, String> varURIMap) {
-		/*
-		System.out.println("filling");
-		System.out.println("  "+subjectVar +", " + predicateVar + ", " + objectVar);
-		 //*/
-		String var_s = varURIMap.get(subjectVar);
-		String var_p = varURIMap.get(predicateVar); 
-		String var_o = varURIMap.get(objectVar);
-		Resource subject = var_s.startsWith(BLANK)? 
-				targetModel.createResource(): targetModel.getResource(var_s);
-		Property predicate = targetModel.getProperty(var_p);
-		RDFNode object = var_o.startsWith(BLANK)? 
-				targetModel.createResource(): targetModel.getResource(var_o);
-
-		/*
-		System.out.println("filled");
-		System.out.println("  "+subject.getURI() +", "+ predicate.getURI() +", "+ object.toString());	//TODO
-		//*/
-		
-		return targetModel.createStatement(subject, predicate, object);
-	}
-
 
 	/**********************************/
 	/********** Objectメソッド **********/
