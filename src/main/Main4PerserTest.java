@@ -12,10 +12,11 @@ import modules.Generator;
 public class Main4PerserTest {
 
 	public static void main(String[] args) {
-		//String readFile = "gooText生物-動物名-All.txt";
-		String readFile = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
-		//String readFile = "./test/literalText.txt";
-		Path textFile = Paths.get(readFile);
+		String textFileName = args.length == 1?
+				args[0] :
+				"./resource/input/goo/text/gooText生物-動物名-あ.txt";
+		//String textFileName = "./test/literalText.txt";
+		Path textFilePath = Paths.get(textFileName);
 		///*
 
 		String[] texts = {
@@ -36,7 +37,7 @@ public class Main4PerserTest {
 		///*
 		Generator generator = new Generator();
 		Ontology ontology = generator.generate(nlLists);
-		//Ontology ontology = generator.generate(textFile);
+		//Ontology ontology = generator.generate(textFilePath);
 		ontology.getTriples().stream().forEach(System.out::println);
 		//*/
 	}
