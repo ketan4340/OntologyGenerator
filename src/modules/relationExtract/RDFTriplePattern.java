@@ -29,7 +29,7 @@ public class RDFTriplePattern {
 	 * @param delimiter	区切り文字
 	 * @param prefix		接頭辞
 	 * @param suffix		接尾辞
-	 * @return
+	 * @return 列記したトリプルパターン
 	 */
 	public String join(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
 		return new StringJoiner(delimiter, prefix, suffix)

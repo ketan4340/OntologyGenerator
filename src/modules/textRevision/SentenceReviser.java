@@ -27,10 +27,11 @@ public class SentenceReviser {
 	
 	
 	public Sentence connectWord(Sentence sentence) {
+		// サ変動詞と接尾をもつ動詞をつなげる
 		Stream.of(tags_CtgAdj).forEach(tag_CA -> {
 			sentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tag_CA[0], tag_CA[1]));			
 		});
-		/* 名詞と形容詞だけ取り出す */
+		// 名詞と形容詞だけ取り出す
 		// これらがClauseの末尾につくものを隣のClauseにつなげる
 		Stream.of(tags_NP).forEach(tag_NP -> {
 			for (AbstractClause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true); 

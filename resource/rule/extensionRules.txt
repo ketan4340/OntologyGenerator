@@ -9,7 +9,8 @@ IF {
 # 主語 (jass:subject)
 IF{
   ?Stc, rdf:type, jass:Sentence.
-  ?Stc, jass:containsClause, ?Cls.
+  ?Stc, jass:clauseList, ?list.
+  ?list, rdf:rest*/rdf:first, ?Cls.
   ?Cls, jass:containsWord, ?Adj.
   ?Adj, jass:pos, "助詞".
   ?Adj, jass:infinitive, "は".
@@ -31,7 +32,8 @@ IF{
   ?Stc, rdf:type, jass:Sentence.
   ?Stc, jass:subject, ?Cls_S.
   ?Stc, jass:predicate, ?Cls_P.
-  ?Stc, jass:containsClause, ?Cls_O.
+  ?Stc, jass:clauseList, ?list.
+  ?list, rdf:rest*/rdf:first, ?Cls_O.
   ?Cls_O, jass:depend, ?Cls_P.
   ?Cls_O, jass:containsWord, ?Adj.
   ?Adj, jass:pos, "助詞".

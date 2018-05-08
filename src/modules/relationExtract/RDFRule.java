@@ -21,6 +21,8 @@ public class RDFRule {
 	private static final String prefixGOO = Namespace.GOO.toQueryPrefixDefinition();
 	private static final String prefixSIO = Namespace.SIO.toQueryPrefixDefinition();
 	
+	private int id;
+	private String label;
 	private RDFGraphPattern ifPattern;
 	private RDFGraphPattern thenPattern;
 
@@ -43,17 +45,7 @@ public class RDFRule {
 	/**********  MemberMethod **********/
 	/***********************************/
 	public Model expands(Model targetModel) {
-		Model m = solve(targetModel);
-		
-		//TODO
-		/*
-		new Generator().convertJena2Original(m).stream()
-		.map(tri -> tri.toString()).forEach(System.out::println);
-		System.out.println();
-		*/
-		
-		targetModel.add(m);
-		return targetModel;
+		return targetModel.add(solve(targetModel));
 	}
 
 	public Model converts(Model targetModel) {
@@ -67,14 +59,41 @@ public class RDFRule {
 	private Query toQuery() {
 		String queryString = 
 				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO+prefixSIO +
-				"CONSTRUCT {" +
-					thenPattern.joins(".", "", "", " ", "", " ") +
-				"}" +
-				"WHERE {" +
-					ifPattern.joins(".", "", "", " ", "", " ") +
-				"}";
+				"CONSTRUCT " +
+					thenPattern.joins(".", "{", "}", " ", "", " ") +
+				"WHERE " +
+					ifPattern.joins(".", "{", "}", " ", "", " ");
 		return QueryFactory.create(queryString);
 	}
+
+	/***********************************/
+	/********** Getter/Setter **********/
+	/***********************************/
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	public RDFGraphPattern getIfPattern() {
+		return ifPattern;
+	}
+	public void setIfPattern(RDFGraphPattern ifPattern) {
+		this.ifPattern = ifPattern;
+	}
+	public RDFGraphPattern getThenPattern() {
+		return thenPattern;
+	}
+	public void setThenPattern(RDFGraphPattern thenPattern) {
+		this.thenPattern = thenPattern;
+	}
+
 
 	/**********************************/
 	/********** Objectメソッド **********/

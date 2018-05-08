@@ -97,6 +97,8 @@ public class Generator {
 		RDFRules extensionRules = RDFRuleReader.read(Paths.get("resource/rule/extensionRules.txt"));
 		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
 	
+		//TODO
+		editedSentences.forEach(s -> s.printW());
 		editedSentences.stream()
 			.map(JASSFactory::createJASSModel)
 			.map(extensionRules::extend)

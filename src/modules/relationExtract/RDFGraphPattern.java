@@ -12,10 +12,6 @@ public class RDFGraphPattern {
 	public RDFGraphPattern(Collection<? extends RDFTriplePattern> triplePatterns) {
 		this.triplePatterns = new HashSet<>(triplePatterns);
 	}
-	public RDFGraphPattern(String[][] patternsString) {
-		
-	}
-	
 	
 
 	/***********************************/

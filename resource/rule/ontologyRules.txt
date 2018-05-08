@@ -20,7 +20,7 @@ IF{
   ?Cls_P, jass:categorem, ?Wrd_P.
   ?Wrd_P, jass:pos, "名詞".
   ?Wrd_P, jass:infinitive, "総称".
-  ?Cls_Pprev, jass:nextClause, ?Cls_P.
+  ?Cls_Pprev, ^rdf:first/rdf:rest/rdf:first, ?Cls_P.
   ?Cls_Pprev, jass:categoremMeans, ?Cpt_Pprev.
 }THEN{
   ?Cpt_S, owl:sameAs, ?Cpt_Pprev.
@@ -33,7 +33,7 @@ IF{
   ?Cls_S, jass:categoremMeans, ?Cpt_S.
   ?Stc, jass:predicate, ?Cls_P.
   ?Cls_P, jass:categorem, ?Wrd_P.
-  ?Wrd_P, jass:pos, "助数詞".
+  ?Wrd_P, jass:independentWord, ?p1.
 }THEN{
   ?Cpt_S, sio:SIO_000216, _:bn.
   _:bn, rdf:value, ?val.

@@ -13,9 +13,8 @@ public class Main4PerserTest {
 
 	public static void main(String[] args) {
 		//String readFile = "gooText生物-動物名-All.txt";
-		//String readFile = "writing/gooText生物-動物名-お.txt";
-		//String readFile = "./resource/input/goo/text2/gooText生物-動物名-え2.txt";
-		String readFile = "./test/literalText.txt";
+		String readFile = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
+		//String readFile = "./test/literalText.txt";
 		Path textFile = Paths.get(readFile);
 		///*
 
@@ -25,7 +24,8 @@ public class Main4PerserTest {
 			"カニの味噌汁は美味しいぞ",
 			"アイアイはアイアイ科の原始的な猿",
 			"ミュウは南アメリカに分布",
-			"馬は体長1メートルほど。"
+			"馬は体長1メートルほど。",
+			"藍鮫はアイザメ科の海水魚の総称。"
 			//*/
 		};
 		NaturalLanguage[] nls = NaturalLanguage.toNaturalLanguageArray(texts);
