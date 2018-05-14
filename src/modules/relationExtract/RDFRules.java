@@ -45,6 +45,7 @@ public class RDFRules {
 		Model convertedModel = ModelFactory.createDefaultModel();
 		rules.stream()
 			.map(r -> r.converts(targetModel))
+			//TODO 
 			.forEach(convertedModel::add);
 		return convertedModel;
 	}

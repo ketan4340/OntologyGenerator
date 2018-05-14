@@ -145,11 +145,61 @@
     
 
 
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/appliedRuleID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/appliedRuleID">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceID"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/identification -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/identification">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/jassID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/jassID">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceID"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/longSentenceID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/longSentenceID">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceID"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos -->
 
     <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos">
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceID">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/identification"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/shortSentenceID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/shortSentenceID">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceID"/>
     </owl:DatatypeProperty>
     
 

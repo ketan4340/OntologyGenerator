@@ -38,7 +38,7 @@ public class RDFTriplePattern {
 	
 
 	/**********************************/
-	/********** Objectメソッド **********/
+	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public String toString() {
