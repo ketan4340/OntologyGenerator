@@ -30,7 +30,7 @@ public class Main4PerserTest {
 			//*/
 		};
 		NaturalLanguage[] nls = NaturalLanguage.toNaturalLanguageArray(texts);
-		List<List<NaturalLanguage>> nlLists = Arrays.asList(Arrays.asList(nls));
+		List<NaturalLanguage> nlLists = Arrays.asList(nls);
 		//*/
 
 

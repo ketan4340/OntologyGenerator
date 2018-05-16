@@ -23,16 +23,15 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import data.RDF.MyResource;
-import data.RDF.Namespace;
 import data.RDF.Ontology;
 import data.RDF.RDFTriple;
 import grammar.NaturalLanguage;
-import grammar.Paragraph;
+import grammar.NaturalParagraph;
 import grammar.Sentence;
 import modules.relationExtract.JASSFactory;
 import modules.relationExtract.RDFRuleReader;
 import modules.relationExtract.RDFRules;
-import modules.syntacticParse.Cabocha;
+import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
@@ -46,26 +45,31 @@ public class Generator {
 	/**********  MemberMethod **********/
 	/***********************************/
 	public Ontology generate(Path textFile) {
-		return generate(loadTextFile(textFile));
+		return generateParagraphs(loadTextFile(textFile));
 	}
 
+	public Ontology generateParagraphs(List<NaturalParagraph> naturalLanguageParagraphs) {
+		// 段落を処理に使う予定はまだないので，文のリストに均す
+		List<NaturalLanguage> naturalLanguages = naturalLanguageParagraphs.stream()
+				.map(NaturalParagraph::getTexts)
+				.flatMap(List<NaturalLanguage>::stream)
+				.collect(Collectors.toList());
+		return generate(naturalLanguages);
+	}
 	/**
 	 * オントロジー構築器の実行
 	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
 	 */
-	public Ontology generate(List<List<NaturalLanguage>> naturalLanguageParagraphs) {
+	public Ontology generate(List<NaturalLanguage> naturalLanguages) {
 		/*************************************/
 		/********** 構文解析モジュール **********/
 		/*************************************/
-		List<Paragraph> originalParagraphs = syntacticParse(naturalLanguageParagraphs);
+		SyntacticParser sp = new SyntacticParser();
+		List<Sentence> originalSentences = sp.parseSentences(naturalLanguages);
 
 		/*************************************/
 		/********** 文章整形モジュール **********/
 		/*************************************/
-		// 段落を処理に使う予定はまだないので，文のリストに均す
-		List<Sentence> originalSentences = originalParagraphs.stream()
-				.flatMap(p -> p.getSentences().stream())
-				.collect(Collectors.toList());
 
 		/*** 文章整形Module ***/
 		List<Sentence> editedSentences = new LinkedList<>();
@@ -98,7 +102,7 @@ public class Generator {
 		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
 	
 		//TODO
-		editedSentences.forEach(s -> s.printW());
+		editedSentences.forEach(Sentence::printW);
 		editedSentences.stream()
 			.map(JASSFactory::createJASSModel)
 			.map(extensionRules::extend)
@@ -134,7 +138,7 @@ public class Generator {
 		}
 		
 		System.out.println("Finished.");
-		System.out.println("Sentences: " + naturalLanguageParagraphs.get(0).size() + "\t->dividedSentences: " + editedSentences.size());
+		System.out.println("Sentences: " + originalSentences.size() + "\t->dividedSentences: " + editedSentences.size());
 		System.out.println("Relations: " + ontology.getTriples().size() + "\n");
 
 		return ontology;
@@ -169,7 +173,7 @@ public class Generator {
 	 * @param textFile テキストファイルのパス
 	 * @return 段落のリスト(段落はNaturalLanguageのリストからなる)
 	 */
-	private List<List<NaturalLanguage>> loadTextFile(Path textFile) {
+	private List<NaturalParagraph> loadTextFile(Path textFile) {
 		List<String> texts;
 		try {
 			texts = Files.readAllLines(textFile);
@@ -179,22 +183,8 @@ public class Generator {
 		}
 		// 空行を見つけたら段落の境界とする
 		return StringListUtil.split("", texts).stream()
-				.map(textList -> textList.stream()
-						.map(text -> new NaturalLanguage(text))
-						.collect(Collectors.toList()))
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * 自然言語文のリストのリストを構文解析し，段落のリストを返す.
-	 * @param naturalLanguageParagraphs 自然言語文を段落ごとにリストしたものをまとめたリスト
-	 * @return 段落のリスト
-	 */
-	private List<Paragraph> syntacticParse(List<List<NaturalLanguage>> naturalLanguageParagraphs) {
-		Cabocha cabocha = new Cabocha();
-		return naturalLanguageParagraphs.stream()
-				.map(nlTexts -> cabocha.texts2sentences(nlTexts))
-				.map(sentenceList -> new Paragraph(sentenceList))
+				.map(NaturalLanguage::toNaturalLanguageList)
+				.map(NaturalParagraph::new)
 				.collect(Collectors.toList());
 	}
 }

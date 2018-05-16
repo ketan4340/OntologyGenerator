@@ -17,7 +17,7 @@ public class NaturalLanguage {
 	/***********************************/
 	public NaturalLanguage(String text) {
 		this.id = sum++;
-		this.text = text;
+		setText(text);
 	}
 	public NaturalLanguage() {
 		this("");
@@ -29,19 +29,19 @@ public class NaturalLanguage {
 	/***********************************/
 	/** List<NaturalLanguage> -> List<String> */
 	public static List<String> toStringList(List<NaturalLanguage> nlList) {
-		return nlList.stream().map(nl -> nl.toString()).collect(Collectors.toList());
+		return nlList.stream().map(NaturalLanguage::toString).collect(Collectors.toList());
 	}
 	/** List<String> -> List<NaturalLanguage> */
 	public static List<NaturalLanguage> toNaturalLanguageList(List<String> stringList) {
-		return stringList.stream().map(str -> new NaturalLanguage(str)).collect(Collectors.toList());
+		return stringList.stream().map(NaturalLanguage::new).collect(Collectors.toList());
 	}	
 	/** NaturalLanguage[] -> String[] */
 	public static String[] toStringArray(NaturalLanguage[] nls) {
-		return Stream.of(nls).map(nl -> nl.toString()).toArray(String[]::new);
+		return Stream.of(nls).map(NaturalLanguage::toString).toArray(String[]::new);
 	}
 	/** String[] -> NaturalLanguage[] */
 	public static NaturalLanguage[] toNaturalLanguageArray(String[] strings) {
-		return Stream.of(strings).map(str -> new NaturalLanguage(str)).toArray(NaturalLanguage[]::new);
+		return Stream.of(strings).map(NaturalLanguage::new).toArray(NaturalLanguage[]::new);
 	}
 	
 	/***********************************/

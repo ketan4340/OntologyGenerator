@@ -1,15 +1,17 @@
 package data.text;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import grammar.NaturalLanguage;
@@ -133,41 +135,32 @@ public class DictionaryEditor {
 	/**
 	 * ディレクトリ内のファイルの内容を全て纏めた一つのファイルを出力する
 	 */
-	public void gatheringTexts(Path dirPath, Path opFile) {
-		try (BufferedWriter bw = Files.newBufferedWriter(opFile)) {
-			Stream<Path> files = Files.list(dirPath);
-			
-			if ( files == null )
-				System.err.println("There is no file.");
-			files.sorted((file1, file2) -> file1.compareTo(file2))
-			.forEach(file -> {
-				if (!Files.exists(file))
-					return;
-				if (Files.isRegularFile(file)) {
-					if (file.getFileName().toString().equals(".gitignore") ||
-						file.getFileName().toString().equals(".DS_Store") ||
-						file.equals(opFile))
-						return;
-					try {
-						Files.lines(file).forEach(line -> {
-							try {
-								bw.write(line);
-								bw.newLine();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						});
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			});
-			files.close();
-			bw.close();
+	public boolean gatheringTexts(Path dirPath, Path outputFile) {
+		Stream<Path> filePathStream = null;
+		try {
+			filePathStream = Files.list(dirPath).sorted(Comparator.comparing(Path::toString));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		if (filePathStream == null || filePathStream.count() == 0) {
+			System.err.println("There is no file.");
+			return false;
+		}
+		
+		filePathStream.forEach(filePath -> {
+			if (!Files.isRegularFile(filePath)) return;
+			if (filePath.getFileName().toString().equals(".gitignore") ||
+				filePath.getFileName().toString().equals(".DS_Store") ||
+				filePath.equals(outputFile)) return;
+			try {
+				List<String> lines = Files.lines(filePath).collect(Collectors.toList());
+				Files.write(outputFile, lines, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		filePathStream.close();
+		return true;
 	}
-
-
 }
