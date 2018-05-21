@@ -1,27 +1,33 @@
 package data.RDF;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.apache.jena.rdf.model.Model;
 
-public class Ontology {
-	private List<RDFTriple> triples;
+import data.id.Identifiable;
+
+
+public class MyJenaModel implements Identifiable{
+	private static int sum = 0;
 	
-
+	private final int id;
+	private Model model;
+	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public Ontology(ArrayList<RDFTriple> triples) {
-		setTriples(triples);
+	public MyJenaModel() {
+		this.id = sum++;
 	}
-	public Ontology(Collection<? extends RDFTriple> triples) {
-		this(new ArrayList<>(triples));
-	}
-	public Ontology() {
-		this(new ArrayList<>());
+	public MyJenaModel(Model m) {
+		this();
+		setModel(m);
 	}
 	
-	
+	/****************************************/
+	/**********    Static Method    *********/
+	/****************************************/
+
+
+
 	/****************************************/
 	/**********   Static  Method   **********/
 	/****************************************/
@@ -31,20 +37,22 @@ public class Ontology {
 	/**********   Member  Method   **********/
 	/****************************************/
 	
-	/****************************************/
 	/**********   Getter, Setter   **********/
-	/****************************************/
-	public List<RDFTriple> getTriples() {
-		return triples;
+	@Override
+	public int getID() {
+		return id;
 	}
-	public void setTriples(List<RDFTriple> triples) {
-		this.triples = triples;
+	public Model getModel() {
+		return model;
+	}
+	public void setModel(Model m) {
+		this.model = m;
 	}
 	
-
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
 
-	
+
+
 }

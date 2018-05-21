@@ -3,7 +3,6 @@ package modules.syntacticParse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import data.id.IDLinkedMap;
 import data.id.SentenceIDMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
@@ -43,10 +42,10 @@ public class SyntacticParser {
 	 * @param sentences
 	 * @return 文とIDタプルのリンクトマップ
 	 */
-	public IDLinkedMap<Sentence> attachIDTuples(List<Sentence> sentences) {
-		SentenceIDMap sentenceMap = new SentenceIDMap(sentences);
+	public SentenceIDMap attachIDTuples(List<Sentence> sentences) {
+		SentenceIDMap sentenceMap = SentenceIDMap.create(sentences);
 		// 全てのIDTuple.scoreを0で初期化
-		sentenceMap.scoreInit();
+		sentenceMap.scoreAllInit();
 		return sentenceMap;
 	}
 }

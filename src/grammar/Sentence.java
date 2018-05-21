@@ -31,7 +31,7 @@ import grammar.word.Word;
 
 public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>> 
 	implements GrammarInterface {
-	private static int sentenceSum = 0;
+	private static int sum = 0;
 
 	public final int id;
 
@@ -41,13 +41,10 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	/***********************************/
 	public Sentence(List<AbstractClause<?>> clauses) {
 		super(clauses);
-		this.id = sentenceSum++;
+		this.id = sum++;
 	}
 	public Sentence(List<AbstractClause<?>> clauses, Map<AbstractClause<?>, Integer> dependingMap) {
-		super(clauses);
-		setChildren(clauses);
-		this.id = sentenceSum++;
-		//imprintThisOnChildren();
+		this(clauses);
 		initializeDepending(dependingMap);
 	}
 	

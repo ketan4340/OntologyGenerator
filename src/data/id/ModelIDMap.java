@@ -4,12 +4,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Model;
+
 import grammar.Sentence;
 
-public class SentenceIDMap extends IDLinkedMap<Sentence> {
-	private static final long serialVersionUID = -2957160502289250254L;
+public class ModelIDMap extends IDLinkedMap<Model> {
+	private static final long serialVersionUID = -7922615222139193991L;
 	
-
+	
 	/***********************************/
 	/********** Static Method **********/
 	/***********************************/
@@ -22,10 +24,10 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public SentenceIDMap() {
+	public ModelIDMap() {
 		super();
 	}
-	public SentenceIDMap(LinkedHashMap<Sentence, IDTuple> m) {
+	public ModelIDMap(LinkedHashMap<Model, IDTuple> m) {
 		super(m);
 	}
 
@@ -33,12 +35,5 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/***********************************/
 	/********** Member Method **********/
 	/***********************************/
-	public void setLongSentenceID() {
-		entrySet().stream().forEach(e -> e.getValue().setLongSentenceID(e.getKey().id));
-	}
-	public void setShortSentenceID() {
-		entrySet().stream().forEach(e -> e.getValue().setShortSentenceID(e.getKey().id));
-	}
-	
-	
+
 }

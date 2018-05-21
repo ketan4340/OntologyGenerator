@@ -22,10 +22,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
+import data.RDF.MyJenaModel;
 import data.RDF.MyResource;
 import data.RDF.Ontology;
 import data.RDF.RDFTriple;
-import data.id.IDLinkedMap;
+import data.id.SentenceIDMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
 import grammar.Sentence;
@@ -68,7 +69,7 @@ public class Generator {
 		/*************************************/
 		SyntacticParser sp = new SyntacticParser();
 		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
-		IDLinkedMap<Sentence> sentenceMap = sp.attachIDTuples(sentenceList);
+		SentenceIDMap sentenceMap = sp.attachIDTuples(sentenceList);
 		sentenceMap.setLongSentenceID();
 		
 		/*************************************/
@@ -100,7 +101,7 @@ public class Generator {
 		System.out.println("------------関係抽出モジュール------------");
 
 		/* 文構造のRDF化 */
-		Model ontologyModel = ModelFactory.createDefaultModel();
+		MyJenaModel ontologyModel = new MyJenaModel(ModelFactory.createDefaultModel());
 		// RDFルール生成 (読み込み)
 		RDFRules extensionRules = RDFRuleReader.read(Paths.get("resource/rule/extensionRules.txt"));
 		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
@@ -111,7 +112,7 @@ public class Generator {
 			.map(JASSFactory::createJASSModel)
 			.map(extensionRules::extend)
 			.map(ontologyRules::convert)
-			.forEach(ontologyModel::add);
+			.forEach(ontologyModel.getModel()::add);
 
 		// ログの出力
 		List<String> textList = editedSentences.stream().map(s -> s.name()).collect(Collectors.toList());
@@ -122,14 +123,14 @@ public class Generator {
 			e1.printStackTrace();
 		}
 		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/ontologyModel.nt"))) {
-			ontologyModel.write(os, "N-TRIPLE");
+			ontologyModel.getModel().write(os, "N-TRIPLE");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
 		
-		Ontology ontology = new Ontology(convertJena2Original(ontologyModel));
+		Ontology ontology = new Ontology(convertJena2Original(ontologyModel.getModel()));
 
-		ontologyModel.close();
+		ontologyModel.getModel().close();
 		
 		List<String> csvList = ontology.getTriples().stream().map(tri -> tri.toString()).collect(Collectors.toList());
 		
