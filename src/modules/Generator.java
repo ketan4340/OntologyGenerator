@@ -25,6 +25,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import data.RDF.MyResource;
 import data.RDF.Ontology;
 import data.RDF.RDFTriple;
+import data.id.IDLinkedMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
 import grammar.Sentence;
@@ -49,7 +50,8 @@ public class Generator {
 	}
 
 	public Ontology generateParagraphs(List<NaturalParagraph> naturalLanguageParagraphs) {
-		// 段落を処理に使う予定はまだないので，文のリストに均す
+		// 段落を処理に使う予定はまだないので，文のリストに均して，
+		// List<Sentence>を引数として受け取る#generateに渡す
 		List<NaturalLanguage> naturalLanguages = naturalLanguageParagraphs.stream()
 				.map(NaturalParagraph::getTexts)
 				.flatMap(List<NaturalLanguage>::stream)
@@ -65,8 +67,10 @@ public class Generator {
 		/********** 構文解析モジュール **********/
 		/*************************************/
 		SyntacticParser sp = new SyntacticParser();
-		List<Sentence> originalSentences = sp.parseSentences(naturalLanguages);
-
+		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
+		IDLinkedMap<Sentence> sentenceMap = sp.attachIDTuples(sentenceList);
+		sentenceMap.setLongSentenceID();
+		
 		/*************************************/
 		/********** 文章整形モジュール **********/
 		/*************************************/
@@ -75,10 +79,10 @@ public class Generator {
 		List<Sentence> editedSentences = new LinkedList<>();
 		SentenceReviser sr = new SentenceReviser();
 		/** Step1: 単語結合 **/
-		originalSentences.forEach(sr::connectWord);
+		sentenceList.forEach(sr::connectWord);
 		/** Step2: 長文分割 **/
 		/* 長文を分割し複数の短文に分ける */
-		for (Sentence originalSentence : originalSentences) {
+		for (Sentence originalSentence : sentenceList) {
 			// originalSentence.printDep();	//TODO
 			for (final Sentence shortSent: originalSentence.divide2()) {
 				//shortSent.printDep();	//TODO
@@ -138,7 +142,7 @@ public class Generator {
 		}
 		
 		System.out.println("Finished.");
-		System.out.println("Sentences: " + originalSentences.size() + "\t->dividedSentences: " + editedSentences.size());
+		System.out.println("Sentences: " + sentenceList.size() + "\t->dividedSentences: " + editedSentences.size());
 		System.out.println("Relations: " + ontology.getTriples().size() + "\n");
 
 		return ontology;

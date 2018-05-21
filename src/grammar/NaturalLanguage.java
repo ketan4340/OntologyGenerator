@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NaturalLanguage {
-	private static int sum;
+	private static int sum = 0;
 	
 	private final int id;
 	private String text;

@@ -1,4 +1,4 @@
-package data.test;
+package data.id;
 
 public class IDTuple extends Tuple{
 	private static final int SIZE 			= 8;
@@ -14,9 +14,12 @@ public class IDTuple extends Tuple{
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
+	public IDTuple() {
+		super(SIZE);
+	}
 	public IDTuple(int tripleID, String subject, String predicate, String object, 
 			int shortSentenceID, int longSentenceID, int rdfRuleID, int score) {
-		super(SIZE);
+		this();
 		setTripleID(tripleID);
 		setSubject(subject);
 		setPredicate(predicate);
@@ -32,6 +35,10 @@ public class IDTuple extends Tuple{
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
+	public IDTuple copy() {
+		//TODO
+		return null;
+	}
 	
 	/***********************************/
 	/********** Getter/Setter **********/

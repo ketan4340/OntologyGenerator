@@ -3,6 +3,8 @@ package modules.syntacticParse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import data.id.IDLinkedMap;
+import data.id.SentenceIDMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
 import grammar.Paragraph;
@@ -10,13 +12,11 @@ import grammar.Sentence;
 
 public class SyntacticParser {
 
-	
 	public SyntacticParser() {
-	
 	}
 	
 	/**
-	 * 自然言語文の段落のリストを構文解析し，段落のリストを返す.
+	 * 自然言語文の段落のリストを構文解析し，段落のリストを返す. 未使用
 	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
 	 * @return 段落のリスト
 	 */
@@ -36,5 +36,17 @@ public class SyntacticParser {
 	public List<Sentence> parseSentences(List<NaturalLanguage> naturalLanguages) {
 		Cabocha cabocha = new Cabocha();
 		return cabocha.texts2sentences(naturalLanguages);
+	}
+	
+	/**
+	 * 文のリストにIDTupleを初期化して付与する.
+	 * @param sentences
+	 * @return 文とIDタプルのリンクトマップ
+	 */
+	public IDLinkedMap<Sentence> attachIDTuples(List<Sentence> sentences) {
+		SentenceIDMap sentenceMap = new SentenceIDMap(sentences);
+		// 全てのIDTuple.scoreを0で初期化
+		sentenceMap.scoreInit();
+		return sentenceMap;
 	}
 }
