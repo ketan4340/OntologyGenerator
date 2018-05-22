@@ -22,10 +22,17 @@ public class SentenceReviser {
 			};
 	
 	
+
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public SentenceReviser() {
 	}
 	
-	
+
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public Sentence connectWord(Sentence sentence) {
 		// サ変動詞と接尾をもつ動詞をつなげる
 		Stream.of(tags_CtgAdj).forEach(tag_CA -> {
@@ -43,7 +50,6 @@ public class SentenceReviser {
 		});
 		return sentence;
 	}
-
 	
 	public List<Sentence> divideLongSentence(Sentence sentence) {
 		

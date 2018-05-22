@@ -1,30 +1,38 @@
 package data.id;
 
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
-public abstract class IDLinkedMap<K> extends LinkedHashMap<K, IDTuple> {
+public abstract class IDLinkedMap<K extends Identifiable> extends LinkedHashMap<K, IDTuple> {
 	private static final long serialVersionUID = 4734377852049948002L;
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
-	public IDLinkedMap() {
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
+	protected IDLinkedMap() {
 		super();
 	}
-	public IDLinkedMap(LinkedHashMap<K, IDTuple> m) {
+	protected IDLinkedMap(LinkedHashMap<K, IDTuple> m) {
 		super(m);
 	}
 	
-	/***********************************/
-	/********** Member Method **********/
-	/***********************************/
-	public void scoreAllInit() {
-		values().stream().forEach(id -> id.setScore(0));
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
+	public void forEachKey(Consumer<? super K> action) {
+		keySet().forEach(action);
 	}
-
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	public void forEachValue(Consumer<? super IDTuple> action) {
+		values().forEach(action);
+	}
+	
+	public void scoreAllInit() {
+		forEachValue(id -> id.setScore(0));
+	}
+	
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 
 	
 }

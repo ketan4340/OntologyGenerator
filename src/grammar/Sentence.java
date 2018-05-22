@@ -21,6 +21,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import data.RDF.MyResource;
 import data.RDF.Namespace;
 import data.RDF.RDFTriple;
+import data.id.Identifiable;
 import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
@@ -30,15 +31,15 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>> 
-	implements GrammarInterface {
+	implements GrammarInterface, Identifiable{
 	private static int sum = 0;
 
 	public final int id;
 
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public Sentence(List<AbstractClause<?>> clauses) {
 		super(clauses);
 		this.id = sum++;
@@ -49,10 +50,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	}
 	
 	
-	
-	/***********************************/
-	/********** Member Method **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	
 	/**
 	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
@@ -699,25 +699,28 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		System.out.println();
 	}
 	
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
+	public int getID() {
+		return id;
+	}
 	
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
-
-	
-
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	@Override
 	public String name() {
 		return getChildren().stream().map(c -> c.name()).collect(Collectors.joining());
 	}
-
-
-	/***********************************/
-	/********** Objectメソッド **********/
-	/***********************************/
+	@Override
+	public int id() {
+		return getID();
+	}
+	
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return children.stream().map(c -> c.toString()).collect(Collectors.joining());

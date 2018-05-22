@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -26,6 +27,7 @@ import data.RDF.MyJenaModel;
 import data.RDF.MyResource;
 import data.RDF.Ontology;
 import data.RDF.RDFTriple;
+import data.id.IDTuple;
 import data.id.SentenceIDMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
@@ -68,31 +70,29 @@ public class Generator {
 		/********** 構文解析モジュール **********/
 		/*************************************/
 		SyntacticParser sp = new SyntacticParser();
-		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
-		SentenceIDMap sentenceMap = sp.attachIDTuples(sentenceList);
+		SentenceIDMap sentenceMap = sp.attachIDTuples(sp.parseSentences(naturalLanguages));
 		sentenceMap.setLongSentenceID();
 		
 		/*************************************/
 		/********** 文章整形モジュール **********/
 		/*************************************/
-
+		
 		/*** 文章整形Module ***/
-		List<Sentence> editedSentences = new LinkedList<>();
+		SentenceIDMap editedSentenceMap = new SentenceIDMap();
 		SentenceReviser sr = new SentenceReviser();
 		/** Step1: 単語結合 **/
-		sentenceList.forEach(sr::connectWord);
+		sentenceMap.forEachKey(sr::connectWord);
 		/** Step2: 長文分割 **/
 		/* 長文を分割し複数の短文に分ける */
-		for (Sentence originalSentence : sentenceList) {
-			// originalSentence.printDep();	//TODO
-			for (final Sentence shortSent: originalSentence.divide2()) {
-				//shortSent.printDep();	//TODO
-				for (final Sentence partSent: shortSent.divide3()) {
-					partSent.uniteSubject();
-					//partSent.printDep();	//TODO
-					editedSentences.add(partSent);
-				}
-			}
+		sentenceMap.forEach((k, v) -> System.out.println(k));
+		for (Map.Entry<Sentence, IDTuple> originalSentence : sentenceMap.entrySet()) {
+			
+		}
+		for (final Sentence shortSent: originalSentence.divide2()) {
+		}
+		for (final Sentence partSent: shortSent.divide3()) {
+			partSent.uniteSubject();
+			editedSentenceMap.put(partSent, shortSent.getIDTuple().clone());
 		}
 
 		/*************************************/
@@ -107,15 +107,15 @@ public class Generator {
 		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
 	
 		//TODO
-		editedSentences.forEach(Sentence::printW);
-		editedSentences.stream()
+		editedSentenceMap.forEachKey(Sentence::printW);
+		editedSentenceMap.keySet().stream()
 			.map(JASSFactory::createJASSModel)
 			.map(extensionRules::extend)
 			.map(ontologyRules::convert)
 			.forEach(ontologyModel.getModel()::add);
 
 		// ログの出力
-		List<String> textList = editedSentences.stream().map(s -> s.name()).collect(Collectors.toList());
+		List<String> textList = editedSentenceMap.keySet().stream().map(s -> s.name()).collect(Collectors.toList());
 		Path textFile = Paths.get("tmp/log/text/dividedText.txt");	// 分割後のテキストを保存
 		try {
 			Files.write(textFile, textList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -143,7 +143,7 @@ public class Generator {
 		}
 		
 		System.out.println("Finished.");
-		System.out.println("Sentences: " + sentenceList.size() + "\t->dividedSentences: " + editedSentences.size());
+		System.out.println("Sentences: " + sentenceMap.size() + "\t->dividedSentences: " + editedSentenceMap.size());
 		System.out.println("Relations: " + ontology.getTriples().size() + "\n");
 
 		return ontology;

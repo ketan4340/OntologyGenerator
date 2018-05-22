@@ -8,19 +8,19 @@ public class RDFTriplePattern {
 	private String objectVar;
 
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
+
 	public RDFTriplePattern(String subjectURI, String predicateURI, String objectURI) {
 		this.subjectVar = subjectURI;
 		this.predicateVar = predicateURI;
 		this.objectVar = objectURI;
 	}
 
-
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public String[] toArray() {
 		return new String[]{subjectVar, predicateVar, objectVar};
 	}
@@ -36,12 +36,34 @@ public class RDFTriplePattern {
 				.add(subjectVar).add(predicateVar).add(objectVar).toString();
 	}
 	
-
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
+	public String getSubject() {
+		return subjectVar;
+	}
+	public void setSubject(String subjectVar) {
+		this.subjectVar = subjectVar;
+	}
+	public String getPredicate() {
+		return predicateVar;
+	}
+	public void setPredicate(String predicateVar) {
+		this.predicateVar = predicateVar;
+	}
+	public String getObject() {
+		return objectVar;
+	}
+	public void setObject(String objectVar) {
+		this.objectVar = objectVar;
+	}
+	
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return join(" ", "", ".");
 	}
+
 }

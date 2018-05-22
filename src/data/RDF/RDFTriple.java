@@ -9,9 +9,9 @@ public class RDFTriple {
 	private MyResource predicate;
 	private MyResource object;
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public RDFTriple(MyResource subject, MyResource predicate, MyResource object) {
 		this.subject = subject;
 		this.predicate = predicate;
@@ -27,9 +27,9 @@ public class RDFTriple {
 	
 	
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	/**
 	 * 主語，述語，目的語の順に並ぶResourceの配列を返す.
 	 * @return トリプルの配列
@@ -39,9 +39,9 @@ public class RDFTriple {
 	}
 	
 	
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public MyResource getSubject() {
 		return subject;
 	}

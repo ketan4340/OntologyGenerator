@@ -1,19 +1,21 @@
 package data.id;
 
-public class IDTuple extends Tuple{
-	private static final int SIZE 			= 8;
-	private static final int TRIPLEID 		= 0;
-	private static final int SUBJECT			= 1;
-	private static final int PREDICATE 		= 2;
-	private static final int OBJECT 			= 3;
-	private static final int SHORTSENTENCEID = 4;
-	private static final int LONGSENTENCEID 	= 5;
-	private static final int RDFRULEID 		= 6;
-	private static final int SCORE 			= 7;
+public class IDTuple extends Tuple implements Cloneable{
+	private static final int SIZE 				= 8;
 	
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	private static final int TRIPLE_ID 			= 0;
+	private static final int SUBJECT				= 1;
+	private static final int PREDICATE 			= 2;
+	private static final int OBJECT 				= 3;
+	private static final int SHORTSENTENCE_ID	= 4;
+	private static final int LONGSENTENCE_ID		= 5;
+	private static final int RDFRULE_ID 			= 6;
+	private static final int SCORE 				= 7;
+	
+	
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public IDTuple() {
 		super(SIZE);
 	}
@@ -32,69 +34,76 @@ public class IDTuple extends Tuple{
 
 
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
-	public IDTuple copy() {
-		//TODO
-		return null;
-	}
-	
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
+
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public int getTripleID() {
-		return Integer.parseInt(values[TRIPLEID]);
+		return Integer.parseInt(values.get(TRIPLE_ID));
 	}
 	public void setTripleID(int tripleID) {
-		this.values[TRIPLEID] = String.valueOf(tripleID);
+		this.values.set(TRIPLE_ID, String.valueOf(tripleID));
 	}
 	public String getSubject() {
-		return values[SUBJECT];
+		return values.get(SUBJECT);
 	}
 	public void setSubject(String subject) {
-		this.values[SUBJECT] = subject;
+		this.values.set(SUBJECT, subject);
 	}
 	public String getPredicate() {
-		return values[PREDICATE];
+		return values.get(PREDICATE);
 	}
 	public void setPredicate(String predicate) {
-		this.values[PREDICATE] = predicate;
+		this.values.set(PREDICATE, predicate);
 	}
 	public String getObject() {
-		return values[OBJECT];
+		return values.get(OBJECT);
 	}
 	public void setObject(String object) {
-		this.values[OBJECT] = object;
+		this.values.set(OBJECT, object);
 	}
 	public int getShortSentenceID() {
-		return Integer.parseInt(values[SHORTSENTENCEID]);
+		return Integer.parseInt(values.get(SHORTSENTENCE_ID));
 	}
 	public void setShortSentenceID(int shortSentenceID) {
-		this.values[SHORTSENTENCEID] = String.valueOf(shortSentenceID);
+		this.values.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
 	}
 	public int getLongSentenceID() {
-		return Integer.parseInt(values[LONGSENTENCEID]);
+		return Integer.parseInt(values.get(LONGSENTENCE_ID));
 	}
 	public void setLongSentenceID(int longSentenceID) {
-		this.values[LONGSENTENCEID] = String.valueOf(longSentenceID);
+		this.values.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
 	}
 	public int getRDFRuleID() {
-		return Integer.parseInt(values[RDFRULEID]);
+		return Integer.parseInt(values.get(RDFRULE_ID));
 	}
 	public void setRDFRuleID(int rdfRuleID) {
-		this.values[RDFRULEID] = String.valueOf(rdfRuleID);
+		this.values.set(RDFRULE_ID, String.valueOf(rdfRuleID));
 	}
 	public int getScore() {
-		return Integer.parseInt(values[SCORE]);
+		return Integer.parseInt(values.get(SCORE));
 	}
 	public void setScore(int score) {
-		this.values[SCORE] = String.valueOf(score);
+		this.values.set(SCORE, String.valueOf(score));
 	}
 	
 
-	
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
+	@Override
+	public IDTuple clone() {
+		return new IDTuple(
+				getTripleID(), 
+				getSubject(), 
+				getPredicate(), 
+				getObject(), 
+				getShortSentenceID(), 
+				getLongSentenceID(), 
+				getRDFRuleID(), 
+				getScore());
+	}
 }

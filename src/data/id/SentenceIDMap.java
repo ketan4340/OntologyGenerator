@@ -34,10 +34,10 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/********** Member Method **********/
 	/***********************************/
 	public void setLongSentenceID() {
-		entrySet().stream().forEach(e -> e.getValue().setLongSentenceID(e.getKey().id));
+		forEach((k, v) -> v.setLongSentenceID(k.id));
 	}
 	public void setShortSentenceID() {
-		entrySet().stream().forEach(e -> e.getValue().setShortSentenceID(e.getKey().id));
+		forEach((k, v) -> v.setShortSentenceID(k.id));
 	}
 	
 	

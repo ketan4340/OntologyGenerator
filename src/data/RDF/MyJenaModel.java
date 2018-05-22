@@ -27,18 +27,12 @@ public class MyJenaModel implements Identifiable{
 	/****************************************/
 
 
-
-	/****************************************/
-	/**********   Static  Method   **********/
-	/****************************************/
-
-
+	
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
 	
 	/**********   Getter, Setter   **********/
-	@Override
 	public int getID() {
 		return id;
 	}
@@ -52,7 +46,10 @@ public class MyJenaModel implements Identifiable{
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
-
+	@Override
+	public int id() {
+		return getID();
+	}
 
 
 }

@@ -9,14 +9,19 @@ public class RDFGraphPattern {
 	
 	private Set<RDFTriplePattern> triplePatterns;
 
+	
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
+
 	public RDFGraphPattern(Collection<? extends RDFTriplePattern> triplePatterns) {
 		this.triplePatterns = new HashSet<>(triplePatterns);
 	}
 	
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public String[][] toArray() {
 		return triplePatterns.stream().map(tp -> tp.toArray()).toArray(String[][]::new);
 	}
@@ -37,10 +42,9 @@ public class RDFGraphPattern {
 				.collect(Collectors.joining(graphDelimiter, graphPrefix, graphSuffix));
 	}
 		
-	
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public Set<RDFTriplePattern> getTriplePatterns() {
 		return triplePatterns;
 	}
@@ -48,10 +52,9 @@ public class RDFGraphPattern {
 		this.triplePatterns = triplePatterns;
 	}
 
-	
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return joins("\n", "{", "}", ", ", "", ".");
