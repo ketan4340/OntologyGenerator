@@ -1,9 +1,12 @@
 package modules.textRevision;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import data.id.IDTuple;
+import data.id.SentenceIDMap;
 import grammar.Sentence;
 import grammar.clause.AbstractClause;
 
@@ -50,10 +53,37 @@ public class SentenceReviser {
 		});
 		return sentence;
 	}
+	public void connectWord(SentenceIDMap sentenceMap) {
+		sentenceMap.forEachKey(this::connectWord);	
+	}
 	
-	public List<Sentence> divideLongSentence(Sentence sentence) {
+	/**
+	 * 長文分割. 
+	 * @param sentenceEntry 	キーが文，値がIDタプルのマップエントリ
+	 * @return
+	 */
+	public SentenceIDMap divideSentence(Map.Entry<Sentence, IDTuple> sentenceEntry) {
+		Sentence sentence = sentenceEntry.getKey();
+		IDTuple ids = sentenceEntry.getValue();
 		
+		List<Sentence> dividedSentences = Stream.of(sentence)
+				.map(Sentence::divide2)
+				.flatMap(List<Sentence>::stream)
+				.map(Sentence::divide3)
+				.flatMap(List<Sentence>::stream)
+				.collect(Collectors.toList());
+
+		SentenceIDMap sm = SentenceIDMap.createFromList(dividedSentences);
+		sm.forEachValue(t -> t.copy(ids));
 		
-		return new ArrayList<>();
+		return sm;
+	}
+	public void divideSentence(SentenceIDMap sentenceMap) {
+		SentenceIDMap clone = new SentenceIDMap(sentenceMap);
+		sentenceMap = clone.entrySet().stream()
+				.map(this::divideSentence)
+				.flatMap(m -> m.entrySet().stream())
+				.peek(e -> e.getKey().uniteSubject())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, SentenceIDMap::new));
 	}
 }

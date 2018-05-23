@@ -13,7 +13,7 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/***********************************/
 	/********** Static Method **********/
 	/***********************************/
-	public static SentenceIDMap create(List<Sentence> sentenceList) {
+	public static SentenceIDMap createFromList(List<Sentence> sentenceList) {
 		LinkedHashMap<Sentence, IDTuple> lhm = sentenceList.stream()
 				.collect(Collectors.toMap(s -> s, s -> new IDTuple(), (e1, e2) -> e1, LinkedHashMap::new));
 		return new SentenceIDMap(lhm);

@@ -37,7 +37,17 @@ public class IDTuple extends Tuple implements Cloneable{
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-
+	public void copy(IDTuple t) {
+		setTripleID(t.getTripleID());
+		setSubject(t.getSubject());
+		setPredicate(t.getPredicate());
+		setObject(t.getObject());
+		setShortSentenceID(t.getShortSentenceID());
+		setLongSentenceID(t.getLongSentenceID());
+		setRDFRuleID(t.getRDFRuleID());
+		setScore(t.getScore());
+	}
+	
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/

@@ -43,7 +43,7 @@ public class SyntacticParser {
 	 * @return 文とIDタプルのリンクトマップ
 	 */
 	public SentenceIDMap attachIDTuples(List<Sentence> sentences) {
-		SentenceIDMap sentenceMap = SentenceIDMap.create(sentences);
+		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentences);
 		// 全てのIDTuple.scoreを0で初期化
 		sentenceMap.scoreAllInit();
 		return sentenceMap;

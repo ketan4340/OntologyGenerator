@@ -1,7 +1,8 @@
 package data.id;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Tuple {
 
@@ -12,7 +13,7 @@ public class Tuple {
 	/**********     Constructor    **********/
 	/****************************************/
 	public Tuple(int size) {
-		setValues(new ArrayList<>());
+		setValues(Stream.generate(() -> "-1").limit(size).collect(Collectors.toList()));
 	}
 	public Tuple(List<String> values) {
 		setValues(values);

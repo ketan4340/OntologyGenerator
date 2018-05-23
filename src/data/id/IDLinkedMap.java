@@ -30,9 +30,5 @@ public abstract class IDLinkedMap<K extends Identifiable> extends LinkedHashMap<
 		forEachValue(id -> id.setScore(0));
 	}
 	
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-
 	
 }
