@@ -15,7 +15,7 @@ public class Main4PerserTest {
 		String textFileName = args.length == 1?
 				args[0] :
 				"./resource/input/goo/text/gooText生物-動物名-あ.txt";
-		textFileName = "./test/literalText.txt";
+		//textFileName = "./test/literalText.txt";
 		Path textFilePath = Paths.get(textFileName);
 		///*
 

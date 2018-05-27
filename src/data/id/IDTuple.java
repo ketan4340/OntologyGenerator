@@ -5,14 +5,13 @@ import util.Tuple;
 public class IDTuple extends Tuple implements Cloneable{
 	private static final int SIZE 				= 9;
 	
-	private static final int TRIPLE_ID 			= 0;
-	private static final int SUBJECT				= 1;
-	private static final int PREDICATE 			= 2;
-	private static final int OBJECT 				= 3;
-	private static final int LONGSENTENCE_ID		= 4;
-	private static final int SHORTSENTENCE_ID	= 5;
-	private static final int NATURALLANGUAGE_ID	= 6;		// やっぱ使わない
-	private static final int RDFRULE_ID 			= 7;
+	private static final int LONGSENTENCE_ID		= 0;
+	private static final int SHORTSENTENCE_ID	= 1;
+	private static final int RDFRULE_ID 			= 3;
+	private static final int TRIPLE_ID 			= 4;
+	private static final int SUBJECT				= 5;
+	private static final int PREDICATE 			= 6;
+	private static final int OBJECT 				= 7;
 	private static final int SCORE 				= 8;
 	
 	
@@ -22,17 +21,16 @@ public class IDTuple extends Tuple implements Cloneable{
 	public IDTuple() {
 		super(SIZE);
 	}
-	public IDTuple(int tripleID, String subject, String predicate, String object, 
-			int naturallanguageID, int longSentenceID, int shortSentenceID, int rdfRuleID, int score) {
+	public IDTuple(int longSentenceID, int shortSentenceID, int rdfRuleID, 
+			int tripleID, String subject, String predicate, String object,  int score) {
 		this();
+		setLongSentenceID(longSentenceID);
+		setShortSentenceID(shortSentenceID);
+		setRDFRuleID(rdfRuleID);
 		setTripleID(tripleID);
 		setSubject(subject);
 		setPredicate(predicate);
 		setObject(object);
-		setNaturalLanguageID(naturallanguageID);
-		setLongSentenceID(longSentenceID);
-		setShortSentenceID(shortSentenceID);
-		setRDFRuleID(rdfRuleID);
 		setScore(score);
 	}
 
@@ -42,20 +40,37 @@ public class IDTuple extends Tuple implements Cloneable{
 	/**********   Member  Method   **********/
 	/****************************************/
 	public void copy(IDTuple t) {
+		setLongSentenceID(t.getLongSentenceID());
+		setShortSentenceID(t.getShortSentenceID());
+		setRDFRuleID(t.getRDFRuleID());
 		setTripleID(t.getTripleID());
 		setSubject(t.getSubject());
 		setPredicate(t.getPredicate());
 		setObject(t.getObject());
-		setNaturalLanguageID(t.getNaturalLanguageID());
-		setLongSentenceID(t.getLongSentenceID());
-		setShortSentenceID(t.getShortSentenceID());
-		setRDFRuleID(t.getRDFRuleID());
 		setScore(t.getScore());
 	}
 	
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
+	public int getLongSentenceID() {
+		return Integer.parseInt(values.get(LONGSENTENCE_ID));
+	}
+	public void setLongSentenceID(int longSentenceID) {
+		this.values.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
+	}
+	public int getShortSentenceID() {
+		return Integer.parseInt(values.get(SHORTSENTENCE_ID));
+	}
+	public void setShortSentenceID(int shortSentenceID) {
+		this.values.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
+	}
+	public int getRDFRuleID() {
+		return Integer.parseInt(values.get(RDFRULE_ID));
+	}
+	public void setRDFRuleID(int rdfRuleID) {
+		this.values.set(RDFRULE_ID, String.valueOf(rdfRuleID));
+	}
 	public int getTripleID() {
 		return Integer.parseInt(values.get(TRIPLE_ID));
 	}
@@ -80,30 +95,6 @@ public class IDTuple extends Tuple implements Cloneable{
 	public void setObject(String object) {
 		this.values.set(OBJECT, object);
 	}
-	public int getNaturalLanguageID() {
-		return Integer.parseInt(values.get(NATURALLANGUAGE_ID));
-	}
-	public void setNaturalLanguageID(int naturallanguageID) {
-		this.values.set(NATURALLANGUAGE_ID, String.valueOf(naturallanguageID));
-	}
-	public int getLongSentenceID() {
-		return Integer.parseInt(values.get(LONGSENTENCE_ID));
-	}
-	public void setLongSentenceID(int longSentenceID) {
-		this.values.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
-	}
-	public int getShortSentenceID() {
-		return Integer.parseInt(values.get(SHORTSENTENCE_ID));
-	}
-	public void setShortSentenceID(int shortSentenceID) {
-		this.values.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
-	}
-	public int getRDFRuleID() {
-		return Integer.parseInt(values.get(RDFRULE_ID));
-	}
-	public void setRDFRuleID(int rdfRuleID) {
-		this.values.set(RDFRULE_ID, String.valueOf(rdfRuleID));
-	}
 	public int getScore() {
 		return Integer.parseInt(values.get(SCORE));
 	}
@@ -117,15 +108,14 @@ public class IDTuple extends Tuple implements Cloneable{
 	/****************************************/
 	@Override
 	public IDTuple clone() {
-		return new IDTuple(
+		return new IDTuple( 
+				getLongSentenceID(), 
+				getShortSentenceID(), 
+				getRDFRuleID(),
 				getTripleID(), 
 				getSubject(), 
 				getPredicate(), 
-				getObject(), 
-				getNaturalLanguageID(),
-				getLongSentenceID(), 
-				getShortSentenceID(), 
-				getRDFRuleID(), 
+				getObject(),
 				getScore());
 	}
 }
