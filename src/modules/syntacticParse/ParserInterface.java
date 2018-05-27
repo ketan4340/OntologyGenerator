@@ -19,8 +19,6 @@ public interface ParserInterface {
 	public Sentence text2sentence(NaturalLanguage nlText);
 	/** 入力が自然言語文のList */
 	public List<Sentence> texts2sentences(List<NaturalLanguage> nlTextList);
-	/** 入力が自然言語文の配列 */
-	public Sentence[] texts2sentences(NaturalLanguage[] nlTexts);
 	/** 入力がテキストファイル */
 	public List<Sentence> texts2sentences(Path nlTextFilePath);
 	
@@ -36,8 +34,6 @@ public interface ParserInterface {
 	public List<String> parse(NaturalLanguage nlText);
 	/** 入力が自然言語文のList */
 	public List<String> parse(List<NaturalLanguage> nlTextList);
-	/** 入力が自然言語文の配列 */
-	public List<String> parse(NaturalLanguage[] nlTexts);
 	/** 入力がテキストファイル */
 	public List<String> parse(Path nlTextFilePath);
 

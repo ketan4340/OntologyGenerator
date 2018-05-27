@@ -29,20 +29,20 @@ import util.StringListUtil;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/* CaboChaの基本実行コマンド */
-	private static final List<String> command4mac = new LinkedList<String>(Arrays.asList("/usr/local/bin/cabocha"));
-	private static final List<String> command4windows = new LinkedList<String>(Arrays.asList("cmd", "/c", "cabocha"));
+	private static final List<String> COMMAND4MACOS = new LinkedList<String>(Arrays.asList("/usr/local/bin/cabocha"));
+	private static final List<String> COMMAND4WINDOWS = new LinkedList<String>(Arrays.asList("cmd", "/c", "cabocha"));
 	/* CaboChaのオプション */
-	private static final String opt_Lattice			= "-f1"; 		// 格子状に並べて出力
-	//private static final String opt_XML			= "-f3";			// XML形式で出力
-	//private static final String opt_nonNE			= "-n0";			// 固有表現解析を行わない
-	private static final String opt_NE_Constraint	= "-n1";			// 文節の整合性を保ちつつ固有表現解析を行う
-	//private static final String opt_NE_noConstraint	= "-n2";			// 文節の整合性を保たずに固有表現解析を行う
-	private static final String opt_output2File		= "--output=";	// CaboChaの結果をファイルに書き出す
+	private static final String OPTION_LATTICE				= "-f1"; 		// 格子状に並べて出力
+	//private static final String OPTION_XML				= "-f3";		// XML形式で出力
+	//private static final String OPTION_NO_NE				= "-n0";		// 固有表現解析を行わない
+	private static final String OPTION_NE_CONSTRAINT		= "-n1";		// 文節の整合性を保ちつつ固有表現解析を行う
+	//private static final String OPTION_NE_UNCONSTRAINT	= "-n2";		// 文節の整合性を保たずに固有表現解析を行う
+	private static final String OPTION_OUTPUT2FILE			= "--output=";	// CaboChaの結果をファイルに書き出す
 
 
 	/* parserの入力ファイル，出力ファイルの保存先 */
-	private static final Path inputFilePath = Paths.get("tmp/log/parserIO/CaboChaInput.tmp");
-	private static final Path outputFilePath = Paths.get("tmp/log/parserIO/CaboChaOutput.tmp");
+	private static final Path PATH_INPUT = Paths.get("tmp/log/parserIO/CaboChaInput.txt");
+	private static final Path PATH_OUTPUT = Paths.get("tmp/log/parserIO/CaboChaOutput.txt");
 
 	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
 	 * 都度clearして使い回す.
@@ -55,12 +55,12 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/***********************************/
 	/* デフォルトではオプション(-f1,-n1)でセッティング */
 	public Cabocha() {
-		this(opt_Lattice, opt_NE_Constraint);
+		this(OPTION_LATTICE, OPTION_NE_CONSTRAINT);
 	}
 	/* オプションをリストで渡すことも可能 */
 	public Cabocha(String... options) {
-		command = (PlatformUtil.isMac()) ?		new LinkedList<String>(command4mac)
-				: (PlatformUtil.isWindows()) ?	new LinkedList<String>(command4windows)
+		command = PlatformUtil.isMac() ?		COMMAND4MACOS
+				: PlatformUtil.isWindows() ?	COMMAND4WINDOWS
 				: null;		// mac, windows以外のOSは実装予定なし
 		command.addAll(Arrays.asList(options));
 	}
@@ -108,11 +108,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		return decodeProcessOutput(parseOutput);
 	}
 	@Override
-	public Sentence[] texts2sentences(NaturalLanguage[] nlTexts){
-		List<Sentence> sentences = texts2sentences(Arrays.asList(nlTexts));
-		return sentences.toArray(new Sentence[sentences.size()]);
-	}
-	@Override
 	public List<Sentence> texts2sentences(Path inputFilePath){
 		List<String> parseOutput = parse(inputFilePath);
 		return decodeProcessOutput(parseOutput);
@@ -133,17 +128,14 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		Path path = output_ParserInput(nlList);	// 一旦ファイルに出力
 		return parse(path);						// そのファイルを入力として解析
 	}
-	public List<String> parse(NaturalLanguage[] nlTexts) {	// 配列の場合
-		return parse(Arrays.asList(nlTexts));	// リストにして同名メソッドに投げる
-	}
 	public List<String> parse(Path inputFilePath) {
 		// CaboChaの入力も出力もファイルになるよう，コマンドを用意
-		command.add(inputFilePath.toString());					// 入力テキストのファイル名
-		command.add(opt_output2File + outputFilePath.toString());	// ファイルに出力するコマンドを追加
-		startProcess(command);									// プロセス開始
-		finishProcess();											// プロセス終了
+		command.add(inputFilePath.toString());						// 入力テキストのファイル名
+		command.add(OPTION_OUTPUT2FILE + PATH_OUTPUT.toString());	// ファイルに出力するコマンドを追加
+		startProcess(command);								// プロセス開始
+		finishProcess();									// プロセス終了
 		try {
-			return Files.readAllLines(outputFilePath, StandardCharsets.UTF_8);
+			return Files.readAllLines(PATH_OUTPUT, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -266,7 +258,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static Path output_ParserInput(List<NaturalLanguage> nlTextList) {
 		// List<NL>からList<String>へ
 		try {
-			return Files.write(inputFilePath, NaturalLanguage.toStringList(nlTextList));
+			return Files.write(PATH_INPUT, NaturalLanguage.toStringList(nlTextList));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -25,9 +25,9 @@ public enum Namespace {
 	private final String prefix;
 	private final String uri;
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	private Namespace(String prefix, String uri) {
 		this.prefix = prefix;
 		this.uri = uri;
@@ -40,9 +40,9 @@ public enum Namespace {
 		*/
 	}
 
-	/***********************************/
-	/**********  StaticMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Static  Method   **********/
+	/****************************************/
 	public static Map<String, String> prefixMap(String... names) {
 		return Stream.of(names).map(n -> valueOf(n))
 				.collect(Collectors.toMap(ns -> ns.prefix, ns -> ns.uri.toString()));
@@ -74,17 +74,17 @@ public enum Namespace {
 		return uri;
 	}
 	
-	/************************************/
-	/**********  Member Method **********/
-	/************************************/
+	
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public String toQueryPrefixDefinition() {
 		return "PREFIX "+ prefix +": <"+ uri +">";
 	}
 
-	
-	/***********************************/
-	/**********     Getter    **********/
-	/***********************************/
+	/****************************************/
+	/**********        Getter      **********/
+	/****************************************/
 	public String getPrefix() {
 		return prefix;
 	}
@@ -93,9 +93,9 @@ public enum Namespace {
 	}
 	
 	
-	/***********************************/
-	/********** Object Method **********/
-	/***********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return prefix;
