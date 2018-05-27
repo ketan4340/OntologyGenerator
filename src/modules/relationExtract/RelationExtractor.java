@@ -18,6 +18,9 @@ import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 
 public class RelationExtractor {
+	// RDFルール生成 (読み込み)
+	private RDFRules extensionRules = RDFRuleReader.read(Paths.get("resource/rule/extensionRules.txt"));
+	private RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
 
 	
 	/****************************************/
@@ -61,9 +64,6 @@ public class RelationExtractor {
 
 	public ModelIDMap convertMap_JASSModel2RDFModel(ModelIDMap JASSMap) {
 		ModelIDMap ontologyMap = new ModelIDMap();
-		// RDFルール生成 (読み込み)
-		RDFRules extensionRules = RDFRuleReader.read(Paths.get("resource/rule/extensionRules.txt"));
-		RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
 
 		// 拡張
 		JASSMap.forEachKey(m -> m.expands(extensionRules));
