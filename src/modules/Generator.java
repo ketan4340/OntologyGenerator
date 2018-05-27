@@ -1,22 +1,16 @@
 package modules;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 
 import data.RDF.Ontology;
-import data.id.IDTuple;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import grammar.NaturalLanguage;
@@ -56,6 +50,7 @@ public class Generator {
 	 */
 	public Ontology generate(List<NaturalLanguage> naturalLanguages) {
 		System.out.println("Start.");
+		OutputManager opm = new OutputManager();
 		/*************************************/
 		/********** 構文解析モジュール **********/
 		/*************************************/
@@ -85,27 +80,16 @@ public class Generator {
 		ontologyMap.setRuleID();
 		Model unionModel = ontologyMap.uniteModels();
 
-		// ログの出力
-		List<String> textList = sentenceMap.stringList();
-		// 分割後のテキストを保存
-		try {
-			Files.write(Paths.get("tmp/log/text/dividedText.txt"), textList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e) {e.printStackTrace();}
-		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/ontologyModel.ttl"))) {
-			unionModel.write(os, "TURTLE");
-		} catch (IOException e) {e.printStackTrace();} 
-		
-		unionModel.write(System.out);
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
-		outputCSV2(ontologyMap);
-
 		
-		unionModel.close();
-		
-		
+		// ログや生成物の出力
+		opm.outputCSV2(ontologyMap);
+		opm.outputOntology(unionModel);
+		opm.outputDividedSentences(sentenceMap);
+				
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());
-		System.out.println("Relations: " + ontology.getTriples().size() + "\n");
+		System.out.println("ontology size: " + ontology.getTriples().size() + "\n");
 
 		return ontology;
 	}
@@ -130,16 +114,4 @@ public class Generator {
 				.map(NaturalParagraph::new)
 				.collect(Collectors.toList());
 	}
-	
-	private void outputCSV2(ModelIDMap ontologyMap) {
-		List<String> stringList = ontologyMap.IDList().stream().map(IDTuple::toCSV).collect(Collectors.toList());
-		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
-		Path csvFile = Paths.get("dest/csv/relation"+sdf.format(Calendar.getInstance().getTime())+".csv");
-		try {
-			Files.write(csvFile, stringList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 }
