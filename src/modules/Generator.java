@@ -73,7 +73,7 @@ public class Generator {
 		sr.connectWord(sentenceMap);
 		/** Step2: 長文分割 **/
 		/* 長文を分割し複数の短文に分ける */
-		sr.divideSentence(sentenceMap);
+		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentenceID();
 		
 		/*************************************/
