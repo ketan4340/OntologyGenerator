@@ -9,8 +9,9 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
 
 import data.RDF.Namespace;
+import data.id.Identifiable;
 
-public class RDFRule {
+public class RDFRule implements Identifiable{
 	private static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();
 	private static final String prefixRDFS = Namespace.RDFS.toQueryPrefixDefinition();
 	private static final String prefixOWL = Namespace.OWL.toQueryPrefixDefinition();
@@ -26,9 +27,9 @@ public class RDFRule {
 	private RDFGraphPattern ifPattern;
 	private RDFGraphPattern thenPattern;
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public RDFRule(String[][] ifs, String[][] thens) {
 		this.ifPattern = new RDFGraphPattern(
 				Stream.of(ifs)
@@ -40,20 +41,19 @@ public class RDFRule {
 				.collect(Collectors.toSet()));
 	}
 
-
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
-	public Model expands(Model targetModel) {
-		return targetModel.add(solve(targetModel));
+	/****************************************/
+	/**********    Member Method   **********/
+	/****************************************/
+	public Model expands(Model model) {
+		return model.add(solve(model));
 	}
 
-	public Model converts(Model targetModel) {
-		return solve(targetModel);
+	public Model converts(Model model) {
+		return solve(model);
 	}
 
-	private Model solve(Model targetModel) {
-		return QueryExecutionFactory.create(toQuery(), targetModel).execConstruct();
+	public Model solve(Model model) {
+		return QueryExecutionFactory.create(toQuery(), model).execConstruct();
 	}
 	
 	private Query toQuery() {
@@ -66,13 +66,13 @@ public class RDFRule {
 		return QueryFactory.create(queryString);
 	}
 
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
-	public int getId() {
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
+	public int getID() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setID(int id) {
 		this.id = id;
 	}
 	public String getLabel() {
@@ -94,10 +94,17 @@ public class RDFRule {
 		this.thenPattern = thenPattern;
 	}
 
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
+	@Override
+	public int id() {
+		return getID();
+	}
 
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return "IF "+ ifPattern.toString() +"\nTHEN "+ thenPattern.toString();

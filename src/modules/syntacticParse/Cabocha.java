@@ -95,9 +95,11 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		// サイズが2以上の時は，ファイルに出力してから同名メソッド(Path)を呼ぶ
 		switch (nlTextList.size()) {
 		case 0:		// 入力テキスト数: 0
-			parseOutput = emptyInput();	break;
+			parseOutput = emptyInput();
+			break;
 		case 1:		// 入力テキスト数: 1
-			parseOutput = parse(nlTextList.get(0));	break;
+			parseOutput = parse(nlTextList.get(0));
+			break;
 		default:		// 入力テキスト数: 2以上
 			Path textFile = output_ParserInput(nlTextList);	// 一旦ファイルに出力
 			parseOutput = parse(textFile);					// そのファイルを入力として解析

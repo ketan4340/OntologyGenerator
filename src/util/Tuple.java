@@ -1,4 +1,4 @@
-package data.id;
+package util;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ public class Tuple {
 	/**********   Member  Method   **********/
 	/****************************************/
 	public String toCSV() {
-		return String.join(",", values);
+		return toString();
 	}
 	
 	/****************************************/
@@ -34,5 +34,13 @@ public class Tuple {
 	}
 	public void setValues(List<String> values) {
 		this.values = values;
+	}
+
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
+	@Override
+	public String toString() {
+		return String.join(", ", values);
 	}
 }
