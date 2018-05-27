@@ -90,14 +90,10 @@ public class Generator {
 		// 分割後のテキストを保存
 		try {
 			Files.write(Paths.get("tmp/log/text/dividedText.txt"), textList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/ontologyModel.nt"))) {
-			unionModel.write(os, "N-TRIPLE");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		} catch (IOException e) {e.printStackTrace();}
+		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/ontologyModel.ttl"))) {
+			unionModel.write(os, "TURTLE");
+		} catch (IOException e) {e.printStackTrace();} 
 		
 		unionModel.write(System.out);
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
@@ -145,16 +141,5 @@ public class Generator {
 			e.printStackTrace();
 		}
 	}
-	
-	private void outputCSV(Ontology ontology) {
-		List<String> csvList = ontology.getTriples().stream().map(tri -> tri.toString()).collect(Collectors.toList());
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm");
-		Path csvFile = Paths.get("dest/csv/relation"+sdf.format(Calendar.getInstance().getTime())+".csv");
-		try {
-			Files.write(csvFile, csvList, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+
 }

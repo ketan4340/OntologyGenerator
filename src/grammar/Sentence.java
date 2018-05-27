@@ -15,9 +15,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-
 import data.RDF.MyResource;
 import data.RDF.Namespace;
 import data.RDF.RDFTriple;
@@ -102,13 +99,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		return null;
 	}
 
-
-	@Override
-	public Sentence clone() {
-		List<AbstractClause<?>> cloneClauses = 
-				children.stream().map(c -> c.clone()).collect(Collectors.toList());
-		return new Sentence(cloneClauses);
-	}
 
 	/**
 	 * 指定の文節をその右隣の文節に繋げる.
@@ -401,16 +391,6 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		clauses_NP.forEach(this::connect2Next);
 	}
 	
-	/**
-	 * この文の情報をRDFグラフにする.
-	 * @return RDFグラフ
-	 */
-	public Model toJASS() {
-		Model model = ModelFactory.createDefaultModel();
-		//TODO
-		
-		return model;
-	}
 
 	/** 文章から関係を見つけtripleにする */
 	public List<RDFTriple> extractRelation() {
@@ -663,9 +643,9 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		return values.stream().collect(Collectors.joining(","));
 	}
 
-	/********************************/
-	/************* 出力用 ************/
-	/********************************/	
+
+	
+	/**********   Output  Method   **********/
 	public void printW() {
 		for(final Word word : getWordList()) {
 			System.out.print("("+word.getID()+")" + word.name());

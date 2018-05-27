@@ -67,19 +67,10 @@ public class RelationExtractor {
 
 		// 拡張
 		JASSMap.forEachKey(m -> m.expands(extensionRules));
-		
+		// 変換
 		JASSMap.entrySet().stream()
 			.map(e -> e.getKey().converts(ontologyRules, e.getValue()))
 			.forEach(ontologyMap::putAll);
-		
-		//TODO log
-		/*
-		try (final OutputStream os = Files.newOutputStream(Paths.get("./tmp/log/JenaModel/JASSModel.nt"))) {
-			JASSMap.uniteModels().write(os, "N-TRIPLE");			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
 		
 		return ontologyMap;
 	}
