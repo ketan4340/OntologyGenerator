@@ -3,6 +3,7 @@ package data.RDF;
 public enum RDFSerialize {
 	RDF_XML("RDF/XML", ".rdf"),
 	N_Triples("N-Triples", ".nt"),
+	N3("N3", ".n3"),
 	Turtle("Turtle", ".ttl"),
 	JSON_LD("JSON-LD", "."),
 	;

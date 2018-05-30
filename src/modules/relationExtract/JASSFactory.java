@@ -47,15 +47,7 @@ public class JASSFactory {
 
 
 	public static Model createJASSModel(Sentence sentence) {
-		Model m = sentence2jass(createDefaultJASSModel(), sentence);
-		/*
-		//TODO
-		new Generator().convertJena2Original(m).stream()
-		.map(tri -> tri.toString()).sorted().forEach(System.out::println);
-		
-		System.out.println();
-		*/
-		return m;
+		return sentence2jass(createDefaultJASSModel(), sentence);
 	}
 	
 	private static Model sentence2jass(Model model, Sentence sentence) {

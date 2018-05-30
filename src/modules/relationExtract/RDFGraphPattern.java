@@ -13,9 +13,11 @@ public class RDFGraphPattern {
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-
-	public RDFGraphPattern(Collection<? extends RDFTriplePattern> triplePatterns) {
-		this.triplePatterns = new HashSet<>(triplePatterns);
+	public RDFGraphPattern(Set<RDFTriplePattern> triplePatterns) {
+		setTriplePatterns(triplePatterns);
+	}
+	public RDFGraphPattern(Collection<RDFTriplePattern> triplePatterns) {
+		setTriplePatterns(new HashSet<>(triplePatterns));
 	}
 	
 
@@ -27,7 +29,7 @@ public class RDFGraphPattern {
 	}
 	/**
 	 * 指定の区切り文字や接頭辞，接尾辞で区切ったグラフパターン，トリプルパターンの文字列を返す.
-	 * @param graphDelimiter		グラフパターンの区切り文字
+	 * @param graphDelimiter	グラフパターンの区切り文字
 	 * @param graphPrefix		グラフパターンの接頭辞
 	 * @param graphSuffix		グラフパターンの接尾辞
 	 * @param tripleDelimiter	トリプルパターンの区切り文字
@@ -57,6 +59,6 @@ public class RDFGraphPattern {
 	/****************************************/
 	@Override
 	public String toString() {
-		return joins("\n", "{", "}", ", ", "", ".");
+		return joins("\n", "{", "}", " ", "", " . ");
 	}
 }

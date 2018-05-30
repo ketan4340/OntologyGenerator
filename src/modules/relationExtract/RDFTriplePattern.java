@@ -11,11 +11,10 @@ public class RDFTriplePattern {
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-
 	public RDFTriplePattern(String subjectURI, String predicateURI, String objectURI) {
-		this.subjectVar = subjectURI;
-		this.predicateVar = predicateURI;
-		this.objectVar = objectURI;
+		setSubject(subjectURI);
+		setPredicate(predicateURI);
+		setObject(objectURI);
 	}
 
 	/****************************************/

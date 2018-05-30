@@ -21,11 +21,11 @@ public class RelationExtractor {
 	/**
 	 * 拡張ルール
 	 */
-	private static RDFRules extensionRules = RDFRuleReader.read(Paths.get("resource/rule/extensionRules.txt"));
+	private static RDFRules extensionRules = RDFRuleReader.readRDFRules(Paths.get("resource/rule/extensionRules.txt"));
 	/**
 	 * オントロジー変換ルール
 	 */
-	private static RDFRules ontologyRules = RDFRuleReader.read(Paths.get("resource/rule/ontologyRules.txt"));
+	private static RDFRules ontologyRules = RDFRuleReader.readRDFRules(Paths.get("resource/rule/ontologyRules.txt"));
 
 	
 	/****************************************/

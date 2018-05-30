@@ -42,7 +42,7 @@ import org.apache.jena.shared.PrefixMapping;
 import data.id.IDTuple;
 import data.id.Identifiable;
 import data.id.ModelIDMap;
-import modules.relationExtract.RDFRule;
+import modules.relationExtract.AbstractRDFRule;
 import modules.relationExtract.RDFRules;
 
 
@@ -82,17 +82,15 @@ public class MyJenaModel implements Identifiable {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	public Model expands(RDFRule rule) {
-		return model.add(rule.solve(model));
+	public void expands(AbstractRDFRule rule) {
+		add(rule.solve(model));
 	}
-	public Model expands(RDFRules rules) {
+	public void expands(RDFRules rules) {
 		rules.getRules().stream()
-			.map(this::expands)
-			.forEach(model::union);
-		return model;
+			.forEach(this::expands);
 	}
 	
-	public MyJenaModel converts(RDFRule rule) {
+	public MyJenaModel converts(AbstractRDFRule rule) {
 		return new MyJenaModel(rule.solve(model), rule.id());
 	}
 	public ModelIDMap converts(RDFRules rules, IDTuple idTuple) {

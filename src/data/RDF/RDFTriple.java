@@ -18,7 +18,7 @@ public class RDFTriple {
 		this.object = object;
 	}
 	public RDFTriple(String[] spo) {
-		this(new MyResource(Namespace.EXAMPLE, spo[0]), new MyResource(Namespace.EXAMPLE, spo[1]), new MyResource(Namespace.EXAMPLE, spo[2]));
+		this(new MyResource(Namespace.EXAMPLE, spo[S]), new MyResource(Namespace.EXAMPLE, spo[P]), new MyResource(Namespace.EXAMPLE, spo[O]));
 	}
 	
 	public RDFTriple(MyResource resource, MyResource property, String literal) {

@@ -1,5 +1,6 @@
 package modules.relationExtract;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,13 +9,16 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 public class RDFRules {
 
-	private List<RDFRule> rules;
+	private LinkedHashSet<AbstractRDFRule> rules;
 	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public RDFRules(List<RDFRule> rules) {
+	public RDFRules(LinkedHashSet<AbstractRDFRule> rules) {
 		setRules(rules);
+	}
+	public RDFRules(List<RDFRule> rules) {
+		setRules(new LinkedHashSet<>(rules));
 	}
 	
 	
@@ -39,10 +43,10 @@ public class RDFRules {
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
-	public List<RDFRule> getRules() {
+	public LinkedHashSet<AbstractRDFRule> getRules() {
 		return rules;
 	}
-	public void setRules(List<RDFRule> rules) {
+	public void setRules(LinkedHashSet<AbstractRDFRule> rules) {
 		this.rules = rules;
 	}
 	

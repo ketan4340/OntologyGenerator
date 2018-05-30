@@ -50,7 +50,6 @@ public class Generator {
 	 */
 	public Ontology generate(List<NaturalLanguage> naturalLanguages) {
 		System.out.println("Start.");
-		OutputManager opm = new OutputManager();
 		/*************************************/
 		/********** 構文解析モジュール **********/
 		/*************************************/
@@ -83,6 +82,7 @@ public class Generator {
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		
 		// ログや生成物の出力
+		OutputManager opm = new OutputManager();
 		opm.outputCSV2(ontologyMap);
 		opm.outputOntology(unionModel);
 		opm.outputDividedSentences(sentenceMap);

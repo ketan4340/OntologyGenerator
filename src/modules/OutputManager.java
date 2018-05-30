@@ -19,7 +19,7 @@ import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 
 public class OutputManager {
-	public static final String RUNTIME = new SimpleDateFormat("MMddHH:mm").format(Calendar.getInstance().getTime());
+	private static final String RUNTIME = new SimpleDateFormat("MMddHH:mm").format(Calendar.getInstance().getTime());
 
 	private static final Path PATH_DIVIDED_SENTENCES = Paths.get("./tmp/log/text/dividedText"+RUNTIME+".txt");
 	private static final Path PATH_GENERATED_ONTOLOGY = Paths.get("./tmp/log/JenaModel/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
