@@ -31,13 +31,6 @@ public enum Namespace {
 	private Namespace(String prefix, String uri) {
 		this.prefix = prefix;
 		this.uri = uri;
-		/*
-		try {
-			this.uri = new URI(uri);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		*/
 	}
 
 	/****************************************/
