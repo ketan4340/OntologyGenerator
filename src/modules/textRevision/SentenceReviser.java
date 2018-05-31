@@ -63,7 +63,7 @@ public class SentenceReviser {
 	 * @param sentenceEntry 	キーが文，値がIDタプルのマップエントリ
 	 * @return
 	 */
-	public SentenceIDMap divideSentence(Map.Entry<Sentence, IDTuple> sentenceEntry) {
+	private SentenceIDMap divideSentence(Map.Entry<Sentence, IDTuple> sentenceEntry) {
 		Sentence sentence = sentenceEntry.getKey();
 		IDTuple ids = sentenceEntry.getValue();
 		

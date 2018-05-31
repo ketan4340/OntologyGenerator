@@ -3,7 +3,7 @@ package data.id;
 import java.util.LinkedHashMap;
 import java.util.function.Consumer;
 
-public class IDLinkedMap<K extends Identifiable> extends LinkedHashMap<K, IDTuple> {
+public abstract class IDLinkedMap<K> extends LinkedHashMap<K, IDTuple> {
 	private static final long serialVersionUID = 4734377852049948002L;
 
 	/****************************************/
@@ -40,5 +40,8 @@ public class IDLinkedMap<K extends Identifiable> extends LinkedHashMap<K, IDTupl
 		forEachValue(id -> id.setScore(0));
 	}
 	
-	
+	/****************************************/
+	/**********  Abstract  Method  **********/
+	/****************************************/
+
 }

@@ -26,7 +26,7 @@ public class RDFRule extends AbstractRDFRule implements Identifiable{
 	/**********  Abstract  Method  **********/
 	/****************************************/
 	@Override
-	protected Query toQuery() {
+	public Query toConstructQuery() {
 		String queryString = 
 				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO+prefixSIO +
 				"CONSTRUCT " +
@@ -69,6 +69,6 @@ public class RDFRule extends AbstractRDFRule implements Identifiable{
 	/****************************************/
 	@Override
 	public String toString() {
-		return "IF "+ ifPattern.toString() +"\nTHEN "+ thenPattern.toString();
+		return id + ":\tIF {"+ ifPattern.toString() +"\n} THEN {"+ thenPattern.toString() + "}";
 	}
 }

@@ -1,7 +1,5 @@
 package data.id;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +8,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 
-import data.RDF.MyJenaModel;
-
-public class ModelIDMap extends IDLinkedMap<MyJenaModel> {
+public class ModelIDMap extends IDLinkedMap<Model> {
 	private static final long serialVersionUID = -7922615222139193991L;
 	
+	public static int modelSum = 0;
 	
 	/****************************************/
 	/**********     Constructor    **********/
@@ -25,7 +22,7 @@ public class ModelIDMap extends IDLinkedMap<MyJenaModel> {
 	public ModelIDMap(int initialCapacity) {
 		super(initialCapacity);
 	}
-	public ModelIDMap(LinkedHashMap<MyJenaModel, IDTuple> m) {
+	public ModelIDMap(LinkedHashMap<Model, IDTuple> m) {
 		super(m);
 	}
 
@@ -33,44 +30,31 @@ public class ModelIDMap extends IDLinkedMap<MyJenaModel> {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
+	public void setModelID() {}
+	/*
+	// 他のLongSentenceIDなんかはこの手のメソッドでID登録しているからいつか同じようにしたい
 	public void setRuleID() {
 		forEach((k, v) -> v.setRDFRuleID(k.id()));
 	}
-	
+	*/
 	public Model uniteModels() {
 		Model unionModel = ModelFactory.createDefaultModel();
-		forEachKey(m -> unionModel.add(m.getModel()));
+		forEachKey(unionModel::add);
 		return unionModel;
 	}
 	
-	public ModelIDMap replaceModel2Models(Map<MyJenaModel, List<MyJenaModel>> replaceMap) {
-		ModelIDMap mm = new ModelIDMap();
+	public ModelIDMap replaceModel2Models(Map<Model, List<Model>> replaceMap) {
+		ModelIDMap newModelMap = new ModelIDMap();
 		replaceMap.forEach((md, mds) -> 
-		mds.forEach(m -> mm.put(md, get(md).clone()))
+		mds.forEach(m -> newModelMap.put(md, get(md).clone()))
 		);
-		return mm;
+		return newModelMap;
+	}
+	
+	public StatementIDMap replaceModel2Statements(Map<Model, List<Statement>> replaceMap) {
+		StatementIDMap newStatementMap = new StatementIDMap();
+		replaceMap.forEach((m, sts) -> sts.forEach(st -> newStatementMap.put(st, get(m).clone())));
+		return newStatementMap;
 	}
 
-	/**
-	 * モデルをRDFトリプルのリストに置き換え，そのIDTupleを返す.
-	 * @return
-	 */
-	public List<IDTuple> IDList() {
-		List<IDTuple> idtupleList = new ArrayList<>();
-		for (Map.Entry<MyJenaModel, IDTuple> e : entrySet()) {
-			MyJenaModel model = e.getKey();
-			IDTuple ids = e.getValue();
-			for (Iterator<Statement> itr = model.listStatements(); itr.hasNext(); ) {
-				Statement st = itr.next();
-				IDTuple id = ids.clone();
-				id.setTripleID(MyJenaModel.tripleSum++);
-				id.setSubject(st.getSubject().toString());
-				id.setPredicate(st.getPredicate().toString());
-				id.setObject(st.getObject().toString());
-				idtupleList.add(id);
-			}
-		}
-		return idtupleList;
-	}
-		
 }

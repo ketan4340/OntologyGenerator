@@ -2,10 +2,10 @@ package modules.relationExtract;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 
 public class RDFRules {
 
@@ -16,9 +16,6 @@ public class RDFRules {
 	/****************************************/
 	public RDFRules(LinkedHashSet<AbstractRDFRule> rules) {
 		setRules(rules);
-	}
-	public RDFRules(List<RDFRule> rules) {
-		setRules(new LinkedHashSet<>(rules));
 	}
 	
 	
@@ -31,13 +28,14 @@ public class RDFRules {
 			.forEach(model::union);
 		return model;
 	}
-
-	public Model convert(Model targetModel) {
-		Model convertedModel = ModelFactory.createDefaultModel();
-		rules.stream()
-			.map(r -> r.converts(targetModel))
-			.forEach(convertedModel::add);
-		return convertedModel;
+	
+	public Map<Model, Integer> convert(Model model) {
+		return rules.stream()
+				.collect(Collectors.toMap(r -> r.converts(model), r -> r.id()));
+	}
+	
+	public List<String> toStringList() {
+		return rules.stream().map(AbstractRDFRule::toString).collect(Collectors.toList());
 	}
 
 	/****************************************/
@@ -56,7 +54,7 @@ public class RDFRules {
 	@Override
 	public String toString() {
 		return rules.stream()
-				.map(r -> r.toString())
+				.map(AbstractRDFRule::toString)
 				.collect(Collectors.joining("\n"));
 	}	
 }

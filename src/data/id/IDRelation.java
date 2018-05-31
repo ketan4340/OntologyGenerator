@@ -15,9 +15,9 @@ public class IDRelation {
 	private Set<IDTuple> tupleList;
 	
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public IDRelation(Collection<? extends IDTuple> tupleList) {
 		this.tupleList = new HashSet<>(tupleList);
 	}
@@ -27,9 +27,9 @@ public class IDRelation {
 	
 	
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********    Member Method   **********/
+	/****************************************/
 	private List<IDTuple> toListOrderedBySentenceID() {
 		return tupleList.stream()
 				.sorted(Comparator.comparingInt(IDTuple::getLongSentenceID)
@@ -48,7 +48,9 @@ public class IDRelation {
 		return true;
 	}
 	
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/	
+
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
+
 }

@@ -41,8 +41,8 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 
 
 	/* parserの入力ファイル，出力ファイルの保存先 */
-	private static final Path PATH_INPUT = Paths.get("tmp/log/parserIO/CaboChaInput.txt");
-	private static final Path PATH_OUTPUT = Paths.get("tmp/log/parserIO/CaboChaOutput.txt");
+	private static final Path PATH_INPUT = Paths.get("tmp/parserIO/CaboChaInput.txt");
+	private static final Path PATH_OUTPUT = Paths.get("tmp/parserIO/CaboChaOutput.txt");
 
 	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
 	 * 都度clearして使い回す.

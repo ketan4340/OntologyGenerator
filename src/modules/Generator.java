@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.Model;
 import data.RDF.Ontology;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
+import data.id.StatementIDMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
 import grammar.Sentence;
@@ -75,17 +76,21 @@ public class Generator {
 		/*************************************/
 		RelationExtractor re = new RelationExtractor();
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
-		ModelIDMap ontologyMap = re.convertMap_JASSModel2RDFModel(JASSMap);
-		ontologyMap.setRuleID();
-		Model unionModel = ontologyMap.uniteModels();
+		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
+		//ontologyMap.setRuleID();
+		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
+		
+		Model unionModel = modelMap.uniteModels();
 
+		
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
-		opm.outputCSV2(ontologyMap);
-		opm.outputOntology(unionModel);
 		opm.outputDividedSentences(sentenceMap);
+		opm.outputIDAsCSV(statementMap);
+		opm.outputOntology(unionModel);
+		opm.outputRDFRules(re.getOntologyRules());
 				
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());

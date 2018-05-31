@@ -25,14 +25,14 @@ public class SPARQLRule extends AbstractRDFRule implements Identifiable{
 	/**********  Abstract  Method  **********/
 	/****************************************/
 	@Override
-	protected Query toQuery() {
+	public Query toConstructQuery() {
 		String queryString = 
 				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO+prefixSIO +
 				"CONSTRUCT {" +
 					thenPattern +
 				"} WHERE {" +
 					ifPattern +
-					"}";
+				"}";
 		return QueryFactory.create(queryString);
 	}
 
@@ -68,7 +68,7 @@ public class SPARQLRule extends AbstractRDFRule implements Identifiable{
 	/****************************************/
 	@Override
 	public String toString() {
-		return "IF {"+ ifPattern +"\n} THEN {"+ thenPattern + "}";
+		return id + ":\tIF {"+ ifPattern +"\n} THEN {"+ thenPattern + "}";
 	}
 
 }

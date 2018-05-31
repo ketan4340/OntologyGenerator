@@ -3,16 +3,16 @@ package data.id;
 import util.Tuple;
 
 public class IDTuple extends Tuple implements Cloneable{
-	private static final int SIZE 				= 9;
+	private static final int SIZE 				= 8;
 	
 	private static final int LONGSENTENCE_ID	= 0;
 	private static final int SHORTSENTENCE_ID	= 1;
-	private static final int RDFRULE_ID 		= 3;
-	private static final int TRIPLE_ID 			= 4;
-	private static final int SUBJECT			= 5;
-	private static final int PREDICATE 			= 6;
-	private static final int OBJECT 			= 7;
-	private static final int SCORE 				= 8;
+	private static final int RDFRULE_ID 		= 2;
+	private static final int TRIPLE_ID 			= 3;
+	private static final int SUBJECT			= 4;
+	private static final int PREDICATE 			= 5;
+	private static final int OBJECT 			= 6;
+	private static final int SCORE 				= 7;
 	
 	
 	/****************************************/

@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import data.RDF.MyJenaModel;
+import org.apache.jena.rdf.model.Model;
+
 import grammar.Sentence;
 
 public class SentenceIDMap extends IDLinkedMap<Sentence> {
@@ -47,7 +48,7 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 		forEach((k, v) -> v.setShortSentenceID(k.id));
 	}
 	
-	public List<String> stringList() {
+	public List<String> toStringList() {
 		return keySet().stream().map(Sentence::name).collect(Collectors.toList());
 	}
 	public SentenceIDMap replaceSentence2Sentences(Map<Sentence, List<Sentence>> replaceMap) {
@@ -57,7 +58,7 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 		);
 		return sm;
 	}
-	public ModelIDMap replaceSentence2Model(Map<Sentence, MyJenaModel> replaceMap) {
+	public ModelIDMap replaceSentence2Model(Map<Sentence, Model> replaceMap) {
 		ModelIDMap mm = new ModelIDMap();
 		replaceMap.forEach((st, md) -> mm.put(md, get(st).clone()));
 		return mm;

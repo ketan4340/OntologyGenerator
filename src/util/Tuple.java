@@ -23,7 +23,7 @@ public class Tuple {
 	/**********   Member  Method   **********/
 	/****************************************/
 	public String toCSV() {
-		return toString();
+		return String.join(",", values);
 	}
 	
 	/****************************************/
@@ -41,6 +41,6 @@ public class Tuple {
 	/****************************************/
 	@Override
 	public String toString() {
-		return String.join(", ", values);
+		return values.toString(); 
 	}
 }

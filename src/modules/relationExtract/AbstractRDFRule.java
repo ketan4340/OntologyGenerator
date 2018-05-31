@@ -27,19 +27,20 @@ public abstract class AbstractRDFRule implements Identifiable{
 	/****************************************/
 	/**********    Member Method   **********/
 	/****************************************/
+	public Model solves(Model model) {
+		return QueryExecutionFactory.create(toConstructQuery(), model).execConstruct();
+	}
+	
 	public Model expands(Model model) {
-		return model.add(solve(model));
+		return model.add(solves(model));
 	}
 
 	public Model converts(Model model) {
-		return solve(model);
+		return solves(model);
 	}
 
-	public Model solve(Model model) {
-		return QueryExecutionFactory.create(toQuery(), model).execConstruct();
-	}
 	
-	protected abstract Query toQuery();
+	public abstract Query toConstructQuery();
 
 
 
@@ -51,5 +52,5 @@ public abstract class AbstractRDFRule implements Identifiable{
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
-
+	public abstract String toString();
 }
