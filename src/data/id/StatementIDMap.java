@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 
 public class StatementIDMap extends IDLinkedMap<Statement> {
@@ -32,13 +33,17 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 		forEachValue(v -> v.setTripleID(sum++));
 	}
 	public void setSubjectString() {
-		forEach((k, v) -> v.setSubject(k.getSubject().toString()));
+		forEach((k, v) -> v.setSubject(k.getModel().qnameFor(k.getSubject().getURI())));
 	}
 	public void setPredicateString() {
-		forEach((k, v) -> v.setPredicate(k.getPredicate().toString()));
+		forEach((k, v) -> v.setPredicate(k.getModel().qnameFor(k.getPredicate().getURI())));
 	}
 	public void setObjectString() {
-		forEach((k, v) -> v.setObject(k.getObject().toString()));
+		forEach((k, v) -> {
+			RDFNode object = k.getObject();
+			String objectString = object.isResource()? object.asResource().getURI() : object.asLiteral().toString();
+			v.setObject(k.getModel().qnameFor(objectString));
+		});
 	}
 	public void setStatement() {
 		setStatementID();

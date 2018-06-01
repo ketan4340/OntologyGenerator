@@ -11,7 +11,7 @@ public class Ontology {
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public Ontology(ArrayList<RDFTriple> triples) {
+	public Ontology(List<RDFTriple> triples) {
 		setTriples(triples);
 	}
 	public Ontology(Collection<? extends RDFTriple> triples) {
