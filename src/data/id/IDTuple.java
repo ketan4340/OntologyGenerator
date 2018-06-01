@@ -1,31 +1,50 @@
 package data.id;
 
+import java.util.Arrays;
+
 import util.Tuple;
 
 public class IDTuple extends Tuple implements Cloneable{
-	private static final int SIZE 				= 8;
+	private static final int SIZE 				= 10;
 	
 	private static final int LONGSENTENCE_ID	= 0;
-	private static final int SHORTSENTENCE_ID	= 1;
-	private static final int RDFRULE_ID 		= 2;
-	private static final int TRIPLE_ID 			= 3;
-	private static final int SUBJECT			= 4;
-	private static final int PREDICATE 			= 5;
-	private static final int OBJECT 			= 6;
-	private static final int SCORE 				= 7;
+	private static final int LONGSENTENCE		= 1;
+	private static final int SHORTSENTENCE_ID	= 2;
+	private static final int SHORTSENTENCE		= 3;
+	private static final int RDFRULE_ID 		= 4;
+	private static final int TRIPLE_ID 			= 5;
+	private static final int SUBJECT			= 6;
+	private static final int PREDICATE 			= 7;
+	private static final int OBJECT 			= 8;
+	private static final int SCORE 				= 9;
 	
-	
+	protected static Tuple ATTRIBUTES = new Tuple(Arrays.asList(
+			"Long Sentence ID", 
+			"Long Sentence", 
+			"Short Sentence ID", 
+			"Short Sentence", 
+			"RDFRule ID", 
+			"Triple ID", 
+			"Subject", 
+			"Predicate", 
+			"Object", 
+			"Score"));
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
 	public IDTuple() {
 		super(SIZE);
 	}
-	public IDTuple(int longSentenceID, int shortSentenceID, int rdfRuleID, 
-			int tripleID, String subject, String predicate, String object,  int score) {
+	public IDTuple(int longSentenceID, String longSentence, 
+			int shortSentenceID, String shortSentence, 
+			int rdfRuleID, int tripleID, 
+			String subject, String predicate, String object,  int score) {
 		this();
 		setLongSentenceID(longSentenceID);
+		setLongSentence(longSentence);
 		setShortSentenceID(shortSentenceID);
+		setShortSentence(shortSentence);
 		setRDFRuleID(rdfRuleID);
 		setTripleID(tripleID);
 		setSubject(subject);
@@ -41,7 +60,9 @@ public class IDTuple extends Tuple implements Cloneable{
 	/****************************************/
 	public void copy(IDTuple t) {
 		setLongSentenceID(t.getLongSentenceID());
+		setLongSentence(t.getLongSentence());
 		setShortSentenceID(t.getShortSentenceID());
+		setShortSentence(t.getShortSentence());
 		setRDFRuleID(t.getRDFRuleID());
 		setTripleID(t.getTripleID());
 		setSubject(t.getSubject());
@@ -59,11 +80,23 @@ public class IDTuple extends Tuple implements Cloneable{
 	public void setLongSentenceID(int longSentenceID) {
 		this.values.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
 	}
+	public String getLongSentence() {
+		return values.get(LONGSENTENCE);
+	}
+	public void setLongSentence(String longSentence) {
+		this.values.set(LONGSENTENCE, longSentence);
+	}
 	public int getShortSentenceID() {
 		return Integer.parseInt(values.get(SHORTSENTENCE_ID));
 	}
 	public void setShortSentenceID(int shortSentenceID) {
 		this.values.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
+	}
+	public String getShortSentence() {
+		return values.get(SHORTSENTENCE);
+	}
+	public void setShortSentence(String shortSentence) {
+		this.values.set(SHORTSENTENCE, shortSentence);
 	}
 	public int getRDFRuleID() {
 		return Integer.parseInt(values.get(RDFRULE_ID));
@@ -110,7 +143,9 @@ public class IDTuple extends Tuple implements Cloneable{
 	public IDTuple clone() {
 		return new IDTuple( 
 				getLongSentenceID(), 
+				getLongSentence(), 
 				getShortSentenceID(), 
+				getShortSentence(), 
 				getRDFRuleID(),
 				getTripleID(), 
 				getSubject(), 

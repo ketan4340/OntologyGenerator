@@ -1,8 +1,6 @@
 package data.id;
 
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -52,8 +50,9 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 		setObjectString();
 	}
 	
-	public List<String> toStringList() {
+	public IDRelation createIDRelation() {
 		setStatement();
-		return values().stream().map(IDTuple::toCSV).collect(Collectors.toList());
+		return new IDRelation(values());
 	}
+	
 }

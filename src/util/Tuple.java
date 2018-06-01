@@ -5,7 +5,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Tuple {
-
+	protected static Tuple ATTRIBUTES;
+	
+	
 	protected List<String> values;
 	
 

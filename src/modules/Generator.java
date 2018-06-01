@@ -57,7 +57,7 @@ public class Generator {
 		SyntacticParser sp = new SyntacticParser();
 		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
-		sentenceMap.setLongSentenceID();
+		sentenceMap.setLongSentence();
 		
 		
 		/*************************************/
@@ -69,7 +69,7 @@ public class Generator {
 		/** Step2: 長文分割 **/
 		/* 長文を分割し複数の短文に分ける */
 		sr.divideEachSentence(sentenceMap);
-		sentenceMap.setShortSentenceID();
+		sentenceMap.setShortSentence();
 		
 		/*************************************/
 		/********** 関係抽出モジュール **********/
@@ -88,7 +88,7 @@ public class Generator {
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
 		opm.outputDividedSentences(sentenceMap);
-		opm.outputIDAsCSV(statementMap);
+		opm.outputIDAsCSV(statementMap.createIDRelation());
 		opm.outputOntology(unionModel);
 		opm.outputRDFRules(re.getOntologyRules());
 				

@@ -41,11 +41,17 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	public void setLongSentenceID() {
-		forEach((k, v) -> v.setLongSentenceID(k.id));
+	public void setLongSentence() {
+		forEach((s, idt) -> {
+			idt.setLongSentenceID(s.id());
+			idt.setLongSentence(s.name());
+		});
 	}
-	public void setShortSentenceID() {
-		forEach((k, v) -> v.setShortSentenceID(k.id));
+	public void setShortSentence() {
+		forEach((s, idt) -> {
+			idt.setShortSentenceID(s.id());
+			idt.setShortSentence(s.name());
+		});
 	}
 	
 	public List<String> toStringList() {

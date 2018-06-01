@@ -11,8 +11,8 @@ import java.util.Calendar;
 import org.apache.jena.rdf.model.Model;
 
 import data.RDF.RDFSerialize;
+import data.id.IDRelation;
 import data.id.SentenceIDMap;
-import data.id.StatementIDMap;
 import modules.relationExtract.RDFRules;
 
 public class OutputManager {
@@ -56,9 +56,9 @@ public class OutputManager {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	
-	public void outputIDAsCSV(StatementIDMap ontologyMap) {
+	public void outputIDAsCSV(IDRelation IDRelation) {
 		try {
-			Files.write(PATH_TRIPLE_CSV, ontologyMap.toStringList());
+			Files.write(PATH_TRIPLE_CSV, IDRelation.toStringList());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
