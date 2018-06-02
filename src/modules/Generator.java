@@ -88,6 +88,7 @@ public class Generator {
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
 		opm.outputDividedSentences(sentenceMap);
+		//opm.outputJASSGraph(JASSMap);
 		opm.outputIDAsCSV(statementMap.createIDRelation());
 		opm.outputOntology(unionModel);
 		opm.outputRDFRules(re.getOntologyRules());

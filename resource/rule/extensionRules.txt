@@ -1,42 +1,37 @@
 # 文節からその自立語の概念を得るショートカット
 IF {
-  ?Cls jass:categorem ?Wrd .
-  ?Wrd jass:means ?Cpt .
+  ?Cls jass:categorem [jass:means ?Cpt] .
 } THEN {
   ?Cls jass:categoremMeans ?Cpt .
 }
 
 # 主語 (jass:subject)
 IF{
-  ?Stc rdf:type jass:Sentence .
-  ?Stc jass:clauseList ?list .
-  ?list rdf:rest*/rdf:first ?Cls .
-  ?Cls jass:containsWord ?Adj .
-  ?Adj jass:pos "助詞" .
-  ?Adj jass:infinitive "は" .
+  ?Stc	a jass:Sentence ; 
+	jass:clauseList [rdf:rest*/rdf:first ?Cls] .
+  ?Cls jass:containsWord [jass:pos "助詞" ;
+			  jass:infinitive "は"] .
 }THEN{
   ?Stc jass:subject ?Cls .
 }
 
 # 述語 (jass:predicate)
 IF{
-  ?Stc rdf:type jass:Sentence .
-  ?Stc jass:subject ?Cls_S .
-  ?Cls_S jass:depend ?Cls_P .
+  ?Stc a jass:Sentence ; jass:subject [jass:depend ?Cls_P] .
 }THEN{
   ?Stc jass:predicate ?Cls_P .
 }
 
 # 目的語 (jass:object)
 IF{
-  ?Stc rdf:type jass:Sentence .
-  ?Stc jass:subject ?Cls_S .
-  ?Stc jass:predicate ?Cls_P .
-  ?Stc jass:clauseList ?list .
-  ?list rdf:rest*/rdf:first ?Cls_O .
-  ?Cls_O jass:depend ?Cls_P .
-  ?Cls_O jass:containsWord ?Adj .
-  ?Adj jass:pos "助詞" .
+  ?Stc	a jass:Sentence ;
+	jass:subject ?Cls_S ;
+	jass:predicate ?Cls_P ;
+	jass:clauseList [rdf:rest*/rdf:first ?Cls_O] .
+  ?Cls_O jass:depend ?Cls_P ;
+  	 jass:containsWord ?Adj .
+  ?Adj 	 jass:pos "助詞" .
+#  ?Adj jass:infinitive "に"} UNION {?Adj jass:infinitive "へ"} UNION {?Adj jass:infinitive "を"} .
 }THEN{
   ?Stc jass:objectSub ?Cls_O .
 }

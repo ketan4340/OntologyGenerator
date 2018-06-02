@@ -1,12 +1,12 @@
 # 概念階層 (rdfs:subClassOf)
 IF{
-  ?Stc rdf:type jass:Sentence .
-  ?Stc jass:subject ?Cls_S .
+  ?Stc a jass:Sentence ;
+	jass:subject ?Cls_S ;
+	jass:predicate ?Cls_P . 
   ?Cls_S jass:categoremMeans ?Cpt_S .
-  ?Stc jass:predicate ?Cls_P .
   ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "名詞" .
-  ?Wrd_P jass:means ?Cpt_P .  
+  ?Wrd_P jass:pos "名詞" ;
+	jass:means ?Cpt_P .  
 }THEN{
   ?Cpt_S rdfs:subClassOf ?Cpt_P .
 }

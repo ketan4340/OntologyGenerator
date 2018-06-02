@@ -30,8 +30,8 @@ public class Main4PerserTest {
 
 		///*
 		Generator generator = new Generator();
-		//Ontology ontology = generator.generate(nlLists);
-		Ontology ontology = generator.generate(textFilePath);
+		Ontology ontology = generator.generate(nlLists);
+		//Ontology ontology = generator.generate(textFilePath);
 		ontology.getTriples().stream().limit(20).forEach(System.out::println);
 		//*/
 	}
