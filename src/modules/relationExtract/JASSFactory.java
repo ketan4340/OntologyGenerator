@@ -102,11 +102,18 @@ public class JASSFactory {
 	}
 
 	private static Model word2jass(Model model, Word word, Resource clauseR) {
+		/*
+		if (isLiteral()) {
+			
+		} else {
+			
+		}
+		*/
 		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Wrd"+word.id)
 				.addProperty(RDF.type, model.getResource(WORD))
 				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.mainPoS()))
-				.addProperty( model.getProperty(POS), model.createLiteral(word.subPoS1()))
+				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS1()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS2()));
 
 		concept2jass(model, word.getConcept(), wordR);
@@ -140,44 +147,6 @@ public class JASSFactory {
 		defaultModel.setNsPrefixes(Namespace.prefixMap("RDF", "RDFS", "OWL", "DC", "DCTERMS", "SCHEMA", "JASS", "GOO"));
 		defaultModel.read("./resource/ontology/SyntaxOntology.owl", "RDF/XML");
 
-		/* クラスResource */
-		/*
-		Resource Paragraph = defaultModel.createResource(PARAGRAPH).addProperty(RDF.type, RDFS.Class);
-		Resource Sentence = defaultModel.createResource(SENTENCE).addProperty(RDF.type, RDFS.Class);
-		Resource Clause = defaultModel.createResource(CLAUSE).addProperty(RDF.type, RDFS.Class);
-		Resource Word = defaultModel.createResource(WORD).addProperty(RDF.type, RDFS.Class);
-		Resource Concept = defaultModel.createResource(CONCEPT).addProperty(RDF.type, RDFS.Class);
-		 //*/
-		/* プロパティResource */
-		/*
-		// 文用
-		Property contains_clause = defaultModel.createProperty(CONTAINS_CLAUSE);
-		contains_clause.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Sentence).addProperty(RDFS.range, Clause);
-		Property subject = defaultModel.createProperty(SUBJECT);
-		subject.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
-		Property predicate = defaultModel.createProperty(PREDICATE);
-		predicate.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
-		Property object = defaultModel.createProperty(OBJECT);
-		object.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_clause);
-		// 文節用
-		Property contains_word = defaultModel.createProperty(CONTAINS_WORD);
-		contains_word.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Word);
-		Property categorem = defaultModel.createProperty(CATEGOREM);
-		categorem.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_word);
-		Property adjunct = defaultModel.createProperty(ADJUNCT);
-		adjunct.addProperty(RDF.type, RDF.Property).addProperty(RDFS.subPropertyOf, contains_word);
-		Property depend = defaultModel.createProperty(DEPEND);
-		depend.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
-		Property next_clause = defaultModel.createProperty(DEPEND);
-		next_clause.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Clause).addProperty(RDFS.range, Clause);
-		// 単語用
-		Property infinitive = defaultModel.createProperty(INFINITIVE);
-		infinitive.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
-		Property pos = defaultModel.createProperty(POS);
-		pos.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, RDFS.Literal);
-		Property means = defaultModel.createProperty(MEANS);
-		means.addProperty(RDF.type, RDF.Property).addProperty(RDFS.domain, Word).addProperty(RDFS.range, Concept);
-		*/
 		return defaultModel;
 	}
 }
