@@ -31,7 +31,7 @@ IF{
   ?Cls_O jass:depend ?Cls_P ;
   	 jass:containsWord ?Adj .
   ?Adj 	 jass:pos "助詞" .
-#  ?Adj jass:infinitive "に"} UNION {?Adj jass:infinitive "へ"} UNION {?Adj jass:infinitive "を"} .
+#FILTER({?Adj jass:infinitive "に"} UNION {?Adj jass:infinitive "へ"} UNION {?Adj jass:infinitive "を"})
 }THEN{
   ?Stc jass:objectSub ?Cls_O .
 }

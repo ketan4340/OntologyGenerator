@@ -80,17 +80,14 @@ public class Generator {
 		//ontologyMap.setRuleID();
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
 		
-		Model unionModel = modelMap.uniteModels();
-
-		
-		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
+		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(modelMap));
 		
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
 		opm.outputDividedSentences(sentenceMap);
-		//opm.outputJASSGraph(JASSMap);
+		opm.outputJASSGraph(JASSMap);
 		opm.outputIDAsCSV(statementMap.createIDRelation());
-		opm.outputOntology(unionModel);
+		opm.outputOntology(modelMap);
 		opm.outputRDFRules(re.getOntologyRules());
 				
 		System.out.println("Finished.");
