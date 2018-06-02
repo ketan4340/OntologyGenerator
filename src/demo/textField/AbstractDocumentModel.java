@@ -17,7 +17,7 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 
 public abstract class AbstractDocumentModel extends PlainDocument{
-	private static final Path path = Paths.get("writings/gooText生物-動物名-あ.txt");
+	private static final Path path = Paths.get("./resource/input/goo/text/gooText生物-動物名-あ.txt");
 
 	public AbstractDocumentModel() {
 		super();
