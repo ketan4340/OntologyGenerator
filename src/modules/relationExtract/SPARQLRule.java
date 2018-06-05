@@ -1,5 +1,7 @@
 package modules.relationExtract;
 
+import java.util.Objects;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 
@@ -7,16 +9,19 @@ import data.id.Identifiable;
 
 public class SPARQLRule extends AbstractRDFRule implements Identifiable{
 	private static int sum = 0;
+	protected static final SPARQLRule EMPTY_RULE = new SPARQLRule("", "", "");
 	
 	private final int id;
+	private String name;
 	private String ifPattern;
 	private String thenPattern;
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public SPARQLRule(String ifPattern, String thenPattern) {
+	public SPARQLRule(String name, String ifPattern, String thenPattern) {
 		this.id = sum++;
+		setName(name);
 		setIfPattern(ifPattern);
 		setThenPattern(thenPattern);
 	}
@@ -50,6 +55,12 @@ public class SPARQLRule extends AbstractRDFRule implements Identifiable{
 	public int getID() {
 		return id;
 	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = Objects.isNull(name)||name.isEmpty()? "no name" : name;
+	}
 	public String getIfPattern() {
 		return ifPattern;
 	}
@@ -68,7 +79,7 @@ public class SPARQLRule extends AbstractRDFRule implements Identifiable{
 	/****************************************/
 	@Override
 	public String toString() {
-		return id + ":\tIF {"+ ifPattern +"\n} THEN {"+ thenPattern + "}";
+		return id + ":" + name + ":\tIF {"+ ifPattern +"\n} THEN {"+ thenPattern + "}";
 	}
 
 }

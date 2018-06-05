@@ -38,8 +38,8 @@ public class RelationExtractor {
 		this.ontologyRules = ontologyRules;
 	}
 	public RelationExtractor() {
-		this(RDFRuleReader.readRDFRules(Paths.get("resource/rule/extensionRules.txt")), 
-				RDFRuleReader.readRDFRules(Paths.get("resource/rule/ontologyRules.txt")));
+		this(RDFRuleReader.readNewRDFRules(Paths.get("resource/rule/extensionRules.txt")), 
+				RDFRuleReader.readNewRDFRules(Paths.get("resource/rule/ontologyRules.txt")));
 	}
 	
 

@@ -1,5 +1,5 @@
 # 概念階層 (rdfs:subClassOf)
-IF{
+IF () {
   ?Stc a jass:Sentence ;
 	jass:subject ?Cls_S ;
 	jass:predicate ?Cls_P . 
@@ -12,7 +12,7 @@ IF{
 }
 
 # 総称 (owl:sameAs)
-IF{
+IF (sameAs) {
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Cls_S jass:categoremMeans ?Cpt_S .
@@ -27,7 +27,7 @@ IF{
 }
 
 # 数値
-IF{
+IF (numeral value) {
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Cls_S jass:categoremMeans ?Cpt_S .
@@ -41,7 +41,7 @@ IF{
 }
 
 # 動詞 (jass:Action)
-IF{
+IF (Action-O) {
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
@@ -53,7 +53,7 @@ IF{
   ?Cpt_vb rdf:type jass:Action .
   ?Cpt_vb jass:domain ?Cpt_S .
 }
-IF{
+IF (Action-O(サ変)) {
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
@@ -65,7 +65,7 @@ IF{
   ?Cpt_vb rdf:type jass:Action .
   ?Cpt_vb jass:domain ?Cpt_S .
 }
-IF{
+IF (Action) {
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
@@ -80,7 +80,7 @@ IF{
   ?Cpt_vb jass:domain ?Cpt_S .
   ?Cpt_vb jass:range ?Cpt_O .
 }
-IF{
+IF(Action(サ変)){
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
@@ -98,7 +98,7 @@ IF{
 
 
 # 形容詞
-IF{
+IF(attributeOf){
   ?Stc rdf:type jass:Sentence .
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
