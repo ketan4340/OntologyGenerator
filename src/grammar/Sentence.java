@@ -23,16 +23,18 @@ import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.structure.GrammarInterface;
+import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>> 
-	implements GrammarInterface, Identifiable{
+public class Sentence extends SyntacticComponent<AbstractClause<?>> 
+	implements GrammarInterface, SyntacticChild, Identifiable{
 	private static int sum = 0;
 
 	public final int id;
 
+	private Paragraph parent;
 
 	/****************************************/
 	/**********     Constructor    **********/
@@ -693,6 +695,14 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	public int id() {
 		return getID();
 	}
+	@Override
+	public <P extends SyntacticComponent<?>> P getParent() {
+		return (P) parent;
+	}
+	@Override
+	public <P extends SyntacticComponent<?>> void setParent(P parent) {
+		this.parent = (Paragraph) parent;
+	}
 	
 	/****************************************/
 	/**********   Object  Method   **********/
@@ -701,4 +711,5 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 	public String toString() {
 		return children.stream().map(c -> c.toString()).collect(Collectors.joining());
 	}
+	
 }

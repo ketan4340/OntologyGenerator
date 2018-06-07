@@ -4,43 +4,46 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import grammar.structure.GrammarInterface;
+import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 import grammar.structure.SyntacticParent;
 
-public class Paragraph extends SyntacticComponent<Paragraph, Sentence> 
-	implements GrammarInterface {
+public class Paragraph extends SyntacticComponent<Sentence> 
+	implements GrammarInterface, SyntacticChild {
 	private static int paragraphSum = 0;
 	
 	private final int id;
-	private List<Sentence> sentences;
 	
+	private Writing parent;
 	
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public Paragraph(List<Sentence> sentences) {
 		super(sentences);
 		this.id = paragraphSum++;
-		this.sentences = sentences;
 	}
 	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	@Override
 	public String name() {
 		return getChildren().stream().map(s -> s.name()).collect(Collectors.joining());
 	}
 	@Override
-	public Paragraph getParent() {return this;}
+	public Writing getParent() {
+		return (Writing) parent;
+	}
 	@Override
-	public <Pr extends SyntacticParent> void setParent(Pr parent) {}
-
+	public <P extends SyntacticComponent<?>> void setParent(P parent) {
+		// TODO 自動生成されたメソッド・スタブ
+	}
 	
 	/****************************************/
 	/**********   Getter, Setter   **********/
@@ -48,16 +51,14 @@ public class Paragraph extends SyntacticComponent<Paragraph, Sentence>
 	public int getID() {
 		return id;
 	}
-	public List<Sentence> getSentences() {
-		return sentences;
-	}
 	
 	
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
-		return sentences.stream().map(s -> s.toString()).collect(Collectors.joining("\n"));
+		return children.stream().map(s -> s.toString()).collect(Collectors.joining("\n"));
 	}
+
 }

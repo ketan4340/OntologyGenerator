@@ -1,6 +1,5 @@
 package grammar.word;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,11 +11,12 @@ import grammar.structure.GrammarInterface;
 import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 
-public class Word extends SyntacticComponent<AbstractClause<?>, Word>
+public class Word 
 implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	private static int wordsSum = 0;
 
 	public final int id;
+	private AbstractClause<?> parent;
 	protected Concept concept;
 
 
@@ -24,7 +24,7 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	/**********  Constructor  **********/
 	/***********************************/
 	private Word() {
-		super(null);		//TODO 子要素はないってことでいいでしょう
+		//super(null);		//TODO 子要素はないってことでいいでしょう
 		this.id = wordsSum++;
 	}
 	public Word(Concept concept, AbstractClause<?> parentClause) {
@@ -65,15 +65,17 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	}
 
 
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	@Override
-	public List<Word> getChildren() {
-		return Arrays.asList(this);
+	public <P extends SyntacticComponent<?>> P getParent() {
+		return (P) parent;
 	}
 	@Override
-	public <Ch extends SyntacticChild> void setChildren(List<Ch> constituents) {}
+	public <P extends SyntacticComponent<?>> void setParent(P parent) {
+		this.parent = (AbstractClause<?>) parent;
+	}
 	@Override
 	public String name() {
 		return concept.name();
@@ -115,10 +117,9 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 		return concept.pronunciation();
 	}
 
-
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public int getID() {
 		return id;
 	}
@@ -133,11 +134,12 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	}
 
 
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return Objects.toString(concept, "nullConcept");
 	}
+
 }

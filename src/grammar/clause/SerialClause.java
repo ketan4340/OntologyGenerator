@@ -14,9 +14,9 @@ public class SerialClause extends AbstractClause<Phrase> {
 	//private final int id;
 	
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	private SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
 		//id = clausesSum++;

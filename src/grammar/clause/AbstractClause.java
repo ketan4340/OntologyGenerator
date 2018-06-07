@@ -12,26 +12,28 @@ import grammar.Concept;
 import grammar.Sentence;
 import grammar.morpheme.Morpheme;
 import grammar.structure.GrammarInterface;
+import grammar.structure.SyntacticChild;
 import grammar.structure.SyntacticComponent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public abstract class AbstractClause<W extends Word> extends SyntacticComponent<Sentence, Word> 
-	implements GrammarInterface {
+public abstract class AbstractClause<W extends Word> extends SyntacticComponent<Word> 
+	implements GrammarInterface, SyntacticChild {
 	private static int clausesSum = 0;
 	
 	public final int id;
 	
 	protected W categorem;				// 自立語
 	protected List<Adjunct> adjuncts; 	// 付属語
-	protected List<Word> others;			// 。などの記号
+	protected List<Word> others;		// 。などの記号
 	
 	protected AbstractClause<?> depending;		// 係り先文節.どのClauseに係るか
 
+	private Sentence parent;
 
-	/************************************/
-	/**********   Constructor  **********/
-	/************************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public AbstractClause(W categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
 		this.id = clausesSum++;
@@ -44,10 +46,9 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 		this.id = clausesSum++;
 	}
 	
-	
-	/************************************/
-	/**********  MemberMethod  **********/
-	/************************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public List<Word> words() {
 		List<Word> words = new ArrayList<>(4);
 		words.add(categorem);
@@ -188,19 +189,29 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 				.collect(Collectors.toSet());
 	}
 	
-
-	/*************************************/
-	/********** InterfaceMethod **********/
-	/*************************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	@Override
 	public String name() {
 		return getChildren().stream().map(w -> w.name()).collect(Collectors.joining());
 	}
-
+	@Override
+	public List<Word> getChildren() {
+		return linedupWords(categorem, adjuncts, others);
+	}
+	@Override
+	public Sentence getParent() {
+		return parent;
+	}
+	@Override
+	public <P extends SyntacticComponent<?>> void setParent(P parent) {
+		this.parent = (Sentence) parent;
+	}
 	
-	/*************************************/
-	/**********  Getter/Setter  **********/
-	/*************************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public int getID() {
 		return id;
 	}
@@ -228,15 +239,10 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	public void setDepending(AbstractClause<?> depending) {
 		this.depending = depending;
 	}
-	@Override
-	public List<Word> getChildren() {
-		return linedupWords(categorem, adjuncts, others);
-	}
 
-	
-	/*************************************/
-	/**********   ObjectMethod  **********/
-	/*************************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return getChildren().stream().map(w -> Objects.toString(w, "nullWord")+".").collect(Collectors.joining());

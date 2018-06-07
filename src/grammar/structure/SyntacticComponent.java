@@ -5,26 +5,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class SyntacticComponent<P extends SyntacticParent, C extends SyntacticChild> 
-	implements SyntacticParent, SyntacticChild
-{
-	protected P parent;
+public abstract class SyntacticComponent<C extends SyntacticChild> {
 	protected List<C> children;
 
-	
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public SyntacticComponent(List<C> constituents) {
 		this.children = constituents;
 		imprintThisOnChildren();
 	}
 
-	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
-	
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public boolean containsSubConstituents(List<C> subConstituents) {
 		int size = children.size();
 		int subsize = subConstituents.size();
@@ -79,27 +73,20 @@ public abstract class SyntacticComponent<P extends SyntacticParent, C extends Sy
 		return before == children.set(beforeIndex, after);
 	}
 	
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
-	public P getParent() {
-		return parent;
-	}
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public List<C> getChildren() {
-		return (List<C>) children;
+		return children;
 	}
-	public <Pr extends SyntacticParent> void setParent(Pr parent) {
-		this.parent = (P) parent;
+	public void setChildren(List<C> children) {
+		this.children = children;
 	}
-	public <Ch extends SyntacticChild> void setChildren(List<Ch> constituents) {
-		this.children = (List<C>) constituents;
-	}
-	
 
 
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return children.stream()
