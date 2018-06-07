@@ -88,16 +88,15 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 	 */
 	public static List<AbstractClause<?>> cloneAll(List<AbstractClause<?>> originClauses) {
 		// まずは複製
-		List<AbstractClause<?>> cloneClauses = originClauses.stream().map(origin -> origin.clone()).collect(Collectors.toList());
-
+		List<AbstractClause<?>> cloneClauses = originClauses.stream().map(AbstractClause::clone).collect(Collectors.toList());
+		ListIterator<AbstractClause<?>> itr_origin = originClauses.listIterator();
+		ListIterator<AbstractClause<?>> itr_clone = cloneClauses.listIterator();
+		
 		// 係り先があれば整え、なければnull
-		for (int i=0; i<originClauses.size(); i++) {
-			AbstractClause<?> origin = originClauses.get(i);
-			AbstractClause<?> clone = cloneClauses.get(i);
+		while (itr_origin.hasNext() && itr_clone.hasNext()) {
+			AbstractClause<?> origin = itr_origin.next(), clone = itr_clone.next();
 			int index2Dep = originClauses.indexOf(origin.getDepending());
-			clone.setDepending( (index2Dep != -1)
-					? cloneClauses.get(index2Dep)
-					: null);
+			clone.setDepending(index2Dep != -1? cloneClauses.get(index2Dep): null);
 		}
 		return cloneClauses;
 	}

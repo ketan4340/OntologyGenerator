@@ -2,9 +2,10 @@ package grammar.structure;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticChild> 
+public abstract class SyntacticComponent<P extends SyntacticParent, C extends SyntacticChild> 
 	implements SyntacticParent, SyntacticChild
 {
 	protected P parent;
@@ -36,7 +37,7 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 	}
 	
 	public boolean imprintThisOnChildren() {
-		if (children == null)
+		if (Objects.isNull(children))
 			return false;
 		children.forEach(c -> c.setParent(this));
 		return true;
@@ -47,27 +48,27 @@ public class SyntacticComponent<P extends SyntacticParent, C extends SyntacticCh
 	}
 	public List<Integer> indexesOfChildren(List<C> clauseList) {
 		List<Integer> indexList = new ArrayList<Integer>(clauseList.size());
-		for(final C clause: clauseList) {
+		for (final C clause: clauseList) {
 			indexList.add(indexOfChild(clause));
 		}
 		return indexList;
 	}
 	public C nextChild(C clause) {
 		int nextIndex = indexOfChild(clause)+1;
-		if(nextIndex < 0 || children.size() <= nextIndex)
+		if (nextIndex <= 0 || children.size() <= nextIndex)
 			return null;
 		return children.get(nextIndex);
 	}
 	public C previousChild(C clause) {
 		int prevIndex = indexOfChild(clause)-1;
-		if(prevIndex < 0 || children.size() <= prevIndex)
+		if (prevIndex < 0)
 			return null;
 		return children.get(prevIndex);
 	}
 	public C head() {
 		return children.get(0);
 	}
-	public C tailChild() {
+	public C tail() {
 		return children.get(children.size()-1);
 	}
 	

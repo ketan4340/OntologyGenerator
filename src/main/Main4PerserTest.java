@@ -15,7 +15,7 @@ public class Main4PerserTest {
 		String textFileName = args.length == 1?
 				args[0] :
 				"./resource/input/goo/text/gooText生物-動物名-あ.txt";
-		//textFileName = "./test/literalText.txt";
+		textFileName = "./test/literalText.txt";
 		Path textFilePath = Paths.get(textFileName);
 
 		String[] texts = {
@@ -28,11 +28,9 @@ public class Main4PerserTest {
 		};
 		List<NaturalLanguage> nlLists = Arrays.asList( NaturalLanguage.toNaturalLanguageArray(texts));
 
-		///*
 		Generator generator = new Generator();
-		Ontology ontology = generator.generate(nlLists);
-		//Ontology ontology = generator.generate(textFilePath);
+		//Ontology ontology = generator.generate(nlLists);
+		Ontology ontology = generator.generate(textFilePath);
 		ontology.getTriples().stream().limit(20).forEach(System.out::println);
-		//*/
 	}
 }

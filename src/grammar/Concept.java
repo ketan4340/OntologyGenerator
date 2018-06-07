@@ -26,7 +26,6 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	/***********************************/
 	private Concept(List<Morpheme> morphemes) {
 		this.morphemes = morphemes;
-
 		uniqueset.add(this);
 	}
 
@@ -49,17 +48,19 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 
 
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public boolean containsTag(String tag) {
 		return getTailMorpheme().containsTag(tag);
 	}
+	public boolean isComplex() {
+		return morphemes.size() > 1;
+	}
 
-
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	@Override
 	public int compareTo(Concept o) {
 		int comparison = 0;
@@ -76,7 +77,7 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	}
 	@Override
 	public String name() {
-		return morphemes.stream().map(m -> m.name()).collect(Collectors.joining());
+		return morphemes.stream().map(Morpheme::name).collect(Collectors.joining());
 	}
 	@Override
 	public String mainPoS() {

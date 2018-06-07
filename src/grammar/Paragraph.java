@@ -42,9 +42,9 @@ public class Paragraph extends SyntacticComponent<Paragraph, Sentence>
 	public <Pr extends SyntacticParent> void setParent(Pr parent) {}
 
 	
-	/***********************************/
-	/********** 	Getter/Setter **********/
-	/***********************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 	public int getID() {
 		return id;
 	}

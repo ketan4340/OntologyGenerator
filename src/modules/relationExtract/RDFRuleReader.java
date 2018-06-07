@@ -62,7 +62,6 @@ public class RDFRuleReader {
 	private static RDFRules createNewRules(String rulesString) {
 		return new RDFRules(SPLIT_RULES_PATTERN.splitAsStream(rulesString)
 				.map(RDFRuleReader::createSPARQLRule)
-				.peek(System.out::println)
 				.collect(Collectors.toCollection(LinkedHashSet::new)));
 	}	
 

@@ -157,7 +157,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<AbstractClause<?>> subjectList = subjectList(false);	// 主節のリスト
 
-		AbstractClause<?> lastClause = tailChild();	// 文の最後尾の文節
+		AbstractClause<?> lastClause = tail();	// 文の最後尾の文節
 		if ((lastClause instanceof Clause) && 			// 最後尾の文節がClauseインスタンスで
 				(subjectList.contains(lastClause))) {	// 主節である場合
 			// おそらく固有名詞を正しく判定できていないせい
@@ -197,25 +197,23 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			// 文頭の主語は全ての分割後の文に係る
 			List<AbstractClause<?>> commonSubjects = Clause.cloneAll(commonSubjectsOrigin);
 
-			if(fromIndex!=0) {		// 最初の分割文は、新たに主語を挿入する必要ない
+			if (fromIndex!=0) {		// 最初の分割文は、新たに主語を挿入する必要ない
 				AbstractClause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭文節
-				if(subjectList.contains(subSentFirst)) {			// それが主語なら
+				if (subjectList.contains(subSentFirst))				// それが主語なら
 					commonSubjectsOrigin.add(subSentFirst);			// 後続の短文にも係るので保管
-				}
-				subSent.children.addAll(0, commonSubjects);	// 共通の主語を挿入
+				subSent.children.addAll(0, commonSubjects);		// 共通の主語を先頭に挿入
 			}
 
-			for(Iterator<AbstractClause<?>> itr = commonSubjects.iterator(); itr.hasNext(); ) {
-				AbstractClause<?> commonSubject = itr.next();
-				commonSubject.setDepending(predicate);	// 係り先を正す
-			}
+			// 係り先を正す
+			commonSubjects.forEach(s -> s.setDepending(predicate));
+
 			subSent.gatherDepending(predicate);
 			shortSentList.add(subSent);
 
 			int commonSubjectsSize = commonSubjectsOrigin.size();
-			if(commonSubjectsSize > 1) {
+			if (commonSubjectsSize > 1) {
 				AbstractClause<?> nextClause = nextChild(predicate);
-				if(subjectList.contains(nextClause))	// かつ次が主語である
+				if (subjectList.contains(nextClause))	// かつ次が主語である
 					commonSubjectsOrigin.remove(commonSubjectsSize-1);
 			}
 			fromIndex = toIndex;
@@ -233,7 +231,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 		List<AbstractClause<?>> subjectList = subjectList(false);	// 主語のリスト
 		if (subjectList.isEmpty()) return partSentList;		// 文中に主語がなければ終了
 
-		AbstractClause<?> lastClause = tailChild();	// 文の最後尾Clause
+		AbstractClause<?> lastClause = tail();	// 文の最後尾Clause
 		if ((lastClause instanceof Clause) && 			// 最後尾の文節がClauseインスタンスで
 				(subjectList.contains(lastClause))) {	// 主節である場合
 			// おそらく固有名詞を正しく判定できていないせい
@@ -269,7 +267,7 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 
 		//List<Integer> commonObjects = new ArrayList<Integer>();	// 複数の述語にかかる目的語を保管
 
-		if(predicates.size() <= 1) { // 述語が一つならスルー
+		if (predicates.size() <= 1) { // 述語が一つならスルー
 			partSentList.add(this);
 			return partSentList;
 		}
@@ -287,14 +285,12 @@ public class Sentence extends SyntacticComponent<Paragraph, AbstractClause<?>>
 			
 			if (fromIndex != 0) {		// 最初の分割文は、新たに主語を挿入する必要ない
 				AbstractClause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭
-				if(subjectList.contains(subSentFirst)) {		// それが主語なら
+				if (subjectList.contains(subSentFirst))			// それが主語なら
 					commonSubjectsOrigin.add(subSentFirst);		// 後続の短文にも係るので保管
-				}
 				subSent.children.addAll(0, commonSubjects);	// 共通の主語を挿入
 			}
 			// 主語の係り先を正す
-			for (final AbstractClause<?> sbjClause : subSent.subjectList(false))
-				sbjClause.setDepending(predicate);
+			subSent.subjectList(false).forEach(s -> s.setDepending(predicate));
 			subSent.gatherDepending(predicate);
 
 			partSentList.add(subSent);

@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.jena.rdf.model.Model;
-
 import data.RDF.Ontology;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
@@ -54,8 +52,7 @@ public class Generator {
 		/*************************************/
 		/********** 構文解析モジュール **********/
 		/*************************************/
-		SyntacticParser sp = new SyntacticParser();
-		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
+		List<Sentence> sentenceList = new SyntacticParser().parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		
@@ -77,7 +74,6 @@ public class Generator {
 		RelationExtractor re = new RelationExtractor();
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
-		//ontologyMap.setRuleID();
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
 		
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(modelMap));
