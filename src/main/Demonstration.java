@@ -10,9 +10,16 @@ import demo.textField.DocumentView;
 import demo.textField.InputTextModel;
 import demo.textField.InputTextView;
 
-public class Main4Demo{
+public class Demonstration{
+	/****************************************/
+	/**********    Main  Method    **********/
+	/****************************************/
 	public static void main(String[] args) {
+		new Demonstration().execute();
+	}
+	
 
+	private void execute() {
 		/** Model生成 **/
 		InputTextModel iptModel = new InputTextModel();
 		OntologyModel ontModel = new OntologyModel();
