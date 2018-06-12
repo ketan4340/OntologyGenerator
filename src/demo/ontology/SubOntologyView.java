@@ -1,7 +1,5 @@
 package demo.ontology;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -9,6 +7,9 @@ import demo.controller.UseOntologyController;
 import demo.graph.OntologyGraphView;
 
 public class SubOntologyView extends JPanel{
+	private static final long serialVersionUID = 8844843627880177575L;
+
+
 	/**** Controller ****/
 	//private UseOntologyController useController;
 

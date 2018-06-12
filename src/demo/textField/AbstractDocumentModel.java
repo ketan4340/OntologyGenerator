@@ -17,6 +17,8 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 
 public abstract class AbstractDocumentModel extends PlainDocument{
+	private static final long serialVersionUID = 6284333991185192069L;
+
 	private static final Path path = Paths.get("./resource/input/goo/text/gooText生物-動物名-あ.txt");
 
 	public AbstractDocumentModel() {

@@ -8,9 +8,10 @@ import javax.swing.JScrollPane;
 
 import demo.controller.UseOntologyController;
 import demo.ontology.OntologyModel;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 
 public class OntologyGraphView extends JPanel{
+	private static final long serialVersionUID = 1470066400485596343L;
+
 	/**** Model ****/
 	private OntologyModel ontModel;
 

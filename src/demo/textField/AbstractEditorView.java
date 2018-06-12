@@ -10,12 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public abstract class AbstractEditorView extends JPanel{
-	/**** Model ****/
-	//protected AbstractDocumentModel edtModel;
-
-	/**** Controller ****/
-	//protected AbstractEditorController edtController;
-
+	private static final long serialVersionUID = -8352347499636273346L;
+	
 	/**** View ****/
 	protected JFrame parentFrame;
 

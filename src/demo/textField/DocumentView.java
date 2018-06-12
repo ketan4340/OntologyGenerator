@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 
@@ -12,6 +11,8 @@ import demo.controller.UseOntologyController;
 import demo.ontology.SubOntologyView;
 
 public class DocumentView extends AbstractEditorView{
+	private static final long serialVersionUID = -7215454239121272210L;
+
 	/**** Model ****/
 	private final DocumentModel docModel;
 

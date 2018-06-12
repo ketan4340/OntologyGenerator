@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -22,6 +20,8 @@ import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 
 /** TableModelクラス(3列限定)をモデルとして受け取り、グラフを生成する **/
 public class MyGraph extends BasicVisualizationServer<MyNode, MyEdge> implements TableModelListener{
+	private static final long serialVersionUID = 6142384106236482968L;
+	
 	/**** Model ****/
 	private final OntologyModel ontModel;
 

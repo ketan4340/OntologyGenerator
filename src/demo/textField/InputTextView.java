@@ -1,19 +1,14 @@
 package demo.textField;
 
-import java.util.List;
-
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 import demo.controller.BuildOntologyController;
-import edu.uci.ics.jung.graph.Graph;
 
 public class InputTextView extends AbstractEditorView{
+	private static final long serialVersionUID = 8179154552983594515L;
+
 	/**** Model ****/
 	private final InputTextModel iptModel;
 

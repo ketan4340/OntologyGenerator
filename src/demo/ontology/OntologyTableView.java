@@ -12,6 +12,8 @@ import demo.controller.BuildOntologyController;
 import demo.controller.UseOntologyController;
 
 public class OntologyTableView extends JPanel{
+	private static final long serialVersionUID = 4163061907899249756L;
+
 	/**** Model ****/
 	private OntologyModel ontModel;
 
