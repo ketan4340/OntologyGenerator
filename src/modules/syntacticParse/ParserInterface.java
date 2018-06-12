@@ -7,7 +7,7 @@ import java.util.List;
 import grammar.Concept;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import grammar.clause.Clause;
+import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
 import grammar.word.Word;
 
@@ -52,7 +52,7 @@ public interface ParserInterface {
 
 	/** Sentence1(Clause1(Word1,Word2,..),Clause2(Word,Word,..),Clause3(..),...)の構成に変換 **/
 	public Sentence decode2Sentence(List<String> parseResult4sentence);
-	public Clause decode2Clause(List<String> parseResult4clause);
+	public SingleClause decode2Clause(List<String> parseResult4clause);
 	public Word decode2Word(List<List<String>> parseResult4word);			// 複数の形態素からなる場合を考慮
 	public Concept decode2Concept(List<List<String>> parseResult4concept);	// Wordに同じ
 	public Morpheme decode2Morpheme(List<String> parseResult4morpheme);		// 形態素の情報が複数行の場合を考慮

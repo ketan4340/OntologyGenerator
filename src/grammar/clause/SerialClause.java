@@ -9,7 +9,7 @@ import grammar.word.Adjunct;
 import grammar.word.Phrase;
 import grammar.word.Word;
 
-public class SerialClause extends AbstractClause<Phrase> {
+public class SerialClause extends Clause<Phrase> {
 
 
 	/****************************************/
@@ -19,9 +19,9 @@ public class SerialClause extends AbstractClause<Phrase> {
 		super(categorem, adjuncts, others);
 	}
 	
-	public static SerialClause connectClauses(AbstractClause<?>... clauses) {
+	public static SerialClause connectClauses(Clause<?>... clauses) {
 		int tailIndex = clauses.length-1;
-		List<AbstractClause<?>> dependent = Arrays.asList(Arrays.copyOfRange(clauses, 0, tailIndex));
+		List<Clause<?>> dependent = Arrays.asList(Arrays.copyOfRange(clauses, 0, tailIndex));
 		Word head = clauses[tailIndex].categorem;
 		Phrase categorem = new Phrase(dependent, head); 
 		List<Adjunct> adjuncts = clauses[tailIndex].adjuncts;

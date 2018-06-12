@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import grammar.Concept;
-import grammar.clause.AbstractClause;
+import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 
 /**
@@ -14,7 +14,7 @@ import grammar.morpheme.Morpheme;
  */
 public class Phrase extends Word{
 
-	private List<AbstractClause<?>> dependent;	// 従属部
+	private List<Clause<?>> dependent;	// 従属部
 	private Word	 head;							// 主要部
 	
 	
@@ -22,12 +22,12 @@ public class Phrase extends Word{
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public Phrase(List<AbstractClause<?>> dependent, Word head) {
+	public Phrase(List<Clause<?>> dependent, Word head) {
 		super(concatConcept(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
 	}
-	private static Concept concatConcept(List<AbstractClause<?>> dependent, Word head) {
+	private static Concept concatConcept(List<Clause<?>> dependent, Word head) {
 		Stream<Morpheme> dependentMorphemes = dependent.stream()
 				.flatMap(c -> c.getChildren().stream())
 				.map(w -> w.concept)
@@ -45,7 +45,7 @@ public class Phrase extends Word{
 	 */
 	@Override
 	public Phrase clone() {
-		List<AbstractClause<?>> cloneDependent = dependent.stream()
+		List<Clause<?>> cloneDependent = dependent.stream()
 				.map(c -> c.clone()).collect(Collectors.toList());
 		Word cloneHead = head.clone();
 		return new Phrase(cloneDependent, cloneHead);

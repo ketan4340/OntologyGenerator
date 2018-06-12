@@ -8,7 +8,7 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.Namespace;
 import grammar.Concept;
 import grammar.Sentence;
-import grammar.clause.AbstractClause;
+import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.word.Word;
 
@@ -59,10 +59,10 @@ public class JASSFactory {
 		
 		sentence.getChildren().forEach(c -> clause2jass(model, c, sentenceR));
 		
-		for (AbstractClause<?> c : sentence.getChildren()) {
+		for (Clause<?> c : sentence.getChildren()) {
 
-			AbstractClause<?> depc = c.getDepending();
-			AbstractClause<?> nextc = sentence.nextChild(c);
+			Clause<?> depc = c.getDepending();
+			Clause<?> nextc = sentence.nextChild(c);
 			Resource cR = model.getResource(Namespace.JASS.getURI()+"Cls"+c.id);
 
 			if (depc != null) {
@@ -84,7 +84,7 @@ public class JASSFactory {
 		return model;
 	}
 	
-	private static Model clause2jass(Model model, AbstractClause<?> clause, Resource sentenceR) {
+	private static Model clause2jass(Model model, Clause<?> clause, Resource sentenceR) {
 		Resource clauseR = model.createResource(Namespace.JASS.getURI()+"Cls"+clause.id)
 				.addProperty(RDF.type, model.getResource(CLAUSE));
 		

@@ -1,7 +1,7 @@
 package grammar.word;
 
 import grammar.Concept;
-import grammar.clause.AbstractClause;
+import grammar.clause.Clause;
 
 public class Categorem extends Word{
 	public static final Categorem ZEROCATEGOREM = new Categorem(Concept.ZEROCONCEPT);
@@ -9,7 +9,7 @@ public class Categorem extends Word{
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public Categorem(Concept concept, AbstractClause<?> parentClause) {
+	public Categorem(Concept concept, Clause<?> parentClause) {
 		super(concept, parentClause);
 	}
 	public Categorem(Concept concept) {

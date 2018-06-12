@@ -1,14 +1,14 @@
 package grammar.word;
 
 import grammar.Concept;
-import grammar.clause.AbstractClause;
+import grammar.clause.Clause;
 
 public class Adjunct extends Word {
 
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public Adjunct(Concept concept, AbstractClause<?> parentClause) {
+	public Adjunct(Concept concept, Clause<?> parentClause) {
 		super(concept, parentClause);
 	}
 	public Adjunct(Concept concept) {

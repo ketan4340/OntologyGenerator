@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import grammar.clause.AbstractClause;
+import grammar.clause.Clause;
 import modules.syntacticParse.Cabocha;
 
 public class DictionaryEditor {
@@ -62,10 +62,10 @@ public class DictionaryEditor {
 
 			for (String interpretation : interpretations) {
 				Sentence sentence = cabocha.text2sentence(new NaturalLanguage(interpretation));
-				List<AbstractClause<?>> subjects = sentence.subjectList(false);
-				AbstractClause<?> firstSubjects = (subjects.isEmpty())? null : subjects.get(0);
+				List<Clause<?>> subjects = sentence.subjectList(false);
+				Clause<?> firstSubjects = (subjects.isEmpty())? null : subjects.get(0);
 				int subjectIndex = sentence.indexOfChild(firstSubjects); 
-				AbstractClause<?> firstCommaClause = sentence.findFirstClauseEndWith(new String[][]{{"、"}}, false);
+				Clause<?> firstCommaClause = sentence.findFirstClauseEndWith(new String[][]{{"、"}}, false);
 				int commaIndex = sentence.indexOfChild(firstCommaClause);
 				String text = (subjectIndex != -1 &&
 						(commaIndex == -1 || subjectIndex <= commaIndex))?

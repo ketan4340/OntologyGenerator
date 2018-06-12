@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 import grammar.Concept;
 import grammar.NaturalLanguage;
 import grammar.Sentence;
-import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
+import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
@@ -48,7 +48,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
 	 * 都度clearして使い回す.
 	 */
-	Map<AbstractClause<?>, Integer> dependingMap = new HashMap<>();
+	Map<Clause<?>, Integer> dependingMap = new HashMap<>();
 	
 	
 	/***********************************/
@@ -171,13 +171,13 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
 		dependingMap.clear();
 		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割	
-		List<AbstractClause<?>> clauses = clauseInfoList.stream()
+		List<Clause<?>> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
-				.map(clause -> (Clause) clause)
+				.map(clause -> (SingleClause) clause)
 				.collect(Collectors.toList());
 		return new Sentence(clauses, dependingMap);
 	}
-	public Clause decode2Clause(List<String> parsedInfo4clause) {
+	public SingleClause decode2Clause(List<String> parsedInfo4clause) {
 		//// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
 		int[] cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
@@ -200,7 +200,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 				.map(wordInfo -> decode2Word(Arrays.asList(wordInfo)))
 				.collect(Collectors.toList());
 		
-		Clause clause = new Clause(headWord, functionWords, otherWords);
+		SingleClause clause = new SingleClause(headWord, functionWords, otherWords);
 		dependingMap.put(clause, depIndex);
 		return clause;
 	}

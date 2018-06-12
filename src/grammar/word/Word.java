@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import grammar.Concept;
-import grammar.clause.AbstractClause;
+import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.Child;
@@ -12,14 +12,14 @@ import grammar.structure.GrammarInterface;
 
 public class Word 
 	implements GrammarInterface, PartOfSpeechInterface, 
-	Child<AbstractClause<? extends Word>>
+	Child<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;
 
 	public final int id;
 	
 	/** 単語の親要素，文節. */
-	protected AbstractClause<?> parentClause;
+	protected Clause<?> parentClause;
 	/** 事実上の子要素，概念. */
 	protected Concept concept;
 
@@ -27,7 +27,7 @@ public class Word
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public Word(Concept concept, AbstractClause<?> parentClause) {
+	public Word(Concept concept, Clause<?> parentClause) {
 		this.id = wordsSum++;
 		this.concept = concept;
 		setParent(parentClause);
@@ -69,11 +69,11 @@ public class Word
 	/**********  Interface Method  **********/
 	/****************************************/
 	@Override
-	public AbstractClause<? extends Word> getParent() {
+	public Clause<? extends Word> getParent() {
 		return parentClause;
 	}
 	@Override
-	public void setParent(AbstractClause<? extends Word> parent) {
+	public void setParent(Clause<? extends Word> parent) {
 		this.parentClause = parent;
 	}
 	@Override
