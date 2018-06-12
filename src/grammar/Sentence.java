@@ -22,19 +22,20 @@ import data.id.Identifiable;
 import grammar.clause.AbstractClause;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
+import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
-import grammar.structure.SyntacticChild;
-import grammar.structure.SyntacticComponent;
+import grammar.structure.Parent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public class Sentence extends SyntacticComponent<AbstractClause<?>> 
-	implements GrammarInterface, SyntacticChild, Identifiable{
+public class Sentence extends Parent<AbstractClause<?>>
+	implements GrammarInterface, Identifiable, Child<Paragraph> {
 	private static int sum = 0;
 
 	public final int id;
 
-	private Paragraph parent;
+	/** 文の親要素，段落. */
+	private Paragraph parentParagraph;
 
 	/****************************************/
 	/**********     Constructor    **********/
@@ -61,7 +62,7 @@ public class Sentence extends SyntacticComponent<AbstractClause<?>>
 		dependingMap.entrySet().stream().forEach(e -> {
 			AbstractClause<?> c = e.getKey();
 			int idxDep2 = e.getValue();
-			c.setDepending((idxDep2 == -1)? Clause.ROOT: children.get(idxDep2));
+			c.setDepending(idxDep2 == -1? Clause.ROOT: children.get(idxDep2));
 		});
 	}
 	
@@ -696,13 +697,19 @@ public class Sentence extends SyntacticComponent<AbstractClause<?>>
 		return getID();
 	}
 	@Override
-	public <P extends SyntacticComponent<?>> P getParent() {
-		return (P) parent;
+	public Paragraph getParent() {
+		return parentParagraph;
 	}
 	@Override
-	public <P extends SyntacticComponent<?>> void setParent(P parent) {
-		this.parent = (Paragraph) parent;
+	public void setParent(Paragraph parent) {
+		this.parentParagraph = parent;
 	}
+	@Override
+	public void setThisAsParent(AbstractClause<?> child) {
+		child.setParent(this);
+	}
+
+	
 	
 	/****************************************/
 	/**********   Object  Method   **********/

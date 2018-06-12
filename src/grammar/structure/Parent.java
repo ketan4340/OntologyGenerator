@@ -5,17 +5,38 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class SyntacticComponent<C extends SyntacticChild> {
+public abstract class Parent<C extends Child<? extends Parent<C>>> {
+	
 	protected List<C> children;
-
+	
+	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public SyntacticComponent(List<C> constituents) {
-		this.children = constituents;
+	public Parent(List<C> children) {
+		this.children = children;
 		imprintThisOnChildren();
 	}
 
+	protected boolean imprintThisOnChildren() {
+		if (Objects.isNull(children))
+			return false;
+		children.forEach(this::setThisAsParent);
+		return true;
+	}
+	public boolean replace(C before, C after) {
+		if (!getChildren().contains(before)) return false;
+		setThisAsParent(after);
+		int beforeIndex = getChildren().indexOf(before);
+		return before == getChildren().set(beforeIndex, after);
+	}
+	/** {@code Child#setParent(Parent<?>)}の{@code Parent<?>}が
+	 * 具象化された型になってから登録したいので，先送りする.
+	 * 「{@code Child}が{@code Parent}を受け取り自分のメンバに登録する」形ではなく，
+	 * 「{@code Parent}が{@code Child}を受け取り相手のメンバに登録させる」形で実装.  
+	 */
+	public abstract void setThisAsParent(C child);
+	
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
@@ -29,14 +50,7 @@ public abstract class SyntacticComponent<C extends SyntacticChild> {
 		}
 		return false;
 	}
-	
-	public boolean imprintThisOnChildren() {
-		if (Objects.isNull(children))
-			return false;
-		children.forEach(c -> c.setParent(this));
-		return true;
-	}
-	
+
 	public int indexOfChild(C predicate) {
 		return children.indexOf(predicate);
 	}
@@ -66,13 +80,7 @@ public abstract class SyntacticComponent<C extends SyntacticChild> {
 		return children.get(children.size()-1);
 	}
 	
-	public boolean replace(C before, C after) {
-		if (!children.contains(before)) return false;
-		after.setParent(this);
-		int beforeIndex = children.indexOf(before);
-		return before == children.set(beforeIndex, after);
-	}
-	
+
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
@@ -82,15 +90,15 @@ public abstract class SyntacticComponent<C extends SyntacticChild> {
 	public void setChildren(List<C> children) {
 		this.children = children;
 	}
-
-
+	
+	
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
 	@Override
 	public String toString() {
 		return children.stream()
-				.map(cons -> cons.toString())
+				.map(C::toString)
 				.collect(Collectors.joining());
 	}
 }

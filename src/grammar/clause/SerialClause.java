@@ -1,5 +1,6 @@
 package grammar.clause;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,17 +10,13 @@ import grammar.word.Phrase;
 import grammar.word.Word;
 
 public class SerialClause extends AbstractClause<Phrase> {
-	//private static int clausesSum = 0;
 
-	//private final int id;
-	
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
 	private SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
-		//id = clausesSum++;
 	}
 	
 	public static SerialClause connectClauses(AbstractClause<?>... clauses) {
@@ -36,9 +33,9 @@ public class SerialClause extends AbstractClause<Phrase> {
 
 	
 	
-	/***********************************/
-	/**********   Abstract    **********/
-	/***********************************/
+	/****************************************/
+	/**********  Abstract  Method  **********/
+	/****************************************/
 	@Override
 	public SerialClause clone() {
 		Phrase cloneCategorem = this.categorem.clone();
@@ -50,27 +47,45 @@ public class SerialClause extends AbstractClause<Phrase> {
 		return clone;
 	}
 	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
-	
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
+		
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	/*
 	public int getID() {
 		return id;
 	}
 	 */
+
+	@Override
+	public void setChildren(List<Word> words) {
+		Phrase phrase = null;
+		List<Adjunct> adjuncts = new ArrayList<>(2);
+		List<Word> others = new ArrayList<>(2);
+		for (Word word : words) {
+			if (word instanceof Phrase)
+				phrase = (Phrase) word;
+			else if (word instanceof Adjunct)
+				adjuncts.add((Adjunct) word);
+			else
+				others.add(word);
+		}
+		setCategorem(phrase);
+		setAdjuncts(adjuncts);
+		setOthers(others);
+	}
 	
-	/**********************************/
-	/**********    Getter    **********/
-	/**********************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
 
 
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	
 
 }

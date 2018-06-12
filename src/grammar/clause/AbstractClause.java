@@ -11,26 +11,35 @@ import java.util.stream.Stream;
 import grammar.Concept;
 import grammar.Sentence;
 import grammar.morpheme.Morpheme;
+import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
-import grammar.structure.SyntacticChild;
-import grammar.structure.SyntacticComponent;
+import grammar.structure.Parent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public abstract class AbstractClause<W extends Word> extends SyntacticComponent<Word> 
-	implements GrammarInterface, SyntacticChild {
+public abstract class AbstractClause<W extends Word> 
+	extends Parent<Word>
+	implements GrammarInterface, Child<Sentence> {
+	
 	private static int clausesSum = 0;
 	
 	public final int id;
+
+	/** 文節の親要素，文. */
+	private Sentence parentSentence;
 	
+	/** 文節の子要素 */
 	protected W categorem;				// 自立語
 	protected List<Adjunct> adjuncts; 	// 付属語
 	protected List<Word> others;		// 。などの記号
 	
 	protected AbstractClause<?> depending;		// 係り先文節.どのClauseに係るか
 
-	private Sentence parent;
-
+	/*
+	protected Mediator<Sentence, AbstractClause<?>> parentMediator;
+	protected Mediator<AbstractClause<?>, Word> childrenMediator;
+	 */
+	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -41,14 +50,14 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 		this.adjuncts = adjuncts;
 		this.others = others;
 	}
-	public AbstractClause(List<Word> constituents) {
-		super(constituents);
-		this.id = clausesSum++;
-	}
 	
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
+	/**
+	 * この文節を構成する単語のリスト. 
+	 * @return
+	 */
 	public List<Word> words() {
 		List<Word> words = new ArrayList<>(4);
 		words.add(categorem);
@@ -184,7 +193,7 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 
 
 	public Set<AbstractClause<?>> clausesDependThis() {
-		return parent.getChildren().stream()
+		return parentSentence.getChildren().stream()
 				.filter(c -> c.depending == this)
 				.collect(Collectors.toSet());
 	}
@@ -197,16 +206,28 @@ public abstract class AbstractClause<W extends Word> extends SyntacticComponent<
 		return getChildren().stream().map(w -> w.name()).collect(Collectors.joining());
 	}
 	@Override
+	/**
+	 * {@code AbstractClause}の子要素，{@code Word}のリストだけは
+	 * {@code Parent.children}とは別に管理しているので上書きする.
+	 */
 	public List<Word> getChildren() {
 		return linedupWords(categorem, adjuncts, others);
 	}
 	@Override
-	public Sentence getParent() {
-		return parent;
+	public void setChildren(List<Word> children) {
+		System.err.println("AbstractClause is not managing words as List<Word>.");
 	}
 	@Override
-	public <P extends SyntacticComponent<?>> void setParent(P parent) {
-		this.parent = (Sentence) parent;
+	public Sentence getParent() {
+		return parentSentence;
+	}
+	@Override
+	public void setParent(Sentence parent) {
+		this.parentSentence = parent;
+	}
+	@Override
+	public void setThisAsParent(Word child) {
+		child.setParent(this);
 	}
 	
 	/****************************************/

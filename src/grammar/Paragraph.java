@@ -3,20 +3,19 @@ package grammar;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
-import grammar.structure.SyntacticChild;
-import grammar.structure.SyntacticComponent;
-import grammar.structure.SyntacticParent;
+import grammar.structure.Parent;
 
-public class Paragraph extends SyntacticComponent<Sentence> 
-	implements GrammarInterface, SyntacticChild {
+public class Paragraph extends Parent<Sentence> 
+	implements GrammarInterface, Child<Writing> {
 	private static int paragraphSum = 0;
 	
 	private final int id;
 	
-	private Writing parent;
+	/** 段落の親要素，文章. */
+	private Writing parentWriting;
 	
-
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -38,11 +37,15 @@ public class Paragraph extends SyntacticComponent<Sentence>
 	}
 	@Override
 	public Writing getParent() {
-		return (Writing) parent;
+		return (Writing) parentWriting;
 	}
 	@Override
-	public <P extends SyntacticComponent<?>> void setParent(P parent) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void setParent(Writing parent) {
+		this.parentWriting = parent;
+	}
+	@Override
+	public void setThisAsParent(Sentence child) {
+		child.setParent(this);
 	}
 	
 	/****************************************/

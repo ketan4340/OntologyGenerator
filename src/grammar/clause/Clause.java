@@ -13,30 +13,24 @@ import grammar.word.Word;
 
 public class Clause extends AbstractClause<Categorem>{
 	public static final Clause ROOT = new Clause(Categorem.ZEROCATEGOREM, new ArrayList<>(), new ArrayList<>());
-	//private static int clausesSum = 0;
 
-	//private final int id;
 	
-
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	/**
-	 * 新型
+	 * 自立語，付属語のリスト，接辞のリストを受け取って初期化.
 	 * @param categorem
 	 * @param adjuncts
 	 * @param others
 	 */
 	public Clause(Categorem categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
-		//this.id = clausesSum++;
-		imprintThisOnChildren();
 	}
 
-	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	
 	/**
 	 * この文節に含まれる単語をOthers以外全て繋げて一つの名詞にする.
@@ -56,9 +50,9 @@ public class Clause extends AbstractClause<Categorem>{
 	}
 	
 	
-	/***********************************/
-	/**********   Abstract    **********/
-	/***********************************/
+	/****************************************/
+	/**********  Abstract  Method  **********/
+	/****************************************/
 	@Override
 	public Clause clone() {
 		Categorem cloneCategorem = this.categorem.clone();
@@ -71,23 +65,18 @@ public class Clause extends AbstractClause<Categorem>{
 	}
 	
 	
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
-	/*
-	public int getID() {
-		return id;
-	}
-	*/
-	
-	/**********************************/
-	/**********    Getter    **********/
-	/**********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 
 	
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
+
 	
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 
 }

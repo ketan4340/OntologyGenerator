@@ -7,28 +7,28 @@ import grammar.Concept;
 import grammar.clause.AbstractClause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
+import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
-import grammar.structure.SyntacticChild;
-import grammar.structure.SyntacticComponent;
 
 public class Word 
-implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
+	implements GrammarInterface, PartOfSpeechInterface, 
+	Child<AbstractClause<? extends Word>>
+{
 	private static int wordsSum = 0;
 
 	public final int id;
-	private AbstractClause<?> parent;
+	
+	/** 単語の親要素，文節. */
+	protected AbstractClause<?> parentClause;
+	/** 事実上の子要素，概念. */
 	protected Concept concept;
 
-
+	
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	private Word() {
-		//super(null);		//TODO 子要素はないってことでいいでしょう
-		this.id = wordsSum++;
-	}
 	public Word(Concept concept, AbstractClause<?> parentClause) {
-		this();
+		this.id = wordsSum++;
 		this.concept = concept;
 		setParent(parentClause);
 	}
@@ -69,12 +69,12 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	/**********  Interface Method  **********/
 	/****************************************/
 	@Override
-	public <P extends SyntacticComponent<?>> P getParent() {
-		return (P) parent;
+	public AbstractClause<? extends Word> getParent() {
+		return parentClause;
 	}
 	@Override
-	public <P extends SyntacticComponent<?>> void setParent(P parent) {
-		this.parent = (AbstractClause<?>) parent;
+	public void setParent(AbstractClause<? extends Word> parent) {
+		this.parentClause = parent;
 	}
 	@Override
 	public String name() {
@@ -141,5 +141,4 @@ implements GrammarInterface, SyntacticChild, PartOfSpeechInterface {
 	public String toString() {
 		return Objects.toString(concept, "nullConcept");
 	}
-
 }
