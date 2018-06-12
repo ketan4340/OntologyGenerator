@@ -20,9 +20,9 @@ public abstract class AbstractEditorView extends JPanel{
 	protected JEditorPane editorpane;
 
 
-	/*************************/
-	/****** コンストラクタ ******/
-	/*************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public AbstractEditorView() {
 		super();
 
@@ -43,10 +43,10 @@ public abstract class AbstractEditorView extends JPanel{
 	}
 
 	/* メニューの配置は子クラスで決める */
-	abstract protected void setMenu();
+	protected abstract void setMenu();
 
 	/* 使うドキュメントは子クラスで決めろや */
-	abstract protected void setDocument();
+	protected abstract void setDocument();
 
 
 	public void setParentFrame(JFrame pf) {

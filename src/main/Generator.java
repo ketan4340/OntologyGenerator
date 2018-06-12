@@ -1,8 +1,9 @@
-package modules;
+package main;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,21 +16,51 @@ import data.id.StatementIDMap;
 import grammar.NaturalLanguage;
 import grammar.NaturalParagraph;
 import grammar.Sentence;
+import modules.OutputManager;
 import modules.relationExtract.RelationExtractor;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-
+	/****************************************/
+	/**********    Main  Method    **********/
+	/****************************************/
+	public static void main(String[] args) {	
+		new Generator().execute(args.length == 1? args[0] : "");
+	}
+	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
 	public Generator() {}
 
+	
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
+	/** ジェネレータの実行. */
+	private void execute(String textFileName) {
+		//textFileName = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
+		textFileName = "./test/literalText.txt";
+		Path textFilePath = Paths.get(textFileName);
+
+		String[] texts = {
+			"クジラは哺乳類である。",
+			"カニの味噌汁は美味しいぞ",
+			"アイアイはアイアイ科の原始的な猿",
+			"ミュウは南アメリカに分布",
+			"馬は体長1メートルほど。",
+			"藍鮫はアイザメ科の海水魚の総称。"
+		};
+		List<NaturalLanguage> nlLists = Arrays.asList( NaturalLanguage.toNaturalLanguageArray(texts));
+
+		Generator generator = new Generator();
+		//Ontology ontology = generator.generate(nlLists);
+		Ontology ontology = generator.generate(textFilePath);
+		ontology.getTriples().stream().limit(20).forEach(System.out::println);
+	}
+	
 	public Ontology generate(Path textFile) {
 		return generateParagraphs(loadTextFile(textFile));
 	}

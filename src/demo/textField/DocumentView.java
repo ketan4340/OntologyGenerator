@@ -24,9 +24,9 @@ public class DocumentView extends AbstractEditorView{
 	SubOntologyView subOntView;
 
 
-	/*************************/
-	/****** コンストラクタ ******/
-	/*************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public DocumentView(UseOntologyController uCtrl) {
 		super();
 		this.useController = uCtrl;
@@ -47,18 +47,16 @@ public class DocumentView extends AbstractEditorView{
 	    importBt.addActionListener(useController.getImportTextAction());
 	    clearBt = new JButton("クリア");
 		clearBt.addActionListener(useController.getClearTextAction());
+		html_PlainTgBt = new JToggleButton("plain", false);
+		html_PlainTgBt.addItemListener(useController.getSwitchHTMLPlainAction());
+		clearBt = new JButton("クリア");
+		clearBt.addActionListener(useController.getClearTextAction());
 
 		menuPanel.add(importBt);
 		menuPanel.add(new JLabel("設定"));
 		menuPanel.add(Box.createGlue());	// 可変長の隙間を挿入
-
-		html_PlainTgBt = new JToggleButton("plain", false);
-		html_PlainTgBt.addItemListener(useController.getSwitchHTMLPlainAction());
 		menuPanel.add(html_PlainTgBt);
 		menuPanel.add(Box.createGlue());	// 可変長の隙間を挿入
-
-		clearBt = new JButton("クリア");
-		clearBt.addActionListener(useController.getClearTextAction());
 		menuPanel.add(clearBt);
 	}
 
