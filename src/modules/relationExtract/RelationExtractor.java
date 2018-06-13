@@ -1,5 +1,6 @@
 package modules.relationExtract;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,8 @@ import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
 
 public class RelationExtractor {
+	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt"); 
+	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
 	/**
 	 * 拡張ルール
 	 */
@@ -38,8 +41,8 @@ public class RelationExtractor {
 		this.ontologyRules = ontologyRules;
 	}
 	public RelationExtractor() {
-		this(RDFRuleReader.readNewRDFRules(Paths.get("resource/rule/extensionRules.txt")), 
-				RDFRuleReader.readNewRDFRules(Paths.get("resource/rule/ontologyRules.txt")));
+		this(RDFRuleReader.readNewRDFRules(EXTENSION_RULE_PATH),
+				RDFRuleReader.readNewRDFRules(ONTOLOGY_RULE_PATH));
 	}
 	
 

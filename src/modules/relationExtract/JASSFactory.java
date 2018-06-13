@@ -14,7 +14,8 @@ import grammar.word.Word;
 
 public class JASSFactory {
 	private static final Model commonModel = ModelFactory.createDefaultModel();
-
+	private static final String JASS_ONTOLOGY_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
+	
 	/********************************************/
 	/********** JASS Schema Definition **********/
 	/********************************************/
@@ -145,7 +146,7 @@ public class JASSFactory {
 	private static Model createDefaultJASSModel() {
 		Model defaultModel = ModelFactory.createDefaultModel();
 		defaultModel.setNsPrefixes(Namespace.prefixMap("RDF", "RDFS", "OWL", "DC", "DCTERMS", "SCHEMA", "JASS", "GOO"));
-		defaultModel.read("./resource/ontology/SyntaxOntology.owl", "RDF/XML");
+		defaultModel.read(JASS_ONTOLOGY_URL, "RDF/XML");
 
 		return defaultModel;
 	}
