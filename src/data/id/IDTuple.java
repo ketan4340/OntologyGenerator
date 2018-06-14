@@ -2,7 +2,7 @@ package data.id;
 
 import java.util.Arrays;
 
-import util.Tuple;
+import util.tuple.Tuple;
 
 public class IDTuple extends Tuple implements Cloneable{
 	private static final int SIZE 				= 10;

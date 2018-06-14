@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import util.Relation;
+import util.tuple.Relation;
 
 public class IDRelation extends Relation<IDTuple>{
 	private static final long serialVersionUID = 3136163355790663043L;

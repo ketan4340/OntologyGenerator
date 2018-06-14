@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 import grammar.structure.GrammarInterface;
-import util.UniqueSet;
-import util.Uniqueness;
+import util.uniqueSet.UniqueSet;
+import util.uniqueSet.Uniqueness;
 
 /**
  * もう使ってませーん。

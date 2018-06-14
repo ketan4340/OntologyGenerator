@@ -1,4 +1,4 @@
-package util;
+package util.tuple;
 
 import java.util.Collection;
 import java.util.HashSet;

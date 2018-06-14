@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.GrammarInterface;
-import util.UniqueSet;
-import util.Uniqueness;
+import util.uniqueSet.UniqueSet;
+import util.uniqueSet.Uniqueness;
 
 public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface {
 	private static UniqueSet<Concept> uniqueset = new UniqueSet<>(100);

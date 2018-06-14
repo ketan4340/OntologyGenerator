@@ -1,4 +1,4 @@
-package util;
+package util.tuple;
 
 import java.util.List;
 import java.util.stream.Collectors;
