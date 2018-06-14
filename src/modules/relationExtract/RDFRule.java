@@ -7,9 +7,9 @@ import org.apache.jena.query.QueryFactory;
 
 import data.id.Identifiable;
 
-public class SPARQLRule extends AbstractRDFRule implements Identifiable{
+public class RDFRule extends AbstractRDFRule implements Identifiable{
 	private static int sum = 0;
-	protected static final SPARQLRule EMPTY_RULE = new SPARQLRule("", "", "");
+	protected static final RDFRule EMPTY_RULE = new RDFRule("", "", "");
 	
 	private final int id;
 	private String name;
@@ -19,7 +19,7 @@ public class SPARQLRule extends AbstractRDFRule implements Identifiable{
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public SPARQLRule(String name, String ifPattern, String thenPattern) {
+	public RDFRule(String name, String ifPattern, String thenPattern) {
 		this.id = sum++;
 		setName(name);
 		setIfPattern(ifPattern);

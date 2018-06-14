@@ -70,13 +70,13 @@ public class RDFRuleReader {
 	 * @param ruleString
 	 * @return SPARQLルール
 	 */
-	private static SPARQLRule createSPARQLRule(String ruleString) {
+	private static RDFRule createSPARQLRule(String ruleString) {
 		Matcher matcherIFTHEN = WHOLE_IFTHEN_PATTERN.matcher(ruleString);
 		Matcher matcherArrow = WHOLE_ARROW_PATTERN.matcher(ruleString);
 		return 	matcherIFTHEN.matches()?
-					new SPARQLRule(matcherIFTHEN.group(NAME_IFTHEN), matcherIFTHEN.group(IF_PATTERN_IFTHEN), matcherIFTHEN.group(THEN_PATTERN_IFTHEN)) :
+					new RDFRule(matcherIFTHEN.group(NAME_IFTHEN), matcherIFTHEN.group(IF_PATTERN_IFTHEN), matcherIFTHEN.group(THEN_PATTERN_IFTHEN)) :
 				matcherArrow.matches()?
-					new SPARQLRule("arrowRule", matcherIFTHEN.group(IF_PATTERN_ARROW), matcherIFTHEN.group(THEN_PATTERN_ARROW)) :
-				SPARQLRule.EMPTY_RULE;
+					new RDFRule("arrowRule", matcherIFTHEN.group(IF_PATTERN_ARROW), matcherIFTHEN.group(THEN_PATTERN_ARROW)) :
+				RDFRule.EMPTY_RULE;
 	}
 }

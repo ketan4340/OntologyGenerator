@@ -13,14 +13,12 @@ import grammar.morpheme.Morpheme;
 import grammar.word.Word;
 
 public class JASSFactory {
-	private static final Model commonModel = ModelFactory.createDefaultModel();
 	private static final String JASS_ONTOLOGY_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
 	
 	/********************************************/
 	/********** JASS Schema Definition **********/
 	/********************************************/
 	/* クラスResource */
-    private static final String PARAGRAPH = Namespace.JASS.getURI() + "Paragraph";
 	private static final String SENTENCE = Namespace.JASS.getURI() + "Sentence";
 	private static final String CLAUSE = Namespace.JASS.getURI() + "Clause";
 	private static final String WORD = Namespace.JASS.getURI() + "Word";
@@ -30,17 +28,14 @@ public class JASSFactory {
 	/* 文用 */
 	private static final String CONTAINS_CLAUSE = Namespace.JASS.getURI() + "containsClause";
 	private static final String CLAUSE_LIST = Namespace.JASS.getURI() + "clauseList";
-	private static final String SUBJECT = Namespace.JASS.getURI() + "subject";
-    private static final String PREDICATE = Namespace.JASS.getURI() + "predicate";
-    private static final String OBJECT = Namespace.JASS.getURI() + "object";
-    private static final String MODIFIER = Namespace.JASS.getURI() + "object";
-    	/* 文節用 */
+	
+    /* 文節用 */
     private static final String CONTAINS_WORD = Namespace.JASS.getURI() + "containsWord";
     private static final String CATEGOREM = Namespace.JASS.getURI() + "categorem";
     private static final String ADJUNCT = Namespace.JASS.getURI() + "adjunct";
     private static final String DEPEND = Namespace.JASS.getURI() + "depend";
     private static final String NEXT_CLAUSE = Namespace.JASS.getURI() + "nextClause";
-    	/* 単語用 */
+    /* 単語用 */
     private static final String INFINITIVE = Namespace.JASS.getURI() + "infinitive";
     private static final String POS = Namespace.JASS.getURI() + "pos";
     private static final String MEANS = Namespace.JASS.getURI() + "means";
