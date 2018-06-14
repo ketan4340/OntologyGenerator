@@ -1,7 +1,6 @@
 package grammar.word;
 
 import java.util.List;
-import java.util.Objects;
 
 import grammar.Concept;
 import grammar.clause.Clause;
@@ -59,7 +58,8 @@ public class Word
 		return match;
 	}
 
-	/* 全く同じWordを複製する */
+	/** 全く同じWordを複製する */
+	@Override
 	public Word clone() {
 		return new Word(this.concept);
 	}
@@ -139,6 +139,6 @@ public class Word
 	/****************************************/
 	@Override
 	public String toString() {
-		return Objects.toString(concept, "nullConcept");
+		return concept.toString();
 	}
 }

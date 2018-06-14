@@ -3,7 +3,6 @@ package grammar.clause;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -215,7 +214,7 @@ public abstract class Clause<W extends Word>
 	}
 	@Override
 	public void setChildren(List<Word> children) {
-		System.err.println("AbstractClause is not managing words as List<Word>.");
+		super.setChildren(children);
 	}
 	@Override
 	public Sentence getParent() {
@@ -266,6 +265,8 @@ public abstract class Clause<W extends Word>
 	/****************************************/
 	@Override
 	public String toString() {
-		return getChildren().stream().map(w -> Objects.toString(w, "nullWord")+".").collect(Collectors.joining());
+		return getChildren().stream()
+				.map(Word::toString)
+				.collect(Collectors.joining("."));
 	}
 }

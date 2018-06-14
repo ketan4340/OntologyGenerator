@@ -98,7 +98,7 @@ public class Generator {
 		/* 長文を分割し複数の短文に分ける */
 		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentence();
-		
+		sentenceMap.forEachKey(System.out::println);	//TODO
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/

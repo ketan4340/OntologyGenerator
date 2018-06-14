@@ -14,7 +14,7 @@ public abstract class Parent<C extends Child<? extends Parent<C>>> {
 	/**********     Constructor    **********/
 	/****************************************/
 	public Parent(List<C> children) {
-		this.children = children;
+		setChildren(children);
 		imprintThisOnChildren();
 	}
 
@@ -27,8 +27,7 @@ public abstract class Parent<C extends Child<? extends Parent<C>>> {
 	public boolean replace(C before, C after) {
 		if (!getChildren().contains(before)) return false;
 		setThisAsParent(after);
-		int beforeIndex = getChildren().indexOf(before);
-		return before == getChildren().set(beforeIndex, after);
+		return before == children.set(children.indexOf(before), after);
 	}
 	/** {@code Child#setParent(Parent<?>)}の{@code Parent<?>}が
 	 * 具象化された型になってから登録したいので，先送りする.

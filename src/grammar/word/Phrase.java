@@ -14,23 +14,25 @@ import grammar.morpheme.Morpheme;
  */
 public class Phrase extends Word{
 
-	private List<Clause<?>> dependent;	// 従属部
-	private Word	 head;							// 主要部
+	/** 従属部 */
+	private List<? extends Clause<?>> dependent;
+	/** 主要部 */
+	private Word head;
 	
 	
 
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public Phrase(List<Clause<?>> dependent, Word head) {
+	public Phrase(List<? extends Clause<?>> dependent, Word head) {
 		super(concatConcept(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
 	}
-	private static Concept concatConcept(List<Clause<?>> dependent, Word head) {
+	private static Concept concatConcept(List<? extends Clause<?>> dependent, Word head) {
 		Stream<Morpheme> dependentMorphemes = dependent.stream()
 				.flatMap(c -> c.getChildren().stream())
-				.map(w -> w.concept)
+				.map(w -> w.getConcept())
 				.flatMap(c -> c.getMorphemes().stream());
 		Stream<Morpheme> headMorphemes = head.concept.getMorphemes().stream();
 		 List<Morpheme> morphemes = Stream.concat(dependentMorphemes, headMorphemes).collect(Collectors.toList());
@@ -57,6 +59,9 @@ public class Phrase extends Word{
 	/**********************************/
 	@Override
 	public String toString() {
-		return dependent.stream().map(d -> d.toString()).collect(Collectors.joining()) + head.toString();
+		return dependent.stream()
+				.map(Clause::toString)
+				.collect(Collectors.joining("/")) + 
+				"-" + head.toString();
 	}
 }

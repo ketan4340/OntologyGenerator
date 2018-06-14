@@ -13,11 +13,11 @@ import grammar.clause.Clause;
 
 public class SentenceReviser {
 
-	private static final String[][][] tags_CtgAdj = {
+	private static final String[][][] TAGS_CATEGOREM_ADJUNCTS = {
 			{{"サ変接続"}, {"動詞", "サ変・スル"}},
 			{{"動詞"}, {"動詞", "接尾"}}
 			};
-	private static final String[][][] tags_NP = {
+	private static final String[][][] TAGS_NOUNPHRASE = {
 			{{"形容詞", "-連用テ接続"}},
 			{{"連体詞"}},
 			{{"助詞", "連体化"}},
@@ -39,16 +39,15 @@ public class SentenceReviser {
 	/****************************************/
 	public Sentence connectWord(Sentence sentence) {
 		// サ変動詞と接尾をもつ動詞をつなげる
-		Stream.of(tags_CtgAdj).forEach(tag_CA -> {
+		Stream.of(TAGS_CATEGOREM_ADJUNCTS).forEach(tag_CA -> {
 			sentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tag_CA[0], tag_CA[1]));			
 		});
 		// 名詞と形容詞だけ取り出す
 		// これらがClauseの末尾につくものを隣のClauseにつなげる
-		Stream.of(tags_NP).forEach(tag_NP -> {
+		Stream.of(TAGS_NOUNPHRASE).forEach(tag_NP -> {
 			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true); 
-					matchedClause != null; ) {
-				if (!sentence.connect2Next(matchedClause)) 
-					break;
+					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
+				if (!sentence.connect2Next(matchedClause)) break;
 				matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
 			}
 		});

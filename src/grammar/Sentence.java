@@ -13,15 +13,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import data.RDF.MyResource;
 import data.RDF.Namespace;
 import data.RDF.RDFTriple;
 import data.id.Identifiable;
 import grammar.clause.Clause;
-import grammar.clause.SingleClause;
 import grammar.clause.SerialClause;
+import grammar.clause.SingleClause;
 import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
 import grammar.structure.Parent;
@@ -114,15 +113,18 @@ public class Sentence extends Parent<Clause<?>>
 		Clause<?> backClause = nextChild(frontClause);
 		if (backClause == null || backClause == SingleClause.ROOT) return false;
 
+		List<Clause<?>> backup = new ArrayList<>(children);
+		
 		SerialClause sc = SerialClause.connectClauses(frontClause, backClause);
 		if (!replace(backClause, sc)) return false;
-
-		Set<Clause<?>> formerDependeds = Stream
-				.concat(frontClause.clausesDependThis().stream(), backClause.clausesDependThis().stream())
-				.collect(Collectors.toSet());
+		if (!children.remove(frontClause)) {
+			setChildren(backup);
+			return false;
+		}
+		Set<Clause<?>> formerDependeds = frontClause.clausesDependThis();
+		formerDependeds.addAll(backClause.clausesDependThis());		
 		gatherDepending(sc, formerDependeds);
-		
-		return children.remove(frontClause) && children.remove(backClause);
+		return true; 
 	}
 	
 
@@ -716,7 +718,9 @@ public class Sentence extends Parent<Clause<?>>
 	/****************************************/
 	@Override
 	public String toString() {
-		return children.stream().map(c -> c.toString()).collect(Collectors.joining());
+		return children.stream()
+				.map(Clause::toString)
+				.collect(Collectors.joining("/"));
 	}
 	
 }

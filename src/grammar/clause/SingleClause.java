@@ -2,6 +2,7 @@ package grammar.clause;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +32,6 @@ public class SingleClause extends Clause<Categorem>{
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	
 	/**
 	 * この文節に含まれる単語をOthers以外全て繋げて一つの名詞にする.
 	 * 構文解析結果を無視して変更する強力な処理なので注意.
@@ -78,5 +78,9 @@ public class SingleClause extends Clause<Categorem>{
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
-
+	@Override
+	public String toString() {
+		return getChildren().stream()
+				.map(w -> Objects.toString(w, "Word"))
+				.collect(Collectors.joining("."));	}
 }

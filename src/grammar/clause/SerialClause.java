@@ -3,6 +3,7 @@ package grammar.clause;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import grammar.word.Adjunct;
@@ -19,6 +20,10 @@ public class SerialClause extends Clause<Phrase> {
 		super(categorem, adjuncts, others);
 	}
 	
+	
+	/****************************************/
+	/**********   Static  Method   **********/
+	/****************************************/
 	public static SerialClause connectClauses(Clause<?>... clauses) {
 		int tailIndex = clauses.length-1;
 		List<Clause<?>> dependent = Arrays.asList(Arrays.copyOfRange(clauses, 0, tailIndex));
@@ -30,7 +35,6 @@ public class SerialClause extends Clause<Phrase> {
 		sc.setDepending(clauses[tailIndex].depending);
 		return sc;
 	}
-
 	
 	
 	/****************************************/
@@ -54,12 +58,6 @@ public class SerialClause extends Clause<Phrase> {
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
-	/*
-	public int getID() {
-		return id;
-	}
-	 */
-
 	@Override
 	public void setChildren(List<Word> words) {
 		Phrase phrase = null;
@@ -86,6 +84,11 @@ public class SerialClause extends Clause<Phrase> {
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
-	
+	@Override
+	public String toString() {
+		return getChildren().stream()
+				.map(w -> Objects.toString(w, "Word"))
+				.collect(Collectors.joining(".", "[", "]"));
+	}
 
 }
