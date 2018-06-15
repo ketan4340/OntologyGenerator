@@ -37,7 +37,7 @@ public class Paragraph extends Parent<Sentence>
 	}
 	@Override
 	public Writing getParent() {
-		return (Writing) parentWriting;
+		return parentWriting;
 	}
 	@Override
 	public void setParent(Writing parent) {

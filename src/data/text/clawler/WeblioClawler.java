@@ -33,19 +33,24 @@ public class WeblioClawler extends DictionaryClawler{
 	/************************************/
 	/********** AbstractMethod **********/
 	/************************************/
+	@Override
 	String dicName() {return "weblio";}
+	@Override
 	boolean collectIndexURL() {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
+	@Override
 	boolean collectEntryURL() {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
+	@Override
 	String headword(Document document) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}
+	@Override
 	String interpretation(Document document) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;

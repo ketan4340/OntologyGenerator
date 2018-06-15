@@ -158,7 +158,7 @@ public class Sentence extends Parent<Clause<?>>
 	 * メインの主語が係る述語ごとに分割
 	 */
 	public List<Sentence> divide2() {
-		List<Sentence> shortSentList = new ArrayList<Sentence>(5);
+		List<Sentence> shortSentList = new ArrayList<>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<Clause<?>> subjectList = subjectList(false);	// 主節のリスト
 
@@ -231,7 +231,7 @@ public class Sentence extends Parent<Clause<?>>
 	 * 述語に係る{動詞,形容詞,名詞,~だ,接続助詞}ごとに分割
 	 */
 	public List<Sentence> divide3() {
-		List<Sentence> partSentList = new ArrayList<Sentence>(5);
+		List<Sentence> partSentList = new ArrayList<>(5);
 		/* 主語を全て探し，それらが連続しているか否かを調べる */
 		List<Clause<?>> subjectList = subjectList(false);	// 主語のリスト
 		if (subjectList.isEmpty()) return partSentList;		// 文中に主語がなければ終了
@@ -395,7 +395,7 @@ public class Sentence extends Parent<Clause<?>>
 
 	/** 文章から関係を見つけtripleにする */
 	public List<RDFTriple> extractRelation() {
-		List<RDFTriple> triples = new ArrayList<RDFTriple>();
+		List<RDFTriple> triples = new ArrayList<>();
 
 		List<Clause<?>> subjectList = subjectList(true);	// 主語を整えたところで再定義
 		if(subjectList.isEmpty()) {
@@ -554,7 +554,7 @@ public class Sentence extends Parent<Clause<?>>
 	/** (s,p,o)の三つ組を受け取り，domain，rangeの定義をする． */
 	private List<RDFTriple> makeObjectiveProperty(RDFTriple triple, boolean not) {
 		MyResource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
-		List<RDFTriple> triples = new LinkedList<RDFTriple>();
+		List<RDFTriple> triples = new LinkedList<>();
 
 		triples.add( new RDFTriple(p, MyResource.TYPE, MyResource.ACTION) );
 		
@@ -575,7 +575,7 @@ public class Sentence extends Parent<Clause<?>>
 	private List<RDFTriple> makeNegation(RDFTriple triple) {
 		MyResource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
 		
-		List<RDFTriple> triples = new LinkedList<RDFTriple>();
+		List<RDFTriple> triples = new LinkedList<>();
 		MyResource blank = new MyResource(Namespace.EMPTY, id + "-not");	// 空白ノードの名前を決める
 		triples.add(new RDFTriple(blank, MyResource.TYPE, new MyResource(Namespace.OWL, "NegativePropertyAssertion")));
 		triples.add(new RDFTriple(blank, new MyResource(Namespace.OWL, "sourceIndividual"), s));

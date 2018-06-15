@@ -1,6 +1,5 @@
 package grammar.structure;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -54,11 +53,7 @@ public abstract class Parent<C extends Child<? extends Parent<C>>> {
 		return children.indexOf(predicate);
 	}
 	public List<Integer> indexesOfChildren(List<C> clauseList) {
-		List<Integer> indexList = new ArrayList<Integer>(clauseList.size());
-		for (final C clause: clauseList) {
-			indexList.add(indexOfChild(clause));
-		}
-		return indexList;
+		return clauseList.stream().map(this::indexOfChild).collect(Collectors.toList());
 	}
 	public C nextChild(C clause) {
 		int nextIndex = indexOfChild(clause)+1;

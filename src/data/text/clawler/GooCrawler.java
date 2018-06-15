@@ -8,8 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -192,19 +190,24 @@ public class GooCrawler extends DictionaryClawler{
 	/************************************/
 	/********** AbstractMethod **********/
 	/************************************/
+	@Override
 	String dicName() {return "goo";}
+	@Override
 	boolean collectIndexURL() {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
+	@Override
 	boolean collectEntryURL() {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
+	@Override
 	String headword(Document document) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}
+	@Override
 	String interpretation(Document document) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
