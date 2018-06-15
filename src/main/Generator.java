@@ -42,7 +42,7 @@ public class Generator {
 	/** ジェネレータの実行. */
 	private void execute(String textFileName) {
 		//textFileName = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
-		textFileName = "./test/literalText.txt";
+		textFileName = "../OntologyGenerator/resource/input/test/literalText.txt";
 		Path textFilePath = Paths.get(textFileName);
 
 		String[] texts = {
