@@ -1,6 +1,5 @@
 package data.text;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import data.text.clawler.GooCrawler;

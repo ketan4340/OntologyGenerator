@@ -10,11 +10,11 @@ public class Clawler {
 	protected int interval;		// クローリングのスリープ間隔
 
 	
-	/************************************/
-	/**********   Constructor  **********/
-	/************************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public Clawler(int interval) {
-		this.interval = interval;
+		setInterval(interval);
 	}
 	
 	/**
@@ -32,5 +32,18 @@ public class Clawler {
 		}
 		return new Document("http://www.uec.ac.jp");
 	}
+
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
+	public int getInterval() {
+		return interval;
+	}
+
+	public void setInterval(int interval) {
+		this.interval = interval;
+	}
 		
+	
+	
 }
