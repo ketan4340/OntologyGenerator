@@ -15,9 +15,9 @@ import grammar.morpheme.Morpheme;
 public class Phrase extends Word{
 
 	/** 従属部 */
-	private List<? extends Clause<?>> dependent;
+	private final List<? extends Clause<?>> dependent;
 	/** 主要部 */
-	private Word head;
+	private final Word head;
 	
 	
 
@@ -59,9 +59,10 @@ public class Phrase extends Word{
 	/**********************************/
 	@Override
 	public String toString() {
-		return dependent.stream()
+		return "[" + 
+				dependent.stream()
 				.map(Clause::toString)
-				.collect(Collectors.joining("/")) + 
-				"-" + head.toString();
+				.collect(Collectors.joining("/")) + "-" + 
+				head.toString() + "]";
 	}
 }

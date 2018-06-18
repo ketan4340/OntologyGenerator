@@ -13,5 +13,4 @@ public interface Child<P extends Parent<? extends Child<P>>> {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	//List<Child<P>> brothers();
 }

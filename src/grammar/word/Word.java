@@ -63,6 +63,11 @@ public class Word
 	public Word clone() {
 		return new Word(this.concept);
 	}
+	
+	public boolean isLiteral() {
+		//concept.
+		return true;
+	}
 
 
 	/****************************************/

@@ -10,6 +10,7 @@ import grammar.Concept;
 import grammar.Sentence;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
+import grammar.word.Phrase;
 import grammar.word.Word;
 
 public class JASSFactory {
@@ -98,13 +99,10 @@ public class JASSFactory {
 	}
 
 	private static Model word2jass(Model model, Word word, Resource clauseR) {
-		/*
-		if (isLiteral()) {
-			
-		} else {
+		if (word instanceof Phrase) {
 			
 		}
-		*/
+		
 		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Wrd"+word.id)
 				.addProperty(RDF.type, model.getResource(WORD))
 				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))

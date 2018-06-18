@@ -61,19 +61,19 @@ public class SerialClause extends Clause<Phrase> {
 	@Override
 	public void setChildren(List<Word> words) {
 		Phrase phrase = null;
-		List<Adjunct> adjuncts = new ArrayList<>(2);
-		List<Word> others = new ArrayList<>(2);
+		List<Adjunct> newAdjuncts = new ArrayList<>(2);
+		List<Word> newOthers = new ArrayList<>(2);
 		for (Word word : words) {
 			if (word instanceof Phrase)
 				phrase = (Phrase) word;
 			else if (word instanceof Adjunct)
-				adjuncts.add((Adjunct) word);
+				newAdjuncts.add((Adjunct) word);
 			else
-				others.add(word);
+				newOthers.add(word);
 		}
 		setCategorem(phrase);
-		setAdjuncts(adjuncts);
-		setOthers(others);
+		setAdjuncts(newAdjuncts);
+		setOthers(newOthers);
 	}
 	
 	/****************************************/
@@ -88,7 +88,7 @@ public class SerialClause extends Clause<Phrase> {
 	public String toString() {
 		return getChildren().stream()
 				.map(w -> Objects.toString(w, "Word"))
-				.collect(Collectors.joining(".", "[", "]"));
+				.collect(Collectors.joining("."));
 	}
 
 }
