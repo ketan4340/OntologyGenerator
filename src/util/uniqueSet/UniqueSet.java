@@ -6,11 +6,10 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
-public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> implements Set<E>, Cloneable, java.io.Serializable {
+public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> implements Cloneable, java.io.Serializable {
 	private static final long serialVersionUID = 768173710L;
 
 	private transient HashMap<E, E> map;
@@ -86,6 +85,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 * @return an Iterator over the elements in this set
 	 * @see ConcurrentModificationException
 	 */
+	@Override
 	public Iterator<E> iterator() {
 		return map.keySet().iterator();
 	}
@@ -95,6 +95,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 *
 	 * @return the number of elements in this set (its cardinality)
 	 */
+	@Override
 	public int size() {
 		return map.size();
 	}
@@ -104,6 +105,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 *
 	 * @return <tt>true</tt> if this set contains no elements
 	 */
+	@Override
 	public boolean isEmpty() {
 		return map.isEmpty();
 	}
@@ -118,6 +120,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 *            element whose presence in this set is to be tested
 	 * @return <tt>true</tt> if this set contains the specified element
 	 */
+	@Override
 	public boolean contains(Object o) {
 		return map.containsKey(o);
 	}
@@ -135,6 +138,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 * @return <tt>true</tt> if this set did not already contain the specified
 	 *         element
 	 */
+	@Override
 	public boolean add(E e) {
 		return map.put(e, e) == null;
 	}
@@ -151,6 +155,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 *            object to be removed from this set, if present
 	 * @return <tt>true</tt> if the set contained the specified element
 	 */
+	@Override
 	public boolean remove(Object o) {
 		return map.remove(o) == o;
 	}
@@ -159,6 +164,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 * Removes all of the elements from this set. The set will be empty after this
 	 * call returns.
 	 */
+	@Override
 	public void clear() {
 		map.clear();
 	}
@@ -169,6 +175,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 *
 	 * @return a shallow copy of this set
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Object clone() {
 		try {
@@ -192,6 +199,7 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 	 * @return a {@code Spliterator} over the elements in this set
 	 * @since 1.8
 	 */
+	@Override
 	public Spliterator<E> spliterator() {
 		return Spliterators.spliterator(iterator(), size(), Spliterator.DISTINCT);
 		// 別案
@@ -202,9 +210,9 @@ public class UniqueSet<E extends Uniqueness<? super E>> extends AbstractSet<E> i
 
 	
 	
-	/**********************************/
-	/**********  独自メソッド  **********/
-	/**********************************/
+	/***************************************/
+	/**********  Original Method  **********/
+	/***************************************/
 	/**
 	 * 指定のインスタンスeとe.equals(t)==trueになるような要素tがあればtを返す．なければeを返す．
 	 * @param e setに存在するか確認したい要素．

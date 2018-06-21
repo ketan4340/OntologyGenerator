@@ -22,6 +22,7 @@ public class JASS {
 	public static final Resource Adjunct = Init.Adjunct();
 	public static final Resource Concept = Init.Concept();
 	
+	//public static final Property 
 	
 	public static class Init {
 	

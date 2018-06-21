@@ -1,10 +1,10 @@
 package grammar;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
@@ -13,20 +13,18 @@ import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
 public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface {
-	private static UniqueSet<Concept> uniqueset = new UniqueSet<>(100);
-
-	private final List<Morpheme> morphemes;	// 形態素たち
-
+	private static final UniqueSet<Concept> CONCEPTS_UNIQUESET = new UniqueSet<>(100);
+	public static final Concept EMPTY_CONCEPT = new Concept(Collections.emptyList());
 
 
-	public static final Concept ZEROCONCEPT = new Concept(new ArrayList<>());
+	private final List<Morpheme> morphemes;
 
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
 	private Concept(List<Morpheme> morphemes) {
 		this.morphemes = morphemes;
-		uniqueset.add(this);
+		CONCEPTS_UNIQUESET.add(this);
 	}
 
 	/**
@@ -36,16 +34,12 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	 */
 	public static Concept getOrNewInstance(List<Morpheme> morphemes) {
 		Concept c = new Concept(morphemes);
-		return uniqueset.getExistingOrIntact(c);
+		return CONCEPTS_UNIQUESET.getExistingOrIntact(c);
 	}
-	@SafeVarargs
-	public static Concept getOrNewInstance(List<String>... tagLists) {
-		List<Morpheme> morphemes = Stream.of(tagLists)
-				.map(name_tags -> Morpheme.getOrNewInstance(name_tags))
-				.collect(Collectors.toList());
-		return getOrNewInstance(morphemes);
+	public static Concept getOrNewInstance(Morpheme... morphemes) {
+		Concept c = new Concept(Arrays.asList(morphemes));
+		return CONCEPTS_UNIQUESET.getExistingOrIntact(c);
 	}
-
 
 
 	/****************************************/

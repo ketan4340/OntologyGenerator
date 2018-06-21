@@ -21,6 +21,8 @@ import data.id.Identifiable;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
+import grammar.morpheme.Morpheme;
+import grammar.morpheme.Tags;
 import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
 import grammar.structure.Parent;
@@ -382,7 +384,7 @@ public class Sentence extends Parent<Clause<?>>
 			if (!sbjCnt) break;	// 連続した主語の最後尾には必要ない
 
 			// 助詞・連体化"の"を新たに用意
-			Concept noCp = Concept.getOrNewInstance(Arrays.asList("の","助詞","連体化","*","*","*","*","の","ノ","ノ"));
+			Concept noCp = Concept.getOrNewInstance(Morpheme.getOrNewInstance("の",new Tags("助詞","連体化","*","*","*","*","の","ノ","ノ")));
 			Adjunct no = new Adjunct(noCp);
 			int index_Ha = subject.indexOfChild(subject.collectWordsHaveAll(tag_Ha).get(0));
 			subject.words().set(index_Ha, no);	// "は"の代わりに"の"を挿入

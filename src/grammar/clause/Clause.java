@@ -16,10 +16,8 @@ import grammar.structure.Parent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public abstract class Clause<W extends Word> 
-	extends Parent<Word>
-	implements GrammarInterface, Child<Sentence> {
-	
+public abstract class Clause<W extends Word> extends Parent<Word>
+implements GrammarInterface, Child<Sentence> {	
 	private static int clausesSum = 0;
 	
 	public final int id;
@@ -34,10 +32,6 @@ public abstract class Clause<W extends Word>
 	
 	protected Clause<?> depending;		// 係り先文節.どのClauseに係るか
 
-	/*
-	protected Mediator<Sentence, AbstractClause<?>> parentMediator;
-	protected Mediator<AbstractClause<?>, Word> childrenMediator;
-	 */
 	
 	/****************************************/
 	/**********     Constructor    **********/
@@ -90,6 +84,7 @@ public abstract class Clause<W extends Word>
 
 
 	/** 全く同じClauseを複製する */
+	@Override
 	public abstract Clause<?> clone();
 	
 	/**

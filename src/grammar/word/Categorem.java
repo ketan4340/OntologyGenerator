@@ -4,7 +4,7 @@ import grammar.Concept;
 import grammar.clause.Clause;
 
 public class Categorem extends Word{
-	public static final Categorem ZEROCATEGOREM = new Categorem(Concept.ZEROCONCEPT);
+	public static final Categorem ZEROCATEGOREM = new Categorem(Concept.EMPTY_CONCEPT);
 
 	/***********************************/
 	/**********  Constructor  **********/

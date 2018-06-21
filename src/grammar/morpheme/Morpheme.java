@@ -3,59 +3,46 @@ package grammar.morpheme;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.jena.rdf.model.Resource;
+
+import data.RDF.RDFconvertable;
 import grammar.structure.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfSpeechInterface {
-	private static UniqueSet<Morpheme> uniqueset = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
+public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfSpeechInterface, RDFconvertable {
+	private static UniqueSet<Morpheme> MORPHEMES_UNIQUESET = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
 
-	public final int id;			// 通し番号
+	public final int id;		// 通し番号
 	private final String name;	// 形態素の文字列
-	private final Tags tags;		// 品詞リスト
+	private final Tags tags;	// 品詞リスト
 
-
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	private Morpheme(String name, Tags tags) {
-		this.id = uniqueset.size();
+		this.id = MORPHEMES_UNIQUESET.size();
 		this.name = name;
 		this.tags = tags;
 
-		Morpheme.uniqueset.add(this);
+		Morpheme.MORPHEMES_UNIQUESET.add(this);
 	}
-	private Morpheme(String name, List<String> tagList) {
-		this(name, new Tags(tagList));
-	}
-	private Morpheme(List<String> name_tags) {
-		this(name_tags.get(0), name_tags.subList(1, name_tags.size()));
-	}
-
 	public static Morpheme getOrNewInstance(String name, Tags tags) {
-		return uniqueset.getExistingOrIntact(new Morpheme(name, tags));
-	}
-	public static Morpheme getOrNewInstance(String name, List<String> tags) {
-		return uniqueset.getExistingOrIntact(new Morpheme(name, tags));
-	}
-	public static Morpheme getOrNewInstance(List<String> name_tags) {
-		return uniqueset.getExistingOrIntact(new Morpheme(name_tags));
+		return MORPHEMES_UNIQUESET.getExistingOrIntact(new Morpheme(name, tags));
 	}
 
 
-
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	public boolean containsTag(String tag) {
 		return tags.contains(tag);
 	}
 
 
-
-	/***********************************/
-	/**********   Interface   **********/
-	/***********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
 	@Override
 	public int compareTo(Morpheme o) {
 		int comparison = name.compareTo(o.name);
@@ -101,25 +88,30 @@ public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfS
 	public String pronunciation() {
 		return tags.pronunciation();
 	}
+	@Override
+	public Resource toRDF() {
+		
+		return null;
+	}
 
-	/**********************************/
-	/**********    Getter    **********/
-	/**********************************/
+	
+	/****************************************/
+	/**********       Getter       **********/
+	/****************************************/
 	public String getName() {
 		return name;
 	}
 	public Tags getTags() {
 		return tags;
 	}
-	/**********   準Getter   **********/
+	/**********     Sub Getter     **********/
 	public List<String> tags() {
 		return tags.getTagList();
 	}
 
-
-	/**********************************/
-	/********** ObjectMethod **********/
-	/**********************************/
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -153,6 +145,4 @@ public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfS
 	public String toString() {
 		return Objects.toString(name, "nullMorpheme");
 	}
-
-
 }

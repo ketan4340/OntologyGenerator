@@ -6,25 +6,19 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.Namespace;
+import data.RDF.vocabulary.JASS;
 import grammar.Concept;
 import grammar.Sentence;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
-import grammar.word.Phrase;
 import grammar.word.Word;
 
 public class JASSFactory {
 	private static final String JASS_ONTOLOGY_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
-	
+
 	/********************************************/
 	/********** JASS Schema Definition **********/
 	/********************************************/
-	/* クラスResource */
-	private static final String SENTENCE = Namespace.JASS.getURI() + "Sentence";
-	private static final String CLAUSE = Namespace.JASS.getURI() + "Clause";
-	private static final String WORD = Namespace.JASS.getURI() + "Word";
-	private static final String CONCEPT = Namespace.JASS.getURI() + "Concept";
-
 	/* プロパティResource */
 	/* 文用 */
 	private static final String CONTAINS_CLAUSE = Namespace.JASS.getURI() + "containsClause";
@@ -40,16 +34,19 @@ public class JASSFactory {
     private static final String INFINITIVE = Namespace.JASS.getURI() + "infinitive";
     private static final String POS = Namespace.JASS.getURI() + "pos";
     private static final String MEANS = Namespace.JASS.getURI() + "means";
-	private static final String MORPHEME_LIST = Namespace.JASS.getURI() + "morphemeList";
+    private static final String MORPHEME_LIST = Namespace.JASS.getURI() + "morphemeList";
 
 
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public static Model createJASSModel(Sentence sentence) {
 		return sentence2jass(createDefaultJASSModel(), sentence);
 	}
 	
 	private static Model sentence2jass(Model model, Sentence sentence) {
 		Resource sentenceR = model.createResource(Namespace.JASS.getURI()+"Stc"+sentence.id)
-				.addProperty(RDF.type, model.getResource(SENTENCE));
+				.addProperty(RDF.type, JASS.Sentence);
 		
 		Resource clauseNode = model.createResource();
 		sentenceR.addProperty(model.getProperty(CLAUSE_LIST), clauseNode); 
@@ -83,7 +80,7 @@ public class JASSFactory {
 	
 	private static Model clause2jass(Model model, Clause<?> clause, Resource sentenceR) {
 		Resource clauseR = model.createResource(Namespace.JASS.getURI()+"Cls"+clause.id)
-				.addProperty(RDF.type, model.getResource(CLAUSE));
+				.addProperty(RDF.type, JASS.Clause);
 		
 		sentenceR.addProperty(model.getProperty(CONTAINS_CLAUSE), clauseR);
 		
@@ -98,13 +95,9 @@ public class JASSFactory {
 		return model;
 	}
 
-	private static Model word2jass(Model model, Word word, Resource clauseR) {
-		if (word instanceof Phrase) {
-			
-		}
-		
+	private static Model word2jass(Model model, Word word, Resource clauseR) {	
 		Resource wordR = model.createResource(Namespace.JASS.getURI()+"Wrd"+word.id)
-				.addProperty(RDF.type, model.getResource(WORD))
+				.addProperty(RDF.type, JASS.Word)
 				.addProperty(model.getProperty(INFINITIVE), model.createLiteral(word.infinitive()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.mainPoS()))
 				.addProperty(model.getProperty(POS), model.createLiteral(word.subPoS1()))
@@ -118,7 +111,7 @@ public class JASSFactory {
 	private static Model concept2jass(Model model, Concept concept, Resource wordR) {
 		Resource conceptR =
 				model.createResource(Namespace.GOO.getURI() + concept.name())
-					.addProperty(RDF.type, model.getResource(CONCEPT));
+					.addProperty(RDF.type, JASS.Concept);
 
 		Resource morphemeNode = model.createResource();
 		wordR.addProperty(model.getProperty(MORPHEME_LIST), morphemeNode);
