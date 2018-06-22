@@ -67,7 +67,6 @@ public class JASSFactory {
 			Resource nextcR = model.getResource(Namespace.JASS.getURI()+"Cls"+nextc.id);
 			cR.addProperty(model.getProperty(NEXT_CLAUSE), nextcR);
 			}
-			
 			Resource nextClauseNode = model.createResource();
 			clauseNode.addProperty(RDF.first, cR)
 				.addProperty(RDF.rest, nextClauseNode);

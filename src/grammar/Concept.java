@@ -29,7 +29,7 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 
 	/**
 	 * 同一の概念が存在していればそれを，なければ新しいインスタンスを作って返す.
-	 * @param morphemes
+	 * @param morphemes 形態素のリストか配列
 	 * @return 渡された文字列と形態素に一致する概念
 	 */
 	public static Concept getOrNewInstance(List<Morpheme> morphemes) {
@@ -55,6 +55,10 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
+	@Override
+	public int id() {
+		return id;
+	}
 	@Override
 	public int compareTo(Concept o) {
 		int comparison = 0;

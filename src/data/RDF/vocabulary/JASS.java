@@ -21,6 +21,7 @@ public class JASS {
 	public static final Resource Categorem = Init.Categorem();
 	public static final Resource Adjunct = Init.Adjunct();
 	public static final Resource Concept = Init.Concept();
+	public static final Resource Morpheme = Init.Morpheme();
 	
 	//public static final Property 
 	
@@ -55,6 +56,9 @@ public class JASS {
 		}
 		public static Resource Concept() {
 			return new ResourceImpl(uri, "Concept");
+		}
+		public static Resource Morpheme() {
+			return new ResourceImpl(uri, "Morpheme");
 		}
 		
 		public static Property pos() {

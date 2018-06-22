@@ -1,16 +1,21 @@
 package grammar.morpheme;
 
-import java.util.List;
 import java.util.Objects;
 
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 
+import data.RDF.Namespace;
 import data.RDF.RDFconvertable;
+import data.RDF.vocabulary.JASS;
+import data.id.Identifiable;
 import grammar.structure.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfSpeechInterface, RDFconvertable {
+public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, 
+PartOfSpeechInterface, Identifiable, RDFconvertable {
 	private static UniqueSet<Morpheme> MORPHEMES_UNIQUESET = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
 
 	public final int id;		// 通し番号
@@ -43,6 +48,10 @@ public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfS
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
+	@Override
+	public int id() {
+		return id;
+	}
 	@Override
 	public int compareTo(Morpheme o) {
 		int comparison = name.compareTo(o.name);
@@ -89,9 +98,18 @@ public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfS
 		return tags.pronunciation();
 	}
 	@Override
-	public Resource toRDF() {
-		
-		return null;
+	public Resource toRDF(Model model) {
+		Resource morphemeNode = model.createResource(JASS.uri+getClass().getSimpleName()+id());
+		wordR.addProperty(model.getProperty(MORPHEME_LIST), morphemeNode);
+
+		for (Morpheme m : concept.getMorphemes()) {
+			Resource mrpR = model.getResource(Namespace.JASS.getURI()+"Mrp"+m.id);
+			Resource nextMorphemeNode = model.createResource();
+			morphemeNode.addProperty(RDF.first, mrpR)
+				.addProperty(RDF.rest, nextMorphemeNode);
+			morphemeNode = nextMorphemeNode;
+		}
+		return ; 
 	}
 
 	
@@ -104,10 +122,7 @@ public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, PartOfS
 	public Tags getTags() {
 		return tags;
 	}
-	/**********     Sub Getter     **********/
-	public List<String> tags() {
-		return tags.getTagList();
-	}
+
 
 	/****************************************/
 	/**********   Object  Method   **********/
