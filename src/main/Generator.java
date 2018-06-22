@@ -1,4 +1,4 @@
-package main;
+﻿package main;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,6 +36,7 @@ public class Generator {
 	public Generator() {}
 
 	
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
