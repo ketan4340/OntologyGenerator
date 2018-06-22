@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
+import data.id.Identifiable;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface {
+public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface, Identifiable {
 	private static final UniqueSet<Concept> CONCEPTS_UNIQUESET = new UniqueSet<>(100);
 	public static final Concept EMPTY_CONCEPT = new Concept(Collections.emptyList());
 
