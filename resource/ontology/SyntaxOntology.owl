@@ -146,6 +146,7 @@
         <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/categorem"/>
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SerialClause"/>
         <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase"/>
+        <rdfs:comment xml:lang="ja">連文節にとっての自立語 (句) を指定する．</rdfs:comment>
     </owl:ObjectProperty>
     
 
@@ -156,6 +157,7 @@
         <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/categorem"/>
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause"/>
         <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Categorem"/>
+        <rdfs:comment xml:lang="ja">単文節にとっての自立語 (句以外の単語) を指定する．</rdfs:comment>
     </owl:ObjectProperty>
     
 
@@ -182,6 +184,17 @@
     
 
 
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/conjugation -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/conjugation">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="ja">活用型</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/infinitive -->
 
     <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/infinitive">
@@ -193,6 +206,48 @@
     
 
 
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/inflection -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/inflection">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="ja">活用形</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/kana -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/kana">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="ja">読み仮名</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/mainPoS -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/mainPoS">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+        <rdfs:label xml:lang="ja">品詞</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/name -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/name">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="ja">表層形 (入力通りの文字列)</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos -->
 
     <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos">
@@ -200,6 +255,44 @@
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">品詞</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/pronunciation -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pronunciation">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="ja">発音</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS1 -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS1">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+        <rdfs:label xml:lang="ja">品詞細分類1</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS2 -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS2">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+        <rdfs:label xml:lang="ja">品詞細分類2</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS3 -->
+
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS3">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+        <rdfs:label xml:lang="ja">品詞細分類3</rdfs:label>
     </owl:DatatypeProperty>
     
 

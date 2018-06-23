@@ -23,7 +23,17 @@ public class JASS {
 	public static final Resource Concept = Init.Concept();
 	public static final Resource Morpheme = Init.Morpheme();
 	
-	//public static final Property 
+	public static final Property name = Init.name();
+	public static final Property pos = Init.pos();
+	public static final Property mainPoS = Init.mainPoS();
+	public static final Property subPoS1 = Init.subPoS1();
+	public static final Property subPoS2 = Init.subPoS2();
+	public static final Property subPoS3 = Init.subPoS3();
+	public static final Property inflection = Init.inflection();
+	public static final Property conjugation = Init.conjugation();
+	public static final Property infinitive = Init.infinitive();
+	public static final Property kana = Init.kana();
+	public static final Property pronunsiation = Init.pronunsiation();
 	
 	public static class Init {
 	
@@ -61,10 +71,39 @@ public class JASS {
 			return new ResourceImpl(uri, "Morpheme");
 		}
 		
+		public static Property name() {
+			return new PropertyImpl(uri, "name");
+		}
 		public static Property pos() {
 			return new PropertyImpl(uri, "pos");
 		}
+		public static Property mainPoS() {
+			return new PropertyImpl(uri, "mainPoS");
+		}
+		public static Property subPoS1() {
+			return new PropertyImpl(uri, "subPoS1");
+		}
+		public static Property subPoS2() {
+			return new PropertyImpl(uri, "subPoS2");
+		}
+		public static Property subPoS3() {
+			return new PropertyImpl(uri, "subPoS3");
+		}
+		public static Property inflection() {
+			return new PropertyImpl(uri, "infinitive");
+		}
+		public static Property conjugation() {
+			return new PropertyImpl(uri, "conjugation");
+		}
+		public static Property infinitive() {
+			return new PropertyImpl(uri, "infinitive");
+		}
+		public static Property kana() {
+			return new PropertyImpl(uri, "kana");
+		}
+		public static Property pronunsiation() {
+			return new PropertyImpl(uri, "pronunciation");
+		}
+		
 	}
-	
-	
 }

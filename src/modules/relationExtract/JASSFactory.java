@@ -118,7 +118,8 @@ public class JASSFactory {
 		for (Morpheme m : concept.getMorphemes()) {
 			Resource mrpR = model.getResource(Namespace.JASS.getURI()+"Mrp"+m.id);
 			Resource nextMorphemeNode = model.createResource();
-			morphemeNode.addProperty(RDF.first, mrpR)
+			morphemeNode.addProperty(RDF.type, RDF.List)
+				.addProperty(RDF.first, mrpR)
 				.addProperty(RDF.rest, nextMorphemeNode);
 			morphemeNode = nextMorphemeNode;
 		}

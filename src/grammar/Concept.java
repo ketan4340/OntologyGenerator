@@ -6,14 +6,17 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
-import data.id.Identifiable;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+
+import data.RDF.RDFconvertable;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface, Identifiable {
+public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface, RDFconvertable {
 	private static final UniqueSet<Concept> CONCEPTS_UNIQUESET = new UniqueSet<>(100);
 	public static final Concept EMPTY_CONCEPT = new Concept(Collections.emptyList());
 
@@ -56,10 +59,6 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
-	@Override
-	public int id() {
-		return id;
-	}
 	@Override
 	public int compareTo(Concept o) {
 		int comparison = 0;
@@ -114,7 +113,11 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	public String pronunciation() {
 		return morphemes.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
 	}
-
+	@Override
+	public Resource toRDF(Model model) {
+		//TODO
+		return null;
+	}
 
 	/**********************************/
 	/**********    Getter    **********/

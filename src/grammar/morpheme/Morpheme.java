@@ -6,7 +6,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.Namespace;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
@@ -98,18 +97,21 @@ PartOfSpeechInterface, Identifiable, RDFconvertable {
 		return tags.pronunciation();
 	}
 	@Override
+	
 	public Resource toRDF(Model model) {
-		Resource morphemeNode = model.createResource(JASS.uri+getClass().getSimpleName()+id());
-		wordR.addProperty(model.getProperty(MORPHEME_LIST), morphemeNode);
-
-		for (Morpheme m : concept.getMorphemes()) {
-			Resource mrpR = model.getResource(Namespace.JASS.getURI()+"Mrp"+m.id);
-			Resource nextMorphemeNode = model.createResource();
-			morphemeNode.addProperty(RDF.first, mrpR)
-				.addProperty(RDF.rest, nextMorphemeNode);
-			morphemeNode = nextMorphemeNode;
-		}
-		return ; 
+		Resource morpheme = model.getResource(JASS.uri+getClass().getSimpleName()+id())
+				.addProperty(RDF.type, JASS.Morpheme)
+				.addProperty(JASS.name, name())
+				.addProperty(JASS.mainPoS, mainPoS())
+				.addProperty(JASS.subPoS1, subPoS1())
+				.addProperty(JASS.subPoS2, subPoS2())
+				.addProperty(JASS.subPoS3, subPoS3())
+				.addProperty(JASS.inflection, inflection())
+				.addProperty(JASS.conjugation, conjugation())
+				.addProperty(JASS.infinitive, infinitive())
+				.addProperty(JASS.kana, kana())
+				.addProperty(JASS.pronunsiation, pronunciation());
+		return morpheme; 
 	}
 
 	
