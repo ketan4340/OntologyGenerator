@@ -11,6 +11,9 @@ public class JASS {
 	
 	public static final String namespacePrefix = "jass";
 	
+	/****************************************/
+	/**********        Class       **********/
+	/****************************************/
 	public static final Resource Paragraph = Init.Paragraph();
 	public static final Resource Sentence = Init.Sentence();
 	public static final Resource Clause = Init.Clause();
@@ -23,6 +26,31 @@ public class JASS {
 	public static final Resource Concept = Init.Concept();
 	public static final Resource Morpheme = Init.Morpheme();
 	
+	/****************************************/
+	/**********  Object  Property  **********/
+	/****************************************/
+	public static final Property means = Init.means();
+	public static final Property partOf = Init.partOf();
+	public static final Property consistsOfSentences = Init.consistsOfSentences();
+	public static final Property consistsOfClauses = Init.consistsOfClauses();
+	public static final Property consistsOfWords = Init.consistsOfWords();
+	public static final Property consistsOfMorphemes = Init.consistsOfMorphemes();
+	public static final Property composesSingleClause = Init.composesSingleClause();
+	public static final Property consistsOfCategorem = Init.consistsOfCategorem();
+	public static final Property composesSerialClause = Init.composesSerialClause();
+	public static final Property consistsOfPhrase = Init.consistsOfPhrase();
+	public static final Property consistsOfAdjuncts = Init.consistsOfAdjuncts();
+	public static final Property composesPhrase = Init.composesPhrase();
+	public static final Property consistsOfHead = Init.consistsOfHead();
+	public static final Property consistsOfDependent = Init.consistsOfDependent();
+	public static final Property sentenceElement = Init.sentenceElement();
+	public static final Property subject = Init.subject();
+	public static final Property predicate = Init.predicate();
+	public static final Property object = Init.object();
+	
+	/****************************************/
+	/**********   Data  Property   **********/
+	/****************************************/
 	public static final Property name = Init.name();
 	public static final Property pos = Init.pos();
 	public static final Property mainPoS = Init.mainPoS();
@@ -35,8 +63,11 @@ public class JASS {
 	public static final Property kana = Init.kana();
 	public static final Property pronunsiation = Init.pronunsiation();
 	
+
 	public static class Init {
-	
+		/****************************************/
+		/**********        Class       **********/
+		/****************************************/
 		public static Resource Paragraph() {
 			return new ResourceImpl(uri, "Paragraph");
 		}
@@ -71,39 +102,99 @@ public class JASS {
 			return new ResourceImpl(uri, "Morpheme");
 		}
 		
-		public static Property name() {
-			return new PropertyImpl(uri, "name");
+		/****************************************/
+		/**********  Object  Property  **********/
+		/****************************************/
+		public static final Property means() {
+			return new PropertyImpl(uri, "means");
 		}
-		public static Property pos() {
-			return new PropertyImpl(uri, "pos");
+		public static final Property partOf() {
+			return new PropertyImpl(uri, "partOf");
 		}
-		public static Property mainPoS() {
-			return new PropertyImpl(uri, "mainPoS");
+		public static final Property consistsOfSentences() {
+			return new PropertyImpl(uri, "consistsOfSentences");
 		}
-		public static Property subPoS1() {
-			return new PropertyImpl(uri, "subPoS1");
+		public static final Property consistsOfClauses() {
+			return new PropertyImpl(uri, "consistsOfClauses");
 		}
-		public static Property subPoS2() {
-			return new PropertyImpl(uri, "subPoS2");
+		public static final Property consistsOfWords() {
+			return new PropertyImpl(uri, "consistsOfWords");
 		}
-		public static Property subPoS3() {
-			return new PropertyImpl(uri, "subPoS3");
+		public static final Property consistsOfMorphemes() {
+			return new PropertyImpl(uri, "consistsOfMorphemes");
 		}
-		public static Property inflection() {
-			return new PropertyImpl(uri, "infinitive");
+		public static final Property composesSingleClause() {
+			return new PropertyImpl(uri, "composesSingleClause");
 		}
-		public static Property conjugation() {
-			return new PropertyImpl(uri, "conjugation");
+		public static final Property consistsOfCategorem() {
+			return new PropertyImpl(uri, "consistsOfCategorem");
 		}
-		public static Property infinitive() {
-			return new PropertyImpl(uri, "infinitive");
+		public static final Property composesSerialClause() {
+			return new PropertyImpl(uri, "composesSerialClause");
 		}
-		public static Property kana() {
-			return new PropertyImpl(uri, "kana");
+		public static final Property consistsOfPhrase() {
+			return new PropertyImpl(uri, "consistsOfPhrase");
 		}
-		public static Property pronunsiation() {
-			return new PropertyImpl(uri, "pronunciation");
+		public static final Property consistsOfAdjuncts() {
+			return new PropertyImpl(uri, "consistsOfAdjuncts");
+		}
+		public static final Property composesPhrase() {
+			return new PropertyImpl(uri, "composesPhrase");
+		}
+		public static final Property consistsOfHead() {
+			return new PropertyImpl(uri, "consistsOfHead");
+		}
+		public static final Property consistsOfDependent() {
+			return new PropertyImpl(uri, "consistsOfDependent");
+		}
+		public static final Property sentenceElement() {
+			return new PropertyImpl(uri, "sentenceElement");
+		}
+		public static final Property subject() {
+			return new PropertyImpl(uri, "subject");
+		}
+		public static final Property predicate() {
+			return new PropertyImpl(uri, "predicate");
+		}
+		public static final Property object() {
+			return new PropertyImpl(uri, "object");
 		}
 		
+		/****************************************/
+		/**********   Data  Property   **********/
+		/****************************************/
+		public static final Property name() {
+			return new PropertyImpl(uri, "name");
+		}
+		public static final Property pos() {
+			return new PropertyImpl(uri, "pos");
+		}
+		public static final Property mainPoS() {
+			return new PropertyImpl(uri, "mainPoS");
+		}
+		public static final Property subPoS1() {
+			return new PropertyImpl(uri, "subPoS1");
+		}
+		public static final Property subPoS2() {
+			return new PropertyImpl(uri, "subPoS2");
+		}
+		public static final Property subPoS3() {
+			return new PropertyImpl(uri, "subPoS3");
+		}
+		public static final Property inflection() {
+			return new PropertyImpl(uri, "infinitive");
+		}
+		public static final Property conjugation() {
+			return new PropertyImpl(uri, "conjugation");
+		}
+		public static final Property infinitive() {
+			return new PropertyImpl(uri, "infinitive");
+		}
+		public static final Property kana() {
+			return new PropertyImpl(uri, "kana");
+		}
+		public static final Property pronunsiation() {
+			return new PropertyImpl(uri, "pronunciation");
+		}
 	}
 }
