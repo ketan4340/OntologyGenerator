@@ -1,16 +1,24 @@
 package grammar.word;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+
+import data.RDF.RDFconvertable;
+import data.RDF.vocabulary.JASS;
+import data.id.Identifiable;
 import grammar.Concept;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
+import util.RDF.RDFUtil;
 
 public class Word 
-	implements GrammarInterface, PartOfSpeechInterface, 
+	implements GrammarInterface, PartOfSpeechInterface, Identifiable, RDFconvertable, 
 	Child<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;
@@ -82,6 +90,10 @@ public class Word
 		this.parentClause = parent;
 	}
 	@Override
+	public int id() {
+		return id;
+	}
+	@Override
 	public String name() {
 		return concept.name();
 	}
@@ -120,6 +132,17 @@ public class Word
 	@Override
 	public String pronunciation() {
 		return concept.pronunciation();
+	}
+	@Override
+	public Resource toRDF(Model model) {
+		List<Resource> morphemeResources = concept.getMorphemes().stream()
+				.map(m -> m.toRDF(model)).collect(Collectors.toList());
+		Resource morphemeNode = RDFUtil.createRDFList(model,morphemeResources);
+		
+		Resource wordResource = model.createResource(JASS.uri+getClass().getSimpleName()+id())
+				.addProperty(JASS.means, concept.toRDF(model))		
+				.addProperty(JASS.consistsOfMorphemes, morphemeNode);
+		return wordResource;
 	}
 
 	/****************************************/

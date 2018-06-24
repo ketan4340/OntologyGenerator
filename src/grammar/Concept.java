@@ -8,8 +8,11 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.RDFconvertable;
+import data.RDF.vocabulary.GOO;
+import data.RDF.vocabulary.JASS;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.GrammarInterface;
@@ -115,8 +118,9 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	}
 	@Override
 	public Resource toRDF(Model model) {
-		//TODO
-		return null;
+		Resource conceptResource = model.createResource(GOO.uri + name())
+				.addProperty(RDF.type, JASS.Concept);
+		return conceptResource;
 	}
 
 	/**********************************/

@@ -99,19 +99,19 @@ PartOfSpeechInterface, Identifiable, RDFconvertable {
 	@Override
 	
 	public Resource toRDF(Model model) {
-		Resource morpheme = model.getResource(JASS.uri+getClass().getSimpleName()+id())
+		Resource morphemeResource = model.getResource(JASS.uri+getClass().getSimpleName()+id())
 				.addProperty(RDF.type, JASS.Morpheme)
-				.addProperty(JASS.name, name())
-				.addProperty(JASS.mainPoS, mainPoS())
-				.addProperty(JASS.subPoS1, subPoS1())
-				.addProperty(JASS.subPoS2, subPoS2())
-				.addProperty(JASS.subPoS3, subPoS3())
-				.addProperty(JASS.inflection, inflection())
-				.addProperty(JASS.conjugation, conjugation())
-				.addProperty(JASS.infinitive, infinitive())
-				.addProperty(JASS.kana, kana())
-				.addProperty(JASS.pronunsiation, pronunciation());
-		return morpheme; 
+				.addLiteral(JASS.name, name())
+				.addLiteral(JASS.mainPoS, mainPoS())
+				.addLiteral(JASS.subPoS1, subPoS1())
+				.addLiteral(JASS.subPoS2, subPoS2())
+				.addLiteral(JASS.subPoS3, subPoS3())
+				.addLiteral(JASS.inflection, inflection())
+				.addLiteral(JASS.conjugation, conjugation())
+				.addLiteral(JASS.infinitive, infinitive())
+				.addLiteral(JASS.kana, kana())
+				.addLiteral(JASS.pronunsiation, pronunciation());
+		return morphemeResource; 
 	}
 
 	
