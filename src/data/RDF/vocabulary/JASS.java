@@ -30,15 +30,14 @@ public class JASS {
 	/**********  Object  Property  **********/
 	/****************************************/
 	public static final Property means = Init.means();
+	public static final Property dependTo = Init.dependTo();
 	public static final Property partOf = Init.partOf();
 	public static final Property consistsOfSentences = Init.consistsOfSentences();
 	public static final Property consistsOfClauses = Init.consistsOfClauses();
 	public static final Property consistsOfWords = Init.consistsOfWords();
 	public static final Property consistsOfMorphemes = Init.consistsOfMorphemes();
-	public static final Property composesSingleClause = Init.composesSingleClause();
+	public static final Property composesClause = Init.composesClause();
 	public static final Property consistsOfCategorem = Init.consistsOfCategorem();
-	public static final Property composesSerialClause = Init.composesSerialClause();
-	public static final Property consistsOfPhrase = Init.consistsOfPhrase();
 	public static final Property consistsOfAdjuncts = Init.consistsOfAdjuncts();
 	public static final Property composesPhrase = Init.composesPhrase();
 	public static final Property consistsOfHead = Init.consistsOfHead();
@@ -108,6 +107,9 @@ public class JASS {
 		public static final Property means() {
 			return new PropertyImpl(uri, "means");
 		}
+		public static final Property dependTo() {
+			return new PropertyImpl(uri, "dependTo");
+		}
 		public static final Property partOf() {
 			return new PropertyImpl(uri, "partOf");
 		}
@@ -123,17 +125,11 @@ public class JASS {
 		public static final Property consistsOfMorphemes() {
 			return new PropertyImpl(uri, "consistsOfMorphemes");
 		}
-		public static final Property composesSingleClause() {
-			return new PropertyImpl(uri, "composesSingleClause");
+		public static final Property composesClause() {
+			return new PropertyImpl(uri, "composesClause");
 		}
 		public static final Property consistsOfCategorem() {
 			return new PropertyImpl(uri, "consistsOfCategorem");
-		}
-		public static final Property composesSerialClause() {
-			return new PropertyImpl(uri, "composesSerialClause");
-		}
-		public static final Property consistsOfPhrase() {
-			return new PropertyImpl(uri, "consistsOfPhrase");
 		}
 		public static final Property consistsOfAdjuncts() {
 			return new PropertyImpl(uri, "consistsOfAdjuncts");

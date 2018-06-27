@@ -6,6 +6,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
+import data.RDF.vocabulary.JASS;
 import grammar.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
@@ -13,7 +18,7 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 
 public class SingleClause extends Clause<Categorem>{
-	public static final SingleClause ROOT = new SingleClause(Categorem.ZEROCATEGOREM, new ArrayList<>(), new ArrayList<>());
+	public static final SingleClause ROOT = new SingleClause(Categorem.EMPTY_CATEGOREM, new ArrayList<>(), new ArrayList<>());
 
 	
 	/****************************************/
@@ -68,7 +73,10 @@ public class SingleClause extends Clause<Categorem>{
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
-
+	@Override
+	public Resource toRDF(Model model) {
+		return super.toRDF(model).addProperty(RDF.type, JASS.SingleClause);
+	}
 	
 	/****************************************/
 	/**********   Getter, Setter   **********/

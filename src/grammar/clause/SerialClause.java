@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
+import data.RDF.vocabulary.JASS;
 import grammar.word.Adjunct;
 import grammar.word.Phrase;
 import grammar.word.Word;
@@ -58,6 +63,8 @@ public class SerialClause extends Clause<Phrase> {
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
+	/** 単語のリストから連文節の各要素をセット.使わない方がいいかも. */
+	@Deprecated
 	@Override
 	public void setChildren(List<Word> words) {
 		Phrase phrase = null;
@@ -74,6 +81,10 @@ public class SerialClause extends Clause<Phrase> {
 		setCategorem(phrase);
 		setAdjuncts(newAdjuncts);
 		setOthers(newOthers);
+	}
+	@Override
+	public Resource toRDF(Model model) {
+		return super.toRDF(model).addProperty(RDF.type, JASS.SerialClause);
 	}
 	
 	/****************************************/

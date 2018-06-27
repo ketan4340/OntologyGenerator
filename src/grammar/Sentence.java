@@ -1,7 +1,6 @@
 package grammar;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -657,7 +656,7 @@ public class Sentence extends Parent<Clause<?>>
 	}
 	public void printC() {
 		for(final Clause<?> clause : children) {
-			System.out.print("("+clause.getID()+")" + clause.toString());
+			System.out.print("("+clause.id()+")" + clause.toString());
 		}
 		System.out.println();
 	}

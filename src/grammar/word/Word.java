@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
@@ -140,6 +141,7 @@ public class Word
 		Resource morphemeNode = RDFUtil.createRDFList(model,morphemeResources);
 		
 		Resource wordResource = model.createResource(JASS.uri+getClass().getSimpleName()+id())
+				.addProperty(RDF.type, JASS.Word)
 				.addProperty(JASS.means, concept.toRDF(model))		
 				.addProperty(JASS.consistsOfMorphemes, morphemeNode);
 		return wordResource;

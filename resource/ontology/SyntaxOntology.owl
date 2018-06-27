@@ -25,6 +25,15 @@
     
 
 
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfWords"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesPhrase -->
 
     <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesPhrase">
@@ -35,29 +44,10 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSerialClause -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSerialClause">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfWords"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SerialClause"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSingleClause -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSingleClause">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfWords"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause"/>
-    </owl:ObjectProperty>
-    
-
-
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfAdjuncts -->
 
     <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfAdjuncts">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSerialClause"/>
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSingleClause"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause"/>
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
         <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Adjunct"/>
         <rdfs:comment xml:lang="ja">文節を構成する付属語のリスト</rdfs:comment>
@@ -68,10 +58,10 @@
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfCategorem -->
 
     <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfCategorem">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSingleClause"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
         <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Categorem"/>
-        <rdfs:comment xml:lang="ja">単文節にとっての自立語 (句以外の単語) を指定する．</rdfs:comment>
+        <rdfs:comment xml:lang="ja">文節の自立語を指定する．</rdfs:comment>
     </owl:ObjectProperty>
     
 
@@ -120,17 +110,6 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfPhrase -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfPhrase">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesSerialClause"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SerialClause"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase"/>
-        <rdfs:comment xml:lang="ja">連文節にとっての自立語 (句) を指定する．</rdfs:comment>
-    </owl:ObjectProperty>
-    
-
-
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfSentences -->
 
     <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfSentences">
@@ -148,6 +127,17 @@
         <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
         <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/dependTo -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/dependTo">
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+        <rdfs:comment xml:lang="ja">文節が他のどの文節と係り受け関係にあるか．</rdfs:comment>
+        <rdfs:label xml:lang="ja">係り先</rdfs:label>
     </owl:ObjectProperty>
     
 

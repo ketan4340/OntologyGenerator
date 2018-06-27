@@ -7,6 +7,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
+import data.RDF.RDFconvertable;
+import data.RDF.vocabulary.JASS;
+import data.id.Identifiable;
 import grammar.Concept;
 import grammar.Sentence;
 import grammar.morpheme.Morpheme;
@@ -15,9 +22,10 @@ import grammar.structure.GrammarInterface;
 import grammar.structure.Parent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
+import util.RDF.RDFUtil;
 
 public abstract class Clause<W extends Word> extends Parent<Word>
-implements GrammarInterface, Child<Sentence> {	
+implements Identifiable, GrammarInterface, Child<Sentence>, RDFconvertable {	
 	private static int clausesSum = 0;
 	
 	public final int id;
@@ -196,6 +204,10 @@ implements GrammarInterface, Child<Sentence> {
 	/**********  Interface Method  **********/
 	/****************************************/
 	@Override
+	public int id() {
+		return id;
+	}
+	@Override
 	public String name() {
 		return getChildren().stream().map(w -> w.name()).collect(Collectors.joining());
 	}
@@ -223,13 +235,24 @@ implements GrammarInterface, Child<Sentence> {
 	public void setThisAsParent(Word child) {
 		child.setParent(this);
 	}
+	@Override
+	public Resource toRDF(Model model) {
+		Resource categoremResource = categorem.toRDF(model);
+		Resource adjunctNode = RDFUtil.createRDFList(model, adjuncts.stream().map(m -> m.toRDF(model))
+				.collect(Collectors.toList()));
+		Resource dependingResource = depending.toRDF(model);
+
+		Resource clauseResource = model.createResource(JASS.uri + getClass().getSimpleName() + id())
+				.addProperty(RDF.type, JASS.Clause)
+				.addProperty(JASS.consistsOfCategorem, categoremResource)
+				.addProperty(JASS.consistsOfAdjuncts, adjunctNode)
+				.addProperty(JASS.dependTo, dependingResource);
+		return clauseResource;
+	}
 	
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
-	public int getID() {
-		return id;
-	}
 	public W getCategorem() {
 		return categorem;
 	}

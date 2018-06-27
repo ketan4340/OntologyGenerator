@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
+import data.RDF.vocabulary.JASS;
 import grammar.Concept;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
@@ -20,10 +25,9 @@ public class Phrase extends Word{
 	private final Word head;
 	
 	
-
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	public Phrase(List<? extends Clause<?>> dependent, Word head) {
 		super(concatConcept(dependent, head));
 		this.dependent = dependent;
@@ -39,9 +43,9 @@ public class Phrase extends Word{
 		return Concept.getOrNewInstance(morphemes);
 	}
 	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	/**
 	 * 全く同じWordを複製する
 	 */
@@ -53,10 +57,18 @@ public class Phrase extends Word{
 		return new Phrase(cloneDependent, cloneHead);
 	}
 	
-
-	/**********************************/
-	/********** Objectメソッド **********/
-	/**********************************/
+	/****************************************/
+	/**********  Interface Method  **********/
+	/****************************************/
+	@Override
+	public Resource toRDF(Model model) {
+		return super.toRDF(model)
+				.addProperty(RDF.type, JASS.Phrase);
+	}
+	
+	/****************************************/
+	/**********   Object  Method   **********/
+	/****************************************/
 	@Override
 	public String toString() {
 		return "[" + 
