@@ -32,7 +32,9 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	/****************************************/
 	public void setModelID() {}
 	/*
+	//TODO
 	// 他のLongSentenceIDなんかはこの手のメソッドでID登録しているからいつか同じようにしたい
+	例)
 	public void setRuleID() {
 		forEach((k, v) -> v.setRDFRuleID(k.id()));
 	}

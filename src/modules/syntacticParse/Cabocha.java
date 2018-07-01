@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,19 +40,19 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static final String OPTION_OUTPUT2FILE			= "--output=";	// CaboChaの結果をファイルに書き出す
 
 
-	/* parserの入力ファイル，出力ファイルの保存先 */
-	private static final Path PATH_INPUT = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
-	private static final Path PATH_OUTPUT = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
+	/** CaboChaの入力ファイルの保存先. */
+	private static Path INPUT_TXTFILE_PATH;
+	/** CaboChaの出力ファイルの保存先 */
+	private static Path OUTPUT_TXTFILE_PATH;
 
 	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
 	 * 都度clearして使い回す.
 	 */
-	Map<Clause<?>, Integer> dependingMap = new HashMap<>();
+	private Map<Clause<?>, Integer> dependingMap = new HashMap<>();
 	
-	
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	/* デフォルトではオプション(-f1,-n1)でセッティング */
 	public Cabocha() {
 		this(OPTION_LATTICE, OPTION_NE_CONSTRAINT);
@@ -66,19 +65,34 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		command.addAll(Arrays.asList(options));
 	}
 
+	/****************************************/
+	/**********   Member  Method   **********/
+	/****************************************/
 	
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
-
-	/********************************************/
-	/** AbstractProcessManagerの抽象メソッドの実装 **/
-	/********************************************/
+	/****************************************/
+	/**********   Getter, Setter   **********/
+	/****************************************/
+	public static Path getINPUT_TXTFILE_PATH() {
+		return INPUT_TXTFILE_PATH;
+	}
+	public static void setINPUT_TXTFILE_PATH(Path INPUT_TXTFILE_PATH) {
+		Cabocha.INPUT_TXTFILE_PATH = INPUT_TXTFILE_PATH;
+	}
+	public static Path getOUTPUT_TXTFILE_PATH() {
+		return OUTPUT_TXTFILE_PATH;
+	}
+	public static void setOUTPUT_TXTFILE_PATH(Path OUTPUT_TXTFILE_PATH) {
+		Cabocha.OUTPUT_TXTFILE_PATH = OUTPUT_TXTFILE_PATH;
+	}	
+	
+	/****************************************/
+	/*** AbstractProcessManager's  Method ***/
+	/****************************************/
 	// nothing
-	
-	/*******************************************/
-	/***** ParserInterfaceの抽象メソッドの実装 *****/
-	/*******************************************/
+
+	/****************************************/
+	/******* ParserInterface's Method *******/
+	/****************************************/
 	/********************************/
 	/***** 解析器・階層化呼び出し部 *****/
 	/********************************/
@@ -135,11 +149,11 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	public List<String> parse(Path inputFilePath) {
 		// CaboChaの入力も出力もファイルになるよう，コマンドを用意
 		command.add(inputFilePath.toString());						// 入力テキストのファイル名
-		command.add(OPTION_OUTPUT2FILE + PATH_OUTPUT.toString());	// ファイルに出力するコマンドを追加
+		command.add(OPTION_OUTPUT2FILE + OUTPUT_TXTFILE_PATH.toString());	// ファイルに出力するコマンドを追加
 		startProcess(command);								// プロセス開始
 		finishProcess();									// プロセス終了
 		try {
-			return Files.readAllLines(PATH_OUTPUT, StandardCharsets.UTF_8);
+			return Files.readAllLines(OUTPUT_TXTFILE_PATH, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -266,7 +280,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	private static Path output_ParserInput(List<NaturalLanguage> nlTextList) {
 		// List<NL>からList<String>へ
 		try {
-			return Files.write(PATH_INPUT, NaturalLanguage.toStringList(nlTextList));
+			return Files.write(INPUT_TXTFILE_PATH, NaturalLanguage.toStringList(nlTextList));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

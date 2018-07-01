@@ -19,6 +19,8 @@ public abstract class AbstractRDFRule implements Identifiable, GrammarInterface{
 	protected static final String prefixGOO = Namespace.GOO.toQueryPrefixDefinition();
 	protected static final String prefixSIO = Namespace.SIO.toQueryPrefixDefinition();
 	
+	protected static final String QUERY_PREFIXES = 
+			prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO+prefixSIO;
 
 	/****************************************/
 	/**********     Constructor    **********/

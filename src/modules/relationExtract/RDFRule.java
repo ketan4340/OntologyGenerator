@@ -30,7 +30,7 @@ public class RDFRule extends AbstractRDFRule {
 	@Override
 	public Query toConstructQuery() {
 		String queryString = 
-				prefixRDF+prefixRDFS+prefixOWL+prefixDC+prefixDCTERM+prefixSCHEMA+prefixJASS+prefixGOO+prefixSIO +
+				QUERY_PREFIXES + 
 				"CONSTRUCT {" +
 					thenPattern +
 				"} WHERE {" +

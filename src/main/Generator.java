@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.jena.vocabulary.RDFS.Init;
+
 import data.RDF.Ontology;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
@@ -18,15 +20,25 @@ import grammar.NaturalParagraph;
 import grammar.Sentence;
 import modules.OutputManager;
 import modules.relationExtract.RelationExtractor;
+import modules.syntacticParse.Cabocha;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
+	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt"); 
+	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
+	private static final String JASS_MODEL_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
+	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
+	private static final Path OUTPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
+
+	
+	
 	/****************************************/
 	/**********    Main  Method    **********/
 	/****************************************/
-	public static void main(String[] args) {	
+	public static void main(String[] args) {
+		init();
 		new Generator().execute(args.length == 1? args[0] : "");
 	}
 	
@@ -102,7 +114,7 @@ public class Generator {
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/
-		RelationExtractor re = new RelationExtractor();
+		RelationExtractor re = new RelationExtractor(EXTENSION_RULE_PATH, ONTOLOGY_RULE_PATH, JASS_MODEL_URL);
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
@@ -143,5 +155,10 @@ public class Generator {
 				.map(NaturalLanguage::toNaturalLanguageList)
 				.map(NaturalParagraph::new)
 				.collect(Collectors.toList());
+	}
+
+	private static void init() {
+		Cabocha.setINPUT_TXTFILE_PATH(INPUT_FILE_PATH);
+		Cabocha.setOUTPUT_TXTFILE_PATH(OUTPUT_FILE_PATH);
 	}
 }

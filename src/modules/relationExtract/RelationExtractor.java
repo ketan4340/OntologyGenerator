@@ -1,7 +1,6 @@
 package modules.relationExtract;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,11 @@ import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
 
 public class RelationExtractor {
-	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt"); 
-	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
 	
-	public static final Model DEFAULT_JASS_MODEL = 
-			ModelFactory.createDefaultModel().read("../OntologyGenerator/resource/ontology/SyntaxOntology.owl");
+	/** 
+	 * 標準のJASSオントロジー
+	 */
+	private final Model defaultJASSModel;
 	
 	/**
 	 * 拡張ルール
@@ -41,13 +40,16 @@ public class RelationExtractor {
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public RelationExtractor(RDFRules extensionRules, RDFRules ontologyRules) {
+	public RelationExtractor(RDFRules extensionRules, RDFRules ontologyRules, Model jassModel) {
 		this.extensionRules = extensionRules;
 		this.ontologyRules = ontologyRules;
+		this.defaultJASSModel = jassModel;
 	}
-	public RelationExtractor() {
-		this(RDFRuleReader.readNewRDFRules(EXTENSION_RULE_PATH),
-				RDFRuleReader.readNewRDFRules(ONTOLOGY_RULE_PATH));
+	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, String jassModelURL) {
+		this(RDFRuleReader.readNewRDFRules(extensionRulePath),
+				RDFRuleReader.readNewRDFRules(ontologyRulePath), 
+				ModelFactory.createDefaultModel().read(jassModelURL)
+				);
 	}
 	
 
@@ -62,7 +64,7 @@ public class RelationExtractor {
 	public ModelIDMap convertMap_Sentence2JASSModel(SentenceIDMap sentenceMap) {
 		ModelIDMap modelIDMap = new ModelIDMap();
 		sentenceMap.forEach((stc, id) -> {
-			Model model = ModelFactory.createDefaultModel().add(DEFAULT_JASS_MODEL);
+			Model model = ModelFactory.createDefaultModel().add(defaultJASSModel);
 			modelIDMap.put(stc.toRDF(model).getModel(), id);	
 		});
 		return modelIDMap;
