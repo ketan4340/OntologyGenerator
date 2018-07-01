@@ -77,6 +77,6 @@ public class RDFRuleReader {
 					new RDFRule(matcherIFTHEN.group(NAME_IFTHEN), matcherIFTHEN.group(IF_PATTERN_IFTHEN), matcherIFTHEN.group(THEN_PATTERN_IFTHEN)) :
 				matcherArrow.matches()?
 					new RDFRule("arrowRule", matcherIFTHEN.group(IF_PATTERN_ARROW), matcherIFTHEN.group(THEN_PATTERN_ARROW)) :
-				RDFRule.EMPTY_RULE;
+					RDFRule.EMPTY_RULE;
 	}
 }

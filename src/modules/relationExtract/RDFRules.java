@@ -9,12 +9,12 @@ import org.apache.jena.rdf.model.Model;
 
 public class RDFRules {
 
-	private LinkedHashSet<AbstractRDFRule> rules;
+	private LinkedHashSet<RDFRule> rules;
 	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public RDFRules(LinkedHashSet<AbstractRDFRule> rules) {
+	public RDFRules(LinkedHashSet<RDFRule> rules) {
 		setRules(rules);
 	}
 	
@@ -33,16 +33,16 @@ public class RDFRules {
 	
 	/** ログの出力用 */
 	public List<String> toStringList() {
-		return rules.stream().map(AbstractRDFRule::toString).collect(Collectors.toList());
+		return rules.stream().map(RDFRule::toString).collect(Collectors.toList());
 	}
 
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
-	public LinkedHashSet<AbstractRDFRule> getRules() {
+	public LinkedHashSet<RDFRule> getRules() {
 		return rules;
 	}
-	public void setRules(LinkedHashSet<AbstractRDFRule> rules) {
+	public void setRules(LinkedHashSet<RDFRule> rules) {
 		this.rules = rules;
 	}
 	
@@ -52,7 +52,7 @@ public class RDFRules {
 	@Override
 	public String toString() {
 		return rules.stream()
-				.map(AbstractRDFRule::toString)
+				.map(RDFRule::toString)
 				.collect(Collectors.joining("\n"));
 	}	
 }

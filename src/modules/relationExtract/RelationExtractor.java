@@ -26,7 +26,7 @@ public class RelationExtractor {
 	/** 
 	 * 標準のJASSオントロジー
 	 */
-	private final Model defaultJASSModel;
+	public final Model defaultJASSModel;
 	
 	/**
 	 * 拡張ルール
@@ -81,8 +81,7 @@ public class RelationExtractor {
 	 * @param model JenaのModel
 	 * @return RDFTripleのリスト
 	 */
-	public List<RDFTriple> convertModel_Jena2TripleList(ModelIDMap modelMap) {
-		Model model = modelMap.uniteModels();
+	public List<RDFTriple> convertModel_Jena2TripleList(Model model) {
 		List<RDFTriple> triples = new LinkedList<>();
 		StmtIterator stmtIter = model.listStatements();
 		while (stmtIter.hasNext()) {
