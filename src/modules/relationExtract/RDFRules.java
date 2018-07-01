@@ -23,9 +23,7 @@ public class RDFRules {
 	/**********    Member Method   **********/
 	/****************************************/
 	public Model expand(Model model) {
-		rules.stream()
-			.map(r -> r.expands(model))
-			.forEach(model::union);
+		rules.forEach(r -> r.expands(model));
 		return model;
 	}
 	
@@ -33,7 +31,7 @@ public class RDFRules {
 		return rules.stream()
 				.collect(Collectors.toMap(r -> r.converts(model), r -> r.id()));
 	}
-	
+	/** ログの出力用 */
 	public List<String> toStringList() {
 		return rules.stream().map(AbstractRDFRule::toString).collect(Collectors.toList());
 	}

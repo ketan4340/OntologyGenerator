@@ -23,12 +23,11 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 	private static final UniqueSet<Concept> CONCEPTS_UNIQUESET = new UniqueSet<>(100);
 	public static final Concept EMPTY_CONCEPT = new Concept(Collections.emptyList());
 
-
 	private final List<Morpheme> morphemes;
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/****************************************/
+	/**********     Constructor    **********/
+	/****************************************/
 	private Concept(List<Morpheme> morphemes) {
 		this.morphemes = morphemes;
 		CONCEPTS_UNIQUESET.add(this);
@@ -117,8 +116,12 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 		return morphemes.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
 	}
 	@Override
+	public String getURI() {
+		return GOO.uri + name();
+	}
+	@Override
 	public Resource toRDF(Model model) {
-		Resource conceptResource = model.createResource(GOO.uri + name())
+		Resource conceptResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Concept);
 		return conceptResource;
 	}
@@ -162,7 +165,6 @@ public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpe
 			return false;
 		return true;
 	}
-
 	@Override
 	public String toString() {
 		return morphemes.stream().map(m -> m.toString()).collect(Collectors.joining());

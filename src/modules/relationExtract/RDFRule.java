@@ -5,9 +5,7 @@ import java.util.Objects;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 
-import data.id.Identifiable;
-
-public class RDFRule extends AbstractRDFRule implements Identifiable{
+public class RDFRule extends AbstractRDFRule {
 	private static int sum = 0;
 	protected static final RDFRule EMPTY_RULE = new RDFRule("", "", "");
 	
@@ -47,6 +45,10 @@ public class RDFRule extends AbstractRDFRule implements Identifiable{
 	@Override
 	public int id() {
 		return getID();
+	}
+	@Override
+	public String name() {
+		return name;
 	}
 
 	/****************************************/

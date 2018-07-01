@@ -1,6 +1,6 @@
 package grammar.clause;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,7 +18,8 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 
 public class SingleClause extends Clause<Categorem>{
-	public static final SingleClause ROOT = new SingleClause(Categorem.EMPTY_CATEGOREM, new ArrayList<>(), new ArrayList<>());
+	public static final SingleClause ROOT = 
+			new SingleClause(Categorem.EMPTY_CATEGOREM, Collections.emptyList(), Collections.emptyList());
 
 	
 	/****************************************/

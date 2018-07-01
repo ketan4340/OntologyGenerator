@@ -8,14 +8,22 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
 import data.RDF.MyResource;
 import data.RDF.Namespace;
 import data.RDF.RDFTriple;
+import data.RDF.RDFconvertable;
+import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
@@ -29,7 +37,7 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class Sentence extends Parent<Clause<?>>
-	implements GrammarInterface, Identifiable, Child<Paragraph> {
+	implements GrammarInterface, Identifiable, Child<Paragraph>, RDFconvertable {
 	private static int sum = 0;
 
 	public final int id;
@@ -646,8 +654,9 @@ public class Sentence extends Parent<Clause<?>>
 	}
 
 
-	
+	/****************************************/
 	/**********   Output  Method   **********/
+	/****************************************/
 	public void printW() {
 		for(final Word word : getWordList()) {
 			System.out.print("("+word.getID()+")" + word.name());
@@ -711,7 +720,31 @@ public class Sentence extends Parent<Clause<?>>
 	public void setThisAsParent(Clause<?> child) {
 		child.setParent(this);
 	}
-
+	@Override
+	public String getURI() {
+		return JASS.uri+getClass().getSimpleName()+id();
+	}
+	@Override
+	public Resource toRDF(Model model) {
+		List<Resource> clauseResources = getChildren().stream()
+				.map(m -> m.toRDF(model)).collect(Collectors.toList());
+		clauseDepending2RDF(clauseResources);
+		Resource clauseNode = model.createList(clauseResources.iterator()); 
+		
+		Resource sentenceResource = model.createResource(getURI())
+				.addProperty(RDF.type, JASS.Sentence)
+				.addProperty(JASS.consistsOfClauses, clauseNode);
+		return sentenceResource;
+	}
+	private void clauseDepending2RDF(List<Resource> clauseResources) {
+		children.forEach(cls -> {
+			Resource clause = clauseResources.stream().filter(c -> Objects.equals(c.getURI(), cls.getURI())).findAny().orElse(null);
+			Clause<?> depending = cls.getDepending();
+			Optional<Resource> dependingResource = depending == SingleClause.ROOT? Optional.empty(): 
+					clauseResources.stream().filter(c -> Objects.equals(c.getURI(), depending.getURI())).findAny();
+			dependingResource.ifPresent(d -> clause.addProperty(JASS.dependTo, d));
+		});
+	}
 	
 	
 	/****************************************/

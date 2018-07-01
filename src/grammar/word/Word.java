@@ -1,7 +1,6 @@
 package grammar.word;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -16,11 +15,10 @@ import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 import grammar.structure.Child;
 import grammar.structure.GrammarInterface;
-import util.RDF.RDFUtil;
 
 public class Word 
-	implements GrammarInterface, PartOfSpeechInterface, Identifiable, RDFconvertable, 
-	Child<Clause<? extends Word>>
+	implements Identifiable, RDFconvertable, GrammarInterface, 
+	PartOfSpeechInterface, Child<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;
 
@@ -135,15 +133,28 @@ public class Word
 		return concept.pronunciation();
 	}
 	@Override
+	public String getURI() {
+		return JASS.uri+getClass().getSimpleName()+id();
+	}
+	@Override
 	public Resource toRDF(Model model) {
-		List<Resource> morphemeResources = concept.getMorphemes().stream()
-				.map(m -> m.toRDF(model)).collect(Collectors.toList());
-		Resource morphemeNode = RDFUtil.createRDFList(model,morphemeResources);
+		Resource morphemeNode = model.createList(concept.getMorphemes().stream()
+				.map(m -> m.toRDF(model)).iterator());
 		
-		Resource wordResource = model.createResource(JASS.uri+getClass().getSimpleName()+id())
+		Resource wordResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Word)
 				.addProperty(JASS.means, concept.toRDF(model))		
-				.addProperty(JASS.consistsOfMorphemes, morphemeNode);
+				.addProperty(JASS.consistsOfMorphemes, morphemeNode)
+				.addLiteral(JASS.name, name())
+				.addLiteral(JASS.mainPoS, mainPoS())
+				.addLiteral(JASS.subPoS1, subPoS1())
+				.addLiteral(JASS.subPoS2, subPoS2())
+				.addLiteral(JASS.subPoS3, subPoS3())
+				.addLiteral(JASS.inflection, inflection())
+				.addLiteral(JASS.conjugation, conjugation())
+				.addLiteral(JASS.infinitive, infinitive())
+				.addLiteral(JASS.kana, kana())
+				.addLiteral(JASS.pronunsiation, pronunciation());
 		return wordResource;
 	}
 
@@ -170,5 +181,31 @@ public class Word
 	@Override
 	public String toString() {
 		return concept.toString();
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((concept == null) ? 0 : concept.hashCode());
+		result = prime * result + id;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Word other = (Word) obj;
+		if (concept == null) {
+			if (other.concept != null)
+				return false;
+		} else if (!concept.equals(other.concept))
+			return false;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

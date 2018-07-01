@@ -47,7 +47,7 @@ public class Phrase extends Word{
 	/**********   Member  Method   **********/
 	/****************************************/
 	/**
-	 * 全く同じWordを複製する
+	 * 全く同じPhraseを複製する
 	 */
 	@Override
 	public Phrase clone() {
@@ -62,8 +62,13 @@ public class Phrase extends Word{
 	/****************************************/
 	@Override
 	public Resource toRDF(Model model) {
+		Resource clauseNode = model.createList(
+				dependent.stream().map(m -> m.toRDF(model)).iterator());
+		
 		return super.toRDF(model)
-				.addProperty(RDF.type, JASS.Phrase);
+				.addProperty(RDF.type, JASS.Phrase)
+				.addProperty(JASS.consistsOfDependent, clauseNode)
+				.addProperty(JASS.consistsOfHead, head.toRDF(model));
 	}
 	
 	/****************************************/

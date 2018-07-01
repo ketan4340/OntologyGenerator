@@ -1,61 +1,62 @@
 # 文節からその自立語の概念を得るショートカット
-IF {
-  ?Cls jass:categorem [jass:means ?Cpt] .
+IF (ex:catMean) {
+  ?Cls jass:consistsOfCategorem [jass:means ?Cpt] .
 } THEN {
   ?Cls jass:categoremMeans ?Cpt .
 }
 
 # 主語 (jass:subject)
-IF{
+IF (ex:subject) {
   ?Stc	a jass:Sentence ; 
-	jass:clauseList [rdf:rest*/rdf:first ?Cls] .
-  ?Cls jass:containsWord [jass:pos "助詞" ;
-			  jass:infinitive "は"] .
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls .
+  ?Cls 	jass:consistsOfAdjuncts/rdf:rest*/rdf:first
+       [jass:mainPoS "助詞" ; jass:infinitive "は"] .
 }THEN{
   ?Stc jass:subject ?Cls .
 }
 
 # 述語 (jass:predicate)
-IF{
-  ?Stc a jass:Sentence ; jass:subject [jass:depend ?Cls_P] .
+IF (ex:predicate) {
+  ?Stc	a jass:Sentence ;
+    	jass:subject/jass:dependTo ?Cls_P .
 }THEN{
   ?Stc jass:predicate ?Cls_P .
 }
 
 # 目的語 (jass:object)
-IF{
+IF (ex:object) {
   ?Stc	a jass:Sentence ;
 	jass:subject ?Cls_S ;
 	jass:predicate ?Cls_P ;
-	jass:clauseList [rdf:rest*/rdf:first ?Cls_O] .
-  ?Cls_O jass:depend ?Cls_P ;
-  	 jass:containsWord ?Adj .
-  ?Adj 	 jass:pos "助詞" .
-#FILTER({?Adj jass:infinitive "に"} UNION {?Adj jass:infinitive "へ"} UNION {?Adj jass:infinitive "を"})
-}THEN{
-  ?Stc jass:objectSub ?Cls_O .
-}
-IF{
-  ?Stc jass:objectSub ?Cls_O .
-  ?Cls_O jass:containsWord ?Adj .
-  ?Adj jass:pos "格助詞" .
-  ?Adj jass:infinitive "に" .
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
+  ?Cls_O jass:dependTo ?Cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
+  ?Adj 	 jass:mainPoS "助詞" ;
+  	 jass:infinitive "を" .
 }THEN{
   ?Stc jass:object ?Cls_O .
 }
-IF{
-  ?Stc jass:objectSub ?Cls_O .
-  ?Cls_O jass:containsWord ?Adj .
-  ?Adj jass:pos "格助詞" .
-  ?Adj jass:infinitive "へ" .
+IF (ex:object) {
+  ?Stc	a jass:Sentence ;
+	jass:subject ?Cls_S ;
+	jass:predicate ?Cls_P ;
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
+  ?Cls_O jass:dependTo ?Cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
+  ?Adj 	 jass:mainPoS "助詞" ;
+  	 jass:infinitive "に" .
 }THEN{
   ?Stc jass:object ?Cls_O .
 }
-IF{
-  ?Stc jass:objectSub ?Cls_O .
-  ?Cls_O jass:containsWord ?Adj .
-  ?Adj jass:pos "格助詞" .
-  ?Adj jass:infinitive "を" .
+IF (ex:object) {
+  ?Stc	a jass:Sentence ;
+	jass:subject ?Cls_S ;
+	jass:predicate ?Cls_P ;
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
+  ?Cls_O jass:dependTo ?Cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
+  ?Adj 	 jass:mainPoS "助詞" ;
+  	 jass:infinitive "へ" .
 }THEN{
   ?Stc jass:object ?Cls_O .
 }

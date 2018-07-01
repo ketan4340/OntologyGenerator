@@ -6,8 +6,9 @@ import org.apache.jena.rdf.model.Model;
 
 import data.RDF.Namespace;
 import data.id.Identifiable;
+import grammar.structure.GrammarInterface;
 
-public abstract class AbstractRDFRule implements Identifiable{
+public abstract class AbstractRDFRule implements Identifiable, GrammarInterface{
 	protected static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();
 	protected static final String prefixRDFS = Namespace.RDFS.toQueryPrefixDefinition();
 	protected static final String prefixOWL = Namespace.OWL.toQueryPrefixDefinition();
@@ -52,5 +53,6 @@ public abstract class AbstractRDFRule implements Identifiable{
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
+	@Override
 	public abstract String toString();
 }

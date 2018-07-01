@@ -22,7 +22,6 @@ import grammar.structure.GrammarInterface;
 import grammar.structure.Parent;
 import grammar.word.Adjunct;
 import grammar.word.Word;
-import util.RDF.RDFUtil;
 
 public abstract class Clause<W extends Word> extends Parent<Word>
 implements Identifiable, GrammarInterface, Child<Sentence>, RDFconvertable {	
@@ -236,17 +235,19 @@ implements Identifiable, GrammarInterface, Child<Sentence>, RDFconvertable {
 		child.setParent(this);
 	}
 	@Override
+	public String getURI() {
+		return JASS.uri + getClass().getSimpleName() + id();
+	}
+	@Override
 	public Resource toRDF(Model model) {
 		Resource categoremResource = categorem.toRDF(model);
-		Resource adjunctNode = RDFUtil.createRDFList(model, adjuncts.stream().map(m -> m.toRDF(model))
-				.collect(Collectors.toList()));
-		Resource dependingResource = depending.toRDF(model);
+		Resource adjunctNode = model.createList(
+				adjuncts.stream().map(m -> m.toRDF(model)).iterator());
 
-		Resource clauseResource = model.createResource(JASS.uri + getClass().getSimpleName() + id())
+		Resource clauseResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Clause)
 				.addProperty(JASS.consistsOfCategorem, categoremResource)
-				.addProperty(JASS.consistsOfAdjuncts, adjunctNode)
-				.addProperty(JASS.dependTo, dependingResource);
+				.addProperty(JASS.consistsOfAdjuncts, adjunctNode);
 		return clauseResource;
 	}
 	

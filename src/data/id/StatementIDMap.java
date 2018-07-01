@@ -2,8 +2,9 @@ package data.id;
 
 import java.util.LinkedHashMap;
 
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
+
+import util.RDF.RDFUtil;
 
 public class StatementIDMap extends IDLinkedMap<Statement> {
 	private static final long serialVersionUID = 511791879522986122L;
@@ -28,20 +29,16 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 	/**********   Member  Method   **********/
 	/****************************************/
 	public void setStatementID() {
-		forEachValue(v -> v.setTripleID(sum++));
+		forEachValue(idt -> idt.setTripleID(sum++));
 	}
 	public void setSubjectString() {
-		forEach((k, v) -> v.setSubject(k.getModel().qnameFor(k.getSubject().getURI())));
+		forEach((stmt, idt) -> idt.setSubject(RDFUtil.toResourceStringAsQName(stmt.getSubject())));
 	}
 	public void setPredicateString() {
-		forEach((k, v) -> v.setPredicate(k.getModel().qnameFor(k.getPredicate().getURI())));
+		forEach((stmt, idt) -> idt.setPredicate(RDFUtil.toResourceStringAsQName(stmt.getPredicate())));
 	}
 	public void setObjectString() {
-		forEach((k, v) -> {
-			RDFNode object = k.getObject();
-			String objectString = object.isResource()? object.asResource().getURI() : object.asLiteral().toString();
-			v.setObject(k.getModel().qnameFor(objectString));
-		});
+		forEach((stmt, idt) -> idt.setObject(RDFUtil.toResourceStringAsQName(stmt.getObject())));
 	}
 	public void setStatement() {
 		setStatementID();

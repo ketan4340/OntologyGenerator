@@ -46,12 +46,12 @@ public class Generator {
 		Path textFilePath = Paths.get(textFileName);
 
 		String[] texts = {
-			"クジラは哺乳類である。",
-			"カニの味噌汁は美味しいぞ",
-			"アイアイはアイアイ科の原始的な猿",
-			"ミュウは南アメリカに分布",
-			"馬は体長1メートルほど。",
-			"藍鮫はアイザメ科の海水魚の総称。"
+				"クジラは小魚を食べる。", 
+				"クジラは哺乳類である。",
+				"カニの味噌汁は美味しいぞ",
+				"アイアイはアイアイ科の原始的な猿",
+				"馬は体長1メートルほど。",
+				"藍鮫はアイザメ科の海水魚の総称だ。"
 		};
 		List<NaturalLanguage> nlLists = Arrays.asList( NaturalLanguage.toNaturalLanguageArray(texts));
 

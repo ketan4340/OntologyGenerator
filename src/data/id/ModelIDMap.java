@@ -13,6 +13,9 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	
 	public static int modelSum = 0;
 	
+	public static final Model DEFAULT_JASS_MODEL = 
+			ModelFactory.createDefaultModel().read("../OntologyGenerator/resource/ontology/SyntaxOntology.owl");
+	
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/

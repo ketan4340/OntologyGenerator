@@ -1,29 +1,15 @@
-# 概念階層 (rdfs:subClassOf)
-IF () {
-  ?Stc a jass:Sentence ;
-	jass:subject ?Cls_S ;
-	jass:predicate ?Cls_P . 
-  ?Cls_S jass:categoremMeans ?Cpt_S .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "名詞" ;
-	jass:means ?Cpt_P .  
-}THEN{
-  ?Cpt_S rdfs:subClassOf ?Cpt_P .
-}
-
 # 総称 (owl:sameAs)
-IF (sameAs) {
+IF (equivalentClass) {
   ?Stc rdf:type jass:Sentence .
-  ?Stc jass:subject ?Cls_S .
-  ?Cls_S jass:categoremMeans ?Cpt_S .
-  ?Stc jass:predicate ?Cls_P .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "名詞" .
-  ?Wrd_P jass:infinitive "総称" .
-  ?Cls_Pprev ^rdf:first/rdf:rest/rdf:first ?Cls_P .
-  ?Cls_Pprev jass:categoremMeans ?Cpt_Pprev .
+  ?Stc jass:subject/jass:categoremMeans ?Cpt_S .
+  ?Stc jass:predicate ?SCls_P .
+  ?SCls_P jass:consistsOfCategorem 	?Prs .
+  ?Prs jass:consistsOfHead/jass:infinitive "総称" .
+  ?Prs jass:consistsOfDependent/rdf:rest* ?node .
+  ?node rdf:rest rdf:nil ;
+	rdf:first/jass:categoremMeans ?Cpt_p .
 }THEN{
-  ?Cpt_S owl:sameAs ?Cpt_Pprev .
+  ?Cpt_S owl:equivalentClass ?Cpt_p .
 }
 
 # 数値
@@ -32,8 +18,13 @@ IF (numeral value) {
   ?Stc jass:subject ?Cls_S .
   ?Cls_S jass:categoremMeans ?Cpt_S .
   ?Stc jass:predicate ?Cls_P .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:independentWord ?p1 .
+  ?Cls_P jass:consistsOfCategorem ?Prs .
+#  ?Prs jass:consistsOfDependent/rdf:rest/jass:name ?length .
+#  FILTER regex(?length, "長$")
+  ?Prs jass:consistsOfHead ?head .
+  ?head jass:consistsOfMorphemes/rdf:first/jass:name ?val .
+  FILTER regex(?val, "[0-9０-９]+")
+  ?head jass:consistsOfMorphemes/rdf:rest/rdf:first/jass:name ?unit .
 }THEN{
   ?Cpt_S sio:SIO_000216 _:bn .
   _:bn rdf:value ?val .
@@ -46,8 +37,8 @@ IF (Action-O) {
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
   ?Cls_S jass:categoremMeans ?Cpt_S .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "動詞" .
+  ?Cls_P jass:consistsOfCategorem ?Wrd_P .
+  ?Wrd_P jass:mainPoS "動詞" .
   ?Wrd_P jass:means ?Cpt_vb .
 }THEN{
   ?Cpt_vb rdf:type jass:Action .
@@ -58,8 +49,8 @@ IF (Action-O(サ変)) {
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
   ?Cls_S jass:categoremMeans ?Cpt_S .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "サ変接続" .
+  ?Cls_P jass:consistsOfCategorem ?Wrd_P .
+  ?Wrd_P jass:subPoS1 "サ変接続" .
   ?Wrd_P jass:means ?Cpt_vb .
 }THEN{
   ?Cpt_vb rdf:type jass:Action .
@@ -72,8 +63,8 @@ IF (Action) {
   ?Stc jass:object ?Cls_O .
   ?Cls_S jass:categoremMeans ?Cpt_S .
   ?Cls_O jass:categoremMeans ?Cpt_O .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "動詞" .
+  ?Cls_P jass:consistsOfCategorem ?Wrd_P .
+  ?Wrd_P jass:mainPoS "動詞" .
   ?Wrd_P jass:means ?Cpt_vb .
 }THEN{
   ?Cpt_vb rdf:type jass:Action .
@@ -87,8 +78,8 @@ IF(Action(サ変)){
   ?Stc jass:object ?Cls_O .
   ?Cls_S jass:categoremMeans ?Cpt_S .
   ?Cls_O jass:categoremMeans ?Cpt_O .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "サ変接続" .
+  ?Cls_P jass:consistsOfCategorem ?Wrd_P .
+  ?Wrd_P jass:subPoS1 "サ変接続" .
   ?Wrd_P jass:means ?Cpt_vb .
 }THEN{
   ?Cpt_vb rdf:type jass:Action .
@@ -103,9 +94,23 @@ IF(attributeOf){
   ?Stc jass:subject ?Cls_S .
   ?Stc jass:predicate ?Cls_P .
   ?Cls_S jass:categoremMeans ?Cpt_S .
-  ?Cls_P jass:categorem ?Wrd_P .
-  ?Wrd_P jass:pos "形容詞" .
+  ?Cls_P jass:consistsOfCategorem ?Wrd_P .
+  ?Wrd_P jass:mainPoS "形容詞" .
   ?Wrd_P jass:means ?Cpt_ad .
 }THEN{
   ?Cpt_S jass:attributeOf ?Cpt_ad .
+}
+
+
+# 概念階層 (rdfs:subClassOf)
+IF (subClassOf) {
+  ?Stc a jass:Sentence ;
+	jass:subject ?Cls_S ;
+	jass:predicate ?Cls_P . 
+  ?Cls_S jass:categoremMeans ?Cpt_S .
+  ?Cls_P jass:consistsOfCategorem ?Wrd_P .
+  ?Wrd_P jass:mainPoS "名詞" ;
+	jass:means ?Cpt_P . 
+}THEN{
+  ?Cpt_S rdfs:subClassOf ?Cpt_P .
 }

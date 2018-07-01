@@ -97,9 +97,12 @@ PartOfSpeechInterface, Identifiable, RDFconvertable {
 		return tags.pronunciation();
 	}
 	@Override
-	
+	public String getURI() {
+		return JASS.uri + getClass().getSimpleName() + id();
+	}
+	@Override
 	public Resource toRDF(Model model) {
-		Resource morphemeResource = model.getResource(JASS.uri+getClass().getSimpleName()+id())
+		Resource morphemeResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Morpheme)
 				.addLiteral(JASS.name, name())
 				.addLiteral(JASS.mainPoS, mainPoS())

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -51,7 +52,10 @@ public class RelationExtractor {
 	/****************************************/
 	public ModelIDMap convertMap_Sentence2JASSModel(SentenceIDMap sentenceMap) {
 		ModelIDMap mm = new ModelIDMap();
-		sentenceMap.forEach((k, v) -> mm.put(JASSFactory.createJASSModel(k), v));
+		sentenceMap.forEach((stc, id) -> {
+			Model model = ModelFactory.createDefaultModel().add(ModelIDMap.DEFAULT_JASS_MODEL);
+			mm.put(stc.toRDF(model).getModel(), id);	
+		});
 		return mm;
 	}
 

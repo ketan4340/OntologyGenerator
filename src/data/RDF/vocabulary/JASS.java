@@ -193,4 +193,6 @@ public class JASS {
 			return new PropertyImpl(uri, "pronunciation");
 		}
 	}
+	
+	public String getURI() {return uri;}
 }
