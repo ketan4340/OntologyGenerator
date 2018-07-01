@@ -134,7 +134,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	/********************************/
 	@Override
 	public List<String> parse(NaturalLanguage nlText) {
-		startProcess(command);									// プロセス開始
+		startProcess();									// プロセス開始
 		writeInput2Process(nlText.toString());					// 入力待ちプロセスにテキスト入力
 		List<String> result = readProcessResult();				// 結果を読み込む
 		finishProcess();											// プロセス終了
@@ -150,7 +150,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		// CaboChaの入力も出力もファイルになるよう，コマンドを用意
 		command.add(inputFilePath.toString());						// 入力テキストのファイル名
 		command.add(OPTION_OUTPUT2FILE + OUTPUT_TXTFILE_PATH.toString());	// ファイルに出力するコマンドを追加
-		startProcess(command);								// プロセス開始
+		startProcess();								// プロセス開始
 		finishProcess();									// プロセス終了
 		try {
 			return Files.readAllLines(OUTPUT_TXTFILE_PATH, StandardCharsets.UTF_8);
@@ -167,7 +167,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	 * @return 解析結果の文字列リスト
 	 */
 	public List<String> passContinualArguments(List<NaturalLanguage> nlList) {
-		startProcess(command);
+		startProcess();
 		PrintWriter pw = new PrintWriter(new BufferedWriter(
 				new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8)));
 		nlList.forEach(nl -> pw.println(nl.toString()));

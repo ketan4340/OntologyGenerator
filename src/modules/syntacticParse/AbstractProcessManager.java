@@ -21,7 +21,7 @@ public abstract class AbstractProcessManager {
 
 
 	/** 外部プロセス開始 */
-	protected void startProcess(List<String> command) {
+	protected void startProcess() {
 		try {
 			process = new ProcessBuilder(command).start();
 		} catch (IOException e) {

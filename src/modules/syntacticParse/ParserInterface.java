@@ -40,7 +40,7 @@ public interface ParserInterface {
 	/** 入力されたList<NL>が空だった場合の処理 */
 	public default List<String> emptyInput() {
 		System.err.println("Input List is Empty!!!");
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 
 

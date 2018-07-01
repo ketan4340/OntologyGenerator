@@ -24,7 +24,7 @@ public class StringListUtil {
 		for (final int borderIndex : borderIndexList) {
 			toIndex = borderIndex;
 			if (fromIndex != toIndex)
-				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
+				splitedLists.add(new ArrayList<>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex + 1;
 		}
 		
@@ -52,7 +52,7 @@ public class StringListUtil {
 			toIndex = borderIndex;
 			// System.out.println("from : " + fromIndex + ", to : " + toIndex);
 			if (fromIndex < toIndex)
-				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
+				splitedLists.add(new ArrayList<>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex;
 		}
 		return splitedLists;
@@ -76,7 +76,7 @@ public class StringListUtil {
 			toIndex = borderIndex + 1;
 			//System.out.println("from : " + fromIndex + ", to : " + toIndex);
 			if (fromIndex < toIndex)
-				splitedLists.add(new ArrayList<String>(list.subList(fromIndex, toIndex)));
+				splitedLists.add(new ArrayList<>(list.subList(fromIndex, toIndex)));
 			fromIndex = toIndex;
 		}
 		return splitedLists;
