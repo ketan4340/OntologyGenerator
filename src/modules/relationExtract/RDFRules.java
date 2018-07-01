@@ -26,11 +26,11 @@ public class RDFRules {
 		rules.forEach(r -> r.expands(model));
 		return model;
 	}
-	
 	public Map<Model, Integer> convert(Model model) {
 		return rules.stream()
 				.collect(Collectors.toMap(r -> r.converts(model), r -> r.id()));
 	}
+	
 	/** ログの出力用 */
 	public List<String> toStringList() {
 		return rules.stream().map(AbstractRDFRule::toString).collect(Collectors.toList());

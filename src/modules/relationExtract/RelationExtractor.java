@@ -25,6 +25,10 @@ import data.id.StatementIDMap;
 public class RelationExtractor {
 	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt"); 
 	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
+	
+	public static final Model DEFAULT_JASS_MODEL = 
+			ModelFactory.createDefaultModel().read("../OntologyGenerator/resource/ontology/SyntaxOntology.owl");
+	
 	/**
 	 * 拡張ルール
 	 */
@@ -50,13 +54,18 @@ public class RelationExtractor {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
+	/**
+	 * {@code Sentence}のIDMapから{@code Model}(JASS) のIDMapに変換する.
+	 * @param sentenceMap
+	 * @return
+	 */
 	public ModelIDMap convertMap_Sentence2JASSModel(SentenceIDMap sentenceMap) {
-		ModelIDMap mm = new ModelIDMap();
+		ModelIDMap modelIDMap = new ModelIDMap();
 		sentenceMap.forEach((stc, id) -> {
-			Model model = ModelFactory.createDefaultModel().add(ModelIDMap.DEFAULT_JASS_MODEL);
-			mm.put(stc.toRDF(model).getModel(), id);	
+			Model model = ModelFactory.createDefaultModel().add(DEFAULT_JASS_MODEL);
+			modelIDMap.put(stc.toRDF(model).getModel(), id);	
 		});
-		return mm;
+		return modelIDMap;
 	}
 
 	public StatementIDMap convertMap_Model2Statements(ModelIDMap modelMap) {
