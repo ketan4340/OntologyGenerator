@@ -37,7 +37,7 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class Sentence extends Parent<Clause<?>>
-	implements GrammarInterface, Identifiable, Child<Paragraph>, RDFconvertable {
+		implements GrammarInterface, Identifiable, Child<Paragraph>, RDFconvertable {
 	private static int sum = 0;
 
 	public final int id;
@@ -56,12 +56,12 @@ public class Sentence extends Parent<Clause<?>>
 		this(clauses);
 		initializeDepending(dependingMap);
 	}
-	
-	
+
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	
+
 	/**
 	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
 	 * @param dependingMap 各文節がこの文の何番目の文節に係るか記録されたマップ
@@ -73,7 +73,7 @@ public class Sentence extends Parent<Clause<?>>
 			c.setDepending(idxDep2 == -1? SingleClause.ROOT: children.get(idxDep2));
 		});
 	}
-	
+
 	public Sentence subSentence(int fromIndex, int toIndex) {
 		List<Clause<?>> subClauses = new ArrayList<>(children.subList(fromIndex, toIndex));
 		return new Sentence(subClauses);
@@ -97,7 +97,7 @@ public class Sentence extends Parent<Clause<?>>
 	public List<Clause<?>> collectClausesEndWith(String[][] tags, boolean ignoreSign) {
 		return children.stream().filter(c -> c.endWith(tags, ignoreSign)).collect(Collectors.toList());
 	}
-	
+
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
 	 * @param tags
@@ -118,12 +118,12 @@ public class Sentence extends Parent<Clause<?>>
 	public boolean connect2Next(Clause<?> frontClause) {
 		if (!children.contains(frontClause)) return false;
 		if (!frontClause.getOthers().isEmpty()) return false;		// 前の文節に接辞(句読点など)があれば繋げない
-		
+
 		Clause<?> backClause = nextChild(frontClause);
 		if (backClause == null || backClause == SingleClause.ROOT) return false;
 
 		List<Clause<?>> backup = new ArrayList<>(children);
-		
+
 		SerialClause sc = SerialClause.connectClauses(frontClause, backClause);
 		if (!replace(backClause, sc)) return false;
 		if (!children.remove(frontClause)) {
@@ -131,11 +131,11 @@ public class Sentence extends Parent<Clause<?>>
 			return false;
 		}
 		Set<Clause<?>> formerDependeds = frontClause.clausesDependThis();
-		formerDependeds.addAll(backClause.clausesDependThis());		
+		formerDependeds.addAll(backClause.clausesDependThis());
 		gatherDepending(sc, formerDependeds);
-		return true; 
+		return true;
 	}
-	
+
 
 	/** 渡したClauseが文中で連続しているかを<clause, Boolean>のMapで返す */
 	/* 例:indexのリストが(2,3,4,6,8,9)なら(T,T,F,F,T,F) */
@@ -179,7 +179,7 @@ public class Sentence extends Parent<Clause<?>>
 			((SingleClause) lastClause).nounize();
 			subjectList.remove(lastClause);
 		}
-		
+
 		if (subjectList.isEmpty()) return shortSentList;	// 文中に主語がなければ終了
 
 		// 主節の連続性を表す真偽値のリスト
@@ -195,7 +195,7 @@ public class Sentence extends Parent<Clause<?>>
 		Clause<?> mainSubject = commonSubjectsOrigin.get(commonSubjectsOrigin.size()-1);
 		List<Clause<?>> predicates = mainSubject.allDependings();
 		predicates.retainAll(children);
-		
+
 		if (predicates.size() <= 1) {	// 述語が一つならスルー
 			shortSentList.add(this);
 			return shortSentList;
@@ -206,7 +206,7 @@ public class Sentence extends Parent<Clause<?>>
 		for (final Clause<?> predicate: predicates) {
 			predicate.setDepending(SingleClause.ROOT);	// 文末の述語となるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;		// 述語も含めて切り取るため+1
-			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
+			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");
 			Sentence subSent = subSentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
 			List<Clause<?>> commonSubjects = SingleClause.cloneAll(commonSubjectsOrigin);
@@ -262,7 +262,7 @@ public class Sentence extends Parent<Clause<?>>
 			if (!entry.getValue())	// 主語の連続が途切れたら
 				break;				// 核主語集め完了
 		}
-		
+
 		/* 述語を収集 */
 		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
 		String[][] tagAdverb = {{"副詞"}};
@@ -270,8 +270,8 @@ public class Sentence extends Parent<Clause<?>>
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: lastClause.clausesDependThis()) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !cls2Last.endWith(tagParticle, true) && 
-					!cls2Last.endWith(tagAdverb, true) && 
+			if ( !cls2Last.endWith(tagParticle, true) &&
+					!cls2Last.endWith(tagAdverb, true) &&
 					!cls2Last.endWith(tagAuxiliary, true) )
 				predicates.add(cls2Last);
 		}
@@ -285,18 +285,19 @@ public class Sentence extends Parent<Clause<?>>
 			partSentList.add(this);
 			return partSentList;
 		}
-		
+
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;
 		for (Iterator<Clause<?>> itr = predicates.iterator(); itr.hasNext(); ) {
 			Clause<?> predicate = itr.next();
 			predicate.setDepending(SingleClause.ROOT);	// 分割後、当該述語は文末にくるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;	// 述語も含めて切り取るため+1
-			//System.out.println("divide3.subList(" + fromIndex + ", " + toIndex + ")");	//TODO
-			Sentence subSent = subSentence(fromIndex, toIndex);			//TODO *from>to problem
+			//System.out.println("divide3.subList(" + fromIndex + ", " + toIndex + ")");
+			//TODO *from>to problem
+			Sentence subSent = subSentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
 			List<Clause<?>> commonSubjects = SingleClause.cloneAll(commonSubjectsOrigin);
-			
+
 			if (fromIndex != 0) {		// 最初の分割文は、新たに主語を挿入する必要ない
 				Clause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭
 				if (subjectList.contains(subSentFirst))			// それが主語なら
@@ -400,7 +401,7 @@ public class Sentence extends Parent<Clause<?>>
 		List<Clause<?>> clauses_NP = collectClausesHaveSome(tags_NP);
 		clauses_NP.forEach(this::connect2Next);
 	}
-	
+
 
 	/** 文章から関係を見つけtripleにする */
 	public List<RDFTriple> extractRelation() {
@@ -411,7 +412,8 @@ public class Sentence extends Parent<Clause<?>>
 			System.err.println("subjectClause is null.");
 			return triples;
 		}
-		Clause<?> subjectClause = subjectList.get(0);		// 主節(!!最初の1つしか使っていない!!) //TODO
+		//TODO 主節(!!最初の1つしか使っていない!!)
+		Clause<?> subjectClause = subjectList.get(0);
 		Word subjectWord = subjectClause.getCategorem();			// 主語
 		if(subjectWord == null) {
 			System.err.println("subjectWord is null.");
@@ -432,10 +434,8 @@ public class Sentence extends Parent<Clause<?>>
 		// 述部(主節に続く全ての節)
 		String predicatePart = subSentence(children.indexOf(subjectClause)+1, children.size()).name();
 
-		//List<AbstractClause<?>> complementClauses;			// 補部
-		//Word complementWord;								// 補語
-
-		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());	//TODO
+		//PRINT
+		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());
 
 		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
 		boolean isNot = predicateClause.containsAnyWordsHave(tag_Not);	// 述語が否定かどうか
@@ -457,7 +457,6 @@ public class Sentence extends Parent<Clause<?>>
 		boolean boolWeight = mtchWeight.matches();
 
 		if(boolLength || boolWeight) {
-			//System.out.println("リテラル");//TODO
 			if(boolLength) {
 				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name()+"-length");
 				triples.add(new RDFTriple(subject, MyResource.LENGTH, blank));			// 空白ノード
@@ -472,7 +471,6 @@ public class Sentence extends Parent<Clause<?>>
 			}
 		/* 述語が動詞 */
 		}else if( predicateClause.containsAnyWordsHave(tagVerb) ) {
-			//System.out.println("動詞");//TODO
 			/* "がある"かどうか */
 			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}, {"動詞", "持つ"}};		// 動詞の"ある"(助動詞ではない)
 			boolean boolHave = predicateClause.containsAnyWordsHave(tag_Have);
@@ -516,7 +514,6 @@ public class Sentence extends Parent<Clause<?>>
 
 		/* 述語が形容詞 */
 		}else if(predicateClause.containsWordHas(tagAdjective)) {
-			//System.out.println("形容詞");//TODO
 			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.infinitive());
 			Clause<?> previousClause = previousChild(predicateClause);	// 形容詞の一つ前の文節
 			if(previousClause == null) return triples;
@@ -529,7 +526,6 @@ public class Sentence extends Parent<Clause<?>>
 
 		/* 述語が名詞または助動詞 */
 		}else {
-			//System.out.println("名詞");//TODO
 			/* 別名・同義語かどうか */
 			String regexSynonym = "(.*?)((に同じ)|(の別名)|(の略)|(のこと)|(の異称))";	// 「〜の別名」「〜に同じ」を探す
 			Pattern ptrnSynonym = Pattern.compile(regexSynonym);
@@ -556,7 +552,7 @@ public class Sentence extends Parent<Clause<?>>
 				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.name())));	// 述語が名詞の場合これがデフォ
 			}
 		}
-		
+
 		return triples;
 	}
 
@@ -566,13 +562,13 @@ public class Sentence extends Parent<Clause<?>>
 		List<RDFTriple> triples = new LinkedList<>();
 
 		triples.add( new RDFTriple(p, MyResource.TYPE, MyResource.ACTION) );
-		
+
 		triples.add( new RDFTriple(p, MyResource.AGENT, s));
 		if(o != null) {	// 目的語あり
-			triples.add( new RDFTriple(p, MyResource.OBJECT, o));	
+			triples.add( new RDFTriple(p, MyResource.OBJECT, o));
 		}else {			// 目的語なし
 		}
-		
+
 		if(!not) {	// 原形
 			triples.add(new RDFTriple(s,p,o));
 		}else {		// 否定形
@@ -583,7 +579,7 @@ public class Sentence extends Parent<Clause<?>>
 	/** (s,p,o)の否定のオントロジーを返す */
 	private List<RDFTriple> makeNegation(RDFTriple triple) {
 		MyResource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
-		
+
 		List<RDFTriple> triples = new LinkedList<>();
 		MyResource blank = new MyResource(Namespace.EMPTY, id + "-not");	// 空白ノードの名前を決める
 		triples.add(new RDFTriple(blank, MyResource.TYPE, new MyResource(Namespace.OWL, "NegativePropertyAssertion")));
@@ -689,14 +685,14 @@ public class Sentence extends Parent<Clause<?>>
 		}
 		System.out.println();
 	}
-	
+
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
 	public int getID() {
 		return id;
 	}
-	
+
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
@@ -714,7 +710,7 @@ public class Sentence extends Parent<Clause<?>>
 	}
 	@Override
 	public void setParent(Paragraph parent) {
-		this.parentParagraph = parent;
+		parentParagraph = parent;
 	}
 	@Override
 	public void setThisAsParent(Clause<?> child) {
@@ -729,8 +725,8 @@ public class Sentence extends Parent<Clause<?>>
 		List<Resource> clauseResources = getChildren().stream()
 				.map(m -> m.toRDF(model)).collect(Collectors.toList());
 		clauseDepending2RDF(clauseResources);
-		Resource clauseNode = model.createList(clauseResources.iterator()); 
-		
+		Resource clauseNode = model.createList(clauseResources.iterator());
+
 		Resource sentenceResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Sentence)
 				.addProperty(JASS.consistsOfClauses, clauseNode);
@@ -740,13 +736,13 @@ public class Sentence extends Parent<Clause<?>>
 		children.forEach(cls -> {
 			Resource clause = clauseResources.stream().filter(c -> Objects.equals(c.getURI(), cls.getURI())).findAny().orElse(null);
 			Clause<?> depending = cls.getDepending();
-			Optional<Resource> dependingResource = depending == SingleClause.ROOT? Optional.empty(): 
+			Optional<Resource> dependingResource = depending == SingleClause.ROOT? Optional.empty():
 					clauseResources.stream().filter(c -> Objects.equals(c.getURI(), depending.getURI())).findAny();
 			dependingResource.ifPresent(d -> clause.addProperty(JASS.dependTo, d));
 		});
 	}
-	
-	
+
+
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
@@ -756,5 +752,5 @@ public class Sentence extends Parent<Clause<?>>
 				.map(Clause::toString)
 				.collect(Collectors.joining("/"));
 	}
-	
+
 }

@@ -19,14 +19,16 @@ IF (numeral value) {
   ?Cls_S jass:categoremMeans ?Cpt_S .
   ?Stc jass:predicate ?Cls_P .
   ?Cls_P jass:consistsOfCategorem ?Prs .
-#  ?Prs jass:consistsOfDependent/rdf:rest/jass:name ?length .
+#  ?Prs jass:consistsOfDependent/rdf:rest/rdf:first/jass:name ?length .
 #  FILTER regex(?length, "長$")
   ?Prs jass:consistsOfHead ?head .
-  ?head jass:consistsOfMorphemes/rdf:first/jass:name ?val .
-  FILTER regex(?val, "[0-9０-９]+")
-  ?head jass:consistsOfMorphemes/rdf:rest/rdf:first/jass:name ?unit .
+  ?head jass:consistsOfMorphemes/rdf:rest*/rdf:first ?valrsc .
+  ?valrsc jass:name ?val .
+  FILTER regex(?val, "[0-9０-９]+?")
+  ?valrsc ^rdf:first/rdf:rest/rdf:first/jass:name ?unit .
 }THEN{
   ?Cpt_S sio:SIO_000216 _:bn .
+#  _:bn rdf:type ?length .
   _:bn rdf:value ?val .
   _:bn sio:SIO_000221 ?unit .
 }

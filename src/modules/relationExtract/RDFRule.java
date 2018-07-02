@@ -59,7 +59,7 @@ public class RDFRule implements Identifiable, GrammarInterface {
 		return solves(model);
 	}
 
-	public Query toConstructQuery() {
+	private Query toConstructQuery() {
 		String queryString = 
 				QUERY_PREFIXES + 
 				"CONSTRUCT {" +
@@ -69,6 +69,7 @@ public class RDFRule implements Identifiable, GrammarInterface {
 				"}";
 		return QueryFactory.create(queryString);
 	}
+	
 
 	/****************************************/
 	/**********  Interface Method  **********/

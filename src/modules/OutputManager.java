@@ -54,13 +54,12 @@ public class OutputManager {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	
-	public void outputOntology(ModelIDMap ontologyMap) {
-		Model unionModel = ontologyMap.uniteModels();
+	public void outputOntology(Model model) {
 		try (final OutputStream os = Files.newOutputStream(PATH_GENERATED_ONTOLOGY_TURTLE)) {
-			unionModel.write(os, "TURTLE");
+			model.write(os, "TURTLE");
 		} catch (IOException e) {e.printStackTrace();}
 		try (final OutputStream os = Files.newOutputStream(PATH_GENERATED_ONTOLOGY_RDFXML)) {
-			unionModel.write(os, "RDF/XML");
+			model.write(os, "RDF/XML");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	

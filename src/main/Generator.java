@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.jena.vocabulary.RDFS.Init;
+import org.apache.jena.rdf.model.Model;
 
 import data.RDF.Ontology;
 import data.id.ModelIDMap;
@@ -51,30 +51,40 @@ public class Generator {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	/** ジェネレータの実行. */
+	/**
+	 * ジェネレータの実行. 
+	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
+	 */
 	private void execute(String textFileName) {
 		//textFileName = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
 		textFileName = "../OntologyGenerator/resource/input/test/literalText.txt";
 		Path textFilePath = Paths.get(textFileName);
 
 		String[] texts = {
+				/*
 				"クジラは小魚を食べる。", 
 				"クジラは哺乳類である。",
 				"カニの味噌汁は美味しいぞ",
 				"アイアイはアイアイ科の原始的な猿",
+				//*/
 				"馬は体長1メートルほど。",
 				"藍鮫はアイザメ科の海水魚の総称だ。"
+				//*/
 		};
-		List<NaturalLanguage> nlLists = Arrays.asList( NaturalLanguage.toNaturalLanguageArray(texts));
+		List<NaturalLanguage> nlLists = Arrays.asList(NaturalLanguage.toNaturalLanguageArray(texts));
 
 		Generator generator = new Generator();
-		//Ontology ontology = generator.generate(nlLists);
-		Ontology ontology = generator.generate(textFilePath);
-		ontology.getTriples().stream().limit(20).forEach(System.out::println);
+		generator.generate(nlLists);
+		//generator.generate(textFilePath);
 	}
 	
-	public Ontology generate(Path textFile) {
-		return generateParagraphs(loadTextFile(textFile));
+	/**
+	 * ジェネレータ本体. 
+	 * @param textFilePath 入力するテキストファイルのパス
+	 * @return
+	 */
+	public Ontology generate(Path textFilePath) {
+		return generateParagraphs(loadTextFile(textFilePath));
 	}
 
 	public Ontology generateParagraphs(List<NaturalParagraph> naturalLanguageParagraphs) {
@@ -119,14 +129,15 @@ public class Generator {
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
 		
-		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(modelMap));
+		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
+		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
 		opm.outputDividedSentences(sentenceMap);
 		opm.outputJASSGraph(JASSMap);
 		opm.outputIDAsCSV(statementMap.createIDRelation());
-		opm.outputOntology(modelMap);
+		opm.outputOntology(unionModel);
 		opm.outputRDFRules(re.getOntologyRules());
 				
 		System.out.println("Finished.");
