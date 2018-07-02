@@ -9,12 +9,12 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.Concept;
+import grammar.Child;
+import grammar.GrammarInterface;
 import grammar.clause.Clause;
+import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
-import grammar.structure.Child;
-import grammar.structure.GrammarInterface;
 
 public class Word 
 	implements Identifiable, RDFconvertable, GrammarInterface, 

@@ -3,10 +3,10 @@ package modules.syntacticParse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import grammar.NaturalLanguage;
-import grammar.NaturalParagraph;
-import grammar.Paragraph;
-import grammar.Sentence;
+import grammar.naturalLanguage.NaturalLanguage;
+import grammar.naturalLanguage.NaturalParagraph;
+import grammar.paragraph.Paragraph;
+import grammar.sentence.Sentence;
 
 public class SyntacticParser {
 

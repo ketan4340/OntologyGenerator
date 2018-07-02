@@ -14,12 +14,12 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.Concept;
-import grammar.Sentence;
+import grammar.Child;
+import grammar.GrammarInterface;
+import grammar.Parent;
+import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
-import grammar.structure.Child;
-import grammar.structure.GrammarInterface;
-import grammar.structure.Parent;
+import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 

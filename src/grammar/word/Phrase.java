@@ -9,8 +9,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.Concept;
 import grammar.clause.Clause;
+import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 
 /**

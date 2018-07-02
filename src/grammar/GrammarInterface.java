@@ -1,4 +1,4 @@
-package grammar.structure;
+package grammar;
 
 public interface GrammarInterface {
 

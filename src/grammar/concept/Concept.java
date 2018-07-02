@@ -1,4 +1,4 @@
-package grammar;
+package grammar.concept;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,9 +13,9 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
+import grammar.GrammarInterface;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
-import grammar.structure.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 

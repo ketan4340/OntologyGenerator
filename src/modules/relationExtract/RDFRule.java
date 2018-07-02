@@ -9,7 +9,7 @@ import org.apache.jena.rdf.model.Model;
 
 import data.RDF.Namespace;
 import data.id.Identifiable;
-import grammar.structure.GrammarInterface;
+import grammar.GrammarInterface;
 
 public class RDFRule implements Identifiable, GrammarInterface {
 	protected static final String prefixRDF = Namespace.RDF.toQueryPrefixDefinition();

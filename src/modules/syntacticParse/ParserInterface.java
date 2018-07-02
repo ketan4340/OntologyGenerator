@@ -4,11 +4,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import grammar.Concept;
-import grammar.NaturalLanguage;
-import grammar.Sentence;
 import grammar.clause.SingleClause;
+import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
+import grammar.naturalLanguage.NaturalLanguage;
+import grammar.sentence.Sentence;
 import grammar.word.Word;
 
 public interface ParserInterface {

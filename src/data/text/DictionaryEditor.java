@@ -14,9 +14,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import grammar.NaturalLanguage;
-import grammar.Sentence;
 import grammar.clause.Clause;
+import grammar.naturalLanguage.NaturalLanguage;
+import grammar.sentence.Sentence;
 import modules.syntacticParse.Cabocha;
 
 public class DictionaryEditor {

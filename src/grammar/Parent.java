@@ -1,4 +1,4 @@
-package grammar.structure;
+package grammar;
 
 import java.util.List;
 import java.util.Objects;

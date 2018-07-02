@@ -1,4 +1,4 @@
-package grammar;
+package grammar.paragraph;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,9 +10,11 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.structure.Child;
-import grammar.structure.GrammarInterface;
-import grammar.structure.Parent;
+import grammar.Child;
+import grammar.GrammarInterface;
+import grammar.Parent;
+import grammar.sentence.Sentence;
+import grammar.writing.Writing;
 
 public class Paragraph extends Parent<Sentence> 
 	implements Identifiable, GrammarInterface, Child<Writing>, RDFconvertable {

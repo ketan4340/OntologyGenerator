@@ -1,4 +1,4 @@
-package grammar;
+package grammar.naturalLanguage;
 
 import java.util.Arrays;
 import java.util.List;

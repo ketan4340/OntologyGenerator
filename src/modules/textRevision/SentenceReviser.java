@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 import data.id.IDTuple;
 import data.id.SentenceIDMap;
-import grammar.Sentence;
 import grammar.clause.Clause;
+import grammar.sentence.Sentence;
 
 public class SentenceReviser {
 

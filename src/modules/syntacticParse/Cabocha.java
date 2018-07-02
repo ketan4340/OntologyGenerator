@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import grammar.Concept;
-import grammar.NaturalLanguage;
-import grammar.Sentence;
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
+import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.Tags;
+import grammar.naturalLanguage.NaturalLanguage;
+import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;

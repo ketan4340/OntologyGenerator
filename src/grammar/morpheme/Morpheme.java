@@ -9,7 +9,7 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.structure.GrammarInterface;
+import grammar.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 

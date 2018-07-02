@@ -1,4 +1,4 @@
-package grammar;
+package grammar.sentence;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,14 +25,16 @@ import data.RDF.RDFTriple;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
+import grammar.Child;
+import grammar.GrammarInterface;
+import grammar.Parent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
+import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.Tags;
-import grammar.structure.Child;
-import grammar.structure.GrammarInterface;
-import grammar.structure.Parent;
+import grammar.paragraph.Paragraph;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 

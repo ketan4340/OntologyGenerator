@@ -5,8 +5,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.Concept;
 import grammar.clause.Clause;
+import grammar.concept.Concept;
 
 public class Categorem extends Word{
 	public static final Categorem EMPTY_CATEGOREM = new Categorem(Concept.EMPTY_CONCEPT);

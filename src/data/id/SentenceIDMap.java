@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 
-import grammar.Sentence;
+import grammar.sentence.Sentence;
 
 public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	private static final long serialVersionUID = -2957160502289250254L;

@@ -1,8 +1,9 @@
-package grammar;
+package grammar.writing;
 
 import java.util.List;
 
-import grammar.structure.Parent;
+import grammar.Parent;
+import grammar.paragraph.Paragraph;
 
 /**
  * 文構造に関わる全てのクラスを包括する最上位クラス. とりあえずは{@code Paragraph}の上位クラス.
