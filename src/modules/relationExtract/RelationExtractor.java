@@ -22,12 +22,12 @@ import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
 
 public class RelationExtractor {
-	
-	/** 
+
+	/**
 	 * 標準のJASSオントロジー
 	 */
 	public final Model defaultJASSModel;
-	
+
 	/**
 	 * 拡張ルール
 	 */
@@ -36,10 +36,10 @@ public class RelationExtractor {
 	 * オントロジー変換ルール
 	 */
 	private final RDFRules ontologyRules;
-	
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
 	public RelationExtractor(RDFRules extensionRules, RDFRules ontologyRules, Model jassModel) {
 		this.extensionRules = extensionRules;
 		this.ontologyRules = ontologyRules;
@@ -47,15 +47,24 @@ public class RelationExtractor {
 	}
 	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, String jassModelURL) {
 		this(RDFRuleReader.readNewRDFRules(extensionRulePath),
-				RDFRuleReader.readNewRDFRules(ontologyRulePath), 
+				RDFRuleReader.readNewRDFRules(ontologyRulePath),
 				ModelFactory.createDefaultModel().read(jassModelURL)
 				);
 	}
-	
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Static  Method        ========== */
+	/* ================================================== */
+	//TODO これをうまく使え
+	public String createPrefixes4Query() {
+		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
+		.map(e -> "PREFIX "+ e.getKey() +": <"+ e.getValue() +">")
+		.collect(Collectors.joining(" "));
+	}
+
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
 	/**
 	 * {@code Sentence}のIDMapから{@code Model}(JASS) のIDMapに変換する.
 	 * @param sentenceMap
@@ -65,7 +74,7 @@ public class RelationExtractor {
 		ModelIDMap modelIDMap = new ModelIDMap();
 		sentenceMap.forEach((stc, id) -> {
 			Model model = ModelFactory.createDefaultModel().add(defaultJASSModel);
-			modelIDMap.put(stc.toRDF(model).getModel(), id);	
+			modelIDMap.put(stc.toRDF(model).getModel(), id);
 		});
 		return modelIDMap;
 	}
@@ -124,9 +133,9 @@ public class RelationExtractor {
 		return ontologyMap;
 	}
 
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Getter, Setter        ========== */
+	/* ================================================== */
 	public RDFRules getExtensionRules() {
 		return extensionRules;
 	}
