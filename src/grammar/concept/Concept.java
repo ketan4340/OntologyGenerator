@@ -10,7 +10,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.RDFconvertable;
+import data.RDF.RDFizable;
 import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
@@ -19,7 +19,7 @@ import grammar.morpheme.PartOfSpeechInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface, RDFconvertable {
+public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface, RDFizable {
 	private static final UniqueSet<Concept> CONCEPTS_UNIQUESET = new UniqueSet<>(100);
 	public static final Concept EMPTY_CONCEPT = new Concept(Collections.emptyList());
 

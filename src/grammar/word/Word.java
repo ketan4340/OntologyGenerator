@@ -6,7 +6,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.RDFconvertable;
+import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.SyntacticChild;
@@ -17,7 +17,7 @@ import grammar.morpheme.Morpheme;
 import grammar.morpheme.PartOfSpeechInterface;
 
 public class Word 
-	implements Identifiable, RDFconvertable, GrammarInterface, 
+	implements Identifiable, RDFizable, GrammarInterface, 
 	PartOfSpeechInterface, SyntacticChild<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;

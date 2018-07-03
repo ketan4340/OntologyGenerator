@@ -22,7 +22,7 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.MyResource;
 import data.RDF.Namespace;
 import data.RDF.RDFTriple;
-import data.RDF.RDFconvertable;
+import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.SyntacticChild;
@@ -39,7 +39,7 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class Sentence extends SyntacticParent<Clause<?>>
-		implements GrammarInterface, Identifiable, SyntacticChild<Paragraph>, RDFconvertable {
+		implements GrammarInterface, Identifiable, SyntacticChild<Paragraph>, RDFizable {
 	private static int sum = 0;
 
 	public final int id;

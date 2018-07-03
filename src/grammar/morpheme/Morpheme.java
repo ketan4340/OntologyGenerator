@@ -6,7 +6,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.RDFconvertable;
+import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
@@ -14,7 +14,7 @@ import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
 public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, 
-PartOfSpeechInterface, Identifiable, RDFconvertable {
+PartOfSpeechInterface, Identifiable, RDFizable {
 	private static UniqueSet<Morpheme> MORPHEMES_UNIQUESET = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
 
 	public final int id;		// 通し番号

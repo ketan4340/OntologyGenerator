@@ -11,7 +11,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.RDFconvertable;
+import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.SyntacticChild;
@@ -24,7 +24,7 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public abstract class Clause<W extends Word> extends SyntacticParent<Word>
-implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFconvertable {	
+implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {	
 	private static int clausesSum = 0;
 	
 	public final int id;

@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.RDFconvertable;
+import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.SyntacticChild;
@@ -17,7 +17,7 @@ import grammar.sentence.Sentence;
 import grammar.writing.Writing;
 
 public class Paragraph extends SyntacticParent<Sentence> 
-	implements Identifiable, GrammarInterface, SyntacticChild<Writing>, RDFconvertable {
+	implements Identifiable, GrammarInterface, SyntacticChild<Writing>, RDFizable {
 	private static int paragraphSum = 0;
 	
 	private final int id;
