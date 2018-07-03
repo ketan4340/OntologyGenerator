@@ -9,7 +9,7 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.Child;
+import grammar.SyntacticChild;
 import grammar.GrammarInterface;
 import grammar.clause.Clause;
 import grammar.concept.Concept;
@@ -18,7 +18,7 @@ import grammar.morpheme.PartOfSpeechInterface;
 
 public class Word 
 	implements Identifiable, RDFconvertable, GrammarInterface, 
-	PartOfSpeechInterface, Child<Clause<? extends Word>>
+	PartOfSpeechInterface, SyntacticChild<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;
 

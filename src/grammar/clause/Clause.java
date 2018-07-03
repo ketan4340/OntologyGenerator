@@ -14,17 +14,17 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.Child;
+import grammar.SyntacticChild;
 import grammar.GrammarInterface;
-import grammar.Parent;
+import grammar.SyntacticParent;
 import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public abstract class Clause<W extends Word> extends Parent<Word>
-implements Identifiable, GrammarInterface, Child<Sentence>, RDFconvertable {	
+public abstract class Clause<W extends Word> extends SyntacticParent<Word>
+implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFconvertable {	
 	private static int clausesSum = 0;
 	
 	public final int id;

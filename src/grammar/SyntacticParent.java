@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class Parent<C extends Child<? extends Parent<C>>> {
+public abstract class SyntacticParent<C extends SyntacticChild<? extends SyntacticParent<C>>> {
 	
 	protected List<C> children;
 	
@@ -12,7 +12,7 @@ public abstract class Parent<C extends Child<? extends Parent<C>>> {
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public Parent(List<C> children) {
+	public SyntacticParent(List<C> children) {
 		setChildren(children);
 		imprintThisOnChildren();
 	}

@@ -25,9 +25,9 @@ import data.RDF.RDFTriple;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.Child;
+import grammar.SyntacticChild;
 import grammar.GrammarInterface;
-import grammar.Parent;
+import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
@@ -38,8 +38,8 @@ import grammar.paragraph.Paragraph;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
-public class Sentence extends Parent<Clause<?>>
-		implements GrammarInterface, Identifiable, Child<Paragraph>, RDFconvertable {
+public class Sentence extends SyntacticParent<Clause<?>>
+		implements GrammarInterface, Identifiable, SyntacticChild<Paragraph>, RDFconvertable {
 	private static int sum = 0;
 
 	public final int id;

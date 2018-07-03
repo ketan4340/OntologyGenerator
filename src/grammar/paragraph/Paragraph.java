@@ -10,14 +10,14 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFconvertable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.Child;
+import grammar.SyntacticChild;
 import grammar.GrammarInterface;
-import grammar.Parent;
+import grammar.SyntacticParent;
 import grammar.sentence.Sentence;
 import grammar.writing.Writing;
 
-public class Paragraph extends Parent<Sentence> 
-	implements Identifiable, GrammarInterface, Child<Writing>, RDFconvertable {
+public class Paragraph extends SyntacticParent<Sentence> 
+	implements Identifiable, GrammarInterface, SyntacticChild<Writing>, RDFconvertable {
 	private static int paragraphSum = 0;
 	
 	private final int id;

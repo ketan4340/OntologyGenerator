@@ -1,6 +1,6 @@
 package grammar;
 
-public interface Child<P extends Parent<? extends Child<P>>> {
+public interface SyntacticChild<P extends SyntacticParent<? extends SyntacticChild<P>>> {
 
 	
 	/****************************************/

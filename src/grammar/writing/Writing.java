@@ -2,7 +2,7 @@ package grammar.writing;
 
 import java.util.List;
 
-import grammar.Parent;
+import grammar.SyntacticParent;
 import grammar.paragraph.Paragraph;
 
 /**
@@ -10,7 +10,7 @@ import grammar.paragraph.Paragraph;
  * @author tanabekentaro
  *
  */
-public class Writing extends Parent<Paragraph> {
+public class Writing extends SyntacticParent<Paragraph> {
 
 	/****************************************/
 	/**********     Constructor    **********/
