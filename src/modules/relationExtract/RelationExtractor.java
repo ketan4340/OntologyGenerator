@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -46,20 +49,10 @@ public class RelationExtractor {
 		this.defaultJASSModel = jassModel;
 	}
 	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, String jassModelURL) {
-		this(RDFRuleReader.readNewRDFRules(extensionRulePath),
-				RDFRuleReader.readNewRDFRules(ontologyRulePath),
+		this(RDFRuleReader.readRDFRules(extensionRulePath),
+				RDFRuleReader.readRDFRules(ontologyRulePath),
 				ModelFactory.createDefaultModel().read(jassModelURL)
 				);
-	}
-
-	/* ================================================== */
-	/* ==========        Static  Method        ========== */
-	/* ================================================== */
-	//TODO これをうまく使え
-	public String createPrefixes4Query() {
-		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
-		.map(e -> "PREFIX "+ e.getKey() +": <"+ e.getValue() +">")
-		.collect(Collectors.joining(" "));
 	}
 
 	/* ================================================== */
@@ -116,15 +109,15 @@ public class RelationExtractor {
 	public ModelIDMap convertMap_JASSModel2RDFModel(ModelIDMap JASSMap) {
 		ModelIDMap ontologyMap = new ModelIDMap();
 		// 拡張
-		JASSMap.forEachKey(extensionRules::expand);
+		JASSMap.forEachKey(this::extendsJASSModel);
 		// 変換
 		for (Map.Entry<Model, IDTuple> e : JASSMap.entrySet()) {
 			Model convertingModel = e.getKey();
 			IDTuple idt = e.getValue();
-			Map<Model, Integer> modelsWithRuleID = ontologyRules.convert(convertingModel);
-			for (Map.Entry<Model, Integer> e2 : modelsWithRuleID.entrySet()) {
+			Map<Model, RDFRule> modelsWithRuleID = convertsJASSModel(convertingModel);
+			for (Map.Entry<Model, RDFRule> e2 : modelsWithRuleID.entrySet()) {
 				Model convertedModel = e2.getKey();
-				int ruleID = e2.getValue();
+				int ruleID = e2.getValue().id();
 				IDTuple idt_clone = idt.clone();
 				idt_clone.setRDFRuleID(ruleID);
 				ontologyMap.put(convertedModel, idt_clone);
@@ -133,8 +126,32 @@ public class RelationExtractor {
 		return ontologyMap;
 	}
 
+	/* クエリ解決用 */
+	private Model extendsJASSModel(Model jass) {
+		extensionRules.forEach(r -> jass.add(solveConstructQuery(jass, r)));
+		return jass;
+	}
+	private Map<Model, RDFRule> convertsJASSModel(Model jass) {
+		return ontologyRules.stream()
+				.collect(Collectors.toMap(
+						r -> solveConstructQuery(jass, r),
+						r -> r
+						));
+	}
+	private Model solveConstructQuery(Model model, RDFRule rule) {
+		return QueryExecutionFactory.create(createQuery(rule), model).execConstruct();
+	}
+	private Query createQuery(RDFRule rule) {
+		return QueryFactory.create(createPrefixes4Query() + rule.writeQuery());
+	}
+	private String createPrefixes4Query() {
+		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
+				.map(e -> "PREFIX "+ e.getKey() +": <"+ e.getValue() +">")
+				.collect(Collectors.joining(" "));
+	}
+
 	/* ================================================== */
-	/* ==========        Getter, Setter        ========== */
+	/* ==========            Getter            ========== */
 	/* ================================================== */
 	public RDFRules getExtensionRules() {
 		return extensionRules;
