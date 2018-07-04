@@ -250,7 +250,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");
 		String name = morphemeInfos[0];
 		List<String> tagList = Arrays.asList(morphemeInfos[1].split(","));
-		Tags tags = Tags.of(tagList, name).orElse(Tags.EMPTY_TAGS);	// Optional使ってるのに，nullの対処を結局Tagsの実装でやらされててあまり意味ない
+		Tags tags = Tags.getInstance(tagList, name).orElse(Tags.EMPTY_TAGS);	// Optional使ってるのに，nullの対処を結局Tagsの実装でやらされててあまり意味ない
 		return Morpheme.getOrNewInstance(name, tags);
 	}
 

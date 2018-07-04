@@ -4,9 +4,11 @@ import java.util.Arrays;
 
 import util.tuple.Tuple;
 
-public class IDTuple extends Tuple implements Cloneable{
+public class IDTuple extends Tuple {
+	private static final long serialVersionUID = -3501992033602856621L;
+
 	private static final int SIZE 				= 10;
-	
+
 	private static final int LONGSENTENCE_ID	= 0;
 	private static final int LONGSENTENCE		= 1;
 	private static final int SHORTSENTENCE_ID	= 2;
@@ -17,30 +19,30 @@ public class IDTuple extends Tuple implements Cloneable{
 	private static final int PREDICATE 			= 7;
 	private static final int OBJECT 			= 8;
 	private static final int SCORE 				= 9;
-	
+
 	protected static Tuple ATTRIBUTES = new Tuple(Arrays.asList(
-			"Long Sentence ID", 
-			"Long Sentence", 
-			"Short Sentence ID", 
-			"Short Sentence", 
-			"RDFRule ID", 
-			"Triple ID", 
-			"Subject", 
-			"Predicate", 
-			"Object", 
+			"Long Sentence ID",
+			"Long Sentence",
+			"Short Sentence ID",
+			"Short Sentence",
+			"RDFRule ID",
+			"Triple ID",
+			"Subject",
+			"Predicate",
+			"Object",
 			"Score"));
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
-	public IDTuple() {
-		super(SIZE);
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
+	public IDTuple(String initValue) {
+		super(SIZE, initValue);
 	}
-	public IDTuple(int longSentenceID, String longSentence, 
-			int shortSentenceID, String shortSentence, 
-			int rdfRuleID, int tripleID, 
+	public IDTuple(int longSentenceID, String longSentence,
+			int shortSentenceID, String shortSentence,
+			int rdfRuleID, int tripleID,
 			String subject, String predicate, String object,  int score) {
-		this();
+		this("-1");
 		setLongSentenceID(longSentenceID);
 		setLongSentence(longSentence);
 		setShortSentenceID(shortSentenceID);
@@ -55,9 +57,9 @@ public class IDTuple extends Tuple implements Cloneable{
 
 
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
 	public void copy(IDTuple t) {
 		setLongSentenceID(t.getLongSentenceID());
 		setLongSentence(t.getLongSentence());
@@ -70,86 +72,86 @@ public class IDTuple extends Tuple implements Cloneable{
 		setObject(t.getObject());
 		setScore(t.getScore());
 	}
-	
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ==========        Getter, Setter        ========== */
+	/* ================================================== */
 	public int getLongSentenceID() {
-		return Integer.parseInt(values.get(LONGSENTENCE_ID));
+		return Integer.parseInt(get(LONGSENTENCE_ID));
 	}
 	public void setLongSentenceID(int longSentenceID) {
-		this.values.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
+		this.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
 	}
 	public String getLongSentence() {
-		return values.get(LONGSENTENCE);
+		return get(LONGSENTENCE);
 	}
 	public void setLongSentence(String longSentence) {
-		this.values.set(LONGSENTENCE, longSentence);
+		this.set(LONGSENTENCE, longSentence);
 	}
 	public int getShortSentenceID() {
-		return Integer.parseInt(values.get(SHORTSENTENCE_ID));
+		return Integer.parseInt(get(SHORTSENTENCE_ID));
 	}
 	public void setShortSentenceID(int shortSentenceID) {
-		this.values.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
+		this.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
 	}
 	public String getShortSentence() {
-		return values.get(SHORTSENTENCE);
+		return get(SHORTSENTENCE);
 	}
 	public void setShortSentence(String shortSentence) {
-		this.values.set(SHORTSENTENCE, shortSentence);
+		this.set(SHORTSENTENCE, shortSentence);
 	}
 	public int getRDFRuleID() {
-		return Integer.parseInt(values.get(RDFRULE_ID));
+		return Integer.parseInt(get(RDFRULE_ID));
 	}
 	public void setRDFRuleID(int rdfRuleID) {
-		this.values.set(RDFRULE_ID, String.valueOf(rdfRuleID));
+		this.set(RDFRULE_ID, String.valueOf(rdfRuleID));
 	}
 	public int getTripleID() {
-		return Integer.parseInt(values.get(TRIPLE_ID));
+		return Integer.parseInt(get(TRIPLE_ID));
 	}
 	public void setTripleID(int tripleID) {
-		this.values.set(TRIPLE_ID, String.valueOf(tripleID));
+		this.set(TRIPLE_ID, String.valueOf(tripleID));
 	}
 	public String getSubject() {
-		return values.get(SUBJECT);
+		return get(SUBJECT);
 	}
 	public void setSubject(String subject) {
-		this.values.set(SUBJECT, subject);
+		this.set(SUBJECT, subject);
 	}
 	public String getPredicate() {
-		return values.get(PREDICATE);
+		return get(PREDICATE);
 	}
 	public void setPredicate(String predicate) {
-		this.values.set(PREDICATE, predicate);
+		this.set(PREDICATE, predicate);
 	}
 	public String getObject() {
-		return values.get(OBJECT);
+		return get(OBJECT);
 	}
 	public void setObject(String object) {
-		this.values.set(OBJECT, object);
+		this.set(OBJECT, object);
 	}
 	public int getScore() {
-		return Integer.parseInt(values.get(SCORE));
+		return Integer.parseInt(get(SCORE));
 	}
 	public void setScore(int score) {
-		this.values.set(SCORE, String.valueOf(score));
+		this.set(SCORE, String.valueOf(score));
 	}
-	
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ==========        Object  Method        ========== */
+	/* ================================================== */
 	@Override
 	public IDTuple clone() {
-		return new IDTuple( 
-				getLongSentenceID(), 
-				getLongSentence(), 
-				getShortSentenceID(), 
-				getShortSentence(), 
+		return new IDTuple(
+				getLongSentenceID(),
+				getLongSentence(),
+				getShortSentenceID(),
+				getShortSentence(),
 				getRDFRuleID(),
-				getTripleID(), 
-				getSubject(), 
-				getPredicate(), 
+				getTripleID(),
+				getSubject(),
+				getPredicate(),
 				getObject(),
 				getScore());
 	}

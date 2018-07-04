@@ -1,45 +1,37 @@
 package util.tuple;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class Tuple {	
-	protected List<String> values;
-	
+public class Tuple extends ArrayList<String> {
+	private static final long serialVersionUID = -201286752453864379L;
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
-	public Tuple(int size) {
-		setValues(Stream.generate(() -> "-1").limit(size).collect(Collectors.toList()));
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
+	public Tuple(int size, String initValue) {
+		super(Collections.nCopies(size, initValue));
+		//this.values = Stream.generate(() -> initValue).limit(size).collect(Collectors.toList());
 	}
 	public Tuple(List<String> values) {
-		setValues(values);
-	}
-	
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
-	public String toCSV() {
-		return String.join(",", values);
-	}
-	
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-	public List<String> getValues() {
-		return values;
-	}
-	public void setValues(List<String> values) {
-		this.values = values;
+		super(values);
 	}
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
-	@Override
-	public String toString() {
-		return values.toString(); 
+	public static Tuple valueOf(int size, String initValue) {
+		return new Tuple(size, initValue);
 	}
+	public static Tuple valueOf(List<String> values) {
+		return new Tuple(values);
+	}
+
+
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
+	public String toCSV() {
+		return String.join(",", this);
+	}
+
+
 }
