@@ -1,8 +1,9 @@
 package grammar.morpheme;
 
-public interface PartOfSpeechInterface {
-	/** 表層形 (入力通り) */
-	String name();
+public interface CabochaPoSInterface {
+	int MINIMUM_TAGS_SIZE = 7;
+	int MAXIMUM_TAGS_SIZE = 9;
+
 	/** 品詞 */
 	String mainPoS();
 	/** 品詞細分類1 */

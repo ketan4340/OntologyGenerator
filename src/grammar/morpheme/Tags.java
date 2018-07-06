@@ -1,40 +1,41 @@
 package grammar.morpheme;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import util.tuple.Tuple;
 
 /** CaboCha準拠の品詞セット */
-public class Tags extends Tuple implements Comparable<Tags>, PartOfSpeechInterface {
+public class Tags extends Tuple implements Comparable<Tags>, CabochaPoSInterface {
 	private static final long serialVersionUID = -3714579060521127807L;
 
-	public static final Tags EMPTY_TAGS = new Tags("", "", "", "", "", "", "empty", "empty", "epmty");
+	private static final HashSet<Tags> ALL_TAGS = new HashSet<>();
+	public static final Tags EMPTY_TAGS = new Tags(Arrays.asList("", "", "", "", "", "", "empty", "empty", "empty"));
+
 	public static final int MINIMUM_TAGS_SIZE = 7;
 	public static final int MAXIMUM_TAGS_SIZE = 9;
 	/** 品詞 */
-	public static final int MAIN_PoS = 0;
+	public static final int MAIN_PoS 		= 0;
 	/** 品詞細分類1 */
-	public static final int SUB_PoS1 = 1;
+	public static final int SUB_PoS1 		= 1;
 	/** 品詞細分類2 */
-	public static final int SUB_PoS2 = 2;
+	public static final int SUB_PoS2 		= 2;
 	/** 品詞細分類3 */
-	public static final int SUB_PoS3 = 3;
+	public static final int SUB_PoS3 		= 3;
 	/** 活用形 */
-	public static final int INFLECTION = 4;
+	public static final int INFLECTION 		= 4;
 	/** 活用型 */
-	public static final int CONJUGATION = 5;
+	public static final int CONJUGATION 	= 5;
 	/** 原形 (半角文字ではデフォルトで"*") */
-	public static final int INFINITIVE = 6;
+	public static final int INFINITIVE 		= 6;
 	/** 読み (半角文字ではもともとない) */
-	public static final int KANA = 7;
+	public static final int KANA 			= 7;
 	/** 発音 (半角文字ではもともとない) */
-	public static final int PRONUNCIATION = 8;
+	public static final int PRONUNCIATION 	= 8;
 
 
 	/* ================================================== */
@@ -43,23 +44,26 @@ public class Tags extends Tuple implements Comparable<Tags>, PartOfSpeechInterfa
 	private Tags(List<String> tagList) {
 		super(tagList);
 	}
-	public Tags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
-			String inflection, String conjugation,
-			String infinitive, String kana, String pronunciation) {
-		this(Collections.unmodifiableList(Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3,
-				inflection, conjugation, infinitive, kana, pronunciation)));
-	}
 
-	public static Optional<Tags> getInstance(List<String> tagList, String infinitive) {
+	/* ===== Factory Method ===== */
+	public static Tags getInstance(List<String> tagList, String infinitive) {
 		if (tagList.size() < MINIMUM_TAGS_SIZE || MAXIMUM_TAGS_SIZE < tagList.size())
-			return null;
-		if (tagList.size() < MAXIMUM_TAGS_SIZE) {	// sizeが7，または8
+			return EMPTY_TAGS;
+		if (tagList.size() < MAXIMUM_TAGS_SIZE) {	// sizeが7，または8．つまり半角文字
 			tagList = Stream.concat(tagList.stream(), Stream.generate(()->infinitive))
 					.limit(MAXIMUM_TAGS_SIZE)
 					.collect(Collectors.toList());
 			tagList.set(6, infinitive);
 		}
-		return Optional.ofNullable(new Tags(tagList));
+		Tags tags = new Tags(tagList);
+		return tags;
+	}
+	public static Tags getInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
+			String inflection, String conjugation,
+			String infinitive, String kana, String pronunciation) {
+		List<String> taglist = Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
+		Tags tags = new Tags(taglist);
+		return tags;
 	}
 
 
@@ -79,10 +83,6 @@ public class Tags extends Tuple implements Comparable<Tags>, PartOfSpeechInterfa
 		return itr1.hasNext()? 1
 				: itr2.hasNext()? -1
 				: comparison;
-	}
-	@Override
-	public String name() {
-		return infinitive();
 	}
 	@Override
 	public String mainPoS() {

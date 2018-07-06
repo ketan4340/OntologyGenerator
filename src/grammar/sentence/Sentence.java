@@ -25,15 +25,15 @@ import data.RDF.RDFTriple;
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.SyntacticChild;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
 import grammar.concept.Concept;
+import grammar.morpheme.CabochaTags;
 import grammar.morpheme.Morpheme;
-import grammar.morpheme.Tags;
 import grammar.paragraph.Paragraph;
 import grammar.word.Adjunct;
 import grammar.word.Word;
@@ -394,7 +394,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			if (!sbjCnt) break;	// 連続した主語の最後尾には必要ない
 
 			// 助詞・連体化"の"を新たに用意
-			Concept noCp = Concept.getOrNewInstance(Morpheme.getOrNewInstance("の",new Tags("助詞","連体化","*","*","*","*","の","ノ","ノ")));
+			Concept noCp = Concept.getOrNewInstance(Morpheme.getOrNewInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
 			Adjunct no = new Adjunct(noCp);
 			int index_Ha = subject.indexOfChild(subject.collectWordsHaveAll(tag_Ha).get(0));
 			subject.words().set(index_Ha, no);	// "は"の代わりに"の"を挿入
@@ -605,7 +605,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 	/**
 	 * 決定木のレコード生成.
-	 * @return
 	 */
 	public String toRecord() {
 		List<String> values = new ArrayList<>();

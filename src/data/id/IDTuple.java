@@ -1,7 +1,5 @@
 package data.id;
 
-import java.util.Arrays;
-
 import util.tuple.Tuple;
 
 public class IDTuple extends Tuple {
@@ -20,7 +18,7 @@ public class IDTuple extends Tuple {
 	private static final int OBJECT 			= 8;
 	private static final int SCORE 				= 9;
 
-	protected static Tuple ATTRIBUTES = new Tuple(Arrays.asList(
+	protected static Tuple ATTRIBUTES = new Tuple(
 			"Long Sentence ID",
 			"Long Sentence",
 			"Short Sentence ID",
@@ -30,7 +28,7 @@ public class IDTuple extends Tuple {
 			"Subject",
 			"Predicate",
 			"Object",
-			"Score"));
+			"Score");
 
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
@@ -42,17 +40,17 @@ public class IDTuple extends Tuple {
 			int shortSentenceID, String shortSentence,
 			int rdfRuleID, int tripleID,
 			String subject, String predicate, String object,  int score) {
-		this("-1");
-		setLongSentenceID(longSentenceID);
-		setLongSentence(longSentence);
-		setShortSentenceID(shortSentenceID);
-		setShortSentence(shortSentence);
-		setRDFRuleID(rdfRuleID);
-		setTripleID(tripleID);
-		setSubject(subject);
-		setPredicate(predicate);
-		setObject(object);
-		setScore(score);
+		super(	String.valueOf(longSentenceID),
+				longSentence,
+				String.valueOf(shortSentenceID),
+				shortSentence,
+				String.valueOf(rdfRuleID),
+				String.valueOf(tripleID),
+				subject,
+				predicate,
+				object,
+				String.valueOf(score)
+				);
 	}
 
 

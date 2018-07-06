@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
 import grammar.concept.Concept;
+import grammar.morpheme.CabochaTags;
 import grammar.morpheme.Morpheme;
-import grammar.morpheme.Tags;
 import grammar.naturalLanguage.NaturalLanguage;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
@@ -49,10 +49,10 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	 * 都度clearして使い回す.
 	 */
 	private Map<Clause<?>, Integer> dependingMap = new HashMap<>();
-	
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
 	/* デフォルトではオプション(-f1,-n1)でセッティング */
 	public Cabocha() {
 		this(OPTION_LATTICE, OPTION_NE_CONSTRAINT);
@@ -65,13 +65,13 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		command.addAll(Arrays.asList(options));
 	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
-	
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
+
+	/* ================================================== */
+	/* ==========        Getter, Setter        ========== */
+	/* ================================================== */
 	public static Path getINPUT_TXTFILE_PATH() {
 		return INPUT_TXTFILE_PATH;
 	}
@@ -83,19 +83,19 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	}
 	public static void setOUTPUT_TXTFILE_PATH(Path OUTPUT_TXTFILE_PATH) {
 		Cabocha.OUTPUT_TXTFILE_PATH = OUTPUT_TXTFILE_PATH;
-	}	
-	
-	/****************************************/
-	/*** AbstractProcessManager's  Method ***/
-	/****************************************/
+	}
+
+	/* ================================================== */
+	/* =====    AbstractProcessManager's  Method    ===== */
+	/* ================================================== */
 	// nothing
 
-	/****************************************/
-	/******* ParserInterface's Method *******/
-	/****************************************/
-	/********************************/
-	/***** 解析器・階層化呼び出し部 *****/
-	/********************************/
+	/* ================================================== */
+	/* ==========   ParserInterface's Method   ========== */
+	/* ================================================== */
+	/* ======================================== */
+	/* =====     解析器・階層化呼び出し部     ===== */
+	/* ======================================== */
 	@Override
 	public Sentence text2sentence(NaturalLanguage nlText){
 		List<String> parseOutput = parse(nlText);
@@ -104,7 +104,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	@Override
 	public List<Sentence> texts2sentences(List<NaturalLanguage> nlTextList){
 		List<String> parseOutput;
-		
+
 		System.out.println("The number of text is "+nlTextList.size()+".");
 		// サイズが1の時は，内部で同名メソッド(NL)を呼ぶ
 		// サイズが2以上の時は，ファイルに出力してから同名メソッド(Path)を呼ぶ
@@ -127,11 +127,11 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		List<String> parseOutput = parse(inputFilePath);
 		return decodeProcessOutput(parseOutput);
 	}
-	
-	
-	/********************************/
-	/********** 解析器実行部 **********/
-	/********************************/
+
+
+	/* ======================================== */
+	/* ==========     解析器実行部     ========== */
+	/* ======================================== */
 	@Override
 	public List<String> parse(NaturalLanguage nlText) {
 		startProcess();									// プロセス開始
@@ -160,7 +160,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		return new ArrayList<>();
 	}
 
-	
+
 	/**
 	 * プロセスへの入力を繰り返し出力をまとめて得る. 多分，数が多いと使えない.
 	 * @param nlList
@@ -177,7 +177,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		return result;
 	}
 
-	
+
 	@Override
 	public List<Sentence> decodeProcessOutput(List<String> parsedInfo4all) {
 		List<List<String>> sentenceInfoList = StringListUtil.split("\\AEOS\\z", parsedInfo4all);	// "EOS"ごとに分割. EOSの行はここで消える.
@@ -189,7 +189,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	@Override
 	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
 		dependingMap.clear();
-		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割	
+		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割
 		List<Clause<?>> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
 				.collect(Collectors.toList());
@@ -199,16 +199,16 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	public SingleClause decode2Clause(List<String> parsedInfo4clause) {
 		//// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
-		int[] cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
-		int depIndex = cabochaClauseIndexes[0];		// 係る先の文節の番号. ex) "-1D"の"-1"部分
-		int subjEndIndex = cabochaClauseIndexes[1];	// 主辞の終端の番号. ex) "0/1"の"0"部分
-		int funcEndIndex = cabochaClauseIndexes[2];	// 機能語の終端の番号. ex) "0/1"の"1"部分
-		
+		Indexes cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
+		int depIndex = cabochaClauseIndexes.dependIndex;			// 係る先の文節の番号. ex) "-1D"の"-1"部分
+		int subjEndIndex = cabochaClauseIndexes.subjectEndIndex;	// 主辞の終端の番号. ex) "0/1"の"0"部分
+		int funcEndIndex = cabochaClauseIndexes.functionEndIndex;	// 機能語の終端の番号. ex) "0/1"の"1"部分
+
 		//// 残り(Index1以降)は単語に関する情報
 		// CaboChaは形態素の情報は一行 (本来Stringで十分)だが，ParserInterface(を実装するKNP)に合わせてList<String>とする．
 		List<List<String>> wordInfoLists = parsedInfo4clause.subList(1, parsedInfo4clause.size())
 				.stream().map(info -> Arrays.asList(info)).collect(Collectors.toList());
-		
+
 		Categorem headWord = decode2Categorem(wordInfoLists.subList(0, subjEndIndex));
 		List<Adjunct> functionWords = wordInfoLists.subList(subjEndIndex, funcEndIndex)
 				.stream()
@@ -218,7 +218,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 				.stream()
 				.map(wordInfo -> decode2Word(Arrays.asList(wordInfo)))
 				.collect(Collectors.toList());
-		
+
 		SingleClause clause = new SingleClause(headWord, functionWords, otherWords);
 		dependingMap.put(clause, depIndex);
 		return clause;
@@ -249,32 +249,42 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 		// CaboChaの場合は形態素の情報は必ず一行なのでget(0)
 		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");
 		String name = morphemeInfos[0];
-		List<String> tagList = Arrays.asList(morphemeInfos[1].split(","));
-		Tags tags = Tags.getInstance(tagList, name).orElse(Tags.EMPTY_TAGS);	// Optional使ってるのに，nullの対処を結局Tagsの実装でやらされててあまり意味ない
+		String[] tagArray = morphemeInfos[1].split(",");
+		CabochaTags tags = CabochaTags.getInstance(tagArray, name);
 		return Morpheme.getOrNewInstance(name, tags);
 	}
 
 
-	/*******************************************/
-	/********** Cabocha専用メソッドの実装 *********/
-	/*******************************************/
-	
+	/* ================================================== */
+	/* ==========    Cabocha専用メソッドの実装    ========== */
+	/* ================================================== */
+
 	/**
 	 * CaboCha特有の文節に関するIndex情報3つをまとめた配列を返す.
 	 * @param cabochaClauseInfo CaboChaの文節に関する出力
 	 * @return Indexをまとめた長さ3の配列
 	 */
-	private int[] cabochaClauseIndexes(String cabochaClauseInfo) {
-		int[] indexes = new int[3];
+	private Indexes cabochaClauseIndexes(String cabochaClauseInfo) {
 		String[] clauseInfos = cabochaClauseInfo.split(" ");				// "*","0","-1D","0/1","0.000000..."
 		int depIndex = Integer.decode(clauseInfos[2].substring(0, clauseInfos[2].length()-1));	// -1で'D'を除去.
 		String[] subjFuncIndexes = clauseInfos[3].split("/");				// ex) "0/1"->("0","1")
 		int subjEndIndex = Integer.decode(subjFuncIndexes[0])+1;			// 主辞の終端の番号. ex) "0/1"の"0"部分
 		int funcEndIndex = Integer.decode(subjFuncIndexes[1])+1;			// 機能語の終端の番号. ex) "0/1"の"1"部分
-		indexes[0] = depIndex;	indexes[1] = subjEndIndex;	indexes[2] = funcEndIndex;
+		Indexes indexes = new Indexes(depIndex, subjEndIndex, funcEndIndex);
 		return indexes;
 	}
-	
+
+	private class Indexes {
+		protected int dependIndex;
+		protected int subjectEndIndex;
+		protected int functionEndIndex;
+		public Indexes(int dependIndex, int subjectEndIndex, int functionEndIndex) {
+			this.dependIndex = dependIndex;
+			this.subjectEndIndex = subjectEndIndex;
+			this.functionEndIndex = functionEndIndex;
+		}
+	}
+
 	/** 入力したいテキスト(List<NL>)を一旦ファイル(parserInput)に出力 **/
 	/* List<NL>のサイズが2以上ならこれらを呼び出し、executeParser(Path)に渡される */
 	private static Path output_ParserInput(List<NaturalLanguage> nlTextList) {

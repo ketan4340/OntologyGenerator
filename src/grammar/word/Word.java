@@ -14,11 +14,11 @@ import grammar.GrammarInterface;
 import grammar.clause.Clause;
 import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
-import grammar.morpheme.PartOfSpeechInterface;
+import grammar.morpheme.CabochaPoSInterface;
 
 public class Word 
 	implements Identifiable, RDFizable, GrammarInterface, 
-	PartOfSpeechInterface, SyntacticChild<Clause<? extends Word>>
+	CabochaPoSInterface, SyntacticChild<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;
 

@@ -15,11 +15,11 @@ import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
 import grammar.morpheme.Morpheme;
-import grammar.morpheme.PartOfSpeechInterface;
+import grammar.morpheme.CabochaPoSInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Concept implements GrammarInterface, Uniqueness<Concept>, PartOfSpeechInterface, RDFizable {
+public class Concept implements GrammarInterface, Uniqueness<Concept>, CabochaPoSInterface, RDFizable {
 	private static final UniqueSet<Concept> CONCEPTS_UNIQUESET = new UniqueSet<>(100);
 	public static final Concept EMPTY_CONCEPT = new Concept(Collections.emptyList());
 

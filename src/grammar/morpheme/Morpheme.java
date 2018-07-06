@@ -13,25 +13,25 @@ import grammar.GrammarInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>, 
-PartOfSpeechInterface, Identifiable, RDFizable {
+public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>,
+CabochaPoSInterface, Identifiable, RDFizable {
 	private static UniqueSet<Morpheme> MORPHEMES_UNIQUESET = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
 
 	public final int id;		// 通し番号
 	private final String name;	// 形態素の文字列
-	private final Tags tags;	// 品詞リスト
+	private final CabochaTags tags;	// 品詞リスト
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	private Morpheme(String name, Tags tags) {
+	private Morpheme(String name, CabochaTags tags) {
 		this.id = MORPHEMES_UNIQUESET.size();
 		this.name = name;
 		this.tags = tags;
 
 		Morpheme.MORPHEMES_UNIQUESET.add(this);
 	}
-	public static Morpheme getOrNewInstance(String name, Tags tags) {
+	public static Morpheme getOrNewInstance(String name, CabochaTags tags) {
 		return MORPHEMES_UNIQUESET.getExistingOrIntact(new Morpheme(name, tags));
 	}
 
@@ -114,17 +114,17 @@ PartOfSpeechInterface, Identifiable, RDFizable {
 				.addLiteral(JASS.infinitive, infinitive())
 				.addLiteral(JASS.kana, kana())
 				.addLiteral(JASS.pronunsiation, pronunciation());
-		return morphemeResource; 
+		return morphemeResource;
 	}
 
-	
+
 	/****************************************/
 	/**********       Getter       **********/
 	/****************************************/
 	public String getName() {
 		return name;
 	}
-	public Tags getTags() {
+	public CabochaTags getTags() {
 		return tags;
 	}
 
