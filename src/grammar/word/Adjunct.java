@@ -1,32 +1,37 @@
 package grammar.word;
 
+import java.util.List;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.clause.Clause;
-import grammar.concept.Concept;
+import grammar.morpheme.Morpheme;
 
 public class Adjunct extends Word {
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public Adjunct(Concept concept, Clause<?> parentClause) {
-		super(concept, parentClause);
+	public Adjunct(List<Morpheme> morphemes) {
+		super(morphemes);
 	}
-	public Adjunct(Concept concept) {
-		super(concept, null);
+	public Adjunct(Morpheme... morphemes) {
+		super(morphemes);
 	}
-	
+	public Adjunct(List<Morpheme> morphemes, Clause<?> parentClause) {
+		super(morphemes, parentClause);
+	}
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
 	/* 全く同じWordを複製する */
 	@Override
 	public Adjunct clone() {
-		return new Adjunct(this.concept);
+		return new Adjunct(children);
 	}
 	/****************************************/
 	/**********  Interface Method  **********/
@@ -36,5 +41,5 @@ public class Adjunct extends Word {
 		return super.toRDF(model)
 				.addProperty(RDF.type, JASS.Adjunct);
 	}
-	
+
 }

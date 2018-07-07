@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import grammar.clause.SingleClause;
-import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.naturalLanguage.NaturalLanguage;
 import grammar.sentence.Sentence;
@@ -21,8 +20,8 @@ public interface ParserInterface {
 	public List<Sentence> texts2sentences(List<NaturalLanguage> nlTextList);
 	/** 入力がテキストファイル */
 	public List<Sentence> texts2sentences(Path nlTextFilePath);
-	
-	
+
+
 	/******************************************/
 	/**********      解析器実行部      **********/
 	/******************************************/
@@ -54,6 +53,5 @@ public interface ParserInterface {
 	public Sentence decode2Sentence(List<String> parseResult4sentence);
 	public SingleClause decode2Clause(List<String> parseResult4clause);
 	public Word decode2Word(List<List<String>> parseResult4word);			// 複数の形態素からなる場合を考慮
-	public Concept decode2Concept(List<List<String>> parseResult4concept);	// Wordに同じ
 	public Morpheme decode2Morpheme(List<String> parseResult4morpheme);		// 形態素の情報が複数行の場合を考慮
 }

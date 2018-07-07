@@ -1,36 +1,43 @@
 package grammar.word;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.clause.Clause;
-import grammar.concept.Concept;
+import grammar.morpheme.Morpheme;
 
 public class Categorem extends Word{
-	public static final Categorem EMPTY_CATEGOREM = new Categorem(Concept.EMPTY_CONCEPT);
+	public static final Categorem EMPTY_CATEGOREM = new Categorem(Collections.emptyList());
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	public Categorem(Concept concept, Clause<?> parentClause) {
-		super(concept, parentClause);
+	public Categorem(List<Morpheme> morphemes) {
+		super(morphemes);
 	}
-	public Categorem(Concept concept) {
-		super(concept, null);
+	public Categorem(Morpheme... morphemes) {
+		this(Arrays.asList(morphemes));
 	}
-	
+	public Categorem(List<Morpheme> morphemes, Clause<?> parentClause) {
+		super(morphemes, parentClause);
+	}
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
 	/* 全く同じWordを複製する */
 	@Override
 	public Categorem clone() {
-		return new Categorem(this.concept);
+		return new Categorem(children);
 	}
-	
-	
+
+
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -12,7 +13,6 @@ import java.util.stream.Stream;
 public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface {
 	private static final HashMap<String, HashSet<CabochaTags>> ALL_TAGS = new HashMap<>();
 	public static final CabochaTags EMPTY_TAGS = new CabochaTags("", "", "", "", "", "", "empty", "empty", "empty");
-
 
 	/** 品詞 */
 	private final String mainPoS;
@@ -33,11 +33,12 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 	/** 発音 (半角文字ではもともとない) */
 	private final String pronunciation;
 
+
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
 	/* ================================================== */
-	private CabochaTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3, String inflection,
-			String conjugation, String infinitive, String kana, String pronunciation) {
+	private CabochaTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
+			String inflection, String conjugation, String infinitive, String kana, String pronunciation) {
 		this.mainPoS = mainPoS;
 		this.subPoS1 = subPoS1;
 		this.subPoS2 = subPoS2;
@@ -50,9 +51,9 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 	}
 
 	/* ===== Factory Method ===== */
-	public static CabochaTags getInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3, String inflection,
-			String conjugation, String infinitive, String kana, String pronunciation) {
-		Optional<CabochaTags> optionalTags = getEquivalentTags(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
+	public static CabochaTags getInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
+			String inflection, String conjugation, String infinitive, String kana, String pronunciation) {
+		Optional<CabochaTags> optionalTags = getEquivalentInstance(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
 		CabochaTags tags = optionalTags.orElseGet(()->new CabochaTags(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation));
 		ALL_TAGS.get(tags.mainPoS + tags.subPoS1).add(tags);
 		return tags;
@@ -66,15 +67,14 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 					.toArray(String[]::new);
 			tagArray[6] = infinitive;
 		}
-		CabochaTags tags = getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
-		return tags;
+		return getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
 	}
-	private static Optional<CabochaTags> getEquivalentTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3, String inflection,
+	private static Optional<CabochaTags> getEquivalentInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3, String inflection,
 			String conjugation, String infinitive, String kana, String pronunciation) {
 		String key = mainPoS + subPoS1;
-		Optional<Set<CabochaTags>> tagsset = Optional.ofNullable(ALL_TAGS.get(key));
-		if (tagsset.isPresent()) {
-			for (CabochaTags tags : tagsset.get()) {
+		Set<CabochaTags> tagsset = ALL_TAGS.get(key);
+		if (Objects.nonNull(tagsset)) {
+			for (CabochaTags tags : tagsset) {
 				List<String> newTaglist = Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
 				List<String> taglist = tags.toList();
 				if (newTaglist.equals(taglist))
@@ -91,8 +91,8 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 	/* ==========        Member  Method        ========== */
 	/* ================================================== */
 	public List<String> toList() {
-		return Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive,
-				kana, pronunciation);
+		return Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3,
+				inflection, conjugation, infinitive, kana, pronunciation);
 	}
 
 	public boolean contains(Object o) {

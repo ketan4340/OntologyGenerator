@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
-import grammar.concept.Concept;
 import grammar.morpheme.CabochaTags;
 import grammar.morpheme.Morpheme;
 import grammar.naturalLanguage.NaturalLanguage;
@@ -27,7 +26,7 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 import util.StringListUtil;
 
-public class Cabocha extends AbstractProcessManager implements ParserInterface{
+public class Cabocha extends AbstractProcessManager implements ParserInterface {
 	/* CaboChaの基本実行コマンド */
 	private static final List<String> COMMAND4MACOS = new LinkedList<>(Arrays.asList("/usr/local/bin/cabocha"));
 	private static final List<String> COMMAND4WINDOWS = new LinkedList<>(Arrays.asList("cmd", "/c", "cabocha"));
@@ -226,23 +225,22 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface{
 	@Override
 	public Word decode2Word(List<List<String>> parsedInfo4word) {
 		// 一つの単語が複数の形態素からなる場合もあるのでListで渡される
-		Concept concept = decode2Concept(parsedInfo4word);
-		return new Word(concept);
-	}
-	public Categorem decode2Categorem(List<List<String>> parsedInfo4word) {
-		Concept concept = decode2Concept(parsedInfo4word);
-		return new Categorem(concept);
-	}
-	public Adjunct decode2Adjunct(List<List<String>> parsedInfo4word) {
-		Concept concept = decode2Concept(parsedInfo4word);
-		return new Adjunct(concept);
-	}
-	@Override
-	public Concept decode2Concept(List<List<String>> parsedInfo4concept) {
-		List<Morpheme> morphemes = parsedInfo4concept.stream()
+		List<Morpheme> morphemes = parsedInfo4word.stream()
 				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
 				.collect(Collectors.toList());
-		return Concept.getOrNewInstance(morphemes);
+		return new Word(morphemes);
+	}
+	public Categorem decode2Categorem(List<List<String>> parsedInfo4word) {
+		List<Morpheme> morphemes = parsedInfo4word.stream()
+				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
+				.collect(Collectors.toList());
+		return new Categorem(morphemes);
+	}
+	public Adjunct decode2Adjunct(List<List<String>> parsedInfo4word) {
+		List<Morpheme> morphemes = parsedInfo4word.stream()
+				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
+				.collect(Collectors.toList());
+		return new Adjunct(morphemes);
 	}
 	@Override
 	public Morpheme decode2Morpheme(List<String> parsedInfo4morpheme) {

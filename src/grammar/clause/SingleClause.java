@@ -11,17 +11,16 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
 
 public class SingleClause extends Clause<Categorem>{
-	public static final SingleClause ROOT = 
+	public static final SingleClause ROOT =
 			new SingleClause(Categorem.EMPTY_CATEGOREM, Collections.emptyList(), Collections.emptyList());
 
-	
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -44,18 +43,18 @@ public class SingleClause extends Clause<Categorem>{
 	 * Phraseとは違い，修飾・被修飾の関係も消える.
 	 */
 	public boolean nounize() {
-		List<Morpheme> morphemes = Stream
-				.concat(categorem.getMorphemes().stream(), 
-						adjuncts.stream().flatMap(ad -> ad.getMorphemes().stream()))
-				.collect(Collectors.toList()); 
-		Categorem nounedWord = new Categorem(Concept.getOrNewInstance(morphemes), this);
-		
+		List<Morpheme> morphemes = Stream.concat(
+				categorem.getChildren().stream(),
+				adjuncts.stream().flatMap(ad -> ad.getChildren().stream()))
+				.collect(Collectors.toList());
+		Categorem nounedWord = new Categorem(morphemes, this);
+
 		this.categorem = nounedWord;
 		this.adjuncts.clear();
 		return true;
 	}
-	
-	
+
+
 	/****************************************/
 	/**********  Abstract  Method  **********/
 	/****************************************/
@@ -64,13 +63,13 @@ public class SingleClause extends Clause<Categorem>{
 		Categorem cloneCategorem = this.categorem.clone();
 		List<Adjunct> cloneAdjuncts = this.adjuncts.stream().map(a -> a.clone()).collect(Collectors.toList());
 		List<Word> cloneOthers = this.others.stream().map(o -> o.clone()).collect(Collectors.toList());
-		
+
 		SingleClause clone = new SingleClause(cloneCategorem, cloneAdjuncts, cloneOthers);
 		clone.setDepending(getDepending());
 		return clone;
 	}
-	
-	
+
+
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
@@ -78,12 +77,12 @@ public class SingleClause extends Clause<Categorem>{
 	public Resource toRDF(Model model) {
 		return super.toRDF(model).addProperty(RDF.type, JASS.SingleClause);
 	}
-	
+
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
 
-	
+
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/

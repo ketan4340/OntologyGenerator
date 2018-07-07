@@ -31,7 +31,6 @@ import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
-import grammar.concept.Concept;
 import grammar.morpheme.CabochaTags;
 import grammar.morpheme.Morpheme;
 import grammar.paragraph.Paragraph;
@@ -42,7 +41,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		implements GrammarInterface, Identifiable, SyntacticChild<Paragraph>, RDFizable {
 	private static int sum = 0;
 
-	public final int id;
+	private final int id;
 
 	/** 文の親要素，段落. */
 	private Paragraph parentParagraph;
@@ -394,8 +393,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			if (!sbjCnt) break;	// 連続した主語の最後尾には必要ない
 
 			// 助詞・連体化"の"を新たに用意
-			Concept noCp = Concept.getOrNewInstance(Morpheme.getOrNewInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
-			Adjunct no = new Adjunct(noCp);
+			Adjunct no = new Adjunct(Morpheme.getOrNewInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
 			int index_Ha = subject.indexOfChild(subject.collectWordsHaveAll(tag_Ha).get(0));
 			subject.words().set(index_Ha, no);	// "は"の代わりに"の"を挿入
 		}
@@ -656,7 +654,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/****************************************/
 	public void printW() {
 		for(final Word word : getWordList()) {
-			System.out.print("("+word.getID()+")" + word.name());
+			System.out.print("("+word.id()+")" + word.name());
 		}
 		System.out.println();
 	}

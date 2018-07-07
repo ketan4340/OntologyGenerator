@@ -1,6 +1,8 @@
 package grammar.word;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -9,37 +11,39 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.SyntacticChild;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
+import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.concept.Concept;
-import grammar.morpheme.Morpheme;
 import grammar.morpheme.CabochaPoSInterface;
+import grammar.morpheme.Morpheme;
 
-public class Word 
-	implements Identifiable, RDFizable, GrammarInterface, 
+public class Word extends SyntacticParent<Morpheme>
+	implements Identifiable, RDFizable, GrammarInterface,
 	CabochaPoSInterface, SyntacticChild<Clause<? extends Word>>
 {
 	private static int wordsSum = 0;
 
-	public final int id;
-	
+	private final int id;
+
 	/** 単語の親要素，文節. */
 	protected Clause<?> parentClause;
-	/** 事実上の子要素，概念. */
-	protected Concept concept;
 
-	
+
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
-	public Word(Concept concept, Clause<?> parentClause) {
+	public Word(List<Morpheme> morphemes) {
+		super(morphemes);
 		this.id = wordsSum++;
-		this.concept = concept;
-		setParent(parentClause);
 	}
-	public Word(Concept concept) {
-		this(concept, null);
+	public Word(Morpheme... morphemes) {
+		this(Arrays.asList(morphemes));
+	}
+	public Word(List<Morpheme> morphemes, Clause<?> parentClause) {
+		this(morphemes);
+		this.parentClause = parentClause;
 	}
 
 
@@ -57,9 +61,9 @@ public class Word
 				not = true;
 				tag = tag.substring(1);	// -を消しておく
 			}
-			match = concept.containsTag(tag);
-			match = not? !match : match; 
-			
+			match = tail().containsTag(tag);
+			match = not? !match : match;
+
 			if (!match) break;	// falseなら即終了
 		}
 		return match;
@@ -68,14 +72,12 @@ public class Word
 	/** 全く同じWordを複製する */
 	@Override
 	public Word clone() {
-		return new Word(this.concept);
-	}
-	
-	public boolean isLiteral() {
-		//concept.
-		return true;
+		return new Word(children);
 	}
 
+	public Concept toConcept() {
+		return Concept.getOrNewInstance(children);
+	}
 
 	/****************************************/
 	/**********  Interface Method  **********/
@@ -94,43 +96,43 @@ public class Word
 	}
 	@Override
 	public String name() {
-		return concept.name();
+		return children.stream().map(Morpheme::name).collect(Collectors.joining());
 	}
 	@Override
 	public String mainPoS() {
-		return concept.mainPoS();
+		return tail().mainPoS();
 	}
 	@Override
 	public String subPoS1() {
-		return concept.subPoS1();
+		return tail().subPoS1();
 	}
 	@Override
 	public String subPoS2() {
-		return concept.subPoS2();
+		return tail().subPoS2();
 	}
 	@Override
 	public String subPoS3() {
-		return concept.subPoS3();
+		return tail().subPoS3();
 	}
 	@Override
 	public String inflection() {
-		return concept.inflection();
+		return tail().inflection();
 	}
 	@Override
 	public String conjugation() {
-		return concept.conjugation();
+		return tail().conjugation();
 	}
 	@Override
 	public String infinitive() {
-		return concept.infinitive();
+		return children.stream().map(m -> m.infinitive()).collect(Collectors.joining());
 	}
 	@Override
 	public String kana() {
-		return concept.kana();
+		return children.stream().map(m -> m.kana()).collect(Collectors.joining());
 	}
 	@Override
 	public String pronunciation() {
-		return concept.pronunciation();
+		return children.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
 	}
 	@Override
 	public String getURI() {
@@ -138,12 +140,12 @@ public class Word
 	}
 	@Override
 	public Resource toRDF(Model model) {
-		Resource morphemeNode = model.createList(concept.getMorphemes().stream()
+		Resource morphemeNode = model.createList(children.stream()
 				.map(m -> m.toRDF(model)).iterator());
-		
+
 		Resource wordResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Word)
-				.addProperty(JASS.means, concept.toRDF(model))		
+				.addProperty(JASS.means, toConcept().toRDF(model))
 				.addProperty(JASS.consistsOfMorphemes, morphemeNode)
 				.addLiteral(JASS.name, name())
 				.addLiteral(JASS.mainPoS, mainPoS())
@@ -157,55 +159,18 @@ public class Word
 				.addLiteral(JASS.pronunsiation, pronunciation());
 		return wordResource;
 	}
-
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-	public int getID() {
-		return id;
+	@Override
+	public void setThisAsParent(Morpheme child) {
+		// 形態素は親を持たないので何もしない
 	}
-	public Concept getConcept() {
-		return concept;
-	}
-	public List<Morpheme> getMorphemes() {
-		return concept.getMorphemes();
-	}
-	public void setConcept(Concept concept) {
-		this.concept = concept;
-	}
-
 
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
 	@Override
 	public String toString() {
-		return concept.toString();
+		return children.stream().map(m -> m.toString()).collect(Collectors.joining());
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((concept == null) ? 0 : concept.hashCode());
-		result = prime * result + id;
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Word other = (Word) obj;
-		if (concept == null) {
-			if (other.concept != null)
-				return false;
-		} else if (!concept.equals(other.concept))
-			return false;
-		if (id != other.id)
-			return false;
-		return true;
-	}
+
+
 }

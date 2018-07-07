@@ -14,32 +14,31 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.SyntacticChild;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import grammar.SyntacticParent;
-import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public abstract class Clause<W extends Word> extends SyntacticParent<Word>
-implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {	
+implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	private static int clausesSum = 0;
-	
+
 	public final int id;
 
 	/** 文節の親要素，文. */
 	private Sentence parentSentence;
-	
+
 	/** 文節の子要素 */
 	protected W categorem;				// 自立語
 	protected List<Adjunct> adjuncts; 	// 付属語
 	protected List<Word> others;		// 。などの記号
-	
+
 	protected Clause<?> depending;		// 係り先文節.どのClauseに係るか
 
-	
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -50,12 +49,12 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		this.adjuncts = adjuncts;
 		this.others = others;
 	}
-	
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
 	/**
-	 * この文節を構成する単語のリスト. 
+	 * この文節を構成する単語のリスト.
 	 * @return
 	 */
 	public List<Word> words() {
@@ -64,7 +63,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		words.addAll(adjuncts);
 		return words;
 	}
-	
+
 	private static List<Word> linedupWords(Word categorem, List<? extends Word> adjuncts, List<? extends Word> others) {
 		List<Word> words = new ArrayList<>(5);
 		words.add(categorem);
@@ -72,7 +71,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		words.addAll(others);
 		return words;
 	}
-	
+
 
 	/**********　  　　旧型　　　  **********/
 	/**
@@ -93,7 +92,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	/** 全く同じClauseを複製する */
 	@Override
 	public abstract Clause<?> clone();
-	
+
 	/**
 	 * 複数のClauseを係り受け関係を維持しつつ複製する
 	 */
@@ -102,7 +101,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		List<Clause<?>> cloneClauses = originClauses.stream().map(Clause::clone).collect(Collectors.toList());
 		ListIterator<Clause<?>> itr_origin = originClauses.listIterator();
 		ListIterator<Clause<?>> itr_clone = cloneClauses.listIterator();
-		
+
 		// 係り先があれば整え、なければnull
 		while (itr_origin.hasNext() && itr_clone.hasNext()) {
 			Clause<?> origin = itr_origin.next(), clone = itr_clone.next();
@@ -114,9 +113,10 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 
 	/**
 	 * 自立語と先頭の付属語がそれぞれ指定の品詞を持つ場合，結合する.
+	 * 名詞とサ変動詞 (使用+する) のような組み合わせに適用する.
 	 * @param tag4Categorem
 	 * @param tag4Adjunct
-	 * @return
+	 * @return 結合に成功すれば真．そうでなければ偽．
 	 */
 	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
 		if (adjuncts.isEmpty())
@@ -125,28 +125,26 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 			return false;
 		if (!adjuncts.get(0).hasTagAll(tag4Adjunct))
 			return false;
-		
+
 		// 付属語から先頭の単語を取り出す
 		Adjunct headAdjunct = adjuncts.remove(0);
-		
+
 		List<Morpheme> morphemes = Stream
-				.concat(categorem.getMorphemes().stream(), headAdjunct.getMorphemes().stream())
+				.concat(categorem.getChildren().stream(), headAdjunct.getChildren().stream())
 				.collect(Collectors.toList());
-		
-		// 統合した新しい概念を用意
-		Concept unitedConcept = Concept.getOrNewInstance(morphemes);
+
 		// この文節の自立語が参照する概念を更新
-		categorem.setConcept(unitedConcept);
+		categorem.setChildren(morphemes);
 		return true;
 	}
-	
-	
+
+
 	/** 指定の品詞を持つWordを返す */
 	public List<Word> collectWordsHaveAll(String[][] tags) {
 		List<Word> taggedWords = new ArrayList<>();
 		for (final Word word: words()) {
 			for (final String[] tag: tags) {
-				if (word.hasTagAll(tag)) 
+				if (word.hasTagAll(tag))
 					taggedWords.add(word);
 			}
 		}
@@ -182,7 +180,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	public boolean endWith(String[][] tags, boolean ignoreSign) {
 		int tagIndex = tags.length-1;
 		List<Word> words = ignoreSign? words() : getChildren();
-		for (ListIterator<Word> li = words.listIterator(words.size()); 
+		for (ListIterator<Word> li = words.listIterator(words.size());
 				li.hasPrevious() && tagIndex>=0; tagIndex--) {
 			Word word = li.previous();		// wordも
 			String[] tag = tags[tagIndex];	// tagも後ろから遡る
@@ -198,7 +196,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 				.filter(c -> c.depending == this)
 				.collect(Collectors.toSet());
 	}
-	
+
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
@@ -250,7 +248,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 				.addProperty(JASS.consistsOfAdjuncts, adjunctNode);
 		return clauseResource;
 	}
-	
+
 	/****************************************/
 	/**********   Getter, Setter   **********/
 	/****************************************/
