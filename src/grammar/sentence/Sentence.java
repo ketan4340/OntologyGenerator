@@ -5,23 +5,17 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.MyResource;
-import data.RDF.Namespace;
-import data.RDF.RDFTriple;
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
@@ -46,9 +40,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/** 文の親要素，段落. */
 	private Paragraph parentParagraph;
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
 	public Sentence(List<Clause<?>> clauses) {
 		super(clauses);
 		this.id = sum++;
@@ -59,9 +53,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
 
 	/**
 	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
@@ -403,194 +397,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 
-	/** 文章から関係を見つけtripleにする */
-	public List<RDFTriple> extractRelation() {
-		List<RDFTriple> triples = new ArrayList<>();
-
-		List<Clause<?>> subjectList = subjectList(true);	// 主語を整えたところで再定義
-		if(subjectList.isEmpty()) {
-			System.err.println("subjectClause is null.");
-			return triples;
-		}
-		//TODO 主節(!!最初の1つしか使っていない!!)
-		Clause<?> subjectClause = subjectList.get(0);
-		Word subjectWord = subjectClause.getCategorem();			// 主語
-		if(subjectWord == null) {
-			System.err.println("subjectWord is null.");
-			return triples;
-		}
-		MyResource subject = new MyResource(Namespace.GOO, subjectWord.name());
-		// 述節
-		Clause<?> predicateClause = subjectClause.getDepending();
-		if(predicateClause == null) {
-			System.err.println("predicateClause is null.");
-			return triples;
-		}
-		Word predicateWord = predicateClause.getCategorem();	// 述語
-		if(predicateWord == null) {
-			System.err.println("predicateWord is null.");
-			return triples;
-		}
-		// 述部(主節に続く全ての節)
-		String predicatePart = subSentence(children.indexOf(subjectClause)+1, children.size()).name();
-
-		//PRINT
-		//System.out.println(subjectClause.toString() + "->" + predicateClause.toString());
-
-		String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
-		boolean isNot = predicateClause.containsAnyWordsHave(tag_Not);	// 述語が否定かどうか
-
-		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
-		String[][] tagVerb = {{"動詞"}, {"サ変接続"}};
-		String[] tagAdjective = {"形容詞"};
-
-		/* リテラル情報かどうか */
-		/* 長さ */
-		String regexLength = "(.*?)[長径]?.*?(\\d+(\\.\\d+)?)([ア-ンa-zA-Zー－]+).*?";	// 「~(数字)(単位)~」を探す
-		Pattern ptrnLength = Pattern.compile(regexLength);
-		Matcher mtchLength = ptrnLength.matcher(predicatePart);
-		boolean boolLength = mtchLength.matches();
-		/* 重さ */
-		String regexWeight = "(.*?)重.*?(\\d+(\\.\\d+)?)([ア-ンa-zA-Zー－]+).*?";	// 「~(数字)(単位)~」を探す
-		Pattern ptrnWeight = Pattern.compile(regexWeight);
-		Matcher mtchWeight = ptrnWeight.matcher(predicatePart);
-		boolean boolWeight = mtchWeight.matches();
-
-		if(boolLength || boolWeight) {
-			if(boolLength) {
-				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name()+"-length");
-				triples.add(new RDFTriple(subject, MyResource.LENGTH, blank));			// 空白ノード
-				triples.add(new RDFTriple(blank, MyResource.VALUE, new MyResource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
-				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
-			}
-			if(boolWeight) {
-				MyResource blank = new MyResource(Namespace.EMPTY, subjectWord.name()+"-weight");
-				triples.add(new RDFTriple(subject, MyResource.WEIGHT, blank));			// 空白ノード
-				triples.add(new RDFTriple(blank, MyResource.VALUE, new MyResource(Namespace.LITERAL, mtchLength.group(2))));	// リテラル
-				triples.add(new RDFTriple(blank, MyResource.UNITS, new MyResource(Namespace.LITERAL, mtchLength.group(4))));	// 単位
-			}
-		/* 述語が動詞 */
-		}else if( predicateClause.containsAnyWordsHave(tagVerb) ) {
-			/* "がある"かどうか */
-			String[][] tag_Have = {{"動詞", "ある"}, {"動詞", "もつ"}, {"動詞", "持つ"}};		// 動詞の"ある"(助動詞ではない)
-			boolean boolHave = predicateClause.containsAnyWordsHave(tag_Have);
-			/* "~の総称" */
-			String regexGnrnm = "(.*?)(の総称)";				// 「〜の総称」を探す
-			Pattern ptrnGnrnm = Pattern.compile(regexGnrnm);
-			Matcher mtchGnrnm = ptrnGnrnm.matcher(predicateClause.toString());
-			boolean boolGnrnm = mtchGnrnm.matches();
-
-			if(boolHave) {			// "~がある","~をもつ"
-				Clause<?> previousClause = previousChild(predicateClause);		// 動詞の一つ前の文節
-				if(previousClause == null) return triples;
-				MyResource part = new MyResource(Namespace.GOO, previousClause.getCategorem().name());	// その主辞のリソース
-				String[][] tag_Ga_Wo = {{"格助詞", "が"}, {"格助詞", "を"}};
-				if(previousClause.containsAnyWordsHave(tag_Ga_Wo)) {
-					triples.add(new RDFTriple(part, new MyResource(Namespace.DCTERMS, "isPartOf"), subject));
-					triples.add(new RDFTriple(subject, new MyResource(Namespace.DCTERMS, "hasPart"), part));
-				}
-
-			}else if(boolGnrnm) {	// "~の総称"
-				triples.add(new RDFTriple(subject, MyResource.EQUIVALENT_CLASS, new MyResource(Namespace.GOO, mtchGnrnm.group(1))));
-
-			}else {					// その他の動詞
-				MyResource verb = new MyResource(Namespace.GOO, predicateWord.infinitive());	// 原形を取り出すためのget(6)
-				MyResource object = null;
-
-				// 格助詞"に","を","へ"などを元に目的語を探す
-				String[][] tag_Ni_Wo = {{"格助詞", "が"}, {"格助詞", "に"}, {"格助詞", "を"}};	// 目的語oと述語pを結ぶ助詞
-				List<Clause<?>> clauses_Ni_Wo = collectClausesHaveSome(tag_Ni_Wo);
-				if (!clauses_Ni_Wo.isEmpty()) {	// 目的語あり
-					Clause<?> clause_Ni_Wo = clauses_Ni_Wo.iterator().next();	//TODO
-					Word word_Ni_Wo = clause_Ni_Wo.getCategorem();	// "に"または"を"の主辞
-					object = new MyResource(Namespace.GOO, word_Ni_Wo.name());
-				} else {								// 目的語なしならnullのまま
-					object = MyResource.NO_OBJECT;
-				}
-				RDFTriple triple = new RDFTriple(subject, verb, object);
-				triples.addAll(makeObjectiveProperty(triple, isNot));
-			}
-
-
-		/* 述語が形容詞 */
-		}else if(predicateClause.containsWordHas(tagAdjective)) {
-			MyResource adjective = new MyResource(Namespace.GOO, predicateWord.infinitive());
-			Clause<?> previousClause = previousChild(predicateClause);	// 形容詞の一つ前の文節
-			if(previousClause == null) return triples;
-			String[] tag_Ga = {"格助詞", "が"};
-			if(previousClause.containsWordHas(tag_Ga)) {
-				String part = previousClause.getCategorem().name();	// その主辞の文字列
-				subject.setFragment(subject.getFragment()+"の"+part);
-			}
-			triples.add(new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
-
-		/* 述語が名詞または助動詞 */
-		}else {
-			/* 別名・同義語かどうか */
-			String regexSynonym = "(.*?)((に同じ)|(の別名)|(の略)|(のこと)|(の異称))";	// 「〜の別名」「〜に同じ」を探す
-			Pattern ptrnSynonym = Pattern.compile(regexSynonym);
-			Matcher mtchSynonym = ptrnSynonym.matcher(predicatePart);
-			boolean boolSynonym = mtchSynonym.matches();
-			/* 一種・一品種かどうか */
-			String regexKind = "(.*?)((の一種)|(の一品種))";					// 「〜の一種」「〜の一品種」を探す
-			Pattern ptrnKind = Pattern.compile(regexKind);
-			Matcher mtchKind = ptrnKind.matcher(predicatePart);
-			boolean boolKind = mtchKind.matches();
-			/* 形容動詞語幹を含むか */
-			String[] tag_Adjective = {"形容動詞語幹"};
-			boolean boolAdjective = predicateClause.containsWordHas(tag_Adjective);
-
-			if(boolSynonym) {
-				//relations.add( new RDFTriple(subjectWord.getName(), "owl:sameClassAs", mtchSynonym.group(1)));
-				triples.add(new RDFTriple(new MyResource(Namespace.GOO, mtchSynonym.group(1)), MyResource.ALTER_NAME, subject));
-			}else if(boolKind) {
-				triples.add( new RDFTriple(subject, MyResource.TYPE, new MyResource(Namespace.GOO, mtchKind.group(1))));
-			}else if(boolAdjective) {
-				MyResource adjective = new MyResource(Namespace.GOO, predicateWord.infinitive());
-				triples.add( new RDFTriple(adjective, new MyResource(Namespace.EXAMPLE, "attributeOf"), subject));
-			}else {
-				triples.add(new RDFTriple(subject, MyResource.SUB_CLASS_OF, new MyResource(Namespace.GOO, predicateWord.name())));	// 述語が名詞の場合これがデフォ
-			}
-		}
-
-		return triples;
-	}
-
-	/** (s,p,o)の三つ組を受け取り，domain，rangeの定義をする． */
-	private List<RDFTriple> makeObjectiveProperty(RDFTriple triple, boolean not) {
-		MyResource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
-		List<RDFTriple> triples = new LinkedList<>();
-
-		triples.add( new RDFTriple(p, MyResource.TYPE, MyResource.ACTION) );
-
-		triples.add( new RDFTriple(p, MyResource.AGENT, s));
-		if(o != null) {	// 目的語あり
-			triples.add( new RDFTriple(p, MyResource.OBJECT, o));
-		}else {			// 目的語なし
-		}
-
-		if(!not) {	// 原形
-			triples.add(new RDFTriple(s,p,o));
-		}else {		// 否定形
-			triples.addAll(makeNegation(triple));
-		}
-		return triples;
-	}
-	/** (s,p,o)の否定のオントロジーを返す */
-	private List<RDFTriple> makeNegation(RDFTriple triple) {
-		MyResource s = triple.getSubject(), p = triple.getPredicate(), o = triple.getObject();
-
-		List<RDFTriple> triples = new LinkedList<>();
-		MyResource blank = new MyResource(Namespace.EMPTY, id + "-not");	// 空白ノードの名前を決める
-		triples.add(new RDFTriple(blank, MyResource.TYPE, new MyResource(Namespace.OWL, "NegativePropertyAssertion")));
-		triples.add(new RDFTriple(blank, new MyResource(Namespace.OWL, "sourceIndividual"), s));
-		triples.add(new RDFTriple(blank, new MyResource(Namespace.OWL, "assertionProperty"), p));
-		if(o!=null)	// 目的語が存在する場合のみ
-			triples.add( new RDFTriple(blank, new MyResource(Namespace.OWL, "targetIndividual"), o));
-
-		return triples;
-	}
-
 	/** ClauseのリストからWordのリストにする */
 	public List<Word> getWordList() {
 		List<Word> wordList = new ArrayList<>();
@@ -649,9 +455,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 
-	/****************************************/
-	/**********   Output  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Output  Method        ========== */
+	/* ================================================== */
 	public void printW() {
 		for(final Word word : getWordList()) {
 			System.out.print("("+word.id()+")" + word.name());
@@ -685,23 +491,17 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		System.out.println();
 	}
 
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-	public int getID() {
-		return id;
-	}
 
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========       Interface Method       ========== */
+	/* ================================================== */
 	@Override
 	public String name() {
 		return getChildren().stream().map(c -> c.name()).collect(Collectors.joining());
 	}
 	@Override
 	public int id() {
-		return getID();
+		return id;
 	}
 	@Override
 	public Paragraph getParent() {
@@ -742,9 +542,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Object  Method        ========== */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return children.stream()
