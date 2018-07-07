@@ -8,7 +8,6 @@ import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface {
 	private static final HashMap<String, HashSet<CabochaTags>> ALL_TAGS = new HashMap<>();
@@ -57,17 +56,6 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 		CabochaTags tags = optionalTags.orElseGet(()->new CabochaTags(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation));
 		ALL_TAGS.get(tags.mainPoS + tags.subPoS1).add(tags);
 		return tags;
-	}
-	public static CabochaTags getInstance(String[] tagArray, String infinitive) {
-		if (tagArray.length < MINIMUM_TAGS_SIZE || MAXIMUM_TAGS_SIZE < tagArray.length)
-			return EMPTY_TAGS;
-		if (tagArray.length < MAXIMUM_TAGS_SIZE) {	// sizeが7，または8．つまり半角文字
-			tagArray = Stream.concat(Stream.of(tagArray), Stream.generate(()->infinitive))
-					.limit(MAXIMUM_TAGS_SIZE)
-					.toArray(String[]::new);
-			tagArray[6] = infinitive;
-		}
-		return getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
 	}
 	private static Optional<CabochaTags> getEquivalentInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3, String inflection,
 			String conjugation, String infinitive, String kana, String pronunciation) {

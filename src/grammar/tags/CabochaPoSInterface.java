@@ -1,8 +1,6 @@
 package grammar.tags;
 
 public interface CabochaPoSInterface {
-	int MINIMUM_TAGS_SIZE = 7;
-	int MAXIMUM_TAGS_SIZE = 9;
 
 	/** 品詞 */
 	String mainPoS();

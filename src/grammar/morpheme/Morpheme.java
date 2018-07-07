@@ -104,7 +104,7 @@ CabochaPoSInterface, Identifiable, RDFizable {
 	}
 	@Override
 	public Resource toRDF(Model model) {
-		Resource morphemeResource = model.createResource(getURI())
+		return model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Morpheme)
 				.addLiteral(JASS.name, name())
 				.addLiteral(JASS.mainPoS, mainPoS())
@@ -116,20 +116,8 @@ CabochaPoSInterface, Identifiable, RDFizable {
 				.addLiteral(JASS.infinitive, infinitive())
 				.addLiteral(JASS.kana, kana())
 				.addLiteral(JASS.pronunsiation, pronunciation());
-		return morphemeResource;
 	}
-	/* 親を持たないので呼ぶつもりはないが一応実装 */
-	/*
-	@Override
-	public Word getParent() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-	@Override
-	public void setParent(Word parent) {
-		// TODO 自動生成されたメソッド・スタブ
-	}
-	*/
+
 	/****************************************/
 	/**********       Getter       **********/
 	/****************************************/

@@ -38,6 +38,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 	//private static final String OPTION_NE_UNCONSTRAINT	= "-n2";		// 文節の整合性を保たずに固有表現解析を行う
 	private static final String OPTION_OUTPUT2FILE			= "--output=";	// CaboChaの結果をファイルに書き出す
 
+	private static final int MAXIMUM_TAGS_LENGTH = 9;
 
 	/** CaboChaの入力ファイルの保存先. */
 	private static Path INPUT_TXTFILE_PATH;
@@ -248,7 +249,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");
 		String name = morphemeInfos[0];
 		String[] tagArray = morphemeInfos[1].split(",");
-		CabochaTags tags = CabochaTags.getInstance(tagArray, name);
+		CabochaTags tags = getTagsSuppliedSingleByteChar(tagArray, name);
 		return Morpheme.getOrNewInstance(name, tags);
 	}
 
@@ -256,6 +257,12 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 	/* ================================================== */
 	/* ==========    Cabocha専用メソッドの実装    ========== */
 	/* ================================================== */
+	private CabochaTags getTagsSuppliedSingleByteChar(String[] tagArray, String infinitive) {
+		if (tagArray.length < MAXIMUM_TAGS_LENGTH) {	// sizeが9未満．つまり半角文字
+			return CabochaTags.getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], infinitive, infinitive, infinitive);
+		}
+		return CabochaTags.getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
+	}
 
 	/**
 	 * CaboCha特有の文節に関するIndex情報3つをまとめた配列を返す.
@@ -271,7 +278,6 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 		Indexes indexes = new Indexes(depIndex, subjEndIndex, funcEndIndex);
 		return indexes;
 	}
-
 	private class Indexes {
 		protected int dependIndex;
 		protected int subjectEndIndex;
