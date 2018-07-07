@@ -150,13 +150,7 @@ implements Identifiable, GrammarInterface, RDFizable {
 				return true;
 		return false;
 	}
-	/** 指定の品詞配列の"全て"の品詞を，"全て"持つWordが含まれているか判定 */
-	public boolean containsAllWordsHave(String[][] tags) {
-		for (String[] tag : tags)
-			if (!containsWordHas(tag))
-				return false;
-		return true;
-	}
+
 	/** 指定の品詞配列の"ある"品詞を，"全て"持つWordが含まれているか判定 */
 	public boolean containsAnyWordsHave(String[][] tags) {
 		for (String[] tag : tags)
