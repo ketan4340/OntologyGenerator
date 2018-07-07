@@ -118,16 +118,6 @@ CabochaPoSInterface, Identifiable, RDFizable {
 				.addLiteral(JASS.pronunsiation, pronunciation());
 	}
 
-	/****************************************/
-	/**********       Getter       **********/
-	/****************************************/
-	public String getName() {
-		return name;
-	}
-	public CabochaTags getTags() {
-		return tags;
-	}
-
 
 	/****************************************/
 	/**********   Object  Method   **********/

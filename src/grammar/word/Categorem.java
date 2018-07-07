@@ -8,8 +8,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
+import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
-import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 
 public class Categorem extends Word{
@@ -29,15 +29,14 @@ public class Categorem extends Word{
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
-	public Concept toConcept() {
-		return Concept.getOrNewInstance(children);
-	}
 	/* 全く同じWordを複製する */
 	@Override
 	public Categorem clone() {
 		return new Categorem(children);
 	}
-
+	public String createConceptURI() {
+		return GOO.uri + name();
+	}
 
 	/****************************************/
 	/**********  Interface Method  **********/
@@ -46,7 +45,7 @@ public class Categorem extends Word{
 	public Resource toRDF(Model model) {
 		return super.toRDF(model)
 				.addProperty(RDF.type, JASS.Categorem)
-				.addProperty(JASS.means, toConcept().toRDF(model));
+				.addProperty(JASS.means, model.createResource(createConceptURI()));
 	}
 
 }
