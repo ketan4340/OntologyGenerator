@@ -12,23 +12,18 @@ import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
-import grammar.SyntacticChild;
 import grammar.SyntacticParent;
-import grammar.clause.Clause;
 import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.tags.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
 	implements Identifiable, RDFizable, GrammarInterface,
-	CabochaPoSInterface, SyntacticChild<Clause<? extends Word>>
+	CabochaPoSInterface
 {
 	private static int wordsSum = 0;
 
 	private final int id;
-
-	/** 単語の親要素，文節. */
-	protected Clause<?> parentClause;
 
 
 	/***********************************/
@@ -41,11 +36,6 @@ public class Word extends SyntacticParent<Morpheme>
 	public Word(Morpheme... morphemes) {
 		this(Arrays.asList(morphemes));
 	}
-	public Word(List<Morpheme> morphemes, Clause<?> parentClause) {
-		this(morphemes);
-		this.parentClause = parentClause;
-	}
-
 
 	/***********************************/
 	/**********  MemberMethod **********/
@@ -82,14 +72,6 @@ public class Word extends SyntacticParent<Morpheme>
 	/****************************************/
 	/**********  Interface Method  **********/
 	/****************************************/
-	@Override
-	public Clause<? extends Word> getParent() {
-		return parentClause;
-	}
-	@Override
-	public void setParent(Clause<? extends Word> parent) {
-		this.parentClause = parent;
-	}
 	@Override
 	public int id() {
 		return id;
@@ -158,10 +140,6 @@ public class Word extends SyntacticParent<Morpheme>
 				.addLiteral(JASS.kana, kana())
 				.addLiteral(JASS.pronunsiation, pronunciation());
 		return wordResource;
-	}
-	@Override
-	public void setThisAsParent(Morpheme child) {
-		// 形態素は親を持たないので何もしない
 	}
 
 	/****************************************/

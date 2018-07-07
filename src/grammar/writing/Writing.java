@@ -12,18 +12,11 @@ import grammar.paragraph.Paragraph;
  */
 public class Writing extends SyntacticParent<Paragraph> {
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
 	public Writing(List<Paragraph> constituents) {
 		super(constituents);
 	}
-	
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
-	@Override
-	public void setThisAsParent(Paragraph child) {
-		child.setParent(this);
-	}
+
 }

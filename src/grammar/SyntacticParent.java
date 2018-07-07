@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class SyntacticParent<C extends SyntacticChild<? extends SyntacticParent<C>>> {
-	
+public abstract class SyntacticParent<C> {
+
 	protected List<C> children;
-	
-	
+
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -20,21 +20,13 @@ public abstract class SyntacticParent<C extends SyntacticChild<? extends Syntact
 	protected boolean imprintThisOnChildren() {
 		if (Objects.isNull(children))
 			return false;
-		children.forEach(this::setThisAsParent);
 		return true;
 	}
 	public boolean replace(C before, C after) {
 		if (!getChildren().contains(before)) return false;
-		setThisAsParent(after);
 		return before == children.set(children.indexOf(before), after);
 	}
-	/** {@code Child#setParent(Parent<?>)}の{@code Parent<?>}が
-	 * 具象化された型になってから登録したいので，先送りする.
-	 * 「{@code Child}が{@code Parent}を受け取り自分のメンバに登録する」形ではなく，
-	 * 「{@code Parent}が{@code Child}を受け取り相手のメンバに登録させる」形で実装.  
-	 */
-	public abstract void setThisAsParent(C child);
-	
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
@@ -73,7 +65,7 @@ public abstract class SyntacticParent<C extends SyntacticChild<? extends Syntact
 	public C tail() {
 		return children.get(children.size()-1);
 	}
-	
+
 
 	/****************************************/
 	/**********   Getter, Setter   **********/
@@ -84,8 +76,8 @@ public abstract class SyntacticParent<C extends SyntacticChild<? extends Syntact
 	public void setChildren(List<C> children) {
 		this.children = children;
 	}
-	
-	
+
+
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/

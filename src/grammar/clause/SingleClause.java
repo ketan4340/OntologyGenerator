@@ -47,7 +47,7 @@ public class SingleClause extends Clause<Categorem>{
 				categorem.getChildren().stream(),
 				adjuncts.stream().flatMap(ad -> ad.getChildren().stream()))
 				.collect(Collectors.toList());
-		Categorem nounedWord = new Categorem(morphemes, this);
+		Categorem nounedWord = new Categorem(morphemes);
 
 		this.categorem = nounedWord;
 		this.adjuncts.clear();

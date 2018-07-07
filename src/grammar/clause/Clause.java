@@ -3,7 +3,6 @@ package grammar.clause;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,21 +14,16 @@ import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
-import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
-import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public abstract class Clause<W extends Word> extends SyntacticParent<Word>
-implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
+implements Identifiable, GrammarInterface, RDFizable {
 	private static int clausesSum = 0;
 
-	public final int id;
-
-	/** 文節の親要素，文. */
-	private Sentence parentSentence;
+	private final int id;
 
 	/** 文節の子要素 */
 	protected W categorem;				// 自立語
@@ -39,9 +33,9 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	protected Clause<?> depending;		// 係り先文節.どのClauseに係るか
 
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
 	public Clause(W categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
 		this.id = clausesSum++;
@@ -50,12 +44,11 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		this.others = others;
 	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
 	/**
 	 * この文節を構成する単語のリスト.
-	 * @return
 	 */
 	public List<Word> words() {
 		List<Word> words = new ArrayList<>(4);
@@ -73,7 +66,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	}
 
 
-	/**********　  　　旧型　　　  **********/
+	/* ==========　  　　旧型　　　       ========== */
 	/**
 	 * この文節が係る文節，その文節が係る文節，と辿っていき，経由した全ての文節をリストにして返す.
 	 * @return この文節から係る全ての文節
@@ -174,7 +167,8 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 
 	/**
 	 * このClauseの最後尾が渡された品詞のWordなら真. 複数の単語が連続しているか調べたければ品詞配列を複数指定可能.
-	 * @param tagNames 品詞
+	 * @param tags 品詞の配列
+	 * @param ignoreSign 文節末尾の接辞，記号 (、や。)を無視するか否か
 	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
 	 */
 	public boolean endWith(String[][] tags, boolean ignoreSign) {
@@ -190,16 +184,9 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		return true;
 	}
 
-
-	public Set<Clause<?>> clausesDependThis() {
-		return parentSentence.getChildren().stream()
-				.filter(c -> c.depending == this)
-				.collect(Collectors.toSet());
-	}
-
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========       Interface Method       ========== */
+	/* ================================================== */
 	@Override
 	public int id() {
 		return id;
@@ -220,6 +207,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	public void setChildren(List<Word> children) {
 		super.setChildren(children);
 	}
+	/*
 	@Override
 	public Sentence getParent() {
 		return parentSentence;
@@ -232,6 +220,7 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 	public void setThisAsParent(Word child) {
 		child.setParent(this);
 	}
+	*/
 	@Override
 	public String getURI() {
 		return JASS.uri + getClass().getSimpleName() + id();
@@ -249,37 +238,37 @@ implements Identifiable, GrammarInterface, SyntacticChild<Sentence>, RDFizable {
 		return clauseResource;
 	}
 
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Getter, Setter        ========== */
+	/* ================================================== */
 	public W getCategorem() {
 		return categorem;
-	}
-	public List<Adjunct> getAdjuncts() {
-		return adjuncts;
-	}
-	public List<Word> getOthers() {
-		return others;
-	}
-	public Clause<?> getDepending() {
-		return depending;
 	}
 	public void setCategorem(W categorem) {
 		this.categorem = categorem;
 	}
+	public List<Adjunct> getAdjuncts() {
+		return adjuncts;
+	}
 	public void setAdjuncts(List<Adjunct> adjuncts) {
 		this.adjuncts = adjuncts;
 	}
+	public List<Word> getOthers() {
+		return others;
+	}
 	public void setOthers(List<Word> others) {
 		this.others = others;
+	}
+	public Clause<?> getDepending() {
+		return depending;
 	}
 	public void setDepending(Clause<?> depending) {
 		this.depending = depending;
 	}
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ==========        Object  Method        ========== */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return getChildren().stream()

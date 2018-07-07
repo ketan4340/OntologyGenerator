@@ -20,25 +20,20 @@ import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
-import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
-import grammar.paragraph.Paragraph;
 import grammar.tags.CabochaTags;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class Sentence extends SyntacticParent<Clause<?>>
-		implements GrammarInterface, Identifiable, SyntacticChild<Paragraph>, RDFizable {
+		implements GrammarInterface, Identifiable, RDFizable {
 	private static int sum = 0;
 
 	private final int id;
-
-	/** 文の親要素，段落. */
-	private Paragraph parentParagraph;
 
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
@@ -125,10 +120,16 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			setChildren(backup);
 			return false;
 		}
-		Set<Clause<?>> formerDependeds = frontClause.clausesDependThis();
-		formerDependeds.addAll(backClause.clausesDependThis());
+		Set<Clause<?>> formerDependeds = clausesDependingThisClause(frontClause);
+		formerDependeds.addAll(clausesDependingThisClause(backClause));
 		gatherDepending(sc, formerDependeds);
 		return true;
+	}
+
+	private Set<Clause<?>> clausesDependingThisClause(Clause<?> clause) {
+		return getChildren().stream()
+				.filter(c -> c.getDepending() == clause)
+				.collect(Collectors.toSet());
 	}
 
 
@@ -263,7 +264,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		String[][] tagAdverb = {{"副詞"}};
 		String[][] tagAuxiliary = {{"助動詞", "体言接続"}};
 		List<Clause<?>> predicates = new ArrayList<>();
-		for (final Clause<?> cls2Last: lastClause.clausesDependThis()) {
+		for (final Clause<?> cls2Last: clausesDependingThisClause(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
 			if ( !cls2Last.endWith(tagParticle, true) &&
 					!cls2Last.endWith(tagAdverb, true) &&
@@ -496,24 +497,10 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ==========       Interface Method       ========== */
 	/* ================================================== */
 	@Override
+	public int id() {return id;}
+	@Override
 	public String name() {
 		return getChildren().stream().map(c -> c.name()).collect(Collectors.joining());
-	}
-	@Override
-	public int id() {
-		return id;
-	}
-	@Override
-	public Paragraph getParent() {
-		return parentParagraph;
-	}
-	@Override
-	public void setParent(Paragraph parent) {
-		parentParagraph = parent;
-	}
-	@Override
-	public void setThisAsParent(Clause<?> child) {
-		child.setParent(this);
 	}
 	@Override
 	public String getURI() {

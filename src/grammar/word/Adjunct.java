@@ -7,7 +7,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 
 public class Adjunct extends Word {
@@ -20,9 +19,6 @@ public class Adjunct extends Word {
 	}
 	public Adjunct(Morpheme... morphemes) {
 		super(morphemes);
-	}
-	public Adjunct(List<Morpheme> morphemes, Clause<?> parentClause) {
-		super(morphemes, parentClause);
 	}
 
 	/****************************************/

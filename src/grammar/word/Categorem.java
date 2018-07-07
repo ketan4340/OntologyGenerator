@@ -9,7 +9,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 
 public class Categorem extends Word{
@@ -24,9 +23,7 @@ public class Categorem extends Word{
 	public Categorem(Morpheme... morphemes) {
 		this(Arrays.asList(morphemes));
 	}
-	public Categorem(List<Morpheme> morphemes, Clause<?> parentClause) {
-		super(morphemes, parentClause);
-	}
+
 
 	/****************************************/
 	/**********   Member  Method   **********/

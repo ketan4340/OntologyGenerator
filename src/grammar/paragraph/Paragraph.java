@@ -10,36 +10,31 @@ import org.apache.jena.vocabulary.RDF;
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
-import grammar.SyntacticChild;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.sentence.Sentence;
-import grammar.writing.Writing;
 
-public class Paragraph extends SyntacticParent<Sentence> 
-	implements Identifiable, GrammarInterface, SyntacticChild<Writing>, RDFizable {
+public class Paragraph extends SyntacticParent<Sentence>
+	implements Identifiable, GrammarInterface, RDFizable {
 	private static int paragraphSum = 0;
-	
+
 	private final int id;
-	
-	/** 段落の親要素，文章. */
-	private Writing parentWriting;
-	
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ==========          Constructor         ========== */
+	/* ================================================== */
 	public Paragraph(List<Sentence> sentences) {
 		super(sentences);
 		this.id = paragraphSum++;
 	}
-	
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
-	
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ==========        Member  Method        ========== */
+	/* ================================================== */
+
+	/* ================================================== */
+	/* ==========       Interface Method       ========== */
+	/* ================================================== */
 	@Override
 	public int id() {return id;}
 	@Override
@@ -47,36 +42,24 @@ public class Paragraph extends SyntacticParent<Sentence>
 		return getChildren().stream().map(s -> s.name()).collect(Collectors.joining());
 	}
 	@Override
-	public Writing getParent() {
-		return parentWriting;
-	}
-	@Override
-	public void setParent(Writing parent) {
-		this.parentWriting = parent;
-	}
-	@Override
-	public void setThisAsParent(Sentence child) {
-		child.setParent(this);
-	}
-	@Override
 	public String getURI() {
-		return JASS.uri+getClass().getSimpleName()+id(); 
+		return JASS.uri+getClass().getSimpleName()+id();
 	}
 	@Override
 	public Resource toRDF(Model model) {
 		Resource sentenceNode = model.createList(getChildren().stream().map(m -> m.toRDF(model)).iterator());
-		
+
 		Resource paragraphResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Paragraph)
 				.addProperty(JASS.consistsOfSentences, sentenceNode);
 		return paragraphResource;
 	}
 
-	
-	
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+
+
+	/* ================================================== */
+	/* ==========        Object  Method        ========== */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return children.stream().map(s -> s.toString()).collect(Collectors.joining("\n"));

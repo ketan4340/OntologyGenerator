@@ -10,14 +10,12 @@ import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
-import grammar.SyntacticChild;
 import grammar.tags.CabochaPoSInterface;
 import grammar.tags.CabochaTags;
-import grammar.word.Word;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 
-public class Morpheme implements GrammarInterface, SyntacticChild<Word>, Uniqueness<Morpheme>,
+public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>,
 CabochaPoSInterface, Identifiable, RDFizable {
 	private static UniqueSet<Morpheme> MORPHEMES_UNIQUESET = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
 
@@ -121,6 +119,7 @@ CabochaPoSInterface, Identifiable, RDFizable {
 		return morphemeResource;
 	}
 	/* 親を持たないので呼ぶつもりはないが一応実装 */
+	/*
 	@Override
 	public Word getParent() {
 		// TODO 自動生成されたメソッド・スタブ
@@ -129,9 +128,8 @@ CabochaPoSInterface, Identifiable, RDFizable {
 	@Override
 	public void setParent(Word parent) {
 		// TODO 自動生成されたメソッド・スタブ
-
 	}
-
+	*/
 	/****************************************/
 	/**********       Getter       **********/
 	/****************************************/
