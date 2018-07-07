@@ -16,8 +16,8 @@ import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.concept.Concept;
-import grammar.morpheme.CabochaPoSInterface;
 import grammar.morpheme.Morpheme;
+import grammar.tags.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
 	implements Identifiable, RDFizable, GrammarInterface,

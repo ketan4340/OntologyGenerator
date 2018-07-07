@@ -11,6 +11,8 @@ import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.SyntacticChild;
+import grammar.tags.CabochaPoSInterface;
+import grammar.tags.CabochaTags;
 import grammar.word.Word;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;

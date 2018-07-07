@@ -14,8 +14,8 @@ import data.RDF.RDFizable;
 import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
-import grammar.morpheme.CabochaPoSInterface;
 import grammar.morpheme.Morpheme;
+import grammar.tags.CabochaPoSInterface;
 import util.uniqueSet.UniqueSet;
 import util.uniqueSet.Uniqueness;
 

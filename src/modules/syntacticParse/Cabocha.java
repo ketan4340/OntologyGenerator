@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
-import grammar.morpheme.CabochaTags;
 import grammar.morpheme.Morpheme;
 import grammar.naturalLanguage.NaturalLanguage;
 import grammar.sentence.Sentence;
+import grammar.tags.CabochaTags;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;

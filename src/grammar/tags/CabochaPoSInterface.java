@@ -1,4 +1,4 @@
-package grammar.morpheme;
+package grammar.tags;
 
 public interface CabochaPoSInterface {
 	int MINIMUM_TAGS_SIZE = 7;

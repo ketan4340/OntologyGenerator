@@ -1,4 +1,4 @@
-package grammar.morpheme;
+package grammar.tags;
 
 import java.util.Arrays;
 import java.util.HashSet;

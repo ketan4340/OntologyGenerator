@@ -31,9 +31,9 @@ import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
-import grammar.morpheme.CabochaTags;
 import grammar.morpheme.Morpheme;
 import grammar.paragraph.Paragraph;
+import grammar.tags.CabochaTags;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 
