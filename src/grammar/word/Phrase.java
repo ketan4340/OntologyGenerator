@@ -16,7 +16,7 @@ import grammar.morpheme.Morpheme;
  * 名詞句を想定
  * @author tanabekentaro
  */
-public class Phrase extends Word{
+public class Phrase extends Categorem {
 
 	/** 従属部 */
 	private final List<? extends Clause<?>> dependent;

@@ -13,7 +13,6 @@ import data.RDF.vocabulary.JASS;
 import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
-import grammar.concept.Concept;
 import grammar.morpheme.Morpheme;
 import grammar.tags.CabochaPoSInterface;
 
@@ -65,9 +64,6 @@ public class Word extends SyntacticParent<Morpheme>
 		return new Word(children);
 	}
 
-	public Concept toConcept() {
-		return Concept.getOrNewInstance(children);
-	}
 
 	/****************************************/
 	/**********  Interface Method  **********/
@@ -127,7 +123,6 @@ public class Word extends SyntacticParent<Morpheme>
 
 		Resource wordResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Word)
-				.addProperty(JASS.means, toConcept().toRDF(model))
 				.addProperty(JASS.consistsOfMorphemes, morphemeNode)
 				.addLiteral(JASS.name, name())
 				.addLiteral(JASS.mainPoS, mainPoS())
