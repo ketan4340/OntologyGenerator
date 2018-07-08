@@ -20,7 +20,7 @@ public class Word extends SyntacticParent<Morpheme>
 	implements Identifiable, RDFizable, GrammarInterface,
 	CabochaPoSInterface
 {
-	private static int wordsSum = 0;
+	private static int WORD_SUM = 0;
 
 	private final int id;
 
@@ -30,7 +30,7 @@ public class Word extends SyntacticParent<Morpheme>
 	/***********************************/
 	public Word(List<Morpheme> morphemes) {
 		super(morphemes);
-		this.id = wordsSum++;
+		this.id = WORD_SUM++;
 	}
 	public Word(Morpheme... morphemes) {
 		this(Arrays.asList(morphemes));

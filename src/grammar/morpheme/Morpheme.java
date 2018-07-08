@@ -12,29 +12,29 @@ import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.tags.CabochaPoSInterface;
 import grammar.tags.CabochaTags;
-import util.uniqueSet.UniqueSet;
-import util.uniqueSet.Uniqueness;
 
-public class Morpheme implements GrammarInterface, Uniqueness<Morpheme>,
-CabochaPoSInterface, Identifiable, RDFizable {
-	private static UniqueSet<Morpheme> MORPHEMES_UNIQUESET = new UniqueSet<>(100);	// EnMorphemeの同名staticフィールドを隠蔽->もうしてない
+public final class Morpheme implements GrammarInterface,
+	CabochaPoSInterface, Identifiable, RDFizable, MorphemeFactory {
+	private static int MORPHEME_SUM = 0;
 
-	public final int id;		// 通し番号
+	private final int id;		// 通し番号
 	private final String name;	// 形態素の文字列
 	private final CabochaTags tags;	// 品詞リスト
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
-	private Morpheme(String name, CabochaTags tags) {
-		this.id = MORPHEMES_UNIQUESET.size();
+	Morpheme(String name, CabochaTags tags) {
+		this.id = MORPHEME_SUM++;
 		this.name = name;
 		this.tags = tags;
-
-		Morpheme.MORPHEMES_UNIQUESET.add(this);
 	}
-	public static Morpheme getOrNewInstance(String name, CabochaTags tags) {
-		return MORPHEMES_UNIQUESET.getExistingOrIntact(new Morpheme(name, tags));
+	public static Morpheme getInstance(String newname, CabochaTags newtags) {
+		return MorphemeFactory.intern(newname, newtags);
+	}
+	@Override
+	public Object[] initArgs() {
+		return new Object[] {name, tags};
 	}
 
 
@@ -53,7 +53,7 @@ CabochaPoSInterface, Identifiable, RDFizable {
 	public int id() {
 		return id;
 	}
-	@Override
+	//@Override
 	public int compareTo(Morpheme o) {
 		int comparison = name.compareTo(o.name);
 		return comparison!=0? comparison : tags.compareTo(o.tags);
@@ -119,6 +119,7 @@ CabochaPoSInterface, Identifiable, RDFizable {
 	}
 
 
+
 	/****************************************/
 	/**********   Object  Method   **********/
 	/****************************************/
@@ -155,4 +156,5 @@ CabochaPoSInterface, Identifiable, RDFizable {
 	public String toString() {
 		return Objects.toString(name, "nullMorpheme");
 	}
+
 }

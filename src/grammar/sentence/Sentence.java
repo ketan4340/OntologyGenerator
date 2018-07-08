@@ -31,7 +31,7 @@ import grammar.word.Word;
 
 public class Sentence extends SyntacticParent<Clause<?>>
 		implements GrammarInterface, Identifiable, RDFizable {
-	private static int sum = 0;
+	private static int SENTENCE_SUM = 0;
 
 	private final int id;
 
@@ -40,7 +40,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ================================================== */
 	public Sentence(List<Clause<?>> clauses) {
 		super(clauses);
-		this.id = sum++;
+		this.id = SENTENCE_SUM++;
 	}
 	public Sentence(List<Clause<?>> clauses, Map<Clause<?>, Integer> dependingMap) {
 		this(clauses);
@@ -388,7 +388,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			if (!sbjCnt) break;	// 連続した主語の最後尾には必要ない
 
 			// 助詞・連体化"の"を新たに用意
-			Adjunct no = new Adjunct(Morpheme.getOrNewInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
+			Adjunct no = new Adjunct(Morpheme.getInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
 			int index_Ha = subject.indexOfChild(subject.collectWordsHaveAll(tag_Ha).get(0));
 			subject.words().set(index_Ha, no);	// "は"の代わりに"の"を挿入
 		}

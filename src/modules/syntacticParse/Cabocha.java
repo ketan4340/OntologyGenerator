@@ -250,7 +250,7 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 		String name = morphemeInfos[0];
 		String[] tagArray = morphemeInfos[1].split(",");
 		CabochaTags tags = getTagsSuppliedSingleByteChar(tagArray, name);
-		return Morpheme.getOrNewInstance(name, tags);
+		return Morpheme.getInstance(name, tags);
 	}
 
 

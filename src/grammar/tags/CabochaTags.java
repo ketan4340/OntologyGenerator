@@ -1,16 +1,11 @@
 package grammar.tags;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 
-public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface {
-	private static final HashMap<String, HashSet<CabochaTags>> ALL_TAGS = new HashMap<>();
+public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface, TagsFactory {
 	public static final CabochaTags EMPTY_TAGS = new CabochaTags("", "", "", "", "", "", "empty", "empty", "empty");
 
 	/** 品詞 */
@@ -36,7 +31,7 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
 	/* ================================================== */
-	private CabochaTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
+	CabochaTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
 			String inflection, String conjugation, String infinitive, String kana, String pronunciation) {
 		this.mainPoS = mainPoS;
 		this.subPoS1 = subPoS1;
@@ -52,26 +47,11 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 	/* ===== Factory Method ===== */
 	public static CabochaTags getInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
 			String inflection, String conjugation, String infinitive, String kana, String pronunciation) {
-		Optional<CabochaTags> optionalTags = getEquivalentInstance(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
-		CabochaTags tags = optionalTags.orElseGet(()->new CabochaTags(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation));
-		ALL_TAGS.get(tags.mainPoS + tags.subPoS1).add(tags);
-		return tags;
+		return TagsFactory.intern(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
 	}
-	private static Optional<CabochaTags> getEquivalentInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3, String inflection,
-			String conjugation, String infinitive, String kana, String pronunciation) {
-		String key = mainPoS + subPoS1;
-		Set<CabochaTags> tagsset = ALL_TAGS.get(key);
-		if (Objects.nonNull(tagsset)) {
-			for (CabochaTags tags : tagsset) {
-				List<String> newTaglist = Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
-				List<String> taglist = tags.toList();
-				if (newTaglist.equals(taglist))
-					return Optional.of(tags);
-			}
-		} else {
-			ALL_TAGS.put(key, new HashSet<>());
-		}
-		return Optional.empty();
+	@Override
+	public Object[] initArgs() {
+		return new Object[] {mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation};
 	}
 
 
@@ -139,6 +119,47 @@ public class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface
 	@Override
 	public String pronunciation() {
 		return pronunciation;
+	}
+
+
+
+	/* ================================================== */
+	/* ==========        Object  Method        ========== */
+	/* ================================================== */
+	@Override
+	public int hashCode() {
+		return Objects.hash(mainPoS, subPoS1, subPoS2, subPoS3,
+				inflection, conjugation, infinitive, kana, pronunciation);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CabochaTags other = (CabochaTags) obj;
+		if (!conjugation.equals(other.conjugation))
+			return false;
+		if (!infinitive.equals(other.infinitive))
+			return false;
+		if (!inflection.equals(other.inflection))
+			return false;
+		if (!kana.equals(other.kana))
+			return false;
+		if (!mainPoS.equals(other.mainPoS))
+			return false;
+		if (!pronunciation.equals(other.pronunciation))
+			return false;
+		if (!subPoS1.equals(other.subPoS1))
+			return false;
+		if (!subPoS2.equals(other.subPoS2))
+			return false;
+		if (!subPoS3.equals(other.subPoS3))
+			return false;
+		return true;
 	}
 
 }
