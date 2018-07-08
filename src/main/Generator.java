@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 
 import data.RDF.Ontology;
+import data.RDF.RDFSerialize;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
@@ -26,14 +29,21 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt"); 
+	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt");
 	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
 	private static final String JASS_MODEL_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
 	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
 	private static final Path OUTPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
 
-	
-	
+	/* ログ用 */
+	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
+	private static final Path PATH_DIVIDED_SENTENCES = Paths.get("../OntologyGenerator/tmp/log/text/dividedText"+RUNTIME+".txt");
+	private static final Path PATH_JASSMODEL_TURTLE = Paths.get("../OntologyGenerator/tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
+	private static final Path PATH_RULES = Paths.get("../OntologyGenerator/tmp/log/rule/rule"+RUNTIME+".rule");
+	private static final Path PATH_GENERATED_ONTOLOGY_TURTLE = Paths.get("../OntologyGenerator/dest/rdf/turtle/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
+	private static final Path PATH_GENERATED_ONTOLOGY_RDFXML = Paths.get("../OntologyGenerator/dest/rdf/rdfxml/ontology"+RUNTIME+RDFSerialize.RDF_XML.getExtension());
+	private static final Path PATH_TRIPLE_CSV = Paths.get("../OntologyGenerator/dest/csv/RDFtriple"+RUNTIME+".csv");
+
 	/****************************************/
 	/**********    Main  Method    **********/
 	/****************************************/
@@ -41,7 +51,7 @@ public class Generator {
 		init();
 		new Generator().execute(args.length == 1? args[0] : "");
 	}
-	
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -52,7 +62,7 @@ public class Generator {
 	/**********   Member  Method   **********/
 	/****************************************/
 	/**
-	 * ジェネレータの実行. 
+	 * ジェネレータの実行.
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileName) {
@@ -62,7 +72,7 @@ public class Generator {
 
 		String[] texts = {
 				/*
-				"クジラは小魚を食べる。", 
+				"クジラは小魚を食べる。",
 				"クジラは哺乳類である。",
 				"カニの味噌汁は美味しいぞ",
 				"アイアイはアイアイ科の原始的な猿",
@@ -77,9 +87,9 @@ public class Generator {
 		generator.generate(nlLists);
 		//generator.generate(textFilePath);
 	}
-	
+
 	/**
-	 * ジェネレータ本体. 
+	 * ジェネレータ本体.
 	 * @param textFilePath 入力するテキストファイルのパス
 	 * @return
 	 */
@@ -108,8 +118,8 @@ public class Generator {
 		List<Sentence> sentenceList = new SyntacticParser().parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
-		
-		
+
+
 		/*************************************/
 		/********** 文章整形モジュール **********/
 		/*************************************/
@@ -128,18 +138,18 @@ public class Generator {
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
-		
+
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
-		
+
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
-		opm.outputDividedSentences(sentenceMap);
-		opm.outputJASSGraph(JASSMap);
-		opm.outputIDAsCSV(statementMap.createIDRelation());
-		opm.outputOntology(unionModel);
-		opm.outputRDFRules(re.getOntologyRules());
-				
+		opm.outputDividedSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
+		opm.outputOntologyAsTurtle(JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), PATH_JASSMODEL_TURTLE);
+		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_TRIPLE_CSV);
+		opm.outputOntologyAsTurtle(unionModel, PATH_GENERATED_ONTOLOGY_TURTLE);
+		opm.outputRDFRules(re.getOntologyRules(), PATH_RULES);
+
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());
 		System.out.println("ontology size: " + ontology.getTriples().size() + "\n");
