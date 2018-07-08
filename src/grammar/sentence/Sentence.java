@@ -79,19 +79,11 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				.collect(Collectors.toList());
 	}
 
-	/**
-	 * 指定の品詞が末尾に並んでいる文節を集める.
-	 * @param tags
-	 * @return
-	 */
-	public List<Clause<?>> collectClausesEndWith(String[][] tags, boolean ignoreSign) {
-		return children.stream().filter(c -> c.endWith(tags, ignoreSign)).collect(Collectors.toList());
-	}
 
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
 	 * @param tags
-	 * @return
+	 * @return 最後の単語が指定の品詞である文節
 	 */
 	public Clause<?> findFirstClauseEndWith(String[][] tags, boolean ignoreSign) {
 		for (Clause<?> clause : children)
@@ -373,6 +365,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return subjectList;
 	}
 
+	/** 二重主語を解消する. */
 	public void uniteSubject() {
 		List<Clause<?>> subjectList = subjectList(false);
 		if (subjectList.isEmpty()) return;

@@ -8,9 +8,9 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 public class JASS {
 
 	public static final String uri = "http://www.uec.ac.jp/k-lab/k-tanabe/jass/";
-	
+
 	public static final String namespacePrefix = "jass";
-	
+
 	/****************************************/
 	/**********        Class       **********/
 	/****************************************/
@@ -25,7 +25,7 @@ public class JASS {
 	public static final Resource Adjunct = Init.Adjunct();
 	public static final Resource Concept = Init.Concept();
 	public static final Resource Morpheme = Init.Morpheme();
-	
+
 	/****************************************/
 	/**********  Object  Property  **********/
 	/****************************************/
@@ -46,7 +46,7 @@ public class JASS {
 	public static final Property subject = Init.subject();
 	public static final Property predicate = Init.predicate();
 	public static final Property object = Init.object();
-	
+
 	/****************************************/
 	/**********   Data  Property   **********/
 	/****************************************/
@@ -61,7 +61,7 @@ public class JASS {
 	public static final Property infinitive = Init.infinitive();
 	public static final Property kana = Init.kana();
 	public static final Property pronunsiation = Init.pronunsiation();
-	
+
 
 	public static class Init {
 		/****************************************/
@@ -100,7 +100,7 @@ public class JASS {
 		public static Resource Morpheme() {
 			return new ResourceImpl(uri, "Morpheme");
 		}
-		
+
 		/****************************************/
 		/**********  Object  Property  **********/
 		/****************************************/
@@ -155,7 +155,7 @@ public class JASS {
 		public static final Property object() {
 			return new PropertyImpl(uri, "object");
 		}
-		
+
 		/****************************************/
 		/**********   Data  Property   **********/
 		/****************************************/
@@ -178,7 +178,7 @@ public class JASS {
 			return new PropertyImpl(uri, "subPoS3");
 		}
 		public static final Property inflection() {
-			return new PropertyImpl(uri, "infinitive");
+			return new PropertyImpl(uri, "inflection");
 		}
 		public static final Property conjugation() {
 			return new PropertyImpl(uri, "conjugation");
@@ -193,6 +193,6 @@ public class JASS {
 			return new PropertyImpl(uri, "pronunciation");
 		}
 	}
-	
+
 	public String getURI() {return uri;}
 }

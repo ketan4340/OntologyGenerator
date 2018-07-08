@@ -21,18 +21,18 @@ public class SentenceReviser {
 			{{"形容詞", "-連用テ接続"}},
 			{{"連体詞"}},
 			{{"助詞", "連体化"}},
-			{{"助動詞", "体言接続"}}, 
+			{{"助動詞", "体言接続"}},
 			{{"名詞"}}
 			};
-	
-	
+
+
 
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
 	public SentenceReviser() {
 	}
-	
+
 
 	/****************************************/
 	/**********   Member  Method   **********/
@@ -40,32 +40,33 @@ public class SentenceReviser {
 	public Sentence connectWord(Sentence sentence) {
 		// サ変動詞と接尾をもつ動詞をつなげる
 		Stream.of(TAGS_CATEGOREM_ADJUNCTS).forEach(tag_CA -> {
-			sentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tag_CA[0], tag_CA[1]));			
+			sentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tag_CA[0], tag_CA[1]));
 		});
 		// 名詞と形容詞だけ取り出す
 		// これらがClauseの末尾につくものを隣のClauseにつなげる
 		Stream.of(TAGS_NOUNPHRASE).forEach(tag_NP -> {
-			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true); 
+			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
 					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
-				if (!sentence.connect2Next(matchedClause)) break;
+				if (!sentence.connect2Next(matchedClause))
+					break;
 				matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
 			}
 		});
 		return sentence;
 	}
 	public void connectWord(SentenceIDMap sentenceMap) {
-		sentenceMap.forEachKey(this::connectWord);	
+		sentenceMap.forEachKey(this::connectWord);
 	}
-	
+
 	/**
-	 * 長文分割. 
+	 * 長文分割.
 	 * @param sentenceEntry 	キーが文，値がIDタプルのマップエントリ
 	 * @return
 	 */
 	private SentenceIDMap divideSentence(Map.Entry<Sentence, IDTuple> sentenceEntry) {
 		Sentence sentence = sentenceEntry.getKey();
 		IDTuple ids = sentenceEntry.getValue();
-		
+
 		List<Sentence> dividedSentences = Stream.of(sentence)
 				.map(Sentence::divide2)
 				.flatMap(List<Sentence>::stream)
@@ -75,7 +76,7 @@ public class SentenceReviser {
 
 		SentenceIDMap sm = SentenceIDMap.createFromList(dividedSentences);
 		sm.forEachValue(t -> t.copy(ids));
-		
+
 		return sm;
 	}
 	public void divideEachSentence(SentenceIDMap sentenceMap) {
@@ -86,7 +87,7 @@ public class SentenceReviser {
 				.map(this::divideSentence)
 				.flatMap(m -> m.entrySet().stream())
 				.peek(e -> e.getKey().uniteSubject())
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, 
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap<Sentence, IDTuple>::new))
 				);
 	}
