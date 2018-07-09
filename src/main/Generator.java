@@ -71,27 +71,28 @@ public class Generator {
 
 		/*
 		List<String> texts = Arrays.asList(
+				///*
 				"クジラは小魚を食べる。",
 				"クジラは哺乳類である。",
 				"カニの味噌汁は美味しいぞ",
 				"アイアイはアイアイ科の原始的な猿",
 				"馬は体長1メートルほど。",
-				"藍鮫はアイザメ科の海水魚の総称だ。"
 		);
 		List<NaturalLanguage> nlLists = NaturalLanguage.toNaturalLanguageList(texts);
 
 		generate(nlLists);
-		*/
+		//*/
+		///*
 		if (textFileString != null) {
 			Path textFilePath = Paths.get(textFileString);
 			generate(textFilePath);
 		}
+		//*/
 	}
 
 	/**
 	 * ジェネレータ本体.
 	 * @param textFilePath 入力するテキストファイルのパス
-	 * @return
 	 */
 	public Ontology generate(Path textFilePath) {
 		return generateParagraphs(loadTextFile(textFilePath));
@@ -108,7 +109,6 @@ public class Generator {
 	}
 	/**
 	 * オントロジー構築器の実行
-	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
 	 */
 	public Ontology generate(List<NaturalLanguage> naturalLanguages) {
 		System.out.println("Start.");
@@ -130,7 +130,7 @@ public class Generator {
 		/* 長文を分割し複数の短文に分ける */
 		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentence();
-		sentenceMap.forEachKey(System.out::println);	//TODO
+		//sentenceMap.forEachKey(System.out::println);	//PRINT
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/

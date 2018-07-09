@@ -18,14 +18,14 @@ public abstract class IDLinkedMap<K> extends LinkedHashMap<K, IDTuple> {
 	protected IDLinkedMap(LinkedHashMap<K, IDTuple> m) {
 		super(m);
 	}
-	
-	
-	
+
+
+
 	/****************************************/
 	/**********   Static  Method   **********/
 	/****************************************/
-	
-	
+
+
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
@@ -35,11 +35,8 @@ public abstract class IDLinkedMap<K> extends LinkedHashMap<K, IDTuple> {
 	public void forEachValue(Consumer<? super IDTuple> action) {
 		values().forEach(action);
 	}
-	
-	public void scoreAllInit() {
-		forEachValue(id -> id.setScore(0));
-	}
-	
+
+
 	/****************************************/
 	/**********  Abstract  Method  **********/
 	/****************************************/

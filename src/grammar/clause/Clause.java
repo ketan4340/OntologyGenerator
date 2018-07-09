@@ -43,6 +43,13 @@ implements Identifiable, GrammarInterface, RDFizable {
 		this.adjuncts = adjuncts;
 		this.others = others;
 	}
+	private static List<Word> linedupWords(Word categorem, List<? extends Word> adjuncts, List<? extends Word> others) {
+		List<Word> words = new ArrayList<>(5);
+		words.add(categorem);
+		words.addAll(adjuncts);
+		words.addAll(others);
+		return words;
+	}
 
 	/* ================================================== */
 	/* ==========        Member  Method        ========== */
@@ -57,16 +64,6 @@ implements Identifiable, GrammarInterface, RDFizable {
 		return words;
 	}
 
-	private static List<Word> linedupWords(Word categorem, List<? extends Word> adjuncts, List<? extends Word> others) {
-		List<Word> words = new ArrayList<>(5);
-		words.add(categorem);
-		words.addAll(adjuncts);
-		words.addAll(others);
-		return words;
-	}
-
-
-	/* ==========　  　　旧型　　　       ========== */
 	/**
 	 * この文節が係る文節，その文節が係る文節，と辿っていき，経由した全ての文節をリストにして返す.
 	 * @return この文節から係る全ての文節
@@ -80,7 +77,6 @@ implements Identifiable, GrammarInterface, RDFizable {
 		}
 		return allDepending;
 	}
-
 
 	/** 全く同じClauseを複製する */
 	@Override
@@ -132,17 +128,6 @@ implements Identifiable, GrammarInterface, RDFizable {
 	}
 
 
-	/** 指定の品詞を持つWordを返す */
-	public List<Word> collectWordsHaveAll(String[][] tags) {
-		List<Word> taggedWords = new ArrayList<>();
-		for (final Word word: words()) {
-			for (final String[] tag: tags) {
-				if (word.hasTagAll(tag))
-					taggedWords.add(word);
-			}
-		}
-		return taggedWords;
-	}
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean containsWordHas(String[] tag) {
 		for (final Word word: words())
@@ -197,10 +182,7 @@ implements Identifiable, GrammarInterface, RDFizable {
 	public List<Word> getChildren() {
 		return linedupWords(categorem, adjuncts, others);
 	}
-	@Override
-	public void setChildren(List<Word> children) {
-		super.setChildren(children);
-	}
+
 	/*
 	@Override
 	public Sentence getParent() {

@@ -113,7 +113,8 @@ IF (subClassOf) {
   ?cls_P jass:consistsOfCategorem ?wrd_P .
   ?wrd_P jass:mainPoS "名詞" ;
 	jass:means ?rsc_P . 
-  MINUS{?wrd_P !jass:subPoS1 "接尾".}
+  MINUS{?wrd_P jass:subPoS1 "接尾".}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:name "総称" .}
 }THEN{
   ?rsc_S rdfs:subClassOf ?rsc_P .
 };

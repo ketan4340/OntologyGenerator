@@ -119,7 +119,7 @@ public class RelationExtractor {
 				Model convertedModel = e2.getKey();
 				int ruleID = e2.getValue().id();
 				IDTuple idt_clone = idt.clone();
-				idt_clone.setRDFRuleID(ruleID);
+				idt_clone.setRDFRuleID(String.valueOf(ruleID));
 				ontologyMap.put(convertedModel, idt_clone);
 			}
 		}

@@ -36,20 +36,20 @@ public class IDTuple extends Tuple {
 	public IDTuple(String initValue) {
 		super(SIZE, initValue);
 	}
-	public IDTuple(int longSentenceID, String longSentence,
-			int shortSentenceID, String shortSentence,
-			int rdfRuleID, int tripleID,
-			String subject, String predicate, String object,  int score) {
-		super(	String.valueOf(longSentenceID),
+	public IDTuple(String longSentenceID, String longSentence,
+			String shortSentenceID, String shortSentence,
+			String rdfRuleID, String tripleID,
+			String subject, String predicate, String object,  String score) {
+		super(	longSentenceID,
 				longSentence,
-				String.valueOf(shortSentenceID),
+				shortSentenceID,
 				shortSentence,
-				String.valueOf(rdfRuleID),
-				String.valueOf(tripleID),
+				rdfRuleID,
+				tripleID,
 				subject,
 				predicate,
 				object,
-				String.valueOf(score)
+				score
 				);
 	}
 
@@ -74,11 +74,11 @@ public class IDTuple extends Tuple {
 	/* ================================================== */
 	/* ==========        Getter, Setter        ========== */
 	/* ================================================== */
-	public int getLongSentenceID() {
-		return Integer.parseInt(get(LONGSENTENCE_ID));
+	public String getLongSentenceID() {
+		return get(LONGSENTENCE_ID);
 	}
-	public void setLongSentenceID(int longSentenceID) {
-		this.set(LONGSENTENCE_ID, String.valueOf(longSentenceID));
+	public void setLongSentenceID(String longSentenceID) {
+		this.set(LONGSENTENCE_ID, (longSentenceID));
 	}
 	public String getLongSentence() {
 		return get(LONGSENTENCE);
@@ -86,11 +86,11 @@ public class IDTuple extends Tuple {
 	public void setLongSentence(String longSentence) {
 		this.set(LONGSENTENCE, longSentence);
 	}
-	public int getShortSentenceID() {
-		return Integer.parseInt(get(SHORTSENTENCE_ID));
+	public String getShortSentenceID() {
+		return get(SHORTSENTENCE_ID);
 	}
-	public void setShortSentenceID(int shortSentenceID) {
-		this.set(SHORTSENTENCE_ID, String.valueOf(shortSentenceID));
+	public void setShortSentenceID(String shortSentenceID) {
+		this.set(SHORTSENTENCE_ID, (shortSentenceID));
 	}
 	public String getShortSentence() {
 		return get(SHORTSENTENCE);
@@ -98,17 +98,17 @@ public class IDTuple extends Tuple {
 	public void setShortSentence(String shortSentence) {
 		this.set(SHORTSENTENCE, shortSentence);
 	}
-	public int getRDFRuleID() {
-		return Integer.parseInt(get(RDFRULE_ID));
+	public String getRDFRuleID() {
+		return get(RDFRULE_ID);
 	}
-	public void setRDFRuleID(int rdfRuleID) {
-		this.set(RDFRULE_ID, String.valueOf(rdfRuleID));
+	public void setRDFRuleID(String rdfRuleID) {
+		this.set(RDFRULE_ID, (rdfRuleID));
 	}
-	public int getTripleID() {
-		return Integer.parseInt(get(TRIPLE_ID));
+	public String getTripleID() {
+		return get(TRIPLE_ID);
 	}
-	public void setTripleID(int tripleID) {
-		this.set(TRIPLE_ID, String.valueOf(tripleID));
+	public void setTripleID(String tripleID) {
+		this.set(TRIPLE_ID, (tripleID));
 	}
 	public String getSubject() {
 		return get(SUBJECT);
@@ -128,11 +128,11 @@ public class IDTuple extends Tuple {
 	public void setObject(String object) {
 		this.set(OBJECT, object);
 	}
-	public int getScore() {
-		return Integer.parseInt(get(SCORE));
+	public String getScore() {
+		return get(SCORE);
 	}
-	public void setScore(int score) {
-		this.set(SCORE, String.valueOf(score));
+	public void setScore(String score) {
+		this.set(SCORE, (score));
 	}
 
 

@@ -6,10 +6,10 @@ import java.util.HashSet;
 public class Relation<T extends Tuple> extends HashSet<T> {
 	private static final long serialVersionUID = -795496356555507147L;
 
-	
+
 	private Tuple attributes;
-	
-	
+
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -22,13 +22,13 @@ public class Relation<T extends Tuple> extends HashSet<T> {
 		setAttributes(attributes);
 	}
 
-	
+
 
 	/****************************************/
 	/**********    Member Method   **********/
 	/****************************************/
 
-	
+
 
 	/****************************************/
 	/**********   Getter, Setter   **********/
@@ -38,6 +38,6 @@ public class Relation<T extends Tuple> extends HashSet<T> {
 	}
 	public void setAttributes(Tuple attributes) {
 		this.attributes = attributes;
-	}	
+	}
 
 }

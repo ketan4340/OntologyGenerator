@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -378,12 +379,19 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		for (Map.Entry<Clause<?>, Boolean> entry: subjectsContinuity.entrySet()) {
 			Clause<?> subject = entry.getKey();		boolean sbjCnt = entry.getValue();
-			if (!sbjCnt) break;	// 連続した主語の最後尾には必要ない
-
+			if (!sbjCnt)
+				break;		// 連続した主語の最後尾には必要ない
 			// 助詞・連体化"の"を新たに用意
 			Adjunct no = new Adjunct(Morpheme.getInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
-			int index_Ha = subject.indexOfChild(subject.collectWordsHaveAll(tag_Ha).get(0));
-			subject.words().set(index_Ha, no);	// "は"の代わりに"の"を挿入
+			ListIterator<Adjunct> itr = subject.getAdjuncts().listIterator();
+			while (itr.hasNext()) {
+				Adjunct adjunct = itr.next();
+				for (final String[] tag: tag_Ha)
+					if (adjunct.hasTagAll(tag)) {
+						itr.set(no);	// "は"の代わりに"の"を挿入
+						break;
+					}
+			}
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
 		List<Clause<?>> clauses_NP = collectClausesHaveSome(tags_NP);

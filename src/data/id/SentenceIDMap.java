@@ -19,7 +19,7 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/****************************************/
 	public static SentenceIDMap createFromList(List<Sentence> sentenceList) {
 		LinkedHashMap<Sentence, IDTuple> lhm = sentenceList.stream()
-				.collect(Collectors.toMap(s -> s, s -> new IDTuple("-1"), (e1, e2) -> e1, LinkedHashMap::new));
+				.collect(Collectors.toMap(s -> s, s -> new IDTuple(""), (e1, e2) -> e1, LinkedHashMap::new));
 		return new SentenceIDMap(lhm);
 	}
 
@@ -43,13 +43,13 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/****************************************/
 	public void setLongSentence() {
 		forEach((s, idt) -> {
-			idt.setLongSentenceID(s.id());
+			idt.setLongSentenceID(String.valueOf(s.id()));
 			idt.setLongSentence(s.name());
 		});
 	}
 	public void setShortSentence() {
 		forEach((s, idt) -> {
-			idt.setShortSentenceID(s.id());
+			idt.setShortSentenceID(String.valueOf(s.id()));
 			idt.setShortSentence(s.name());
 		});
 	}

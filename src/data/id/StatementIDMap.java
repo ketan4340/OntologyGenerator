@@ -10,7 +10,7 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 	private static final long serialVersionUID = 511791879522986122L;
 
 	private static int sum = 0;
-	
+
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
@@ -29,7 +29,7 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 	/**********   Member  Method   **********/
 	/****************************************/
 	public void setStatementID() {
-		forEachValue(idt -> idt.setTripleID(sum++));
+		forEachValue(idt -> idt.setTripleID(String.valueOf(sum++)));
 	}
 	public void setSubjectString() {
 		forEach((stmt, idt) -> idt.setSubject(RDFUtil.toResourceStringAsQName(stmt.getSubject())));
@@ -46,10 +46,10 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 		setPredicateString();
 		setObjectString();
 	}
-	
+
 	public IDRelation createIDRelation() {
 		setStatement();
 		return new IDRelation(values());
 	}
-	
+
 }
