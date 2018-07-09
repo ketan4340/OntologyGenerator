@@ -49,7 +49,7 @@ public class Generator {
 	/****************************************/
 	public static void main(String[] args) {
 		init();
-		new Generator().execute(args.length == 1? args[0] : "");
+		new Generator().execute(args.length == 1? args[0] : null);
 	}
 
 	/****************************************/
@@ -65,27 +65,28 @@ public class Generator {
 	 * ジェネレータの実行.
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
-	private void execute(String textFileName) {
-		//textFileName = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
-		textFileName = "../OntologyGenerator/resource/input/test/literalText.txt";
-		Path textFilePath = Paths.get(textFileName);
+	private void execute(String textFileString) {
+		//textFileString = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
+		//textFileString = "../OntologyGenerator/resource/input/test/literalText.txt";
 
-		String[] texts = {
+		List<String> texts = Arrays.asList(
 				/*
 				"クジラは小魚を食べる。",
 				"クジラは哺乳類である。",
 				"カニの味噌汁は美味しいぞ",
-				"アイアイはアイアイ科の原始的な猿",
 				//*/
+				"アイアイはアイアイ科の原始的な猿",
 				"馬は体長1メートルほど。",
 				"藍鮫はアイザメ科の海水魚の総称だ。"
 				//*/
-		};
-		List<NaturalLanguage> nlLists = Arrays.asList(NaturalLanguage.toNaturalLanguageArray(texts));
+		);
+		List<NaturalLanguage> nlLists = NaturalLanguage.toNaturalLanguageList(texts);
 
-		Generator generator = new Generator();
-		generator.generate(nlLists);
-		//generator.generate(textFilePath);
+		generate(nlLists);
+		if (textFileString != null) {
+			Path textFilePath = Paths.get(textFileString);
+			generate(textFilePath);
+		}
 	}
 
 	/**

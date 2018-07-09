@@ -9,16 +9,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class RDFRuleReader {
-	/** 直後に"THEN"がない"}"と、直前に"."がある";"の後ろの位置にマッチ.
+	/** 直前に"}"がある";"と、直前に"."がある";"の後ろの位置にマッチ.
 	 * ただし直前(直後)の判定の際，空白文字は無視する.
 	 * 位置にマッチなので置換や分割をしても，"}"も";"も残る. */
 	private static final Pattern SPLIT_RULES_PATTERN =
-			Pattern.compile("(?<=(}(?!(\\s*THEN))))|(?<=(?<=\\.)\\s*;)", Pattern.CASE_INSENSITIVE);
+			Pattern.compile("(?<=(?<=\\});)|(?<=(?<=\\.)\\s*;)", Pattern.CASE_INSENSITIVE);
+			//Pattern.compile("(?<=(}(?!(\\s*THEN))))|(?<=(?<=\\.)\\s*;)", Pattern.CASE_INSENSITIVE);
 
 	/** "IF(name){...}THEN{...}"の形式で書かれたルールにマッチ.
 	 * 大文字小文字を問わない. ルールの名前"(name)"は無くても良い. (){}の前後に空白文字が入っても良い. */
 	private static final Pattern WHOLE_IFTHEN_PATTERN = Pattern.compile(
-					"\\A\\s*IF\\s*(\\((.*)\\))?\\s*\\{(.+)\\}\\s*THEN\\s*\\{(.+)\\}\\s*\\z",
+					"\\A\\s*IF\\s*(\\((.*)\\))?\\s*\\{(.+)\\}\\s*THEN\\s*\\{(.+)\\};\\s*\\z",
 					Pattern.CASE_INSENSITIVE);
 	/** {@link Matcher#group(int)}で取り出す際の定数. {@code WHOLE_IFTHEN_PATTERN}の括弧()の変更に合わせること. */
 	private static final int NAME_IFTHEN = 2, IF_PATTERN_IFTHEN = 3, THEN_PATTERN_IFTHEN = 4;

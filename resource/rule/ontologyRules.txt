@@ -10,7 +10,7 @@ IF (equivalentClass) {
 	rdf:first/jass:categoremMeans ?rsc_p .
 }THEN{
   ?rsc_S owl:equivalentClass ?rsc_p .
-}
+};
 
 # 数値
 IF (numeral value) {
@@ -26,12 +26,12 @@ IF (numeral value) {
   FILTER regex(?val, "[0-9０-９]+?")
   ?valrsc jass:name ?val .
   ?unitrsc jass:name ?unit .
-}THEN{
+} THEN {
   ?rsc_S sio:SIO_000216 _:bn .
 #  _:bn rdf:type ?length .
   _:bn rdf:value ?val .
   _:bn sio:SIO_000221 ?unit .
-}
+};
 
 # 動詞 (jass:Action)
 IF (Action-O) {
@@ -45,7 +45,7 @@ IF (Action-O) {
 }THEN{
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
-}
+};
 IF (Action-O(サ変)) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
@@ -57,7 +57,7 @@ IF (Action-O(サ変)) {
 }THEN{
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
-}
+};
 IF (Action) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
@@ -72,7 +72,7 @@ IF (Action) {
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
   ?rsc_vb jass:range ?rsc_O .
-}
+};
 IF(Action(サ変)){
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
@@ -87,7 +87,7 @@ IF(Action(サ変)){
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
   ?rsc_vb jass:range ?rsc_O .
-}
+};
 
 
 # 形容詞
@@ -101,7 +101,7 @@ IF(attributeOf){
   ?wrd_P jass:means ?rsc_ad .
 }THEN{
   ?rsc_S jass:attributeOf ?rsc_ad .
-}
+};
 
 
 # 概念階層 (rdfs:subClassOf)
@@ -113,6 +113,7 @@ IF (subClassOf) {
   ?cls_P jass:consistsOfCategorem ?wrd_P .
   ?wrd_P jass:mainPoS "名詞" ;
 	jass:means ?rsc_P . 
+  MINUS{?wrd_P !jass:subPoS1 "接尾".}
 }THEN{
   ?rsc_S rdfs:subClassOf ?rsc_P .
-}
+};

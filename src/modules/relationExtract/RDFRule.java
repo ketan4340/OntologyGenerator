@@ -4,7 +4,7 @@ import data.id.Identifiable;
 import grammar.GrammarInterface;
 
 public class RDFRule implements Identifiable, GrammarInterface {
-	protected static final RDFRule EMPTY_RULE = new RDFRule("", "", "");
+	protected static final RDFRule EMPTY_RULE = new RDFRule("empty rule", "", "");
 
 	private static int sum = 0;
 
@@ -54,7 +54,7 @@ public class RDFRule implements Identifiable, GrammarInterface {
 	/* ================================================== */
 	@Override
 	public String toString() {
-		return id + ":" + name + ":\tIF {"+ ifPattern +"\n} THEN {"+ thenPattern + "}";
+		return id + "-" + name + ":\tIF {"+ ifPattern +"}\n\t\tTHEN {"+ thenPattern + "}";
 	}
 
 }

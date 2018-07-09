@@ -194,5 +194,5 @@ public class JASS {
 		}
 	}
 
-	public String getURI() {return uri;}
+	public static final String getURI() {return uri;}
 }

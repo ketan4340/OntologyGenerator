@@ -14,6 +14,7 @@ public class RDFRules {
 	/* ==========          Constructor         ========== */
 	/* ================================================== */
 	public RDFRules(LinkedHashSet<RDFRule> rules) {
+		rules.forEach(System.out::println);//PRINT
 		this.rules = rules;
 	}
 
