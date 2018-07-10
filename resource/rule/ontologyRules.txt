@@ -34,7 +34,7 @@ IF (numeral value) {
 };
 
 # 動詞 (jass:Action)
-IF (Action-O) {
+IF (Action) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
   ?stc jass:predicate ?cls_P .
@@ -46,7 +46,7 @@ IF (Action-O) {
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
 };
-IF (Action-O(サ変)) {
+IF (Action(サ変)) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
   ?stc jass:predicate ?cls_P .
@@ -58,7 +58,7 @@ IF (Action-O(サ変)) {
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
 };
-IF (Action) {
+IF (Action+O) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
   ?stc jass:predicate ?cls_P .
@@ -73,7 +73,7 @@ IF (Action) {
   ?rsc_vb jass:domain ?rsc_S .
   ?rsc_vb jass:range ?rsc_O .
 };
-IF(Action(サ変)){
+IF(Action+O(サ変)){
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
   ?stc jass:predicate ?cls_P .
