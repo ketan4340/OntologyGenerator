@@ -1,4 +1,4 @@
-package modules.relationExtract;
+package data.RDF.rule;
 
 import java.util.LinkedHashSet;
 import java.util.List;

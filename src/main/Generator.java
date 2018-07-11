@@ -22,7 +22,7 @@ import grammar.naturalLanguage.NaturalLanguage;
 import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
 import modules.OutputManager;
-import modules.relationExtract.RelationExtractor;
+import modules.RDFConvert.RelationExtractor;
 import modules.syntacticParse.Cabocha;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;

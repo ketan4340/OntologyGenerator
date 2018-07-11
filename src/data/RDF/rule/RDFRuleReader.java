@@ -1,4 +1,4 @@
-package modules.relationExtract;
+package data.RDF.rule;
 
 import java.io.IOException;
 import java.nio.file.Files;

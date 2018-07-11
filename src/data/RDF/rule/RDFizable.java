@@ -1,4 +1,4 @@
-package data.RDF;
+package data.RDF.rule;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;

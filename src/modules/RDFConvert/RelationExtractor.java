@@ -1,4 +1,4 @@
-package modules.relationExtract;
+package modules.RDFConvert;
 
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -19,6 +19,9 @@ import org.apache.jena.rdf.model.StmtIterator;
 
 import data.RDF.MyResource;
 import data.RDF.RDFTriple;
+import data.RDF.rule.RDFRule;
+import data.RDF.rule.RDFRuleReader;
+import data.RDF.rule.RDFRules;
 import data.id.IDTuple;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;

@@ -5,27 +5,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 public class MyResource {
-	public static final MyResource TYPE = new MyResource(Namespace.RDF, "type");
-	public static final MyResource SUB_CLASS_OF = new MyResource(Namespace.RDFS, "subClassOf"); 
-	public static final MyResource SUB_PROPERTY_OF = new MyResource(Namespace.RDFS, "subPropertyOf"); 
-	public static final MyResource RANGE = new MyResource(Namespace.RDFS, "range"); 
-	public static final MyResource DOMAIN = new MyResource(Namespace.RDFS, "domain"); 
-	public static final MyResource VALUE = new MyResource(Namespace.RDF, "value");
-	
-	public static final MyResource EQUIVALENT_CLASS = new MyResource(Namespace.OWL, "equivalentClass");
-	
-	public static final MyResource ALTER_NAME = new MyResource(Namespace.SCHEMA, "alternateName");
-	public static final MyResource ACTION = new MyResource(Namespace.SCHEMA, "Action");
-	public static final MyResource AGENT = new MyResource(Namespace.SCHEMA, "agent");
-	public static final MyResource OBJECT = new MyResource(Namespace.SCHEMA, "object");
-	
-	public static final MyResource LENGTH = new MyResource(Namespace.EXAMPLE, "hasLength");
-	public static final MyResource WEIGHT = new MyResource(Namespace.EXAMPLE, "hasWeight");
-	public static final MyResource UNITS = new MyResource(Namespace.EXAMPLE, "units");
-	
-	public static final MyResource NO_OBJECT = new MyResource(Namespace.EXAMPLE, "no_object");
-	
-	
 	/**
 	 * 名前空間.
 	 */
@@ -35,8 +14,8 @@ public class MyResource {
 	 * コロン(:)を含んではいけない．
 	 */
 	private String fragment;
-	
-	
+
+
 	/***********************************/
 	/**********  Constructor  **********/
 	/***********************************/
@@ -44,11 +23,11 @@ public class MyResource {
 		this.namespace = namespace;
 		this.fragment = fragment;
 	}
-	
+
 	public MyResource(String uri) {
 		this(Namespace.getNamespaceFromURI(uri), Namespace.getFragmentFromURI(uri));
 	}
-	
+
 	public MyResource(Resource jenaResource) {
 		this(jenaResource.getURI());
 	}
@@ -58,8 +37,8 @@ public class MyResource {
 	public MyResource(RDFNode jenaRDFNode) {
 		this(jenaRDFNode.toString());
 	}
-	
-	
+
+
 	/***********************************/
 	/**********  MemberMethod **********/
 	/***********************************/
@@ -69,7 +48,7 @@ public class MyResource {
 				namespace.getURI() + fragment;
 	}
 
-	
+
 	/***********************************/
 	/********** Getter/Setter **********/
 	/***********************************/
@@ -85,14 +64,14 @@ public class MyResource {
 	public void setFragment(String fragment) {
 		this.fragment = fragment;
 	}
-	
+
 
 	/**********************************/
 	/********** ObjectMethod **********/
 	/**********************************/
 	@Override
 	public String toString() {
-		return namespace == Namespace.LITERAL ? 
+		return namespace == Namespace.LITERAL ?
 				"\"" + fragment + "\"":
 				namespace + ":" + fragment;
 	}

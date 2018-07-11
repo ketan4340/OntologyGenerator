@@ -1,4 +1,4 @@
-package modules.relationExtract;
+package data.RDF.rule;
 
 import data.id.Identifiable;
 import grammar.GrammarInterface;

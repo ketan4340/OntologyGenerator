@@ -7,10 +7,10 @@ import java.nio.file.Path;
 
 import org.apache.jena.rdf.model.Model;
 
+import data.RDF.rule.RDFRules;
 import data.id.IDRelation;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
-import modules.relationExtract.RDFRules;
 
 public class OutputManager {
 

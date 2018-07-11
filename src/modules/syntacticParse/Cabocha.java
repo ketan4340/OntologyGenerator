@@ -24,6 +24,7 @@ import grammar.tags.CabochaTags;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
+import util.PlatformUtil;
 import util.StringListUtil;
 
 public class Cabocha extends AbstractProcessManager implements ParserInterface {
