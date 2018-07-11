@@ -8,13 +8,12 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
-import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.tags.CabochaPoSInterface;
 import grammar.tags.CabochaTags;
 
 public final class Morpheme implements GrammarInterface,
-	CabochaPoSInterface, Identifiable, RDFizable, MorphemeFactory {
+	CabochaPoSInterface, RDFizable, MorphemeFactory {
 	private static int MORPHEME_SUM = 0;
 
 	private final int id;		// 通し番号
@@ -98,10 +97,7 @@ public final class Morpheme implements GrammarInterface,
 	public String pronunciation() {
 		return tags.pronunciation();
 	}
-	@Override
-	public String getURI() {
-		return JASS.uri + getClass().getSimpleName() + id();
-	}
+
 	@Override
 	public Resource toRDF(Model model) {
 		return model.createResource(getURI())

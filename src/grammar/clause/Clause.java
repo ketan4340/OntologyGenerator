@@ -12,7 +12,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
-import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
@@ -20,7 +19,7 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public abstract class Clause<W extends Word> extends SyntacticParent<Word>
-implements Identifiable, GrammarInterface, RDFizable {
+implements GrammarInterface, RDFizable {
 	private static int clausesSum = 0;
 
 	private final int id;
@@ -181,25 +180,6 @@ implements Identifiable, GrammarInterface, RDFizable {
 	 */
 	public List<Word> getChildren() {
 		return linedupWords(categorem, adjuncts, others);
-	}
-
-	/*
-	@Override
-	public Sentence getParent() {
-		return parentSentence;
-	}
-	@Override
-	public void setParent(Sentence parent) {
-		this.parentSentence = parent;
-	}
-	@Override
-	public void setThisAsParent(Word child) {
-		child.setParent(this);
-	}
-	*/
-	@Override
-	public String getURI() {
-		return JASS.uri + getClass().getSimpleName() + id();
 	}
 	@Override
 	public Resource toRDF(Model model) {

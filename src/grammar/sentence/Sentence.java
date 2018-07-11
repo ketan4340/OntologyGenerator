@@ -19,7 +19,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
-import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
@@ -31,7 +30,7 @@ import grammar.word.Adjunct;
 import grammar.word.Word;
 
 public class Sentence extends SyntacticParent<Clause<?>>
-		implements GrammarInterface, Identifiable, RDFizable {
+		implements GrammarInterface, RDFizable {
 	private static int SENTENCE_SUM = 0;
 
 	private final int id;
@@ -502,10 +501,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	@Override
 	public String name() {
 		return getChildren().stream().map(c -> c.name()).collect(Collectors.joining());
-	}
-	@Override
-	public String getURI() {
-		return JASS.uri+getClass().getSimpleName()+id();
 	}
 	@Override
 	public Resource toRDF(Model model) {

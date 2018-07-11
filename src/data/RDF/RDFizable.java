@@ -3,8 +3,12 @@ package data.RDF;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 
-public interface RDFizable {
-	String getURI();
+import data.RDF.vocabulary.JASS;
+import data.id.Identifiable;
 
+public interface RDFizable extends Identifiable {
+	default String getURI() {
+		return JASS.uri+getClass().getSimpleName()+id();
+	}
 	Resource toRDF(Model model);
 }

@@ -10,14 +10,13 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.RDFizable;
 import data.RDF.vocabulary.JASS;
-import data.id.Identifiable;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
 import grammar.tags.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
-	implements Identifiable, RDFizable, GrammarInterface,
+	implements RDFizable, GrammarInterface,
 	CabochaPoSInterface
 {
 	private static int WORD_SUM = 0;
@@ -111,10 +110,6 @@ public class Word extends SyntacticParent<Morpheme>
 	@Override
 	public String pronunciation() {
 		return children.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
-	}
-	@Override
-	public String getURI() {
-		return JASS.uri+getClass().getSimpleName()+id();
 	}
 	@Override
 	public Resource toRDF(Model model) {
