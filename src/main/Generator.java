@@ -68,15 +68,19 @@ public class Generator {
 	private void execute(String textFileString) {
 		//textFileString = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
 		//textFileString = "../OntologyGenerator/resource/input/test/literalText.txt";
+		//textFileString = "../OntologyGenerator/resource/input/test/whale.txt";
 
 		/*
 		List<String> texts = Arrays.asList(
 				///*
 				"クジラは小魚を食べる。",
-				"クジラは哺乳類である。",
+				"クジラはヒレをもつ",
 				"カニの味噌汁は美味しいぞ",
 				"アイアイはアイアイ科の原始的な猿",
 				"馬は体長1メートルほど。",
+				"犬はイヌ科の哺乳類の通称。",
+				"猫はネコ科の動物の総称である。",
+				"カサゴは棘がある"
 		);
 		List<NaturalLanguage> nlLists = NaturalLanguage.toNaturalLanguageList(texts);
 
@@ -130,6 +134,7 @@ public class Generator {
 		/* 長文を分割し複数の短文に分ける */
 		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentence();
+
 		//sentenceMap.forEachKey(System.out::println);	//PRINT
 		/*************************************/
 		/********** 関係抽出モジュール **********/
@@ -154,6 +159,7 @@ public class Generator {
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());
 		System.out.println("ontology size: " + ontology.getTriples().size() + "\n");
 
+		//ontology.getTriples().forEach(t -> System.out.println(t));	//PRINT
 		return ontology;
 	}
 

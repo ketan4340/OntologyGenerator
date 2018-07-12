@@ -12,7 +12,7 @@ public class SyntacticParser {
 
 	public SyntacticParser() {
 	}
-	
+
 	/**
 	 * 自然言語文の段落のリストを構文解析し，段落のリストを返す. 未使用
 	 * @param naturalLanguageParagraphs 自然言語文の段落のリスト
@@ -33,7 +33,8 @@ public class SyntacticParser {
 	 */
 	public List<Sentence> parseSentences(List<NaturalLanguage> naturalLanguages) {
 		return new Cabocha().texts2sentences(naturalLanguages);
+		//return new Cabocha("-f1", "-n1", "-d", "/usr/local/lib/mecab/dic/mecab-ipadic-neologd").texts2sentences(naturalLanguages);
 	}
-	
+
 
 }
