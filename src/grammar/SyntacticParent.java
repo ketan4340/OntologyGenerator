@@ -63,7 +63,7 @@ public abstract class SyntacticParent<C> {
 		return children.get(0);
 	}
 	public C tail() {
-		return children.get(children.size()-1);
+		return children.isEmpty()? null : children.get(children.size()-1);
 	}
 
 
