@@ -32,6 +32,7 @@ public class Generator {
 	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt");
 	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
 	private static final String JASS_MODEL_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
+
 	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
 	private static final Path OUTPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
 
@@ -70,7 +71,7 @@ public class Generator {
 		//textFileString = "../OntologyGenerator/resource/input/test/literalText.txt";
 		//textFileString = "../OntologyGenerator/resource/input/test/whale.txt";
 
-		/*
+		///*
 		List<String> texts = Arrays.asList(
 				///*
 				"クジラは小魚を食べる。",

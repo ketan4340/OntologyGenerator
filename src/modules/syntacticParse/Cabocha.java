@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,9 +44,9 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 	private static final int MAXIMUM_TAGS_LENGTH = 9;
 
 	/** CaboChaの入力ファイルの保存先. */
-	private static Path INPUT_TXTFILE_PATH;
+	private static Path INPUT_TXTFILE_PATH = Paths.get("tmp/parserIO/CaboChaInput.txt");
 	/** CaboChaの出力ファイルの保存先 */
-	private static Path OUTPUT_TXTFILE_PATH;
+	private static Path OUTPUT_TXTFILE_PATH = Paths.get("tmp/parserIO/CaboChaOutput.txt");
 
 	/** 読み込み時，文節ごとの係り受け関係をインデックスで保管するMap.
 	 * 都度clearして使い回す.
@@ -295,7 +297,8 @@ public class Cabocha extends AbstractProcessManager implements ParserInterface {
 	private static Path output_ParserInput(List<NaturalLanguage> nlTextList) {
 		// List<NL>からList<String>へ
 		try {
-			return Files.write(INPUT_TXTFILE_PATH, NaturalLanguage.toStringList(nlTextList));
+			return Files.write(INPUT_TXTFILE_PATH, NaturalLanguage.toStringList(nlTextList),
+					StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
