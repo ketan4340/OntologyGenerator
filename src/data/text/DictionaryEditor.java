@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import grammar.clause.Clause;
-import grammar.naturalLanguage.NaturalLanguage;
 import grammar.sentence.Sentence;
-import modules.syntacticParse.Cabocha;
+import modules.syntacticParse.CabochaDecoder;
+import parser.Cabocha;
 
 public class DictionaryEditor {
 	/* 繰り返しつかうのでここでコンパイル */
@@ -26,15 +26,17 @@ public class DictionaryEditor {
 	/** 鉤括弧で囲まれた用例を探す正規表現 */
 	private static final Pattern ptnExm2 = Pattern.compile("(?<![あ-ん])「[^「」]+」(?![あ-ん、。])");
 	/** 語釈文頭の箇条書きの数字を探す正規表現 */
-	private static final Pattern ptnNum = Pattern.compile("[１-９\\d{2}][ ㋐-㋾]");	
+	private static final Pattern ptnNum = Pattern.compile("[１-９\\d{2}][ ㋐-㋾]");
 	/** 補説とそこから行末までを探す正規表現 */
 	private static final Pattern ptnSplm = Pattern.compile("\\[補説\\].+");
 
-
+	/* ================================================== */
+	/* ==========          Constructor         ==========*/
+	/* ================================================== */
 	public DictionaryEditor() {
 		// TODO 自動生成されたコンストラクター・スタブ
 	}
-	
+
 	/**
 	 * 辞書を扱いやすいよう主語を加えた文章にして出力
 	 */
@@ -61,10 +63,10 @@ public class DictionaryEditor {
 			String[] interpretations = serialInterpretation.split("。", 0);
 
 			for (String interpretation : interpretations) {
-				Sentence sentence = cabocha.text2sentence(new NaturalLanguage(interpretation));
+				Sentence sentence = new CabochaDecoder().decode2Sentence(cabocha.parse(interpretation));
 				List<Clause<?>> subjects = sentence.subjectList(false);
 				Clause<?> firstSubjects = (subjects.isEmpty())? null : subjects.get(0);
-				int subjectIndex = sentence.indexOfChild(firstSubjects); 
+				int subjectIndex = sentence.indexOfChild(firstSubjects);
 				Clause<?> firstCommaClause = sentence.findFirstClauseEndWith(new String[][]{{"、"}}, false);
 				int commaIndex = sentence.indexOfChild(firstCommaClause);
 				String text = (subjectIndex != -1 &&
@@ -79,11 +81,11 @@ public class DictionaryEditor {
 			Files.write(outputFile, texts);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
-	
+
 	/**
-	 * DictionaryFileを読み込み，見出し語をKey，語釈をValueにもつMapを返す. 
+	 * DictionaryFileを読み込み，見出し語をKey，語釈をValueにもつMapを返す.
 	 * @param dictionaryFile 見出し語<TAB>語釈<RETURN>という規則で書かれたテキストファイル
 	 * @return 見出し語と語釈のマップ
 	 */
@@ -101,7 +103,7 @@ public class DictionaryEditor {
 		}
 		return dictionary;
 	}
-	
+
 	/**
 	 * 日本語テキストから余計なかっこ,記号を除去し，見出し語の代入を行う
 	 */
@@ -129,8 +131,8 @@ public class DictionaryEditor {
 		text = text.replaceAll("\\d(?=」)", "");		// カギカッコ内最後の数字除去
 		return text;
 	}
-	
-	
+
+
 
 	/**
 	 * ディレクトリ内のファイルの内容を全て纏めた一つのファイルを出力する
@@ -147,7 +149,7 @@ public class DictionaryEditor {
 			System.err.println("There is no file.");
 			return false;
 		}
-		
+
 		filePathStream.forEach(filePath -> {
 			if (!Files.isRegularFile(filePath)) return;
 			if (filePath.getFileName().toString().equals(".gitignore") ||

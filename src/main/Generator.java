@@ -23,7 +23,6 @@ import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
 import modules.OutputManager;
 import modules.RDFConvert.RelationExtractor;
-import modules.syntacticParse.Cabocha;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
@@ -33,23 +32,22 @@ public class Generator {
 	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
 	private static final String JASS_MODEL_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
 
+	/*
 	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
 	private static final Path OUTPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
-
+	 */
 	/* ログ用 */
 	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
 	private static final Path PATH_DIVIDED_SENTENCES = Paths.get("../OntologyGenerator/tmp/log/text/dividedText"+RUNTIME+".txt");
 	private static final Path PATH_JASSMODEL_TURTLE = Paths.get("../OntologyGenerator/tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
 	private static final Path PATH_RULES = Paths.get("../OntologyGenerator/tmp/log/rule/rule"+RUNTIME+".rule");
 	private static final Path PATH_GENERATED_ONTOLOGY_TURTLE = Paths.get("../OntologyGenerator/dest/rdf/turtle/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
-	private static final Path PATH_GENERATED_ONTOLOGY_RDFXML = Paths.get("../OntologyGenerator/dest/rdf/rdfxml/ontology"+RUNTIME+RDFSerialize.RDF_XML.getExtension());
 	private static final Path PATH_TRIPLE_CSV = Paths.get("../OntologyGenerator/dest/csv/RDFtriple"+RUNTIME+".csv");
 
 	/****************************************/
 	/**********    Main  Method    **********/
 	/****************************************/
 	public static void main(String[] args) {
-		init();
 		new Generator().execute(args.length == 1? args[0] : null);
 	}
 
@@ -185,8 +183,4 @@ public class Generator {
 				.collect(Collectors.toList());
 	}
 
-	private static void init() {
-		Cabocha.setINPUT_TXTFILE_PATH(INPUT_FILE_PATH);
-		Cabocha.setOUTPUT_TXTFILE_PATH(OUTPUT_FILE_PATH);
-	}
 }
