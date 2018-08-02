@@ -101,6 +101,7 @@ IF (Action(サ変)) {
   ?rsc_vb rdf:type jass:Action .
   ?rsc_vb jass:domain ?rsc_S .
 };
+# 動詞 (目的語あり)(jass:Action)
 IF (Action+O) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
