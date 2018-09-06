@@ -2,9 +2,9 @@ package modules.syntacticParse;
 
 import java.util.List;
 
+import cabocha.Cabocha;
 import grammar.naturalLanguage.NaturalLanguage;
 import grammar.sentence.Sentence;
-import parser.Cabocha;
 
 public class SyntacticParser {
 
