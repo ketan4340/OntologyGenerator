@@ -55,7 +55,7 @@ IF (hasPart) {
   ?rsc_S dcterms:hasPart ?rsc_O .
 };
 
-# 数値
+# 数値と単位
 IF (numeral value) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
@@ -76,31 +76,6 @@ IF (numeral value) {
   _:bn sio:SIO_000221 ?unit .
 };
 
-# 動詞 (jass:Action)
-IF (Action) {
-  ?stc rdf:type jass:Sentence .
-  ?stc jass:subject ?cls_S .
-  ?stc jass:predicate ?cls_P .
-  ?cls_S jass:categoremMeans ?rsc_S .
-  ?cls_P jass:consistsOfCategorem ?wrd_P .
-  ?wrd_P jass:mainPoS "動詞" .
-  ?wrd_P jass:means ?rsc_vb .
-}THEN{
-  ?rsc_vb rdf:type jass:Action .
-  ?rsc_vb jass:domain ?rsc_S .
-};
-IF (Action(サ変)) {
-  ?stc rdf:type jass:Sentence .
-  ?stc jass:subject ?cls_S .
-  ?stc jass:predicate ?cls_P .
-  ?cls_S jass:categoremMeans ?rsc_S .
-  ?cls_P jass:consistsOfCategorem ?wrd_P .
-  ?wrd_P jass:subPoS1 "サ変接続" .
-  ?wrd_P jass:means ?rsc_vb .
-}THEN{
-  ?rsc_vb rdf:type jass:Action .
-  ?rsc_vb jass:domain ?rsc_S .
-};
 # 動詞 (目的語あり)(jass:Action)
 IF (Action+O) {
   ?stc rdf:type jass:Sentence .
@@ -133,6 +108,32 @@ IF(Action+O(サ変)){
   ?rsc_vb jass:range ?rsc_O .
 };
 
+# 動詞 (jass:Action)
+IF (Action) {
+  ?stc rdf:type jass:Sentence .
+  ?stc jass:subject ?cls_S .
+  ?stc jass:predicate ?cls_P .
+  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:mainPoS "動詞" .
+  ?wrd_P jass:means ?rsc_vb .
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rsc_S .
+};
+IF (Action(サ変)) {
+  ?stc rdf:type jass:Sentence .
+  ?stc jass:subject ?cls_S .
+  ?stc jass:predicate ?cls_P .
+  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:subPoS1 "サ変接続" .
+  ?wrd_P jass:means ?rsc_vb .
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rsc_S .
+};
+
 
 # 形容詞
 IF(attributeOf){
@@ -145,20 +146,4 @@ IF(attributeOf){
   ?wrd_P jass:means ?rsc_ad .
 }THEN{
   ?rsc_S jass:attributeOf ?rsc_ad .
-};
-
-
-# 概念階層 (rdfs:subClassOf)
-IF (subClassOf) {
-  ?stc a jass:Sentence ;
-	jass:subject ?cls_S ;
-	jass:predicate ?cls_P . 
-  ?cls_S jass:categoremMeans ?rsc_S .
-  ?cls_P jass:consistsOfCategorem ?wrd_P .
-  ?wrd_P jass:mainPoS "名詞" ;
-	jass:means ?rsc_P . 
-  MINUS{?wrd_P jass:subPoS1 "接尾".}
-  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:name "総称" .}
-}THEN{
-  ?rsc_S rdfs:subClassOf ?rsc_P .
 };

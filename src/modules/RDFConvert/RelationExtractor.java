@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.jena.query.Query;
@@ -29,37 +30,43 @@ import data.id.StatementIDMap;
 
 public class RelationExtractor {
 
-	/**
-	 * 標準のJASSオントロジー
-	 */
+	/** 標準のJASSオントロジー */
 	public final Model defaultJASSModel;
 
-	/**
-	 * 拡張ルール
-	 */
+	/** 拡張ルール */
 	private final RDFRules extensionRules;
-	/**
-	 * オントロジー変換ルール
-	 */
+	/** オントロジー変換ルール */
 	private final RDFRules ontologyRules;
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
 	public RelationExtractor(RDFRules extensionRules, RDFRules ontologyRules, Model jassModel) {
 		this.extensionRules = extensionRules;
 		this.ontologyRules = ontologyRules;
 		this.defaultJASSModel = jassModel;
 	}
+
 	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, String jassModelURL) {
-		this(RDFRuleReader.readRDFRules(extensionRulePath),
-				RDFRuleReader.readRDFRules(ontologyRulePath),
-				ModelFactory.createDefaultModel().read(jassModelURL)
-				);
+		this(RDFRuleReader.readRDFRules(extensionRulePath), RDFRuleReader.readRDFRules(ontologyRulePath),
+				ModelFactory.createDefaultModel().read(jassModelURL));
 	}
 
 	/* ================================================== */
-	/* ==========        Member  Method        ========== */
+	/* ================== Inner Class =================== */
+	/* ================================================== */
+	private static class Moderule {
+		public final Model model;
+		public final RDFRule rule;
+
+		public Moderule(Model model, RDFRule rule) {
+			this.model = model;
+			this.rule = rule;
+		}
+	}
+
+	/* ================================================== */
+	/* ================== Member Method ================= */
 	/* ================================================== */
 	/**
 	 * {@code Sentence}のIDMapから{@code Model}(JASS) のIDMapに変換する.
@@ -95,9 +102,7 @@ public class RelationExtractor {
 			Property predicate = stmt.getPredicate(); // get the predicate
 			RDFNode object = stmt.getObject(); // get the object
 
-			RDFTriple triple = new RDFTriple(
-					new MyResource(subject),
-					new MyResource(predicate),
+			RDFTriple triple = new RDFTriple(new MyResource(subject), new MyResource(predicate),
 					new MyResource(object));
 			triples.add(triple);
 		}
@@ -112,53 +117,65 @@ public class RelationExtractor {
 	public ModelIDMap convertMap_JASSModel2RDFModel(ModelIDMap JASSMap) {
 		ModelIDMap ontologyMap = new ModelIDMap();
 		// 拡張
+		// 拡張は全てのルールをチェックする
 		JASSMap.forEachKey(this::extendsJASSModel);
 		// 変換
-		for (Map.Entry<Model, IDTuple> e : JASSMap.entrySet()) {
+		// 変換は1つでもルールにマッチした時点でその後のマッチングを止める
+		JASSMap.entrySet().forEach(e -> {
 			Model convertingModel = e.getKey();
 			IDTuple idt = e.getValue();
-			Map<Model, RDFRule> modelsWithRuleID = convertsJASSModel(convertingModel);
-			for (Map.Entry<Model, RDFRule> e2 : modelsWithRuleID.entrySet()) {
-				Model convertedModel = e2.getKey();
-				int ruleID = e2.getValue().id();
+			Optional<Moderule> modelWithRule = convertsJASSModel(convertingModel);
+			modelWithRule.ifPresent(mr -> {
 				IDTuple idt_clone = idt.clone();
-				idt_clone.setRDFRuleID(String.valueOf(ruleID));
-				ontologyMap.put(convertedModel, idt_clone);
-			}
-		}
+				idt_clone.setRDFRuleID(String.valueOf(mr.rule.id()));
+				ontologyMap.put(mr.model, idt_clone);				
+			});
+		});
 		return ontologyMap;
 	}
 
+
 	/* クエリ解決用 */
 	private Model extendsJASSModel(Model jass) {
-		extensionRules.forEach(r -> jass.add(solveConstructQuery(jass, r)));
+		extensionRules.forEach(r -> {
+			Optional<Moderule> optmr = solveConstructQuery(jass, r);
+			optmr.ifPresent(mr -> jass.add(mr.model));
+		});
 		return jass;
 	}
-	private Map<Model, RDFRule> convertsJASSModel(Model jass) {
-		return ontologyRules.stream()
-				.collect(Collectors.toMap(
-						r -> solveConstructQuery(jass, r),
-						r -> r
-						));
+
+	/**
+	 * JASSモデルに対し、全てのRDFルールズを適用し、マッチするとjenaモデルを生成する。 マッチしなくても空のモデルを返してる？
+	 * 生成されたjenaモデルはマッチしたルールとのマッピングとして返される。
+	 * @param jass
+	 * @return
+	 */
+	private Optional<Moderule> convertsJASSModel(Model jass) {
+		return ontologyRules.stream().map(r -> solveConstructQuery(jass, r)).filter(opt -> opt.isPresent())	// TODO
+				.map(opt -> opt.get()).findFirst();
 	}
-	private Model solveConstructQuery(Model model, RDFRule rule) {
-		return QueryExecutionFactory.create(createQuery(rule), model).execConstruct();
+
+	private Optional<Moderule> solveConstructQuery(Model model, RDFRule rule) {
+		Model m = QueryExecutionFactory.create(createQuery(rule), model).execConstruct();
+		return m.isEmpty() ? Optional.empty() : Optional.of(new Moderule(m, rule));
 	}
+	
 	private Query createQuery(RDFRule rule) {
 		return QueryFactory.create(createPrefixes4Query() + rule.writeQuery());
 	}
+
 	private String createPrefixes4Query() {
 		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
-				.map(e -> "PREFIX "+ e.getKey() +": <"+ e.getValue() +">")
-				.collect(Collectors.joining(" "));
+				.map(e -> "PREFIX " + e.getKey() + ": <" + e.getValue() + ">").collect(Collectors.joining(" "));
 	}
 
 	/* ================================================== */
-	/* ==========            Getter            ========== */
+	/* ===================== Getter ===================== */
 	/* ================================================== */
 	public RDFRules getExtensionRules() {
 		return extensionRules;
 	}
+
 	public RDFRules getOntologyRules() {
 		return ontologyRules;
 	}

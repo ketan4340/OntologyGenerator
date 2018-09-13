@@ -28,9 +28,9 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/extensionRules.txt");
-	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resource/rule/ontologyRules.txt");
-	private static final String JASS_MODEL_URL = "../OntologyGenerator/resource/ontology/SyntaxOntology.owl";
+	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resources/rule/extensionRules.txt");
+	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resources/rule/ontologyRules.txt");
+	private static final String JASS_MODEL_URL = "../OntologyGenerator/resources/ontology/SyntaxOntology.owl";
 
 	/*
 	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
@@ -83,7 +83,9 @@ public class Generator {
 		);
 		List<NaturalLanguage> nlLists = NaturalLanguage.toNaturalLanguageList(texts);
 
-		generate(nlLists);
+		Ontology o = generate(nlLists);
+		o.getTriples().forEach(System.out::println);
+		//PRINT
 		//*/
 		///*
 		if (textFileString != null) {
@@ -134,7 +136,7 @@ public class Generator {
 		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentence();
 
-		//sentenceMap.forEachKey(System.out::println);	//PRINT
+		sentenceMap.forEachKey(System.out::println);	//PRINT
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/
@@ -146,6 +148,7 @@ public class Generator {
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 
+		
 		// ログや生成物の出力
 		OutputManager opm = new OutputManager();
 		opm.outputDividedSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
