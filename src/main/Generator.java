@@ -28,10 +28,10 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path EXTENSION_RULE_PATH = Paths.get("../OntologyGenerator/resources/rule/extensionRules.txt");
-	private static final Path ONTOLOGY_RULE_PATH = Paths.get("../OntologyGenerator/resources/rule/ontologyRules.txt");
-	private static final String JASS_MODEL_URL = "../OntologyGenerator/resources/ontology/SyntaxOntology.owl";
-
+	private static final Path EXTENSION_RULE_PATH = Paths.get("resources/rule/extensionRules.txt");
+	private static final Path ONTOLOGY_RULE_PATH = Paths.get("resources/rule/ontology-rules");
+	private static final String JASS_MODEL_URL = "resources/ontology/SyntaxOntology.owl";
+	
 	/*
 	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
 	private static final Path OUTPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
@@ -155,7 +155,7 @@ public class Generator {
 		opm.outputOntologyAsTurtle(JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), PATH_JASSMODEL_TURTLE);
 		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_TRIPLE_CSV);
 		opm.outputOntologyAsTurtle(unionModel, PATH_GENERATED_ONTOLOGY_TURTLE);
-		opm.outputRDFRules(re.getOntologyRules(), PATH_RULES);
+		opm.outputRDFRulesSet(re.getOntologyRules(), PATH_RULES);
 
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());

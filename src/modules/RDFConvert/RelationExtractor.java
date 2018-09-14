@@ -23,6 +23,7 @@ import data.RDF.RDFTriple;
 import data.RDF.rule.RDFRule;
 import data.RDF.rule.RDFRuleReader;
 import data.RDF.rule.RDFRules;
+import data.RDF.rule.RDFRulesSet;
 import data.id.IDTuple;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
@@ -36,19 +37,19 @@ public class RelationExtractor {
 	/** 拡張ルール */
 	private final RDFRules extensionRules;
 	/** オントロジー変換ルール */
-	private final RDFRules ontologyRules;
+	private final RDFRulesSet ontologyRulesSet;
 
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
-	public RelationExtractor(RDFRules extensionRules, RDFRules ontologyRules, Model jassModel) {
+	public RelationExtractor(RDFRules extensionRules, RDFRulesSet ontologyRules, Model jassModel) {
 		this.extensionRules = extensionRules;
-		this.ontologyRules = ontologyRules;
+		this.ontologyRulesSet = ontologyRules;
 		this.defaultJASSModel = jassModel;
 	}
 
 	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, String jassModelURL) {
-		this(RDFRuleReader.readRDFRules(extensionRulePath), RDFRuleReader.readRDFRules(ontologyRulePath),
+		this(RDFRuleReader.readRDFRules(extensionRulePath), RDFRuleReader.readRDFRulesSet(ontologyRulePath),
 				ModelFactory.createDefaultModel().read(jassModelURL));
 	}
 
@@ -128,7 +129,7 @@ public class RelationExtractor {
 			modelWithRule.ifPresent(mr -> {
 				IDTuple idt_clone = idt.clone();
 				idt_clone.setRDFRuleID(String.valueOf(mr.rule.id()));
-				ontologyMap.put(mr.model, idt_clone);				
+				ontologyMap.put(mr.model, idt_clone);
 			});
 		});
 		return ontologyMap;
@@ -151,7 +152,8 @@ public class RelationExtractor {
 	 * @return
 	 */
 	private Optional<Moderule> convertsJASSModel(Model jass) {
-		return ontologyRules.stream().map(r -> solveConstructQuery(jass, r)).filter(opt -> opt.isPresent())	// TODO
+		return ontologyRulesSet.stream().flatMap(r -> r.stream()).map(r -> solveConstructQuery(jass, r))
+				.filter(opt -> opt.isPresent())	// TODO
 				.map(opt -> opt.get()).findFirst();
 	}
 
@@ -159,7 +161,7 @@ public class RelationExtractor {
 		Model m = QueryExecutionFactory.create(createQuery(rule), model).execConstruct();
 		return m.isEmpty() ? Optional.empty() : Optional.of(new Moderule(m, rule));
 	}
-	
+
 	private Query createQuery(RDFRule rule) {
 		return QueryFactory.create(createPrefixes4Query() + rule.writeQuery());
 	}
@@ -176,7 +178,7 @@ public class RelationExtractor {
 		return extensionRules;
 	}
 
-	public RDFRules getOntologyRules() {
-		return ontologyRules;
+	public RDFRulesSet getOntologyRules() {
+		return ontologyRulesSet;
 	}
 }

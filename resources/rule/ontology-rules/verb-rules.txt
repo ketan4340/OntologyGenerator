@@ -1,0 +1,85 @@
+# 部分 (dcterms:hasPart)
+IF (hasPart) {
+  ?stc 	rdf:type jass:Sentence ;
+  		jass:subject/jass:categoremMeans ?rsc_S ;
+  		jass:predicate ?cls_P ;
+  		jass:object ?cls_O .
+  ?cls_P jass:consistsOfCategorem/jass:infinitive ?has .
+  FILTER(?has="もつ" || ?has="持つ")
+  ?cls_O 	jass:consistsOfAdjuncts/rdf:first/jass:infinitive "を" ;
+  			jass:categoremMeans ?rsc_O .
+} THEN {
+  ?rsc_S dcterms:hasPart ?rsc_O .
+};
+IF (hasPart) {
+  ?stc 	rdf:type jass:Sentence ;
+  		jass:subject/jass:categoremMeans ?rsc_S ;
+  		jass:predicate ?cls_P ;
+  		jass:object ?cls_O .
+  ?cls_P jass:consistsOfCategorem/jass:infinitive ?has .
+  FILTER(?has="ある")
+  ?cls_O 	jass:consistsOfAdjuncts/rdf:first/jass:infinitive "が" ;
+  			jass:categoremMeans ?rsc_O .
+} THEN {
+  ?rsc_S dcterms:hasPart ?rsc_O .
+};
+
+
+
+# 動詞 (目的語あり)(jass:Action)
+IF (Action+O) {
+  ?stc rdf:type jass:Sentence .
+  ?stc jass:subject ?cls_S .
+  ?stc jass:predicate ?cls_P .
+  ?stc jass:object ?cls_O .
+  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_O jass:categoremMeans ?rsc_O .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:mainPoS "動詞" .
+  ?wrd_P jass:means ?rsc_vb .
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rsc_S .
+  ?rsc_vb jass:range ?rsc_O .
+};
+IF(Action+O(サ変)){
+  ?stc rdf:type jass:Sentence .
+  ?stc jass:subject ?cls_S .
+  ?stc jass:predicate ?cls_P .
+  ?stc jass:object ?cls_O .
+  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_O jass:categoremMeans ?rsc_O .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:subPoS1 "サ変接続" .
+  ?wrd_P jass:means ?rsc_vb .
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rsc_S .
+  ?rsc_vb jass:range ?rsc_O .
+};
+
+# 動詞 (jass:Action)
+IF (Action) {
+  ?stc rdf:type jass:Sentence .
+  ?stc jass:subject ?cls_S .
+  ?stc jass:predicate ?cls_P .
+  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:mainPoS "動詞" .
+  ?wrd_P jass:means ?rsc_vb .
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rsc_S .
+};
+IF (Action(サ変)) {
+  ?stc rdf:type jass:Sentence .
+  ?stc jass:subject ?cls_S .
+  ?stc jass:predicate ?cls_P .
+  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:subPoS1 "サ変接続" .
+  ?wrd_P jass:means ?rsc_vb .
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rsc_S .
+};

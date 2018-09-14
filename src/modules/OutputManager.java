@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import org.apache.jena.rdf.model.Model;
 
 import data.RDF.rule.RDFRules;
+import data.RDF.rule.RDFRulesSet;
 import data.id.IDRelation;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
@@ -37,6 +38,11 @@ public class OutputManager {
 	}
 
 	public void outputRDFRules(RDFRules rules, Path path) {
+		try {
+			Files.write(path, rules.toStringList());
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void outputRDFRulesSet(RDFRulesSet rules, Path path) {
 		try {
 			Files.write(path, rules.toStringList());
 		} catch (IOException e) {e.printStackTrace();}
