@@ -51,6 +51,10 @@ IF(Action+O(サ変)){
   ?cls_O jass:categoremMeans ?rsc_O .
   ?cls_P jass:consistsOfCategorem ?wrd_P .
   ?wrd_P jass:subPoS1 "サ変接続" .
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "総称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "通称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "別称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "異称" .}
   ?wrd_P jass:means ?rsc_vb .
 }THEN{
   ?rsc_vb rdf:type jass:Action .
@@ -78,6 +82,10 @@ IF (Action(サ変)) {
   ?cls_S jass:categoremMeans ?rsc_S .
   ?cls_P jass:consistsOfCategorem ?wrd_P .
   ?wrd_P jass:subPoS1 "サ変接続" .
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "総称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "通称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "別称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "異称" .}
   ?wrd_P jass:means ?rsc_vb .
 }THEN{
   ?rsc_vb rdf:type jass:Action .

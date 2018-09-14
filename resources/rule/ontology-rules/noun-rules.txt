@@ -46,6 +46,8 @@ IF (subClassOf) {
   MINUS{?wrd_P jass:subPoS1 "接尾".}
   MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "総称" .}
   MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "通称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "別称" .}
+  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "異称" .}
 }THEN{
   ?rsc_S rdfs:subClassOf ?rsc_P .
 };
