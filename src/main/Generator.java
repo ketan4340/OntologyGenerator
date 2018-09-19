@@ -28,9 +28,9 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path EXTENSION_RULE_PATH = Paths.get("resources/rule/extensionRules.txt");
-	private static final Path ONTOLOGY_RULE_PATH = Paths.get("resources/rule/ontology-rules");
-	private static final String JASS_MODEL_URL = "resources/ontology/SyntaxOntology.owl";
+	private static final Path EXTENSION_RULE_PATH = Paths.get("resource/rule/extensionRules.txt");
+	private static final Path ONTOLOGY_RULE_PATH = Paths.get("resource/rule/ontology-rules");
+	private static final String JASS_MODEL_URL = "resource/ontology/SyntaxOntology.owl";
 	
 	/*
 	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
@@ -65,13 +65,11 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		//textFileString = "./resource/input/goo/text/gooText生物-動物名-あ.txt";
-		//textFileString = "../OntologyGenerator/resource/input/test/literalText.txt";
-		//textFileString = "../OntologyGenerator/resource/input/test/whale.txt";
+		textFileString = "resource/input/goo/text/gooText生物-動物名-test.txt";
+		//textFileString = "resource/input/test/whale.txt";
 
-		///*
+		/*
 		List<String> texts = Arrays.asList(
-				///*
 				"クジラは小魚を食べる。",
 				"クジラはヒレをもつ",
 				"カニの味噌汁は美味しいぞ",
@@ -84,8 +82,7 @@ public class Generator {
 		List<NaturalLanguage> nlLists = NaturalLanguage.toNaturalLanguageList(texts);
 
 		Ontology o = generate(nlLists);
-		o.getTriples().forEach(System.out::println);
-		//PRINT
+		o.getTriples().forEach(System.out::println);	//PRINT
 		//*/
 		///*
 		if (textFileString != null) {
@@ -136,7 +133,7 @@ public class Generator {
 		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentence();
 
-		sentenceMap.forEachKey(System.out::println);	//PRINT
+		//sentenceMap.forEachKey(System.out::println);	//PRINT
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/

@@ -1,6 +1,5 @@
 package modules.textRevision;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,13 +81,10 @@ public class SentenceReviser {
 	public void divideEachSentence(SentenceIDMap sentenceMap) {
 		SentenceIDMap clone = new SentenceIDMap(sentenceMap);
 		sentenceMap.clear();
-		sentenceMap.putAll(
-				clone.entrySet().stream()
-				.map(this::divideSentence)
-				.flatMap(m -> m.entrySet().stream())
-				.peek(e -> e.getKey().uniteSubject())
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-						(e1, e2) -> e1, LinkedHashMap<Sentence, IDTuple>::new))
-				);
+		clone.entrySet().stream()
+		.map(this::divideSentence)
+		.flatMap(m -> m.entrySet().stream())
+		.peek(e -> e.getKey().uniteSubject())	// 主語結合
+		.forEach(e -> sentenceMap.put(e.getKey(), e.getValue()));
 	}
 }
