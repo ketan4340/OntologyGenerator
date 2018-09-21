@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -65,31 +66,13 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		textFileString = "resource/input/goo/text/gooText生物-動物名-test.txt";
+		textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/test/whale.txt";
 
-		/*
-		List<String> texts = Arrays.asList(
-				"クジラは小魚を食べる。",
-				"クジラはヒレをもつ",
-				"カニの味噌汁は美味しいぞ",
-				"アイアイはアイアイ科の原始的な猿",
-				"馬は体長1メートルほど。",
-				"犬はイヌ科の哺乳類の通称。",
-				"猫はネコ科の動物の総称である。",
-				"カサゴは棘がある"
-		);
-		List<NaturalLanguage> nlLists = NaturalLanguage.toNaturalLanguageList(texts);
-
-		Ontology o = generate(nlLists);
-		o.getTriples().forEach(System.out::println);	//PRINT
-		//*/
-		///*
-		if (textFileString != null) {
+		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
 			generate(textFilePath);
 		}
-		//*/
 	}
 
 	/**
@@ -120,8 +103,7 @@ public class Generator {
 		List<Sentence> sentenceList = new SyntacticParser().parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
-
-
+		
 		/*************************************/
 		/********** 文章整形モジュール **********/
 		/*************************************/
