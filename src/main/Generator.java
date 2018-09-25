@@ -1,6 +1,7 @@
 ﻿package main;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,12 +11,13 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 
+import cabocha.Cabocha;
 import data.RDF.Ontology;
-import data.RDF.RDFSerialize;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
@@ -29,22 +31,44 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path EXTENSION_RULE_PATH = Paths.get("resource/rule/extensionRules.txt");
-	private static final Path ONTOLOGY_RULE_PATH = Paths.get("resource/rule/ontology-rules");
-	private static final String JASS_MODEL_URL = "resource/ontology/SyntaxOntology.owl";
-	
-	/*
-	private static final Path INPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaInput.txt");
-	private static final Path OUTPUT_FILE_PATH = Paths.get("../OntologyGenerator/tmp/parserIO/CaboChaOutput.txt");
-	 */
+	private static final Path EXTENSION_RULE_PATH;// = Paths.get("resource/rule/extensionRules.txt");
+	private static final Path ONTOLOGY_RULES_PATH;// = Paths.get("resource/rule/ontology-rules");
+	private static final String JASS_MODEL_URL;// = "resource/ontology/SyntaxOntology.owl";
+
 	/* ログ用 */
 	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
-	private static final Path PATH_DIVIDED_SENTENCES = Paths.get("../OntologyGenerator/tmp/log/text/dividedText"+RUNTIME+".txt");
-	private static final Path PATH_JASSMODEL_TURTLE = Paths.get("../OntologyGenerator/tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
-	private static final Path PATH_RULES = Paths.get("../OntologyGenerator/tmp/log/rule/rule"+RUNTIME+".rule");
-	private static final Path PATH_GENERATED_ONTOLOGY_TURTLE = Paths.get("../OntologyGenerator/dest/rdf/turtle/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
-	private static final Path PATH_TRIPLE_CSV = Paths.get("../OntologyGenerator/dest/csv/RDFtriple"+RUNTIME+".csv");
+	private static final Path PATH_DIVIDED_SENTENCES;// = Paths.get("tmp/log/text/dividedText"+RUNTIME+".txt");
+	private static final Path PATH_JASSMODEL_TURTLE;// = Paths.get("tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
+	private static final Path PATH_USEDRULES;// = Paths.get("tmp/log/rule/rule"+RUNTIME+".rule");
+	private static final Path PATH_ONTOLOGY_TURTLE;// = Paths.get("dest/rdf/turtle/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
+	private static final Path PATH_ID_TRIPLE_CSV;// = Paths.get("dest/csv/RDFtriple"+RUNTIME+".csv");
 
+	static {
+		Properties prop = new Properties();
+		try (InputStream is = Cabocha.class.getClassLoader().getResourceAsStream("conf/property.xml")) {
+			prop.loadFromXML(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String val4exrule = prop.getProperty("extension_rule-file");
+		String val4ontrules = prop.getProperty("ontology_rules-dir");
+		String val4def_jass = prop.getProperty("default-JASS-file");
+		String val4o_shsent = prop.getProperty("output-shortsentence");
+		String val4o_jass = prop.getProperty("output-convertedJASS-turtle");
+		String val4usedrules = prop.getProperty("output-usedrules");
+		String val4ontology = prop.getProperty("output-ontology-turtle");
+		String val4id_tri = prop.getProperty("output-id_triple");
+		
+		EXTENSION_RULE_PATH = Paths.get(val4exrule);
+		ONTOLOGY_RULES_PATH = Paths.get(val4ontrules);
+		JASS_MODEL_URL = val4def_jass;
+		PATH_DIVIDED_SENTENCES = Paths.get(val4o_shsent);
+		PATH_JASSMODEL_TURTLE = Paths.get(val4o_jass);
+		PATH_USEDRULES = Paths.get(val4usedrules);
+		PATH_ONTOLOGY_TURTLE = Paths.get(val4ontology);
+		PATH_ID_TRIPLE_CSV = Paths.get(val4id_tri);
+	}
+	
 	/****************************************/
 	/**********    Main  Method    **********/
 	/****************************************/
@@ -66,7 +90,7 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
+		textFileString = "resource/input/goo/text/gooText生物-動物名-あ.txt";
 		//textFileString = "resource/input/test/whale.txt";
 
 		if (Objects.nonNull(textFileString)) {
@@ -119,28 +143,31 @@ public class Generator {
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/
-		RelationExtractor re = new RelationExtractor(EXTENSION_RULE_PATH, ONTOLOGY_RULE_PATH, JASS_MODEL_URL);
+		RelationExtractor re = new RelationExtractor(EXTENSION_RULE_PATH, ONTOLOGY_RULES_PATH, JASS_MODEL_URL);
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
 
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
-
 		
-		// ログや生成物の出力
+
 		OutputManager opm = new OutputManager();
+		// ログや生成物の出力
 		opm.outputDividedSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
-		opm.outputOntologyAsTurtle(JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), PATH_JASSMODEL_TURTLE);
-		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_TRIPLE_CSV);
-		opm.outputOntologyAsTurtle(unionModel, PATH_GENERATED_ONTOLOGY_TURTLE);
-		opm.outputRDFRulesSet(re.getOntologyRules(), PATH_RULES);
+		// デフォルトJASSモデルは取り除いて出力
+		opm.outputOntologyAsTurtle(
+				JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
+				PATH_JASSMODEL_TURTLE);
+		opm.outputRDFRulesSet(re.getOntologyRules(), PATH_USEDRULES);
+
+		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
+		opm.outputOntologyAsTurtle(unionModel, PATH_ONTOLOGY_TURTLE);
 
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());
 		System.out.println("ontology size: " + ontology.getTriples().size() + "\n");
 
-		//ontology.getTriples().forEach(t -> System.out.println(t));	//PRINT
 		return ontology;
 	}
 

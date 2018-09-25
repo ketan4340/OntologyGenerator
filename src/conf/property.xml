@@ -2,5 +2,19 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 	<comment>コメント</comment>
-	<entry key="key-name">value</entry>
+	<!-- 実行に必要 -->
+	<entry key="extension_rule-file">resource/rule/extensionRules.txt</entry>
+	<entry key="ontology_rules-dir">resource/rule/ontology-rules</entry>
+	<entry key="default-JASS-file">resource/ontology/SyntaxOntology.owl</entry>
+
+	<!-- 途中生成物 (ログ) の出力先 -->
+	<entry key="output-shortsentence">tmp/log/text/shortsentence</entry>
+	<entry key="output-convertedJASS-turtle">tmp/log/jass/jass</entry>
+	<entry key="output-usedrules">tmp/log/rule/rule</entry>
+
+	<!-- 最終成果物の出力先 -->
+	<entry key="output-ontology-turtle">dest/rdf/turtle/ontology</entry>
+	<entry key="output-id_triple">dest/csv/RDFtriple</entry>
+	
+	<entry key="key">value</entry>
 </properties>
