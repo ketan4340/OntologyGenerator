@@ -113,7 +113,7 @@ public class RelationExtractor {
 	/**
 	 * JASSモデルからオントロジーに変換する.
 	 * @param JASSMap
-	 * @return
+	 * @return 変換したオントロジーマップ
 	 */
 	public ModelIDMap convertMap_JASSModel2RDFModel(ModelIDMap JASSMap) {
 		ModelIDMap ontologyMap = new ModelIDMap();
@@ -146,14 +146,15 @@ public class RelationExtractor {
 	}
 
 	/**
-	 * JASSモデルに対し、全てのRDFルールズを適用し、マッチするとjenaモデルを生成する。 マッチしなくても空のモデルを返してる？
+	 * JASSモデルに対し、全てのRDFルールズを適用し、マッチするとjenaモデルを生成する。
+	 * マッチしなくても空のモデルを返してる？
 	 * 生成されたjenaモデルはマッチしたルールとのマッピングとして返される。
 	 * @param jass
-	 * @return
+	 * @return 生成されたモデルと使用したルール
 	 */
 	private Optional<Moderule> convertsJASSModel(Model jass) {
 		return ontologyRulesSet.stream().flatMap(r -> r.stream()).map(r -> solveConstructQuery(jass, r))
-				.filter(opt -> opt.isPresent())	// TODO
+				.filter(opt -> opt.isPresent())	//TODO　isPresentは汚い
 				.map(opt -> opt.get()).findFirst();
 	}
 

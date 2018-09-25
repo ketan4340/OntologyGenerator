@@ -38,7 +38,7 @@ public class Generator {
 	/* ログ用 */
 	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
 	private static final Path PATH_DIVIDED_SENTENCES;// = Paths.get("tmp/log/text/dividedText"+RUNTIME+".txt");
-	private static final Path PATH_JASSMODEL_TURTLE;// = Paths.get("tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
+	private static final Path PATH_CONVERTEDJASS_TURTLE;// = Paths.get("tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
 	private static final Path PATH_USEDRULES;// = Paths.get("tmp/log/rule/rule"+RUNTIME+".rule");
 	private static final Path PATH_ONTOLOGY_TURTLE;// = Paths.get("dest/rdf/turtle/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
 	private static final Path PATH_ID_TRIPLE_CSV;// = Paths.get("dest/csv/RDFtriple"+RUNTIME+".csv");
@@ -50,23 +50,15 @@ public class Generator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		String val4exrule = prop.getProperty("extension_rule-file");
-		String val4ontrules = prop.getProperty("ontology_rules-dir");
-		String val4def_jass = prop.getProperty("default-JASS-file");
-		String val4o_shsent = prop.getProperty("output-shortsentence");
-		String val4o_jass = prop.getProperty("output-convertedJASS-turtle");
-		String val4usedrules = prop.getProperty("output-usedrules");
-		String val4ontology = prop.getProperty("output-ontology-turtle");
-		String val4id_tri = prop.getProperty("output-id_triple");
 		
-		EXTENSION_RULE_PATH = Paths.get(val4exrule);
-		ONTOLOGY_RULES_PATH = Paths.get(val4ontrules);
-		JASS_MODEL_URL = val4def_jass;
-		PATH_DIVIDED_SENTENCES = Paths.get(val4o_shsent);
-		PATH_JASSMODEL_TURTLE = Paths.get(val4o_jass);
-		PATH_USEDRULES = Paths.get(val4usedrules);
-		PATH_ONTOLOGY_TURTLE = Paths.get(val4ontology);
-		PATH_ID_TRIPLE_CSV = Paths.get(val4id_tri);
+		EXTENSION_RULE_PATH = Paths.get(prop.getProperty("extension_rule-file"));
+		ONTOLOGY_RULES_PATH = Paths.get(prop.getProperty("ontology_rules-dir"));
+		JASS_MODEL_URL = prop.getProperty("default-JASS-file");
+		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence"));
+		PATH_CONVERTEDJASS_TURTLE = Paths.get(prop.getProperty("output-convertedJASS-turtle"));
+		PATH_USEDRULES = Paths.get(prop.getProperty("output-usedrules"));
+		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle"));
+		PATH_ID_TRIPLE_CSV = Paths.get(prop.getProperty("output-id_triple"));
 	}
 	
 	/****************************************/
@@ -158,7 +150,7 @@ public class Generator {
 		// デフォルトJASSモデルは取り除いて出力
 		opm.outputOntologyAsTurtle(
 				JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
-				PATH_JASSMODEL_TURTLE);
+				PATH_CONVERTEDJASS_TURTLE);
 		opm.outputRDFRulesSet(re.getOntologyRules(), PATH_USEDRULES);
 
 		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
