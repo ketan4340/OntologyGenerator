@@ -1,5 +1,6 @@
 package modules.syntacticParse;
 
+import java.util.Collection;
 import java.util.List;
 
 import cabocha.Cabocha;
@@ -8,7 +9,14 @@ import grammar.sentence.Sentence;
 
 public class SyntacticParser {
 
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	public SyntacticParser() {
+	}
+	
+	public SyntacticParser(Collection<String> nouns) {
+		
 	}
 
 	/**

@@ -12,7 +12,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 
@@ -31,10 +33,11 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path EXTENSION_RULE_PATH;// = Paths.get("resource/rule/extensionRules.txt");
-	private static final Path ONTOLOGY_RULES_PATH;// = Paths.get("resource/rule/ontology-rules");
-	private static final String JASS_MODEL_URL;// = "resource/ontology/SyntaxOntology.owl";
-
+	private static final Path PATH_EXTENSION_RULE;// = Paths.get("resource/rule/extensionRules.txt");
+	private static final Path PATH_ONTOLOGY_RULES;// = Paths.get("resource/rule/ontology-rules");
+	private static final Path PATH_DEFAULT_JASS;// = "resource/ontology/SyntaxOntology.owl";
+	private static final Path PATH_NOUN_WORDS;
+	
 	/* ログ用 */
 	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
 	private static final Path PATH_DIVIDED_SENTENCES;// = Paths.get("tmp/log/text/dividedText"+RUNTIME+".txt");
@@ -51,14 +54,16 @@ public class Generator {
 			e.printStackTrace();
 		}
 		
-		EXTENSION_RULE_PATH = Paths.get(prop.getProperty("extension_rule-file"));
-		ONTOLOGY_RULES_PATH = Paths.get(prop.getProperty("ontology_rules-dir"));
-		JASS_MODEL_URL = prop.getProperty("default-JASS-file");
-		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence"));
-		PATH_CONVERTEDJASS_TURTLE = Paths.get(prop.getProperty("output-convertedJASS-turtle"));
-		PATH_USEDRULES = Paths.get(prop.getProperty("output-usedrules"));
-		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle"));
-		PATH_ID_TRIPLE_CSV = Paths.get(prop.getProperty("output-id_triple"));
+		PATH_EXTENSION_RULE = Paths.get(prop.getProperty("extension_rule-file"));
+		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
+		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
+		PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
+		
+		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+RUNTIME+".txt");
+		PATH_CONVERTEDJASS_TURTLE = Paths.get(prop.getProperty("output-convertedJASS-turtle")+RUNTIME+".ttl");
+		PATH_USEDRULES = Paths.get(prop.getProperty("output-usedrules")+RUNTIME+".rule");
+		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle")+RUNTIME+".ttl");
+		PATH_ID_TRIPLE_CSV = Paths.get(prop.getProperty("output-id_triple")+RUNTIME+".csv");
 	}
 	
 	/****************************************/
@@ -114,9 +119,15 @@ public class Generator {
 	public Ontology generate(List<NaturalLanguage> naturalLanguages) {
 		System.out.println("Start.");
 		/*************************************/
-		/********** 構文解析モジュール **********/
+		/********** 構文解析モジュール  **********/
 		/*************************************/
-		List<Sentence> sentenceList = new SyntacticParser().parseSentences(naturalLanguages);
+		Set<String> nouns = null;
+		try (Stream<String> stream = Files.lines(PATH_NOUN_WORDS)) {
+			nouns = stream.collect(Collectors.toSet());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		List<Sentence> sentenceList = new SyntacticParser(nouns).parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		
@@ -135,7 +146,7 @@ public class Generator {
 		/*************************************/
 		/********** 関係抽出モジュール **********/
 		/*************************************/
-		RelationExtractor re = new RelationExtractor(EXTENSION_RULE_PATH, ONTOLOGY_RULES_PATH, JASS_MODEL_URL);
+		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);

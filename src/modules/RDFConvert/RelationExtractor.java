@@ -48,9 +48,9 @@ public class RelationExtractor {
 		this.defaultJASSModel = jassModel;
 	}
 
-	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, String jassModelURL) {
+	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, Path defaultJASSPath) {
 		this(RDFRuleReader.readRDFRules(extensionRulePath), RDFRuleReader.readRDFRulesSet(ontologyRulePath),
-				ModelFactory.createDefaultModel().read(jassModelURL));
+				ModelFactory.createDefaultModel().read(defaultJASSPath.toString()));
 	}
 
 	/* ================================================== */

@@ -6,6 +6,7 @@
 	<entry key="extension_rule-file">resource/rule/extensionRules.txt</entry>
 	<entry key="ontology_rules-dir">resource/rule/ontology-rules</entry>
 	<entry key="default-JASS-file">resource/ontology/SyntaxOntology.owl</entry>
+	<entry key="noun-file">resource/noun/nouns.txt</entry>
 
 	<!-- 途中生成物 (ログ) の出力先 -->
 	<entry key="output-shortsentence">tmp/log/text/shortsentence</entry>
