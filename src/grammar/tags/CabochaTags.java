@@ -16,14 +16,14 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 	private final String subPoS2;
 	/** 品詞細分類3 */
 	private final String subPoS3;
-	/** 活用形 */
-	private final String inflection;
 	/** 活用型 */
 	private final String conjugation;
+	/** 活用形 */
+	private final String inflection;
 	/** 原形 (半角文字ではデフォルトで"*") */
 	private final String infinitive;
 	/** 読み (半角文字ではもともとない) */
-	private final String kana;
+	private final String yomi;
 	/** 発音 (半角文字ではもともとない) */
 	private final String pronunciation;
 
@@ -31,27 +31,27 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
 	/* ================================================== */
-	CabochaTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
-			String inflection, String conjugation, String infinitive, String kana, String pronunciation) {
-		this.mainPoS = mainPoS;
-		this.subPoS1 = subPoS1;
-		this.subPoS2 = subPoS2;
-		this.subPoS3 = subPoS3;
-		this.inflection = inflection;
-		this.conjugation = conjugation;
-		this.infinitive = infinitive;
-		this.kana = kana;
-		this.pronunciation = pronunciation;
+	protected CabochaTags(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
+			String conjugation, String inflection, String infinitive, String yomi, String pronunciation) {
+		this.mainPoS 		= mainPoS;
+		this.subPoS1 		= subPoS1;
+		this.subPoS2 		= subPoS2;
+		this.subPoS3 		= subPoS3;
+		this.conjugation 	= conjugation;
+		this.inflection 	= inflection;
+		this.infinitive 	= infinitive;
+		this.yomi 			= yomi;
+		this.pronunciation 	= pronunciation;
 	}
 
 	/* ===== Factory Method ===== */
 	public static CabochaTags getInstance(String mainPoS, String subPoS1, String subPoS2, String subPoS3,
-			String inflection, String conjugation, String infinitive, String kana, String pronunciation) {
-		return TagsFactory.intern(mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation);
+			String conjugation, String inflection, String infinitive, String yomi, String pronunciation) {
+		return TagsFactory.intern(mainPoS, subPoS1, subPoS2, subPoS3, conjugation, inflection, infinitive, yomi, pronunciation);
 	}
 	@Override
 	public Object[] initArgs() {
-		return new Object[] {mainPoS, subPoS1, subPoS2, subPoS3, inflection, conjugation, infinitive, kana, pronunciation};
+		return new Object[] {mainPoS, subPoS1, subPoS2, subPoS3, conjugation, inflection, infinitive, yomi, pronunciation};
 	}
 
 
@@ -60,7 +60,7 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 	/* ================================================== */
 	public List<String> toList() {
 		return Arrays.asList(mainPoS, subPoS1, subPoS2, subPoS3,
-				inflection, conjugation, infinitive, kana, pronunciation);
+				conjugation, inflection, infinitive, yomi, pronunciation);
 	}
 
 	public boolean contains(Object o) {
@@ -101,20 +101,20 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 		return subPoS3;
 	}
 	@Override
-	public String inflection() {
-		return inflection;
-	}
-	@Override
 	public String conjugation() {
 		return conjugation;
+	}
+	@Override
+	public String inflection() {
+		return inflection;
 	}
 	@Override
 	public String infinitive() {
 		return infinitive;
 	}
 	@Override
-	public String kana() {
-		return kana;
+	public String yomi() {
+		return yomi;
 	}
 	@Override
 	public String pronunciation() {
@@ -129,7 +129,7 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 	@Override
 	public int hashCode() {
 		return Objects.hash(mainPoS, subPoS1, subPoS2, subPoS3,
-				inflection, conjugation, infinitive, kana, pronunciation);
+				conjugation, inflection, infinitive, yomi, pronunciation);
 	}
 
 	@Override
@@ -141,23 +141,23 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 		if (getClass() != obj.getClass())
 			return false;
 		CabochaTags other = (CabochaTags) obj;
-		if (!conjugation.equals(other.conjugation))
-			return false;
-		if (!infinitive.equals(other.infinitive))
-			return false;
-		if (!inflection.equals(other.inflection))
-			return false;
-		if (!kana.equals(other.kana))
-			return false;
 		if (!mainPoS.equals(other.mainPoS))
-			return false;
-		if (!pronunciation.equals(other.pronunciation))
 			return false;
 		if (!subPoS1.equals(other.subPoS1))
 			return false;
 		if (!subPoS2.equals(other.subPoS2))
 			return false;
 		if (!subPoS3.equals(other.subPoS3))
+			return false;
+		if (!conjugation.equals(other.conjugation))
+			return false;
+		if (!inflection.equals(other.inflection))
+			return false;
+		if (!infinitive.equals(other.infinitive))
+			return false;
+		if (!yomi.equals(other.yomi))
+			return false;
+		if (!pronunciation.equals(other.pronunciation))
 			return false;
 		return true;
 	}

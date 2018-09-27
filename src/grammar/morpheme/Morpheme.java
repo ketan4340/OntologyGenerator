@@ -90,8 +90,8 @@ public final class Morpheme implements GrammarInterface,
 		return tags.infinitive();
 	}
 	@Override
-	public String kana() {
-		return tags.kana();
+	public String yomi() {
+		return tags.yomi();
 	}
 	@Override
 	public String pronunciation() {
@@ -110,7 +110,7 @@ public final class Morpheme implements GrammarInterface,
 				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.conjugation, conjugation())
 				.addLiteral(JASS.infinitive, infinitive())
-				.addLiteral(JASS.kana, kana())
+				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());
 	}
 

@@ -104,8 +104,8 @@ public class Word extends SyntacticParent<Morpheme>
 		return children.stream().map(m -> m.infinitive()).collect(Collectors.joining());
 	}
 	@Override
-	public String kana() {
-		return children.stream().map(m -> m.kana()).collect(Collectors.joining());
+	public String yomi() {
+		return children.stream().map(m -> m.yomi()).collect(Collectors.joining());
 	}
 	@Override
 	public String pronunciation() {
@@ -127,7 +127,7 @@ public class Word extends SyntacticParent<Morpheme>
 				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.conjugation, conjugation())
 				.addLiteral(JASS.infinitive, infinitive())
-				.addLiteral(JASS.kana, kana())
+				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());
 		return wordResource;
 	}
