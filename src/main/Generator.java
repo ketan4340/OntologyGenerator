@@ -88,7 +88,7 @@ public class Generator {
 	 */
 	private void execute(String textFileString) {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
-		//textFileString = "resource/input/test/whale.txt";
+		//textFileString = "resource/input/test/attribute.txt";
 
 		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
@@ -156,7 +156,7 @@ public class Generator {
 		opm.outputOntologyAsTurtle(
 				JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
 				PATH_CONVERTEDJASS_TURTLE);
-		opm.outputRDFRulesSet(re.getOntologyRules(), PATH_USEDRULES);
+		opm.outputRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
 
 		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
 		opm.outputOntologyAsTurtle(unionModel, PATH_ONTOLOGY_TURTLE);

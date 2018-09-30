@@ -34,16 +34,29 @@ IF (equivalentClass) {
   ?rsc_S owl:equivalentClass ?rsc_p .
 };
 
-# 概念階層 (rdfs:subClassOf)
-IF (subClassOf) {
+#形容詞的名詞
+IF(attributive){
   ?stc a jass:Sentence ;
-	jass:subject ?cls_S ;
+	jass:subject/jass:categoremMeans ?rsc_S ;
 	jass:predicate ?cls_P . 
-  ?cls_S jass:categoremMeans ?rsc_S .
+  ?cls_P jass:consistsOfCategorem ?wrd_P .
+  ?wrd_P jass:feature "attributive" ;
+	jass:means ?rsc_P . 
+}THEN{
+  ?rsc_S jass:attributeOf ?rsc_P .
+};
+
+
+# 概念階層 (rdfs:subClassOf)
+IF(subClassOf){
+  ?stc a jass:Sentence ;
+	jass:subject/jass:categoremMeans ?rsc_S ;
+	jass:predicate ?cls_P . 
   ?cls_P jass:consistsOfCategorem ?wrd_P .
   ?wrd_P jass:mainPoS "名詞" ;
 	jass:means ?rsc_P . 
   MINUS{?wrd_P jass:subPoS1 "接尾".}
+  MINUS{?wrd_P jass:subPoS1 "サ変接続".}
   MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "総称" .}
   MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "通称" .}
   MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "別称" .}

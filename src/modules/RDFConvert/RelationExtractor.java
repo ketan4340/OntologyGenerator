@@ -137,10 +137,15 @@ public class RelationExtractor {
 
 
 	/* クエリ解決用 */
+	/** 
+	 * Modelを拡張する
+	 * @param jass
+	 * @return
+	 */
 	private Model extendsJASSModel(Model jass) {
 		extensionRules.forEach(r -> {
-			Optional<Moderule> optmr = solveConstructQuery(jass, r);
-			optmr.ifPresent(mr -> jass.add(mr.model));
+			Optional<Moderule> moderule = solveConstructQuery(jass, r);
+			moderule.ifPresent(mr -> jass.add(mr.model));
 		});
 		return jass;
 	}
@@ -153,9 +158,11 @@ public class RelationExtractor {
 	 * @return 生成されたモデルと使用したルール
 	 */
 	private Optional<Moderule> convertsJASSModel(Model jass) {
-		return ontologyRulesSet.stream().flatMap(r -> r.stream()).map(r -> solveConstructQuery(jass, r))
+		return ontologyRulesSet.stream().flatMap(r -> r.stream())
+				.map(r -> solveConstructQuery(jass, r))
 				.filter(opt -> opt.isPresent())	//TODO　isPresentは汚い
-				.map(opt -> opt.get()).findFirst();
+				.map(opt -> opt.get())
+				.findFirst();
 	}
 
 	private Optional<Moderule> solveConstructQuery(Model model, RDFRule rule) {

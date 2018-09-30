@@ -43,8 +43,10 @@ public class RDFRuleReader {
 
 	public static RDFRulesSet readRDFRulesSet(Path rulesDir) {
 		try (Stream<Path> files = Files.walk(rulesDir)) {
-			return files.filter(Files::isRegularFile).filter(p -> p.toString().toLowerCase().endsWith(".txt"))
-					.map(RDFRuleReader::readRDFRules).collect(Collectors.toCollection(RDFRulesSet::new));
+			return files.filter(Files::isRegularFile)
+					.filter(p -> p.toString().toLowerCase().endsWith(".txt"))
+					.map(RDFRuleReader::readRDFRules)
+					.collect(Collectors.toCollection(RDFRulesSet::new));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -59,12 +61,13 @@ public class RDFRuleReader {
 	public static RDFRules readRDFRules(Path rulesFile) {
 		String rulesString;
 		try {
-			rulesString = Files.lines(rulesFile).map(COMMENT_PATTERN::matcher)	// コメントアウトを検知
+			rulesString = Files.lines(rulesFile)
+					.map(COMMENT_PATTERN::matcher)	// コメントアウトを検知
 					.map(m -> m.replaceAll(""))		// #から行末まで削除
 					.collect(Collectors.joining());
 			rulesString = removeBOM(rulesString);
 		} catch (IOException e) {
-			rulesString = new String();
+			rulesString = "";
 			e.printStackTrace();
 		}
 		return createRDFRules(rulesString);
@@ -81,7 +84,8 @@ public class RDFRuleReader {
 	 * @return RDFルールセット
 	 */
 	private static RDFRules createRDFRules(String rulesString) {
-		return new RDFRules(SPLIT_RULES_PATTERN.splitAsStream(rulesString).map(RDFRuleReader::createRDFRule)
+		return new RDFRules(SPLIT_RULES_PATTERN.splitAsStream(rulesString)
+				.map(RDFRuleReader::createRDFRule)
 				.collect(Collectors.toCollection(LinkedHashSet::new)));
 	}
 

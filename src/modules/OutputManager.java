@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import org.apache.jena.rdf.model.Model;
 
@@ -52,10 +53,11 @@ public class OutputManager {
 		}
 	}
 
-	public void outputRDFRulesSet(RDFRulesSet rules, Path path) {
+	public void outputRDFRulesSet(RDFRules exrules, RDFRulesSet rules, Path path) {
 		try {
 			Files.createDirectories(path.getParent());
-			Files.write(path, rules.toStringList());
+			Files.write(path, exrules.toStringList());
+			Files.write(path, rules.toStringList(), StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
