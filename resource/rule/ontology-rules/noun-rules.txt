@@ -1,17 +1,15 @@
 # 数値と単位
 IF (numeral value) {
-  ?stc rdf:type jass:Sentence .
-  ?stc jass:subject ?cls_S .
-  ?cls_S jass:categoremMeans ?rsc_S .
-  ?stc jass:predicate ?cls_P .
+  ?stc 	rdf:type jass:Sentence ;
+  		jass:subject/jass:categoremMeans ?rsc_S ;
+ 		jass:predicate ?cls_P .
   ?cls_P jass:consistsOfCategorem ?prs .
 #  ?prs jass:consistsOfDependent/rdf:rest/rdf:first/jass:name ?length .
 #  FILTER regex(?length, "長$")
-  ?prs jass:consistsOfHead ?head .
-  ?head jass:consistsOfMorphemes/rdf:rest* (?valrsc ?unitrsc) .
-  FILTER regex(?val, "[0-9０-９]+?")
+  ?prs jass:consistsOfHead/jass:consistsOfMorphemes/rdf:rest* (?valrsc ?unitrsc) .
   ?valrsc jass:name ?val .
   ?unitrsc jass:name ?unit .
+  FILTER(regex(str(?val), "[0-9０-９]+?(\\.[0-9０-９]+?)??"))
 } THEN {
   ?rsc_S sio:SIO_000216 _:bn .
 #  _:bn rdf:type ?length .
@@ -26,7 +24,7 @@ IF (equivalentClass) {
   ?stc jass:predicate ?Scls_P .
   ?Scls_P jass:consistsOfCategorem 	?prs .
   ?prs jass:consistsOfHead/jass:infinitive ?equiv .
-  FILTER(?equiv="総称" || ?equiv="通称" || ?equiv="別称" || ?equiv="異称")
+  FILTER(?equiv="総称" || ?equiv="通称" || ?equiv="別称" || ?equiv="異称" || ?equiv="別名")
   ?prs jass:consistsOfDependent/rdf:rest* ?node . # 形態素の最後尾
   ?node rdf:rest rdf:nil ;
 	rdf:first/jass:categoremMeans ?rsc_p .
@@ -35,7 +33,7 @@ IF (equivalentClass) {
 };
 
 #形容詞的名詞
-IF(attributive){
+IF (attributive) {
   ?stc a jass:Sentence ;
 	jass:subject/jass:categoremMeans ?rsc_S ;
 	jass:predicate ?cls_P . 
@@ -48,7 +46,7 @@ IF(attributive){
 
 
 # 概念階層 (rdfs:subClassOf)
-IF(subClassOf){
+IF (subClassOf) {
   ?stc a jass:Sentence ;
 	jass:subject/jass:categoremMeans ?rsc_S ;
 	jass:predicate ?cls_P . 

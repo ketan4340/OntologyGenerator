@@ -20,6 +20,6 @@
 	<entry key="named-entity">1</entry>
 	<entry key="input-file"></entry> <!-- メソッドの引数として渡すので通常最初から設定はしない -->
 	<entry key="output-file"></entry>
-	<entry key="sysdic-dir">resource/sysdic/mecab-ipadic-neologd</entry>
+	<entry key="sysdic-dir"></entry>
 	<entry key="usrdic-file">resource/usrdic/user.dic</entry>
 </properties>

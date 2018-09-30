@@ -137,9 +137,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		while (liIdx.hasNext() && liID.hasNext()) {
 			int nextIdx = liIdx.next();
 			Clause<?> clause = liID.next();
-			if(currentIdx+1 == nextIdx) {	// indexが連続しているか
+			if (currentIdx+1 == nextIdx) {	// indexが連続しているか
 				continuity.put(clause, true);
-			}else {							// 否か
+			} else {							// 否か
 				continuity.put(clause, false);
 			}
 			currentIdx = nextIdx;
@@ -386,7 +386,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			while (itr.hasNext()) {
 				Adjunct adjunct = itr.next();
 				for (final String[] tag: tag_Ha)
-					if (adjunct.hasTagAll(tag)) {
+					if (adjunct.hasAllTag(tag)) {
 						itr.set(no);	// "は"の代わりに"の"を挿入
 						break;
 					}
@@ -399,14 +399,19 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 
 	/** ClauseのリストからWordのリストにする */
-	public List<Word> getWordList() {
-		List<Word> wordList = new ArrayList<>();
-		for(final Clause<?> clause: children) {
-			wordList.addAll(clause.words());
-		}
-		return wordList;
+	public List<Word> words() {
+		return children.stream()
+				.map(Clause::words)
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
 	}
 
+	public List<Morpheme> morphemes() {
+		return words().stream()
+				.map(Word::getChildren)
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
+	}
 
 	/**
 	 * 決定木のレコード生成.
@@ -459,8 +464,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ================================================== */
 	/* ==========        Output  Method        ========== */
 	/* ================================================== */
+	public void printM() {
+		System.out.println(
+				morphemes().stream().map(Morpheme::name).collect(Collectors.joining("'")));
+	}
 	public void printW() {
-		for(final Word word : getWordList()) {
+		for(final Word word : words()) {
 			System.out.print("("+word.id()+")" + word.name());
 		}
 		System.out.println();
@@ -482,7 +491,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 	/** 文を区切りを挿入して出力する */
 	public void printS() {
-		for(final Word word : getWordList()) { // Word単位で区切る
+		for(final Word word : words()) { // Word単位で区切る
 			System.out.print(word.name() + "|");
 		}
 		System.out.println();

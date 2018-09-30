@@ -23,13 +23,15 @@ public class CabochaDecoder {
 	private Map<Clause<?>, Integer> dependingMap = new HashMap<>();
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
 	public CabochaDecoder() {
-		// TODO 自動生成されたコンストラクター・スタブ
 	}
 
 
+	/* ================================================== */
+	/* ================= Member Method ================== */
+	/* ================================================== */
 	public List<Sentence> decodeProcessOutput(List<String> parsedInfo4all) {
 		List<List<String>> sentenceInfoList = StringListUtil.split("\\AEOS\\z", parsedInfo4all);	// "EOS"ごとに分割. EOSの行はここで消える.
 		List<Sentence> sentences = sentenceInfoList.stream()
@@ -109,9 +111,8 @@ public class CabochaDecoder {
 	/* ==========    Cabocha専用メソッドの実装    ========== */
 	/* ================================================== */
 	private CabochaTags getTagsSuppliedSingleByteChar(String[] tagArray, String infinitive) {
-		if (tagArray.length < MAXIMUM_TAGS_LENGTH) {	// sizeが9未満．つまり半角文字
+		if (tagArray.length < MAXIMUM_TAGS_LENGTH)	// sizeが9未満．つまり半角文字
 			return CabochaTags.getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], infinitive, infinitive, infinitive);
-		}
 		return CabochaTags.getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
 	}
 

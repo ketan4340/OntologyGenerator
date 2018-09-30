@@ -109,9 +109,9 @@ implements GrammarInterface, RDFizable {
 	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
 		if (adjuncts.isEmpty())
 			return false;	// 付属語がないなら意味がない
-		if (!categorem.hasTagAll(tag4Categorem))
+		if (!categorem.hasAllTag(tag4Categorem))
 			return false;
-		if (!adjuncts.get(0).hasTagAll(tag4Adjunct))
+		if (!adjuncts.get(0).hasAllTag(tag4Adjunct))
 			return false;
 
 		// 付属語から先頭の単語を取り出す
@@ -130,7 +130,7 @@ implements GrammarInterface, RDFizable {
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean containsWordHas(String[] tag) {
 		for (final Word word: words())
-			if (word.hasTagAll(tag))
+			if (word.hasAllTag(tag))
 				return true;
 		return false;
 	}
@@ -156,7 +156,7 @@ implements GrammarInterface, RDFizable {
 				li.hasPrevious() && tagIndex>=0; tagIndex--) {
 			Word word = li.previous();		// wordも
 			String[] tag = tags[tagIndex];	// tagも後ろから遡る
-			if (!word.hasTagAll(tag))
+			if (!word.hasAllTag(tag))
 				return false;
 		}
 		return true;

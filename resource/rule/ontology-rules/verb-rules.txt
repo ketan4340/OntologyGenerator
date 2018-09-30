@@ -1,5 +1,5 @@
 # 部分 (dcterms:hasPart)
-IF (hasPart) {
+IF (hasPart(をもつ)) {
   ?stc 	rdf:type jass:Sentence ;
   		jass:subject/jass:categoremMeans ?rsc_S ;
   		jass:predicate ?cls_P ;
@@ -11,7 +11,7 @@ IF (hasPart) {
 } THEN {
   ?rsc_S dcterms:hasPart ?rsc_O .
 };
-IF (hasPart) {
+IF (hasPart(がある)) {
   ?stc 	rdf:type jass:Sentence ;
   		jass:subject/jass:categoremMeans ?rsc_S ;
   		jass:predicate ?cls_P ;
@@ -42,7 +42,7 @@ IF (Action+O) {
   ?rsc_vb jass:domain ?rsc_S .
   ?rsc_vb jass:range ?rsc_O .
 };
-IF(Action+O(サ変)){
+IF (Action+O(サ変)) {
   ?stc rdf:type jass:Sentence .
   ?stc jass:subject ?cls_S .
   ?stc jass:predicate ?cls_P .

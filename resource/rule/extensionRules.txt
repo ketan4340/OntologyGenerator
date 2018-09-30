@@ -1,90 +1,90 @@
 # 文節からその自立語の概念を得るショートカット
 IF (ex:catMean) {
-  ?Cls jass:consistsOfCategorem [jass:means ?Cpt] .
+  ?cls jass:consistsOfCategorem [jass:means ?Cpt] .
 } THEN {
-  ?Cls jass:categoremMeans ?Cpt .
+  ?cls jass:categoremMeans ?Cpt .
 };
 
 # 主語 (jass:subject)
 IF (ex:subject) {
-  ?Stc	a jass:Sentence ; 
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls .
-  ?Cls 	jass:consistsOfAdjuncts/rdf:rest*/rdf:first
+  ?stc	a jass:Sentence ; 
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls .
+  ?cls 	jass:consistsOfAdjuncts/rdf:rest*/rdf:first
        [jass:mainPoS "助詞" ; jass:infinitive "は"] .
 }THEN{
-  ?Stc jass:subject ?Cls .
+  ?stc jass:subject ?cls .
 };
 
 # 述語 (jass:predicate)
 IF (ex:predicate) {
-  ?Stc	a jass:Sentence ;
-    	jass:subject/jass:dependTo ?Cls_P .
+  ?stc	a jass:Sentence ;
+    	jass:subject/jass:dependTo ?cls_P .
 }THEN{
-  ?Stc jass:predicate ?Cls_P .
+  ?stc jass:predicate ?cls_P .
 };
 
 # 目的語 (jass:object)
 IF (ex:object) {
-  ?Stc	a jass:Sentence ;
-	jass:subject ?Cls_S ;
-	jass:predicate ?Cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
-  ?Cls_O jass:dependTo ?Cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
-  ?Adj 	 jass:mainPoS "助詞" ;
+  ?stc	a jass:Sentence ;
+	jass:subject ?cls_S ;
+	jass:predicate ?cls_P ;
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
+  ?cls_O jass:dependTo ?cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
+  ?adj 	 jass:mainPoS "助詞" ;
   	 jass:infinitive "を" .
 }THEN{
-  ?Stc jass:object ?Cls_O .
+  ?stc jass:object ?cls_O .
 };
 IF (ex:object) {
-  ?Stc	a jass:Sentence ;
-	jass:subject ?Cls_S ;
-	jass:predicate ?Cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
-  ?Cls_O jass:dependTo ?Cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
-  ?Adj 	 jass:mainPoS "助詞" ;
+  ?stc	a jass:Sentence ;
+	jass:subject ?cls_S ;
+	jass:predicate ?cls_P ;
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
+  ?cls_O jass:dependTo ?cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
+  ?adj 	 jass:mainPoS "助詞" ;
   	 jass:infinitive "に" .
 }THEN{
-  ?Stc jass:object ?Cls_O .
+  ?stc jass:object ?cls_O .
 };
 IF (ex:object) {
-  ?Stc	a jass:Sentence ;
-	jass:subject ?Cls_S ;
-	jass:predicate ?Cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
-  ?Cls_O jass:dependTo ?Cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
-  ?Adj 	 jass:mainPoS "助詞" ;
+  ?stc	a jass:Sentence ;
+	jass:subject ?cls_S ;
+	jass:predicate ?cls_P ;
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
+  ?cls_O jass:dependTo ?cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
+  ?adj 	 jass:mainPoS "助詞" ;
   	 jass:infinitive "へ" .
 }THEN{
-  ?Stc jass:object ?Cls_O .
+  ?stc jass:object ?cls_O .
 };
 IF (ex:object) {
-  ?Stc	a jass:Sentence ;
-	jass:subject ?Cls_S ;
-	jass:predicate ?Cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?Cls_O .
-  ?Cls_O jass:dependTo ?Cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?Adj .
-  ?Adj 	 jass:mainPoS "助詞" ;
+  ?stc	a jass:Sentence ;
+	jass:subject ?cls_S ;
+	jass:predicate ?cls_P ;
+	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
+  ?cls_O jass:dependTo ?cls_P ;
+  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
+  ?adj 	 jass:mainPoS "助詞" ;
   	 jass:infinitive "が" .
 }THEN{
-  ?Stc jass:object ?Cls_O .
+  ?stc jass:object ?cls_O .
 };
 
 #形容詞的名詞(緑色、辛味)などへのマーキング
 IF (ex:attributiveNoun1) {
-  ?Wrd	a jass:Categorem ;
+  ?wrd	a jass:Categorem ;
 	jass:subPoS1 	?pos .
   FILTER(?pos="形容動詞語幹"||?pos="ナイ形容詞語幹")
 }THEN{
-  ?Wrd jass:feature "attributive" .
+  ?wrd jass:feature "attributive" .
 };
 IF (ex:attributiveNoun2) {
-  ?Wrd	a jass:Categorem ;
+  ?wrd	a jass:Categorem ;
 	jass:infinitive	?infi .
   FILTER(regex(?infi,"(色|形|型|味)$"))
 }THEN{
-  ?Wrd jass:feature "attributive" .
+  ?wrd jass:feature "attributive" .
 };

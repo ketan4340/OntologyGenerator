@@ -5,13 +5,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class SyntacticParent<C> {
-
 	protected List<C> children;
 
-
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	public SyntacticParent(List<C> children) {
 		setChildren(children);
 		imprintThisOnChildren();
@@ -22,14 +20,17 @@ public abstract class SyntacticParent<C> {
 			return false;
 		return true;
 	}
-	public boolean replace(C before, C after) {
-		if (!getChildren().contains(before)) return false;
-		return before == children.set(children.indexOf(before), after);
-	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
+	public boolean replace(C before, C after) {
+		int beforeIndex = children.indexOf(before);
+		if (beforeIndex == -1) 
+			return false;
+		return before == children.set(beforeIndex, after);
+	}
 	public boolean containsSubConstituents(List<C> subConstituents) {
 		int size = children.size();
 		int subsize = subConstituents.size();
@@ -60,16 +61,16 @@ public abstract class SyntacticParent<C> {
 		return children.get(prevIndex);
 	}
 	public C head() {
-		return children.get(0);
+		return children.isEmpty()? null : children.get(0);
 	}
 	public C tail() {
 		return children.isEmpty()? null : children.get(children.size()-1);
 	}
 
 
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Getter, Setter ================ */
+	/* ================================================== */	
 	public List<C> getChildren() {
 		return children;
 	}
@@ -78,9 +79,9 @@ public abstract class SyntacticParent<C> {
 	}
 
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return children.stream()

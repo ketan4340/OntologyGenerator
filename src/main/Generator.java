@@ -70,7 +70,12 @@ public class Generator {
 	/**********    Main  Method    **********/
 	/****************************************/
 	public static void main(String[] args) {
-		new Generator().execute(args.length == 1? args[0] : null);
+		if (args.length == 0)
+			new Generator().execute(null);
+		else if (args.length == 1)
+			new Generator().execute(args[0]);
+		else
+			System.err.println("The amount of arguments is not 1.");
 	}
 
 	/****************************************/
@@ -89,11 +94,15 @@ public class Generator {
 	private void execute(String textFileString) {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/test/attribute.txt";
+		//textFileString = "resource/input/test/literal.txt";
 
 		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
-			generate(textFilePath);
-		}
+			Ontology o = generate(textFilePath);
+			o.getTriples().stream()
+			.limit(50)
+			.forEach(System.out::println);
+		}	
 	}
 
 	/**

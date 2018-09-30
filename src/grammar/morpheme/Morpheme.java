@@ -1,6 +1,8 @@
 package grammar.morpheme;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -31,11 +33,20 @@ public final class Morpheme implements GrammarInterface,
 	public static Morpheme getInstance(String newname, CabochaTags newtags) {
 		return MorphemeFactory.intern(newname, newtags);
 	}
-	@Override
-	public Object[] initArgs() {
-		return new Object[] {name, tags};
-	}
 
+
+	/* ================================================== */
+	/* ================== Static Method ================= */
+	/* ================================================== */
+	public static Morpheme concat(List<Morpheme> morphemes) {
+		String newname = morphemes.stream()
+				.map(Morpheme::name)
+				.collect(Collectors.joining());
+		CabochaTags newtags = morphemes.stream()
+				.map(Morpheme::getTags)
+				.reduce(CabochaTags.EMPTY_TAGS, (c1, c2) -> CabochaTags.concat(c1, c2));
+		return Morpheme.getInstance(newname, newtags);
+	}
 
 	/****************************************/
 	/**********   Member  Method   **********/
@@ -44,6 +55,9 @@ public final class Morpheme implements GrammarInterface,
 		return tags.contains(tag);
 	}
 
+	public CabochaTags getTags() {
+		return tags;
+	}
 
 	/****************************************/
 	/**********  Interface Method  **********/
@@ -113,7 +127,10 @@ public final class Morpheme implements GrammarInterface,
 				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());
 	}
-
+	@Override
+	public Object[] initArgs() {
+		return new Object[] {name, tags};
+	}
 
 
 	/****************************************/

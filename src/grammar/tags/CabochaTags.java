@@ -6,7 +6,7 @@ import java.util.ListIterator;
 import java.util.Objects;
 
 public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInterface, TagsFactory {
-	public static final CabochaTags EMPTY_TAGS = new CabochaTags("", "", "", "", "", "", "empty", "empty", "empty");
+	public static final CabochaTags EMPTY_TAGS = new CabochaTags("", "", "", "", "", "", "", "", "");
 
 	/** 品詞 */
 	private final String mainPoS;
@@ -54,6 +54,24 @@ public final class CabochaTags implements Comparable<CabochaTags>, CabochaPoSInt
 		return new Object[] {mainPoS, subPoS1, subPoS2, subPoS3, conjugation, inflection, infinitive, yomi, pronunciation};
 	}
 
+	/**
+	 * 後方優先で結合する。
+	 * @param tag1
+	 * @param tag2
+	 * @return 結合したCaboChaタグ
+	 */
+	public static CabochaTags concat(CabochaTags tag1, CabochaTags tag2) {
+		String mainPoS			= tag2.mainPoS;
+		String subPoS1			= tag2.subPoS1;
+		String subPoS2			= tag2.subPoS2;
+		String subPoS3			= tag2.subPoS3;
+		String conjugation	 	= tag2.conjugation;
+		String inflection		= tag2.inflection;
+		String infinitive 		= tag1.infinitive + tag2.infinitive;
+		String yomi				= tag1.yomi + tag2.yomi;
+		String pronunciation	= tag1.pronunciation + tag2.pronunciation;
+		return new CabochaTags(mainPoS, subPoS1, subPoS2, subPoS3, conjugation, inflection, infinitive, yomi, pronunciation);
+	}
 
 	/* ================================================== */
 	/* ==========        Member  Method        ========== */

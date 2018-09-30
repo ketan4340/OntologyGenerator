@@ -16,13 +16,10 @@ import grammar.morpheme.Morpheme;
 import grammar.tags.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
-	implements RDFizable, GrammarInterface,
-	CabochaPoSInterface
-{
+		implements RDFizable, GrammarInterface, CabochaPoSInterface {
 	private static int WORD_SUM = 0;
 
 	private final int id;
-
 
 	/***********************************/
 	/**********  Constructor  **********/
@@ -41,7 +38,7 @@ public class Word extends SyntacticParent<Morpheme>
 	/**
 	 * 渡されたTagを"全て"持って入れば真、それ以外は偽を返す
 	 */
-	public boolean hasTagAll(String[] tags) {
+	public boolean hasAllTag(String[] tags) {
 		boolean match = true;	// デフォがtrueなので空の配列は任意の品詞とみなされる
 		for (String tag: tags) {
 			boolean not = false;	// NOT検索用のフラグ
@@ -63,6 +60,11 @@ public class Word extends SyntacticParent<Morpheme>
 		return new Word(children);
 	}
 
+	public String withPunc() {
+		return getChildren().stream()
+				.map(Morpheme::name)
+				.collect(Collectors.joining("'"));
+	}
 
 	/****************************************/
 	/**********  Interface Method  **********/
