@@ -12,9 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 
@@ -36,7 +34,8 @@ public class Generator {
 	private static final Path PATH_EXTENSION_RULE;// = Paths.get("resource/rule/extensionRules.txt");
 	private static final Path PATH_ONTOLOGY_RULES;// = Paths.get("resource/rule/ontology-rules");
 	private static final Path PATH_DEFAULT_JASS;// = "resource/ontology/SyntaxOntology.owl";
-	private static final Path PATH_NOUN_WORDS;
+	//private static final Path PATH_NOUN_WORDS;
+	private static final Path PATH_CABOCHA_PROP;
 	
 	/* ログ用 */
 	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
@@ -57,7 +56,8 @@ public class Generator {
 		PATH_EXTENSION_RULE = Paths.get(prop.getProperty("extension_rule-file"));
 		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
 		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
-		PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
+		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
+		PATH_CABOCHA_PROP = Paths.get(prop.getProperty("cabocha-prop"));
 		
 		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+RUNTIME+".txt");
 		PATH_CONVERTEDJASS_TURTLE = Paths.get(prop.getProperty("output-convertedJASS-turtle")+RUNTIME+".ttl");
@@ -87,7 +87,7 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		textFileString = "resource/input/goo/text/gooText生物-動物名-あ.txt";
+		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/test/whale.txt";
 
 		if (Objects.nonNull(textFileString)) {
@@ -121,13 +121,7 @@ public class Generator {
 		/*************************************/
 		/********** 構文解析モジュール  **********/
 		/*************************************/
-		Set<String> nouns = null;
-		try (Stream<String> stream = Files.lines(PATH_NOUN_WORDS)) {
-			nouns = stream.collect(Collectors.toSet());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		List<Sentence> sentenceList = new SyntacticParser(nouns).parseSentences(naturalLanguages);
+		List<Sentence> sentenceList = new SyntacticParser(PATH_CABOCHA_PROP).parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		

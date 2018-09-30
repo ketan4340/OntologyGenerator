@@ -8,6 +8,8 @@
 	<entry key="default-JASS-file">resource/ontology/SyntaxOntology.owl</entry>
 	<entry key="noun-file">resource/noun/nouns.txt</entry>
 
+	<entry key="cabocha-prop">resource/prop/CaboCha-property.xml</entry>
+
 	<!-- 途中生成物 (ログ) の出力先 -->
 	<entry key="output-shortsentence">tmp/log/text/shortsentence</entry>
 	<entry key="output-convertedJASS-turtle">tmp/log/jass/jass</entry>
@@ -17,5 +19,4 @@
 	<entry key="output-ontology-turtle">dest/rdf/turtle/ontology</entry>
 	<entry key="output-id_triple">dest/csv/RDFtriple</entry>
 	
-	<entry key="key">value</entry>
 </properties>
