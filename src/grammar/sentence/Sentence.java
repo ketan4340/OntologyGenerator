@@ -19,13 +19,13 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
+import dic.CabochaTags;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
-import grammar.tags.CabochaTags;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 

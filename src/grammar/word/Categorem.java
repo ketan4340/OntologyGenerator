@@ -12,7 +12,7 @@ import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
 import grammar.morpheme.Morpheme;
 
-public class Categorem extends Word{
+public class Categorem extends Word implements Resourcable {
 	public static final Categorem EMPTY_CATEGOREM = new Categorem(Collections.emptyList());
 
 	/****************************************/
@@ -34,8 +34,9 @@ public class Categorem extends Word{
 	public Categorem clone() {
 		return new Categorem(children);
 	}
-	public String createConceptURI() {
-		return GOO.uri + name();
+	@Override
+	public String toResourceURI() {
+		return GOO.uri + infinitive();
 	}
 
 	/****************************************/
@@ -45,7 +46,7 @@ public class Categorem extends Word{
 	public Resource toRDF(Model model) {
 		return super.toRDF(model)
 				.addProperty(RDF.type, JASS.Categorem)
-				.addProperty(JASS.means, model.createResource(createConceptURI()));
+				.addProperty(JASS.means, model.createResource(toResourceURI()));
 	}
 
 }

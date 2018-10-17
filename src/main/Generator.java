@@ -70,10 +70,11 @@ public class Generator {
 	/**********    Main  Method    **********/
 	/****************************************/
 	public static void main(String[] args) {
+		Generator g = new Generator();
 		if (args.length == 0)
-			new Generator().execute(null);
+			g.execute(null);
 		else if (args.length == 1)
-			new Generator().execute(args[0]);
+			g.execute(args[0]);
 		else
 			System.err.println("The amount of arguments is not 1.");
 	}
@@ -95,7 +96,7 @@ public class Generator {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/test/attribute.txt";
 		//textFileString = "resource/input/test/literal.txt";
-
+		
 		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
 			Ontology o = generate(textFilePath);

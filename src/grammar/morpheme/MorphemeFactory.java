@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import grammar.tags.CabochaTags;
-import util.factory.Factory;
+import dic.CabochaTags;
+import util.Factory;
 
 public interface MorphemeFactory extends Factory {
 	Map<String, Set<Morpheme>> CONSTANT_POOL = new HashMap<>();

@@ -10,9 +10,9 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
+import dic.CabochaPoSInterface;
+import dic.CabochaTags;
 import grammar.GrammarInterface;
-import grammar.tags.CabochaPoSInterface;
-import grammar.tags.CabochaTags;
 
 public final class Morpheme implements GrammarInterface,
 	CabochaPoSInterface, RDFizable, MorphemeFactory {
@@ -92,12 +92,12 @@ public final class Morpheme implements GrammarInterface,
 		return tags.subPoS3();
 	}
 	@Override
-	public String inflection() {
-		return tags.inflection();
-	}
-	@Override
 	public String conjugation() {
 		return tags.conjugation();
+	}
+	@Override
+	public String inflection() {
+		return tags.inflection();
 	}
 	@Override
 	public String infinitive() {
@@ -121,8 +121,8 @@ public final class Morpheme implements GrammarInterface,
 				.addLiteral(JASS.subPoS1, subPoS1())
 				.addLiteral(JASS.subPoS2, subPoS2())
 				.addLiteral(JASS.subPoS3, subPoS3())
-				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.conjugation, conjugation())
+				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.infinitive, infinitive())
 				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());

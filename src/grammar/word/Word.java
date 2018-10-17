@@ -10,10 +10,10 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
+import dic.CabochaPoSInterface;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
-import grammar.tags.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
 		implements RDFizable, GrammarInterface, CabochaPoSInterface {
@@ -126,8 +126,8 @@ public class Word extends SyntacticParent<Morpheme>
 				.addLiteral(JASS.subPoS1, subPoS1())
 				.addLiteral(JASS.subPoS2, subPoS2())
 				.addLiteral(JASS.subPoS3, subPoS3())
-				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.conjugation, conjugation())
+				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.infinitive, infinitive())
 				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());

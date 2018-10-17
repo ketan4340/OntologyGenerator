@@ -103,7 +103,7 @@ public class SentenceReviser {
 		if (from == -1)
 			return Optional.empty();
 		// 末尾にピリオドやカンマが並んでいたら切り落とす
-		for (int j = to; j > from; j--) {
+		for (int j = to-1; j > from; j--) {
 			String name = morphemes.get(j).name();
 			if (name.equals(".") || name.equals(","))
 				to--;
