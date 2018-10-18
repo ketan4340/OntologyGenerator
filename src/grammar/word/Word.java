@@ -10,10 +10,10 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
-import dic.CabochaPoSInterface;
 import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
+import pos.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
 		implements RDFizable, GrammarInterface, CabochaPoSInterface {

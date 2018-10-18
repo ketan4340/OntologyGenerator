@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import dic.CabochaTags;
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
@@ -14,6 +13,7 @@ import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
+import pos.CabochaTags;
 import util.StringListUtil;
 
 public class CabochaDecoder {

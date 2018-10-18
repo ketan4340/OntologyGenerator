@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import dic.CabochaTags;
+import pos.CabochaTags;
 import util.Factory;
 
 public interface MorphemeFactory extends Factory {

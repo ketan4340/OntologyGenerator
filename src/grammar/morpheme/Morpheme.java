@@ -10,17 +10,18 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
-import dic.CabochaPoSInterface;
-import dic.CabochaTags;
+import dic.Immutable;
 import grammar.GrammarInterface;
+import pos.CabochaPoSInterface;
+import pos.CabochaTags;
 
 public final class Morpheme implements GrammarInterface,
-	CabochaPoSInterface, RDFizable, MorphemeFactory {
+	CabochaPoSInterface, RDFizable, Immutable {
 	private static int MORPHEME_SUM = 0;
 
-	private final int id;		// 通し番号
-	private final String name;	// 形態素の文字列
-	private final CabochaTags tags;	// 品詞リスト
+	private final int id;			// 通し番号
+	private final String name;		// 形態素の文字列
+	private final CabochaTags tags;	// 品詞
 
 	/****************************************/
 	/**********     Constructor    **********/
