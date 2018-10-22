@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.MorphemeFactory;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
 import pos.CabochaTags;
+import pos.TagsFactory;
 import util.StringListUtil;
 
 public class CabochaDecoder {
@@ -103,7 +105,7 @@ public class CabochaDecoder {
 		String name = morphemeInfos[0];
 		String[] tagArray = morphemeInfos[1].split(",");
 		CabochaTags tags = getTagsSuppliedSingleByteChar(tagArray, name);
-		return Morpheme.getInstance(name, tags);
+		return MorphemeFactory.getInstance().getMorpheme(name, tags);
 	}
 
 
@@ -111,9 +113,10 @@ public class CabochaDecoder {
 	/* ==========    Cabocha専用メソッドの実装    ========== */
 	/* ================================================== */
 	private CabochaTags getTagsSuppliedSingleByteChar(String[] tagArray, String infinitive) {
+		TagsFactory factory = TagsFactory.getInstance();
 		if (tagArray.length < MAXIMUM_TAGS_LENGTH)	// sizeが9未満．つまり半角文字
-			return CabochaTags.getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], infinitive, infinitive, infinitive);
-		return CabochaTags.getInstance(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
+			return factory.getCabochaTags(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], infinitive, infinitive, infinitive);
+		return factory.getCabochaTags(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], tagArray[6], tagArray[7], tagArray[8]);
 	}
 
 	/**

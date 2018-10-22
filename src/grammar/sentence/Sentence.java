@@ -25,9 +25,10 @@ import grammar.clause.Clause;
 import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.MorphemeFactory;
 import grammar.word.Adjunct;
 import grammar.word.Word;
-import pos.CabochaTags;
+import pos.TagsFactory;
 
 public class Sentence extends SyntacticParent<Clause<?>>
 		implements GrammarInterface, RDFizable {
@@ -381,7 +382,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			if (!sbjCnt)
 				break;		// 連続した主語の最後尾には必要ない
 			// 助詞・連体化"の"を新たに用意
-			Adjunct no = new Adjunct(Morpheme.getInstance("の",CabochaTags.getInstance("助詞","連体化","*","*","*","*","の","ノ","ノ")));
+			Adjunct no = new Adjunct(MorphemeFactory.getInstance().getMorpheme("の",TagsFactory.getInstance().getCabochaTags("助詞","連体化","*","*","*","*","の","ノ","ノ")));
 			ListIterator<Adjunct> itr = subject.getAdjuncts().listIterator();
 			while (itr.hasNext()) {
 				Adjunct adjunct = itr.next();

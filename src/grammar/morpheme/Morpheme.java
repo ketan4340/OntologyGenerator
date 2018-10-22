@@ -31,9 +31,6 @@ public final class Morpheme implements GrammarInterface,
 		this.name = name;
 		this.tags = tags;
 	}
-	public static Morpheme getInstance(String newname, CabochaTags newtags) {
-		return MorphemeFactory.intern(newname, newtags);
-	}
 
 
 	/* ================================================== */
@@ -46,7 +43,7 @@ public final class Morpheme implements GrammarInterface,
 		CabochaTags newtags = morphemes.stream()
 				.map(Morpheme::getTags)
 				.reduce(CabochaTags.EMPTY_TAGS, (c1, c2) -> CabochaTags.concat(c1, c2));
-		return Morpheme.getInstance(newname, newtags);
+		return MorphemeFactory.getInstance().getMorpheme(newname, newtags);
 	}
 
 	/****************************************/

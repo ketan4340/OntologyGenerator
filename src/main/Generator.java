@@ -96,6 +96,7 @@ public class Generator {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/test/attribute.txt";
 		//textFileString = "resource/input/test/literal.txt";
+		//textFileString = "resource/input/test/single.txt";
 		
 		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
