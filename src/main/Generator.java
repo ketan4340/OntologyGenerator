@@ -25,25 +25,27 @@ import grammar.naturalLanguage.NaturalLanguage;
 import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
 import modules.OutputManager;
+import modules.RDFConvert.EntityLinker;
 import modules.RDFConvert.RelationExtractor;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
-	private static final Path PATH_EXTENSION_RULE;// = Paths.get("resource/rule/extensionRules.txt");
-	private static final Path PATH_ONTOLOGY_RULES;// = Paths.get("resource/rule/ontology-rules");
-	private static final Path PATH_DEFAULT_JASS;// = "resource/ontology/SyntaxOntology.owl";
+	private static final Path PATH_EXTENSION_RULE;
+	private static final Path PATH_ONTOLOGY_RULES;
+	private static final Path PATH_DEFAULT_JASS;
 	//private static final Path PATH_NOUN_WORDS;
+	private static final String URL_SPARQL_ENDPOINT;
 	private static final Path PATH_CABOCHA_PROP;
 	
 	/* ログ用 */
 	private static final String RUNTIME = new SimpleDateFormat("MMdd-HHmm").format(Calendar.getInstance().getTime());
-	private static final Path PATH_DIVIDED_SENTENCES;// = Paths.get("tmp/log/text/dividedText"+RUNTIME+".txt");
-	private static final Path PATH_CONVERTEDJASS_TURTLE;// = Paths.get("tmp/log/jass/jass"+RUNTIME+RDFSerialize.Turtle.getExtension());
-	private static final Path PATH_USEDRULES;// = Paths.get("tmp/log/rule/rule"+RUNTIME+".rule");
-	private static final Path PATH_ONTOLOGY_TURTLE;// = Paths.get("dest/rdf/turtle/ontology"+RUNTIME+RDFSerialize.Turtle.getExtension());
-	private static final Path PATH_ID_TRIPLE_CSV;// = Paths.get("dest/csv/RDFtriple"+RUNTIME+".csv");
+	private static final Path PATH_DIVIDED_SENTENCES;
+	private static final Path PATH_CONVERTEDJASS_TURTLE;
+	private static final Path PATH_USEDRULES;
+	private static final Path PATH_ONTOLOGY_TURTLE;
+	private static final Path PATH_ID_TRIPLE_CSV;
 
 	static {
 		Properties prop = new Properties();
@@ -57,6 +59,7 @@ public class Generator {
 		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
 		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
 		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
+		URL_SPARQL_ENDPOINT = prop.getProperty("sparql-endpoint");
 		PATH_CABOCHA_PROP = Paths.get(prop.getProperty("cabocha-prop"));
 		
 		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+RUNTIME+".txt");
@@ -94,7 +97,7 @@ public class Generator {
 	 */
 	private void execute(String textFileString) {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
-		//textFileString = "resource/input/test/attribute.txt";
+		textFileString = "resource/input/test/attribute.txt";
 		//textFileString = "resource/input/test/literal.txt";
 		//textFileString = "resource/input/test/single.txt";
 		
@@ -157,6 +160,10 @@ public class Generator {
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
 
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
+		// DBpediaとのエンティティリンキング
+		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINT);
+		el.linkEntity(unionModel);
+		
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		
 

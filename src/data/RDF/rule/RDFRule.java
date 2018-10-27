@@ -14,7 +14,7 @@ public class RDFRule implements Identifiable, GrammarInterface {
 	private final String thenPattern;
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
 	public RDFRule(String name, String ifPattern, String thenPattern) {
 		this.id = sum++;
@@ -24,20 +24,20 @@ public class RDFRule implements Identifiable, GrammarInterface {
 	}
 
 	/* ================================================== */
-	/* ==========         Member Method        ========== */
+	/* ================== Member Method ================= */
 	/* ================================================== */
-	public String writeQuery() {
-		return writeCONSTRUCTPhrase() + writeWHEREPhrase();
+	public String toQueryString() {
+		return toCONSTRUCTPhrase() + toWHEREPhrase();
 	}
-	public String writeCONSTRUCTPhrase() {
+	public String toCONSTRUCTPhrase() {
 		return "CONSTRUCT {"+thenPattern+"} ";
 	}
-	public String writeWHEREPhrase() {
+	public String toWHEREPhrase() {
 		return "WHERE {"+ifPattern+"} ";
 	}
 
 	/* ================================================== */
-	/* ==========       Interface Method       ========== */
+	/* ================ Interface Method ================ */
 	/* ================================================== */
 	@Override
 	public int id() {
@@ -50,7 +50,7 @@ public class RDFRule implements Identifiable, GrammarInterface {
 
 
 	/* ================================================== */
-	/* ==========        Object  Method        ========== */
+	/* ================== Object Method ================= */
 	/* ================================================== */
 	@Override
 	public String toString() {

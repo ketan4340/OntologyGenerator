@@ -7,6 +7,7 @@
 	<entry key="ontology_rules-dir">resource/rule/ontology-rules</entry>
 	<entry key="default-JASS-file">resource/ontology/SyntaxOntology.owl</entry>
 	<entry key="noun-file">resource/noun/nouns.txt</entry>
+	<entry key="sparql-endpoint">http://dbpedia.org/sparql</entry>
 
 	<entry key="cabocha-prop">resource/prop/CaboCha-property.xml</entry>
 

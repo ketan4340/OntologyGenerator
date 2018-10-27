@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -72,7 +74,7 @@ public class RelationExtractor {
 	/**
 	 * {@code Sentence}のIDMapから{@code Model}(JASS) のIDMapに変換する.
 	 * @param sentenceMap
-	 * @return
+	 * @return JASSモデルとIDタプルのマップ
 	 */
 	public ModelIDMap convertMap_Sentence2JASSModel(SentenceIDMap sentenceMap) {
 		ModelIDMap modelIDMap = new ModelIDMap();
@@ -98,10 +100,10 @@ public class RelationExtractor {
 		List<RDFTriple> triples = new LinkedList<>();
 		StmtIterator stmtIter = model.listStatements();
 		while (stmtIter.hasNext()) {
-			Statement stmt = stmtIter.nextStatement(); // get next statement
-			Resource subject = stmt.getSubject(); // get the subject
-			Property predicate = stmt.getPredicate(); // get the predicate
-			RDFNode object = stmt.getObject(); // get the object
+			Statement stmt = stmtIter.nextStatement();
+			Resource subject = stmt.getSubject();
+			Property predicate = stmt.getPredicate();
+			RDFNode object = stmt.getObject();
 
 			RDFTriple triple = new RDFTriple(new MyResource(subject), new MyResource(predicate),
 					new MyResource(object));
@@ -125,8 +127,8 @@ public class RelationExtractor {
 		JASSMap.entrySet().forEach(e -> {
 			Model convertingModel = e.getKey();
 			IDTuple idt = e.getValue();
-			Optional<Moderule> modelWithRule = convertsJASSModel(convertingModel);
-			modelWithRule.ifPresent(mr -> {
+			Set<Moderule> modelWithRule = convertsJASSModel(convertingModel);
+			modelWithRule.forEach(mr -> {
 				IDTuple idt_clone = idt.clone();
 				idt_clone.setRDFRuleID(String.valueOf(mr.rule.id()));
 				ontologyMap.put(mr.model, idt_clone);
@@ -151,27 +153,34 @@ public class RelationExtractor {
 	}
 
 	/**
-	 * JASSモデルに対し、全てのRDFルールズを適用し、マッチするとjenaモデルを生成する。
-	 * マッチしなくても空のモデルを返してる？
-	 * 生成されたjenaモデルはマッチしたルールとのマッピングとして返される。
+	 * JASSモデルに対し、全てのRDFルールズを適用し、マッチするとJenaモデルを生成する。
+	 * 1つのRDFルールに対し、たかだか1つまでしかマッチしない。
+	 * 1つもマッチしなければ空のセットを返す。
+	 * 生成されたJenaモデルはマッチしたルールとのタプルとして返される。
 	 * @param jass
-	 * @return 生成されたモデルと使用したルール
+	 * @return 生成されたモデルと使用したルールのタプルの集合
 	 */
-	private Optional<Moderule> convertsJASSModel(Model jass) {
-		return ontologyRulesSet.stream().flatMap(r -> r.stream())
-				.map(r -> solveConstructQuery(jass, r))
-				.filter(opt -> opt.isPresent())	//TODO　isPresentは汚い
-				.map(opt -> opt.get())
-				.findFirst();
+	private Set<Moderule> convertsJASSModel(Model jass) {
+		return ontologyRulesSet.stream()
+				.map(rs -> solveFirstConstructQuery(jass, rs))
+				.flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))	//TODO
+				.collect(Collectors.toSet());
 	}
 
+	private Optional<Moderule> solveFirstConstructQuery(Model m, RDFRules rs) {
+		return rs.stream()
+				.map(r -> solveConstructQuery(m, r))
+				.flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))	//TODO
+				.findFirst();			// 各ルールズにつき最初の1つだけ。
+	}
+	
 	private Optional<Moderule> solveConstructQuery(Model model, RDFRule rule) {
 		Model m = QueryExecutionFactory.create(createQuery(rule), model).execConstruct();
 		return m.isEmpty() ? Optional.empty() : Optional.of(new Moderule(m, rule));
 	}
 
 	private Query createQuery(RDFRule rule) {
-		return QueryFactory.create(createPrefixes4Query() + rule.writeQuery());
+		return QueryFactory.create(createPrefixes4Query() + rule.toQueryString());
 	}
 
 	private String createPrefixes4Query() {
