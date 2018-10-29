@@ -24,7 +24,7 @@ IF (equivalentClass) {
   ?stc jass:predicate ?Scls_P .
   ?Scls_P jass:consistsOfCategorem 	?prs .
   ?prs jass:consistsOfHead/jass:infinitive ?equiv .
-  FILTER(?equiv="総称" || ?equiv="通称" || ?equiv="別称" || ?equiv="異称" || ?equiv="別名")
+  FILTER(?equiv IN("総称", "通称", "別称", "異称", "別名"))
   ?prs jass:consistsOfDependent/rdf:rest* ?node . # 形態素の最後尾
   ?node rdf:rest rdf:nil ;
 	rdf:first/jass:categoremMeans ?rsc_p .

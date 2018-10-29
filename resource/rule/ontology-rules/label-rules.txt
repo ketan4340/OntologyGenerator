@@ -1,5 +1,5 @@
 # 総称 (owl:sameAs)
-IF (equivalentClass) {
+IF (label) {
   ?word	a jass:Word ;
   		jass:mainPoS "名詞" ;
   		jass:means ?rsc ;

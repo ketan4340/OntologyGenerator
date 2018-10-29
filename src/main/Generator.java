@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -36,7 +37,7 @@ public class Generator {
 	private static final Path PATH_ONTOLOGY_RULES;
 	private static final Path PATH_DEFAULT_JASS;
 	//private static final Path PATH_NOUN_WORDS;
-	private static final String URL_SPARQL_ENDPOINT;
+	private static final List<String> URL_SPARQL_ENDPOINTS;
 	private static final Path PATH_CABOCHA_PROP;
 	
 	/* ログ用 */
@@ -59,7 +60,8 @@ public class Generator {
 		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
 		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
 		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
-		URL_SPARQL_ENDPOINT = prop.getProperty("sparql-endpoint");
+		URL_SPARQL_ENDPOINTS = Pattern.compile(",").splitAsStream(prop.getProperty("sparql-endpoint"))
+				.map(String::trim).collect(Collectors.toList());
 		PATH_CABOCHA_PROP = Paths.get(prop.getProperty("cabocha-prop"));
 		
 		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+RUNTIME+".txt");
@@ -161,7 +163,7 @@ public class Generator {
 
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		// DBpediaとのエンティティリンキング
-		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINT);
+		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS);
 		el.linkEntity(unionModel);
 		
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));

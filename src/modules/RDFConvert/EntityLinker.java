@@ -1,5 +1,7 @@
 package modules.RDFConvert;
 
+import java.util.List;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -13,13 +15,13 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 
 public class EntityLinker {
-	private String sparqlEndpoint;
+	private List<String> sparqlEndpoints;
 	
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
-	public EntityLinker(String sparqlEndpoint) {
-		this.sparqlEndpoint = sparqlEndpoint;
+	public EntityLinker(List<String> sparqlEndpoint) {
+		this.sparqlEndpoints = sparqlEndpoint;
 	}
 	
 	/* ================================================== */
@@ -33,8 +35,10 @@ public class EntityLinker {
 			Resource s = stmt.getSubject();
 			String label = stmt.getObject().toString();
 			Query query = createConstructQuery(s, label);
-			QueryExecution qe = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-			qe.execConstruct(m);
+			sparqlEndpoints.forEach(se -> {
+				QueryExecution qe = QueryExecutionFactory.sparqlService(se, query);
+				qe.execConstruct(m);
+			});
 		}
 	}
 	
