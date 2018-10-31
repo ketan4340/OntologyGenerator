@@ -71,9 +71,16 @@ public class Generator {
 		PATH_ID_TRIPLE_CSV = Paths.get(prop.getProperty("output-id_triple")+RUNTIME+".csv");
 	}
 	
-	/****************************************/
-	/**********    Main  Method    **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
+	public Generator() {}
+
+	
+	/* ================================================== */
+	/* =================== Main Method ================== */
+	/* ================================================== */
 	public static void main(String[] args) {
 		Generator g = new Generator();
 		if (args.length == 0)
@@ -84,22 +91,16 @@ public class Generator {
 			System.err.println("The amount of arguments is not 1.");
 	}
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
-	public Generator() {}
-
-
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	/**
 	 * ジェネレータの実行.
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
-		textFileString = "resource/input/test/attribute.txt";
+		//textFileString = "resource/input/test/attribute.txt";
 		//textFileString = "resource/input/test/literal.txt";
 		//textFileString = "resource/input/test/single.txt";
 		
@@ -164,7 +165,7 @@ public class Generator {
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		// DBpediaとのエンティティリンキング
 		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS);
-		el.linkEntity(unionModel);
+		el.executeBySameLabelIdentification(unionModel);
 		
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		

@@ -8,7 +8,7 @@ import data.id.Identifiable;
 
 public interface RDFizable extends Identifiable {
 	default String getURI() {
-		return JASS.uri+getClass().getSimpleName()+id();
+		return JASS.uri+getClass().getSimpleName().toLowerCase()+id();
 	}
 	Resource toRDF(Model model);
 }
