@@ -1,6 +1,7 @@
 package modules.RDFConvert;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -26,6 +26,7 @@ import data.id.ModelIDMap;
 
 public class EntityLinker {
 	private List<String> sparqlEndpoints;
+	private static final short MAXSIZE4IN_FILTER = 150;
 	
 	/* ================================================== */
 	/* =================== Constructor ================== */
@@ -38,27 +39,86 @@ public class EntityLinker {
 	/* =================== Member Method ================ */
 	/* ================================================== */
 	/**
-	 * 旧型
-	 * @param m オントロジー
+	 * 指定のモデル中のリソースを、DBpedia、DBpedia Japanese上で同じラベルをもつリソースと{@code owl:sameAs}プロパティで結び、モデルに追加する.
+	 * @param m 生成した{@code owl:sameAs}トリプルを追加したいモデル
 	 */
 	public void executeBySameLabelIdentification(Model m) {
+		// JASSモデル内でrdfs:labelを持つリソース
+		Map<Resource, String> rsc_labelMap = new HashMap<>();
+		StmtIterator labelStmtItr = m.listStatements(null, RDFS.label, (RDFNode) null);
+		labelStmtItr.forEachRemaining(stmt -> rsc_labelMap.put(stmt.getSubject(), stmt.getObject().toString()));
+		
+		Set<Map<String, Resource>> label_rscMaps = splitReverseMapWithoutOverlapUnderSize(rsc_labelMap, MAXSIZE4IN_FILTER);
+		label_rscMaps.forEach(lrMap -> {
+			if (lrMap.isEmpty()) return;
+			// ラベルを結合した文字列
+			String inExprStr = lrMap.keySet().stream().map(s -> s.replaceAll(",", "\\,"))
+					.map(s -> '"'+s+'"'+"@ja").collect(Collectors.joining(","));
+			Query query = QueryFactory.create(""
+					+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " 
+					+ "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " 
+					+ "SELECT ?x ?label "
+					+ "WHERE {?x rdfs:label|skos:prefLabel ?label . "
+					+ "FILTER(?label IN(" + inExprStr + ")) } ");
+			sparqlEndpoints.forEach(se -> {
+				ResultSet results = QueryExecutionFactory.sparqlService(se, query).execSelect();
+				results.forEachRemaining(qs -> {
+					Resource dbRsc = qs.getResource("x");
+					String label = qs.getLiteral("label").getString();
+					Resource jassRsc = lrMap.get(label);	// ラベルからJASSリソースを逆引き
+					m.add(jassRsc, OWL.sameAs, dbRsc);	// JASSリソースとDBpediaのリソースをsameAsリンクして格納
+				});
+			});
+		});
+	}
+	/**
+	 * {@code Map<K,V>}から{@code Map<V, K>}の集合へ、キー(元のマップの値)の重複がなく、かつ1つのマップが指定サイズ未満になるように分割する. 
+	 * @param map キー・値を逆転し分割したいマップ
+	 * @param size 分割後の{@code Map<V, K>}1つあたりの上限サイズ
+	 * @return 分割された{@code Map<V, K>}の集合
+	 */
+	private static <K, V> Set<Map<V, K>> splitReverseMapWithoutOverlapUnderSize(Map<K, V> map, int maxSize) {
+		Set<Map<V, K>> mapset = new HashSet<>();
+		map.entrySet().forEach(e -> {
+			K key = e.getKey();
+			V value = e.getValue();
+			mapset.parallelStream()
+			.filter(m -> !m.containsKey(value))	// キーが重複せず
+			.filter(m -> m.size()<maxSize)		// 分割後のサイズが指定量未満
+			.findAny()							// 条件に合えばどれでもいい
+			.orElseGet(() -> {
+				Map<V, K> newmap = new HashMap<>();
+				mapset.add(newmap);
+				return newmap;
+			})	// なければ新しく作る
+			.put(value, key);					// 値とキーを逆にしてプット
+		});
+		return mapset;
+	}
+	
+	/**
+	 * リソース1つごとにエンドポイントにクエリを投げて、同じラベルを持つリソースを探す. 
+	 * @param m オントロジー
+	 */
+	public void executeBySameLabelIdentification_old(Model m) {
 		// rdfs:labelを持つリソース
 		StmtIterator rsc_itr = m.listStatements(null, RDFS.label, (RDFNode) null);
-		while (rsc_itr.hasNext()) {
-			Statement stmt = rsc_itr.nextStatement();
+		rsc_itr.forEachRemaining(stmt -> {
 			Resource s = stmt.getSubject();
 			String label = stmt.getObject().toString();
-			Query query = QueryFactory.create("" +
-					"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " + 
-					"PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" + 
-					"CONSTRUCT {<" + s +"> <"+ OWL.sameAs + "> ?x} " +
-					"WHERE {?x rdfs:label|skos:prefLabel \""+ label +"\"@ja} " + 
-					"LIMIT 100");;
+			Query query = QueryFactory.create(""
+					+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " 
+					+ "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" 
+					+ "CONSTRUCT {<" + s +"> <"+ OWL.sameAs + "> ?x} "
+					+ "WHERE {?x rdfs:label|skos:prefLabel \""+ label +"\"@ja . "
+					+ "FILTER(?x IN()) "
+					+ "} " 
+					+ "LIMIT 100");
 			sparqlEndpoints.forEach(se -> {
 				QueryExecution qe = QueryExecutionFactory.sparqlService(se, query);
 				qe.execConstruct(m);
 			});
-		}
+		});
 	}
 	
 	/**
