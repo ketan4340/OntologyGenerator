@@ -38,6 +38,7 @@ public class Generator {
 	private static final Path PATH_DEFAULT_JASS;
 	//private static final Path PATH_NOUN_WORDS;
 	private static final List<String> URL_SPARQL_ENDPOINTS;
+	private static final int MAX_SIZE_OF_INSTATEMENT;
 	private static final Path PATH_CABOCHA_PROP;
 	
 	/* ログ用 */
@@ -62,6 +63,7 @@ public class Generator {
 		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
 		URL_SPARQL_ENDPOINTS = Pattern.compile(",").splitAsStream(prop.getProperty("sparql-endpoint"))
 				.map(String::trim).collect(Collectors.toList());
+		MAX_SIZE_OF_INSTATEMENT = Integer.valueOf(prop.getProperty("max-size-of-INstatement"));
 		PATH_CABOCHA_PROP = Paths.get(prop.getProperty("cabocha-prop"));
 		
 		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+RUNTIME+".txt");
@@ -99,7 +101,8 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
+		textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
+		//textFileString = "resource/input/goo/text/gooText生物-動物名-あ.txt";
 		//textFileString = "resource/input/test/whale.txt";
 		//textFileString = "resource/input/test/literal.txt";
 		//textFileString = "resource/input/test/single.txt";
@@ -141,6 +144,7 @@ public class Generator {
 		List<Sentence> sentenceList = new SyntacticParser(PATH_CABOCHA_PROP).parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
+		System.out.println("Syntactic parsed.");
 		
 		/*************************************/
 		/********** 文章整形モジュール **********/
@@ -152,6 +156,7 @@ public class Generator {
 		/* 長文を分割し複数の短文に分ける */
 		sr.divideEachSentence(sentenceMap);
 		sentenceMap.setShortSentence();
+		System.out.println("Sentence revised.");
 
 		//sentenceMap.forEachKey(System.out::println);	//PRINT
 		/*************************************/
@@ -161,11 +166,13 @@ public class Generator {
 		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
 		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
-
+		System.out.println("Relation extracted.");
+		
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		// DBpediaとのエンティティリンキング
-		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS);
+		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
 		el.executeBySameLabelIdentification(unionModel);
+		System.out.println("Entity linked.");
 		
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		

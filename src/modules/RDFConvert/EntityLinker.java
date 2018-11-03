@@ -26,13 +26,13 @@ import data.id.ModelIDMap;
 
 public class EntityLinker {
 	private List<String> sparqlEndpoints;
-	private static final short MAXSIZE4IN_FILTER = 150;
-	
+	private int maxSizeOfINstatement;
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
-	public EntityLinker(List<String> sparqlEndpoint) {
+	public EntityLinker(List<String> sparqlEndpoint, int maxSizeOfINstatement) {
 		this.sparqlEndpoints = sparqlEndpoint;
+		this.maxSizeOfINstatement = maxSizeOfINstatement;
 	}
 	
 	/* ================================================== */
@@ -48,7 +48,7 @@ public class EntityLinker {
 		StmtIterator labelStmtItr = m.listStatements(null, RDFS.label, (RDFNode) null);
 		labelStmtItr.forEachRemaining(stmt -> rsc_labelMap.put(stmt.getSubject(), stmt.getObject().toString()));
 		
-		Set<Map<String, Resource>> label_rscMaps = splitReverseMapWithoutOverlapUnderSize(rsc_labelMap, MAXSIZE4IN_FILTER);
+		Set<Map<String, Resource>> label_rscMaps = splitReverseMapWithoutOverlapUnderSize(rsc_labelMap, maxSizeOfINstatement);
 		label_rscMaps.forEach(lrMap -> {
 			if (lrMap.isEmpty()) return;
 			// ラベルを結合した文字列
@@ -61,14 +61,17 @@ public class EntityLinker {
 					+ "WHERE {?x rdfs:label|skos:prefLabel ?label . "
 					+ "FILTER(?label IN(" + inExprStr + ")) } ");
 			sparqlEndpoints.forEach(se -> {
-				ResultSet results = QueryExecutionFactory.sparqlService(se, query).execSelect();
+				QueryExecution qe = QueryExecutionFactory.sparqlService(se, query);
+				ResultSet results = qe.execSelect();
+				System.out.println("finish sparql. got results. : " + results.hasNext());//PRINT
 				results.forEachRemaining(qs -> {
 					Resource dbRsc = qs.getResource("x");
 					String label = qs.getLiteral("label").getString();
 					Resource jassRsc = lrMap.get(label);	// ラベルからJASSリソースを逆引き
-					m.add(jassRsc, OWL.sameAs, dbRsc);	// JASSリソースとDBpediaのリソースをsameAsリンクして格納
+					m.add(jassRsc, OWL.sameAs, dbRsc);		// JASSリソースとDBpediaのリソースをsameAsリンクして格納
 				});
 			});
+
 		});
 	}
 	/**
