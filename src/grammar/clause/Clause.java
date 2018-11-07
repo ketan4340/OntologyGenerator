@@ -102,16 +102,16 @@ implements GrammarInterface, RDFizable {
 	/**
 	 * 自立語と先頭の付属語がそれぞれ指定の品詞を持つ場合，結合する.
 	 * 名詞とサ変動詞 (使用+する) のような組み合わせに適用する.
-	 * @param tag4Categorem
-	 * @param tag4Adjunct
+	 * @param categoremTag
+	 * @param adjunctTag
 	 * @return 結合に成功すれば真．そうでなければ偽．
 	 */
-	public boolean uniteAdjunct2Categorem(String[] tag4Categorem, String[] tag4Adjunct) {
+	public boolean uniteAdjunct2Categorem(String[] categoremTag, String[] adjunctTag) {
 		if (adjuncts.isEmpty())
 			return false;	// 付属語がないなら意味がない
-		if (!categorem.hasAllTag(tag4Categorem))
+		if (!categorem.hasAllTag(categoremTag))
 			return false;
-		if (!adjuncts.get(0).hasAllTag(tag4Adjunct))
+		if (!adjuncts.get(0).hasAllTag(adjunctTag))
 			return false;
 
 		// 付属語から先頭の単語を取り出す

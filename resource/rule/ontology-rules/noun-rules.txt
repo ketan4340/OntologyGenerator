@@ -32,7 +32,20 @@ IF (equivalentClass) {
   ?rsc_S owl:equivalentClass ?rsc_p .
 };
 
-#形容詞的名詞
+# サ変接続の動詞
+IF (Action(サ変)) {
+  ?stc 	a jass:Sentence ; 
+  		jass:subject/jass:categoremMeans ?rscS ; 
+  		jass:predicate/jass:consistsOfCategorem 
+  				[jass:subPoS1 "サ変接続" ; jass:means ?rsc_vb] .
+  OPTIONAL{?stc jass:object/jass:categoremMeans ?rscO . }
+}THEN{
+  ?rsc_vb rdf:type jass:Action .
+  ?rsc_vb jass:domain ?rscS .
+  ?rsc_vb jass:range ?rscO .
+};
+
+# 形容詞的名詞
 IF (attributive) {
   ?stc a jass:Sentence ;
 	jass:subject/jass:categoremMeans ?rsc_S ;
@@ -54,11 +67,6 @@ IF (subClassOf) {
   ?wrd_P jass:mainPoS "名詞" ;
 	jass:means ?rsc_P . 
   MINUS{?wrd_P jass:subPoS1 "接尾".}
-  MINUS{?wrd_P jass:subPoS1 "サ変接続".}
-  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "総称" .}
-  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "通称" .}
-  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "別称" .}
-  MINUS{?wrd_P jass:consistsOfMorphemes/rdf:rest*/rdf:first/jass:infinitive "異称" .}
-}THEN{
+} THEN {
   ?rsc_S rdfs:subClassOf ?rsc_P .
 };

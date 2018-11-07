@@ -23,10 +23,9 @@ public class Phrase extends Categorem {
 	/** 主要部 */
 	private final Word head;
 
-
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	public Phrase(List<? extends Clause<?>> dependent, Word head) {
 		super(concatMorphemes(dependent, head));
 		this.dependent = dependent;
@@ -40,9 +39,9 @@ public class Phrase extends Categorem {
 		return Stream.concat(dependentMorphemes, headMorphemes).collect(Collectors.toList());
 	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	/**
 	 * 全く同じPhraseを複製する
 	 */
@@ -54,9 +53,9 @@ public class Phrase extends Categorem {
 		return new Phrase(cloneDependent, cloneHead);
 	}
 
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================ Interface Method ================ */ 
+	/* ================================================== */
 	@Override
 	public Resource toRDF(Model model) {
 		Resource clauseNode = model.createList(
@@ -68,9 +67,9 @@ public class Phrase extends Categorem {
 				.addProperty(JASS.consistsOfHead, head.toRDF(model));
 	}
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Object Method ================= */ 
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return "[" +

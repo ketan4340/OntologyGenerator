@@ -70,6 +70,7 @@ public class EntityLinker {
 					Resource jassRsc = lrMap.get(label);	// ラベルからJASSリソースを逆引き
 					m.add(jassRsc, OWL.sameAs, dbRsc);		// JASSリソースとDBpediaのリソースをsameAsリンクして格納
 				});
+				qe.close();
 			});
 
 		});

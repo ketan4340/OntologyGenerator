@@ -27,14 +27,11 @@ public class SentenceReviser {
 			{{"名詞"}}
 			};
 
-
-
 	/****************************************/
 	/**********     Constructor    **********/
 	/****************************************/
 	public SentenceReviser() {
 	}
-
 
 	/****************************************/
 	/**********   Member  Method   **********/
@@ -45,13 +42,14 @@ public class SentenceReviser {
 		.map(Sentence::getChildren).flatMap(List::stream)
 		.map(Clause::words).flatMap(List::stream)
 		.forEach(w -> weldNumbers(w));
-		//sentence.printM();
+
 		// サ変動詞と接尾をもつ動詞をつなげる
+		/*
 		Stream.of(TAGS_CATEGOREM_ADJUNCTS).forEach(tag_CA -> {
 			sentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tag_CA[0], tag_CA[1]));
 		});
-		// 名詞と形容詞だけ取り出す
-		// これらがClauseの末尾につくものを隣のClauseにつなげる
+		*/
+		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
 		Stream.of(TAGS_NOUNPHRASE).forEach(tag_NP -> {
 			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
 					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し

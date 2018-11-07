@@ -26,7 +26,6 @@ import grammar.naturalLanguage.NaturalLanguage;
 import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
 import modules.OutputManager;
-import modules.RDFConvert.EntityLinker;
 import modules.RDFConvert.RelationExtractor;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
@@ -101,9 +100,9 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
+		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-あ.txt";
-		//textFileString = "resource/input/test/whale.txt";
+		textFileString = "resource/input/test/whale.txt";
 		//textFileString = "resource/input/test/literal.txt";
 		//textFileString = "resource/input/test/single.txt";
 		
@@ -170,10 +169,11 @@ public class Generator {
 		
 		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
 		// DBpediaとのエンティティリンキング
+		/*
 		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
 		el.executeBySameLabelIdentification(unionModel);
 		System.out.println("Entity linked.");
-		
+		*/
 		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		
 

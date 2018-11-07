@@ -15,9 +15,9 @@ import grammar.morpheme.Morpheme;
 public class Categorem extends Word implements Resourcable {
 	public static final Categorem EMPTY_CATEGOREM = new Categorem(Collections.emptyList());
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	public Categorem(List<Morpheme> morphemes) {
 		super(morphemes);
 	}
@@ -25,11 +25,10 @@ public class Categorem extends Word implements Resourcable {
 		this(Arrays.asList(morphemes));
 	}
 
-
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
-	/* 全く同じWordを複製する */
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
+	/** 全く同じWordを複製する */
 	@Override
 	public Categorem clone() {
 		return new Categorem(children);
@@ -39,9 +38,9 @@ public class Categorem extends Word implements Resourcable {
 		return GOO.uri + infinitive();
 	}
 
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================ Interface Method ================ */ 
+	/* ================================================== */
 	@Override
 	public Resource toRDF(Model model) {
 		return super.toRDF(model)

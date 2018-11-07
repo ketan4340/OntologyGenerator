@@ -9,8 +9,7 @@ IF (ex:catMean) {
 IF (ex:subject) {
   ?stc	a jass:Sentence ; 
 	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls .
-  ?cls 	jass:consistsOfAdjuncts/rdf:rest*/rdf:first
-       [jass:mainPoS "助詞" ; jass:infinitive "は"] .
+  ?cls 	jass:consistsOfAdjuncts/rdf:rest*/rdf:first [jass:mainPoS "助詞" ; jass:infinitive "は"] .
 }THEN{
   ?stc jass:subject ?cls .
 };
@@ -32,43 +31,8 @@ IF (ex:object) {
   ?cls_O jass:dependTo ?cls_P ;
   	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
   ?adj 	 jass:mainPoS "助詞" ;
-  	 jass:infinitive "を" .
-}THEN{
-  ?stc jass:object ?cls_O .
-};
-IF (ex:object) {
-  ?stc	a jass:Sentence ;
-	jass:subject ?cls_S ;
-	jass:predicate ?cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
-  ?cls_O jass:dependTo ?cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
-  ?adj 	 jass:mainPoS "助詞" ;
-  	 jass:infinitive "に" .
-}THEN{
-  ?stc jass:object ?cls_O .
-};
-IF (ex:object) {
-  ?stc	a jass:Sentence ;
-	jass:subject ?cls_S ;
-	jass:predicate ?cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
-  ?cls_O jass:dependTo ?cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
-  ?adj 	 jass:mainPoS "助詞" ;
-  	 jass:infinitive "へ" .
-}THEN{
-  ?stc jass:object ?cls_O .
-};
-IF (ex:object) {
-  ?stc	a jass:Sentence ;
-	jass:subject ?cls_S ;
-	jass:predicate ?cls_P ;
-	jass:consistsOfClauses/rdf:rest*/rdf:first ?cls_O .
-  ?cls_O jass:dependTo ?cls_P ;
-  	 jass:consistsOfAdjuncts/rdf:rest*/rdf:first ?adj .
-  ?adj 	 jass:mainPoS "助詞" ;
-  	 jass:infinitive "が" .
+  	 jass:infinitive ?adjinf . 
+  	 FILTER(?adjinf IN("を", "へ", "に", "が")) 
 }THEN{
   ?stc jass:object ?cls_O .
 };
@@ -77,14 +41,14 @@ IF (ex:object) {
 IF (ex:attributiveNoun1) {
   ?wrd	a jass:Categorem ;
 	jass:subPoS1 	?pos .
-  FILTER(?pos="形容動詞語幹"||?pos="ナイ形容詞語幹")
+  FILTER(?pos IN("形容動詞語幹", "ナイ形容詞語幹"))
 }THEN{
   ?wrd jass:feature "attributive" .
 };
 IF (ex:attributiveNoun2) {
   ?wrd	a jass:Categorem ;
 	jass:infinitive	?infi .
-  FILTER(regex(?infi,"(色|形|型|味)$"))
+  FILTER(regex(?infi,"(色|形|型|味|的)$"))
 }THEN{
   ?wrd jass:feature "attributive" .
 };

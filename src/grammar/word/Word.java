@@ -21,9 +21,9 @@ public class Word extends SyntacticParent<Morpheme>
 
 	private final int id;
 
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	public Word(List<Morpheme> morphemes) {
 		super(morphemes);
 		this.id = WORD_SUM++;
@@ -32,9 +32,9 @@ public class Word extends SyntacticParent<Morpheme>
 		this(Arrays.asList(morphemes));
 	}
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	/**
 	 * 渡されたTagを"全て"持って入れば真、それ以外は偽を返す
 	 */
@@ -66,9 +66,9 @@ public class Word extends SyntacticParent<Morpheme>
 				.collect(Collectors.joining("'"));
 	}
 
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================ Interface Method ================ */ 
+	/* ================================================== */
 	@Override
 	public int id() {
 		return id;
@@ -134,9 +134,9 @@ public class Word extends SyntacticParent<Morpheme>
 		return wordResource;
 	}
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Object Method ================= */ 
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return children.stream().map(m -> m.toString()).collect(Collectors.joining());
