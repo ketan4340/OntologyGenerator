@@ -1,7 +1,6 @@
 package modules.RDFConvert;
 
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,14 +13,8 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 
-import data.RDF.MyResource;
-import data.RDF.RDFTriple;
 import data.RDF.rule.RDFRule;
 import data.RDF.rule.RDFRuleReader;
 import data.RDF.rule.RDFRules;
@@ -89,27 +82,6 @@ public class RelationExtractor {
 		Map<Model, List<Statement>> replaceMap = modelMap.keySet().stream()
 				.collect(Collectors.toMap(m -> m, m -> m.listStatements().toList()));
 		return modelMap.replaceModel2Statements(replaceMap);
-	}
-
-	/**
-	 * JenaのModelを独自クラスRDFTripleのリストに置き換える.
-	 * @param model JenaのModel
-	 * @return RDFTripleのリスト
-	 */
-	public List<RDFTriple> convertModel_Jena2TripleList(Model model) {
-		List<RDFTriple> triples = new LinkedList<>();
-		StmtIterator stmtIter = model.listStatements();
-		while (stmtIter.hasNext()) {
-			Statement stmt = stmtIter.nextStatement();
-			Resource subject = stmt.getSubject();
-			Property predicate = stmt.getPredicate();
-			RDFNode object = stmt.getObject();
-
-			RDFTriple triple = new RDFTriple(new MyResource(subject), new MyResource(predicate),
-					new MyResource(object));
-			triples.add(triple);
-		}
-		return triples;
 	}
 
 	/**
@@ -186,6 +158,10 @@ public class RelationExtractor {
 	private String createPrefixes4Query() {
 		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
 				.map(e -> "PREFIX " + e.getKey() + ": <" + e.getValue() + ">").collect(Collectors.joining(" "));
+	}
+	
+	public Model removeJASSOntology(Model m) {
+		return m.difference(defaultJASSModel);
 	}
 
 	/* ================================================== */

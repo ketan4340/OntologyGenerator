@@ -1,14 +1,14 @@
 # 部分 (dcterms:hasPart)
 IF (hasPart(をもつ/がある)) {
   ?stc 	a jass:Sentence ;
-  		jass:subject/jass:categoremMeans ?rscS ;
+  		jass:subject/jass:categoremMeans ?rsrcS ;
   		jass:predicate/jass:consistsOfCategorem/jass:infinitive ?has ; 
   		jass:object ?clsO .
   ?clsO 	jass:consistsOfAdjuncts/rdf:first/jass:infinitive ?adjO ;
-  			jass:categoremMeans ?rscO .
+  			jass:categoremMeans ?rsrcO .
   FILTER( (?has IN("もつ","持つ") && ?adjO="を") || (?has="ある" && ?adjO="が") )
 } THEN {
-  ?rscS dcterms:hasPart ?rscO .
+  ?rsrcS dcterms:hasPart ?rsrcO .
 };
 
 
@@ -16,22 +16,27 @@ IF (hasPart(をもつ/がある)) {
 IF (Action) {
 	?stc 	a jass:Sentence ; 
   			jass:predicate ?clsP . 
-	?clsP 	jass:consistsOfCategorem [jass:mainPoS "動詞" ; jass:means ?rscVb] . 
+	?clsP 	jass:consistsOfCategorem [jass:mainPoS "動詞" ; jass:means ?rsrcVb] . 
 	{
-		# 能動態
-		?stc jass:subject/jass:categoremMeans ?rscS . 
-		OPTIONAL{ ?stc jass:object/jass:categoremMeans ?rscO . }
+		# 能動態 (受動態ではない)
+		OPTIONAL { 
+			?clsP 	jass:consistsOfAdjuncts/rdf:first ?1stAdjP . 
+			?1stAdjP 	jass:mainPoS "動詞" ; jass:subPoS1 "接尾" ; jass:infinitive ?reruinf .
+			FILTER(?reruinf NOT IN("れる","られる")) 
+		} 
+		?stc jass:subject/jass:categoremMeans ?rsrcS . 
+		OPTIONAL { ?stc jass:object/jass:categoremMeans ?rsrcO . }
 	} UNION {
+		?clsP 	jass:consistsOfAdjuncts/rdf:first ?1stAdjP . 
+		?1stAdjP 	jass:mainPoS "動詞" ; jass:subPoS1 "接尾" ; jass:infinitive ?reruinf . 
 		# 受動態
-		?stc jass:subject/jass:categoremMeans ?rscO . 
-		?clsP 	jass:consistsOfAdjuncts/rdf:first 
-						[jass:mainPoS "動詞" ; jass:subPoS1 "接尾" ; jass:infinitive ?reruinf] . 
-		FILTER(?reruinf IN("れる","られる")) . 
-		OPTIONAL{ ?stc jass:object/jass:categoremMeans ?rscS . } 
+		FILTER(?reruinf IN("れる","られる")) 
+		?stc jass:subject/jass:categoremMeans ?rsrcO . 
+		OPTIONAL{ ?stc jass:object/jass:categoremMeans ?rsrcS . } 
 	}
 } THEN {
-	_:v a ?srcVb ; 
-	 	jass:domain ?rscS ;
-  		jass:range ?rscO .
-	?rscVb rdfs:subClassOf schema:Action ;
+	_:v a ?rsrcVb ; 
+	 	schema:agent ?rsrcS ;
+  		schema:object ?rsrcO .
+	?rsrcVb rdfs:subClassOf schema:Action ;
 };

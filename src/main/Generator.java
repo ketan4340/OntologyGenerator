@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
 
 import cabocha.Cabocha;
-import data.RDF.Ontology;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
@@ -26,6 +25,7 @@ import grammar.naturalLanguage.NaturalLanguage;
 import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
 import modules.OutputManager;
+import modules.RDFConvert.EntityLinker;
 import modules.RDFConvert.RelationExtractor;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
@@ -102,16 +102,18 @@ public class Generator {
 	private void execute(String textFileString) {
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-あ.txt";
-		textFileString = "resource/input/test/whale.txt";
+		//textFileString = "resource/input/test/whale.txt";
 		//textFileString = "resource/input/test/literal.txt";
 		//textFileString = "resource/input/test/single.txt";
 		
 		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
-			Ontology o = generate(textFilePath);
-			o.getTriples().stream()
+			Model result = generate(textFilePath);
+			/*
+			result.listStatements().toList().stream()
 			.limit(50)
 			.forEach(System.out::println);
+			*/
 		}	
 	}
 
@@ -119,11 +121,11 @@ public class Generator {
 	 * ジェネレータ本体.
 	 * @param textFilePath 入力するテキストファイルのパス
 	 */
-	public Ontology generate(Path textFilePath) {
+	public Model generate(Path textFilePath) {
 		return generateParagraphs(loadTextFile(textFilePath));
 	}
 
-	public Ontology generateParagraphs(List<NaturalParagraph> naturalLanguageParagraphs) {
+	public Model generateParagraphs(List<NaturalParagraph> naturalLanguageParagraphs) {
 		// 段落を処理に使う予定はまだないので，文のリストに均して，
 		// List<Sentence>を引数として受け取る#generateに渡す
 		List<NaturalLanguage> naturalLanguages = naturalLanguageParagraphs.stream()
@@ -135,7 +137,7 @@ public class Generator {
 	/**
 	 * オントロジー構築器の実行
 	 */
-	public Ontology generate(List<NaturalLanguage> naturalLanguages) {
+	public Model generate(List<NaturalLanguage> naturalLanguages) {
 		System.out.println("Start.");
 		/*************************************/
 		/********** 構文解析モジュール  **********/
@@ -162,19 +164,18 @@ public class Generator {
 		/********** 関係抽出モジュール **********/
 		/*************************************/
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
-		ModelIDMap JASSMap = re.convertMap_Sentence2JASSModel(sentenceMap);
-		ModelIDMap modelMap = re.convertMap_JASSModel2RDFModel(JASSMap);
-		StatementIDMap statementMap = re.convertMap_Model2Statements(modelMap);
+		ModelIDMap jassMap = re.convertMap_Sentence2JASSModel(sentenceMap);
+		ModelIDMap ontologyMap = re.convertMap_JASSModel2RDFModel(jassMap);
+		StatementIDMap statementMap = re.convertMap_Model2Statements(ontologyMap);
 		System.out.println("Relation extracted.");
 		
-		Model unionModel = modelMap.uniteModels().difference(re.defaultJASSModel);
+		// 全てのModelIDMapを統合し、JASS語彙の定義を取り除く
+		Model unionOntology = ontologyMap.uniteModels();
 		// DBpediaとのエンティティリンキング
-		/*
+		
 		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
-		el.executeBySameLabelIdentification(unionModel);
+		el.executeBySameLabelIdentification(unionOntology);
 		System.out.println("Entity linked.");
-		*/
-		Ontology ontology = new Ontology(re.convertModel_Jena2TripleList(unionModel));
 		
 
 		OutputManager opm = new OutputManager();
@@ -182,18 +183,18 @@ public class Generator {
 		opm.outputDividedSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
 		// デフォルトJASSモデルは取り除いて出力
 		opm.outputOntologyAsTurtle(
-				JASSMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
+				jassMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
 				PATH_CONVERTEDJASS_TURTLE);
 		opm.outputRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
 
 		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
-		opm.outputOntologyAsTurtle(unionModel, PATH_ONTOLOGY_TURTLE);
+		opm.outputOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
 
 		System.out.println("Finished.");
 		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());
-		System.out.println("ontology size: " + ontology.getTriples().size() + "\n");
+		System.out.println("ontology size: " + unionOntology.size() + "\n");
 
-		return ontology;
+		return unionOntology;
 	}
 
 
