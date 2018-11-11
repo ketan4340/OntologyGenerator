@@ -19,9 +19,9 @@ IF (numeral value) {
 
 # 総称 (owl:sameAs)
 IF (equivalentClass) {
-  ?stc rdf:type jass:Sentence .
-  ?stc jass:subject/jass:categoremMeans ?rsc_S .
-  ?stc jass:predicate ?Scls_P .
+  ?stc rdf:type jass:Sentence ; 
+       jass:subject/jass:categoremMeans ?rsc_S ; 
+       jass:predicate ?Scls_P .
   ?Scls_P jass:consistsOfCategorem 	?prs .
   ?prs jass:consistsOfHead/jass:infinitive ?equiv .
   FILTER(?equiv IN("総称", "通称", "別称", "異称", "別名"))
@@ -34,15 +34,16 @@ IF (equivalentClass) {
 
 # サ変接続の動詞
 IF (Action(サ変)) {
-  ?stc 	a jass:Sentence ; 
-  		jass:subject/jass:categoremMeans ?rscS ; 
-  		jass:predicate/jass:consistsOfCategorem 
-  				[jass:subPoS1 "サ変接続" ; jass:means ?rsc_vb] .
-  OPTIONAL{?stc jass:object/jass:categoremMeans ?rscO . }
-}THEN{
-  ?rsc_vb rdf:type jass:Action .
-  ?rsc_vb jass:domain ?rscS .
-  ?rsc_vb jass:range ?rscO .
+  ?stc a jass:Sentence ; 
+       jass:subject/jass:categoremMeans ?rsrcS ; 
+       jass:predicate/jass:consistsOfCategorem 
+           [jass:subPoS1 "サ変接続" ; jass:means ?rsrcVb] .
+  OPTIONAL{?stc jass:object/jass:categoremMeans ?rsrcO . }
+} THEN {
+  _:v a ?rsrcVb ; 
+      schema:agent ?rsrcS ;
+      schema:object ?rsrcO .
+  ?rsrcVb rdfs:subClassOf schema:Action .
 };
 
 # 形容詞的名詞

@@ -1,11 +1,11 @@
 # 総称 (owl:sameAs)
 IF (label) {
-  ?word	a jass:Word ;
-  		jass:mainPoS "名詞" ;
-  		jass:means ?rsc ;
-  		jass:name ?label.
+  ?word a jass:Word ;
+        jass:mainPoS "名詞" ;
+        jass:means ?rsc ;
+        jass:name ?label.
   {?word jass:subPoS1 "一般"} UNION {?word jass:subPoS2 "固有名詞"} . 
-  MINUS{?word a jass:Phrase . }
+  MINUS{ ?word a jass:Phrase .}
 }THEN{
   ?rsc rdfs:label ?label .
 };

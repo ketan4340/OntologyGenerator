@@ -36,6 +36,9 @@ public class SentenceReviser {
 	/****************************************/
 	/**********   Member  Method   **********/
 	/****************************************/
+	public void connectWord(SentenceIDMap sentenceMap) {
+		sentenceMap.forEachKey(this::connectWord);
+	}
 	public Sentence connectWord(Sentence sentence) {
 		// 別々の形態素に別れてしまっている数値を1つの形態素にする
 		Stream.of(sentence)
@@ -59,9 +62,6 @@ public class SentenceReviser {
 			}
 		});
 		return sentence;
-	}
-	public void connectWord(SentenceIDMap sentenceMap) {
-		sentenceMap.forEachKey(this::connectWord);
 	}
 
 	private void weldNumbers(Word w) {

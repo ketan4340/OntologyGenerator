@@ -1,6 +1,5 @@
 package grammar.word;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class Categorem extends Word implements Resourcable {
 		super(morphemes);
 	}
 	public Categorem(Morpheme... morphemes) {
-		this(Arrays.asList(morphemes));
+		super(morphemes);
 	}
 
 	/* ================================================== */

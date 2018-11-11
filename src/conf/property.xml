@@ -17,7 +17,7 @@
 	<entry key="output-usedrules">tmp/log/rule/rule</entry>
 
 	<!-- 最終成果物の出力先 -->
-	<entry key="output-ontology-turtle">dest/rdf/turtle/ontology</entry>
+	<entry key="output-ontology-turtle">dest/turtle/ontology</entry>
 	<entry key="output-id_triple">dest/csv/RDFtriple</entry>
 	
 </properties>

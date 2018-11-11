@@ -13,7 +13,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -22,7 +21,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import data.RDF.vocabulary.JASS;
-import data.id.ModelIDMap;
 
 public class EntityLinker {
 	private List<String> sparqlEndpoints;
@@ -63,7 +61,6 @@ public class EntityLinker {
 			sparqlEndpoints.forEach(se -> {
 				QueryExecution qe = QueryExecutionFactory.sparqlService(se, query);
 				ResultSet results = qe.execSelect();
-				System.out.println("finish sparql. got results. : " + results.hasNext());//PRINT
 				results.forEachRemaining(qs -> {
 					Resource dbRsc = qs.getResource("x");
 					String label = qs.getLiteral("label").getString();
@@ -130,6 +127,7 @@ public class EntityLinker {
 	 * @param JASSモデルとIDのMap
 	 * @return {@code owl:sameAs}でリンクしたRDFグラフ
 	 */
+	/*
 	public Model linkEntityWithCoexistentWords(ModelIDMap JASSMap) {
 		Model jass = JASSMap.uniteModels();
 		Map<String, Map<Resource, String>> stc_rsc_labelMap = 
@@ -143,8 +141,9 @@ public class EntityLinker {
 		ontologies.forEach(sameAsOntology::add);
 		return sameAsOntology;
 	}
+	*/
 	
-	
+	/*
 	public Model linkEntityAtSentence(Map<Resource, String> resource_labelMap) {
 		// リソース毎のリンク候補集合を初期化
 		resource_labelMap.entrySet()
@@ -161,9 +160,9 @@ public class EntityLinker {
 				});
 			});
 		});
-		
 		return null;//TODO
 	}
+	*/
 	
 	/* ================================================== */
 	/* ================== Static Method ================= */
@@ -176,7 +175,6 @@ public class EntityLinker {
 				"LIMIT 100");
 	}
 	
-
 	private static final Query SENTENCE_RESOURCE_LABEL_QUERY = QueryFactory.create(""+
 			"PREFIX rdf: <"+ RDF.getURI() +"> "+
 			"PREFIX jass: <"+ JASS.getURI() +"> "+
@@ -201,5 +199,4 @@ public class EntityLinker {
 		});
 		return stc_rsc_labelMap;
 	}
-
 }

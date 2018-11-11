@@ -56,11 +56,12 @@ public class CabochaDecoder {
 		// ex) * 0 -1D 0/1 0.000000...
 		Indexes cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
 		int depIndex = cabochaClauseIndexes.dependIndex;			// 係る先の文節の番号. ex) "-1D"の"-1"部分
-		int subjEndIndex = cabochaClauseIndexes.subjectEndIndex;	// 主辞の終端の番号. ex) "0/1"の"0"部分
-		int funcEndIndex = cabochaClauseIndexes.functionEndIndex;	// 機能語の終端の番号. ex) "0/1"の"1"部分
-
+		int subjEndIndex = cabochaClauseIndexes.subjectEndIndex+1;	// 主辞の終端の番号. ex) "0/1"の"0"部分
+		int funcEndIndex = cabochaClauseIndexes.functionEndIndex+1;	// 機能語の終端の番号. ex) "0/1"の"1"部分
+		// List#sublistは返り値のサブリストに引数endIndex番目の要素は含まれないので1を足しておく
+		
 		//// 残り(Index1以降)は単語に関する情報
-		// CaboChaは形態素の情報は一行 (本来Stringで十分)だが，ParserInterface(を実装するKNP)に合わせてList<String>とする．
+		// CaboChaは形態素の情報は一行(Stringで十分)だが，ParserInterface(を実装するKNP)に合わせてList<String>とする．
 		List<List<String>> wordInfoLists = parsedInfo4clause.subList(1, parsedInfo4clause.size())
 				.stream().map(info -> Arrays.asList(info)).collect(Collectors.toList());
 
@@ -128,8 +129,8 @@ public class CabochaDecoder {
 		String[] clauseInfos = cabochaClauseInfo.split(" ");				// "*","0","-1D","0/1","0.000000..."
 		int depIndex = Integer.decode(clauseInfos[2].substring(0, clauseInfos[2].length()-1));	// -1で'D'を除去.
 		String[] subjFuncIndexes = clauseInfos[3].split("/");				// ex) "0/1"->("0","1")
-		int subjEndIndex = Integer.decode(subjFuncIndexes[0])+1;			// 主辞の終端の番号. ex) "0/1"の"0"部分
-		int funcEndIndex = Integer.decode(subjFuncIndexes[1])+1;			// 機能語の終端の番号. ex) "0/1"の"1"部分
+		int subjEndIndex = Integer.decode(subjFuncIndexes[0]);				// 主辞の終端の番号. ex) "0/1"の"0"部分
+		int funcEndIndex = Integer.decode(subjFuncIndexes[1]);				// 機能語の終端の番号. ex) "0/1"の"1"部分
 		Indexes indexes = new Indexes(depIndex, subjEndIndex, funcEndIndex);
 		return indexes;
 	}

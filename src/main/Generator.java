@@ -100,20 +100,18 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFileString) {
-		//textFileString = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFileString = "resource/input/goo/text/gooText生物-動物名-あ.txt";
 		//textFileString = "resource/input/test/whale.txt";
 		//textFileString = "resource/input/test/literal.txt";
-		//textFileString = "resource/input/test/single.txt";
 		
 		if (Objects.nonNull(textFileString)) {
 			Path textFilePath = Paths.get(textFileString);
-			Model result = generate(textFilePath);
-			/*
-			result.listStatements().toList().stream()
-			.limit(50)
+			generate(textFilePath);
+			/* デバッグ用
+			generate(textFilePath).listStatements().toList()
+			.stream().limit(50)
 			.forEach(System.out::println);
-			*/
+			//*/
 		}	
 	}
 
@@ -171,12 +169,13 @@ public class Generator {
 		
 		// 全てのModelIDMapを統合し、JASS語彙の定義を取り除く
 		Model unionOntology = ontologyMap.uniteModels();
-		// DBpediaとのエンティティリンキング
 		
+		///*
+		// DBpediaとのエンティティリンキング
 		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
 		el.executeBySameLabelIdentification(unionOntology);
 		System.out.println("Entity linked.");
-		
+		//*/
 
 		OutputManager opm = new OutputManager();
 		// ログや生成物の出力
@@ -191,8 +190,9 @@ public class Generator {
 		opm.outputOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
 
 		System.out.println("Finished.");
-		System.out.println("Sentences: " + naturalLanguages.size() + "\t->dividedSentences: " + sentenceMap.size());
-		System.out.println("ontology size: " + unionOntology.size() + "\n");
+		System.out.println("input sentences: " + naturalLanguages.size());
+		System.out.println("-> divided sentences: " + sentenceMap.size());
+		System.out.println("ontology size: " + unionOntology.size());
 
 		return unionOntology;
 	}

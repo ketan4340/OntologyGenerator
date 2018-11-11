@@ -37,9 +37,9 @@ public class RelationExtractor {
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
-	public RelationExtractor(RDFRules extensionRules, RDFRulesSet ontologyRules, Model jassModel) {
+	public RelationExtractor(RDFRules extensionRules, RDFRulesSet ontologyRuleSet, Model jassModel) {
 		this.extensionRules = extensionRules;
-		this.ontologyRulesSet = ontologyRules;
+		this.ontologyRulesSet = ontologyRuleSet;
 		this.defaultJASSModel = jassModel;
 	}
 

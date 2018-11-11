@@ -14,33 +14,40 @@ public class RDFRuleReader {
 	 * 直前に"}"がある";"と、直前に"."がある";"の後ろの位置にマッチ. ただし直前(直後)の判定の際，空白文字は無視する.
 	 * 位置にマッチなので置換や分割をしても，"}"も";"も残る.
 	 */
-	private static final Pattern SPLIT_RULES_PATTERN = Pattern.compile("(?<=(?<=\\});)|(?<=(?<=\\.)\\s*;)",
-			Pattern.CASE_INSENSITIVE);
-	// Pattern.compile("(?<=(}(?!(\\s*THEN))))|(?<=(?<=\\.)\\s*;)",
-	// Pattern.CASE_INSENSITIVE);
+	private static final Pattern SPLIT_RULES_PATTERN = 
+			Pattern.compile("(?<=(?<=\\});)|(?<=(?<=\\.)\\s*;)", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * "IF(name){...}THEN{...}"の形式で書かれたルールにマッチ. 大文字小文字を問わない. ルールの名前"(name)"は無くても良い.
 	 * (){}の前後に空白文字が入っても良い.
 	 */
 	private static final Pattern WHOLE_IFTHEN_PATTERN = Pattern.compile(
-			"\\A\\s*IF\\s*(\\((.*)\\))?\\s*\\{(.+)\\}\\s*THEN\\s*\\{(.+)\\};\\s*\\z", Pattern.CASE_INSENSITIVE);
+			"\\A\\s*IF\\s*(\\((.*?)\\))??\\s*\\{(.+)\\}\\s*THEN\\s*\\{(.+)\\};\\s*\\z", 
+			//0           1   2                 3                     4
+			Pattern.CASE_INSENSITIVE
+			);
 	/**
 	 * {@link Matcher#group(int)}で取り出す際の定数.
 	 * {@code WHOLE_IFTHEN_PATTERN}の括弧()の変更に合わせること.
 	 */
-	private static final int NAME_IFTHEN = 2, IF_PATTERN_IFTHEN = 3, THEN_PATTERN_IFTHEN = 4;
+	private static final int IFTHEN_NAME_NUM = 2, IFTHEN_IF_NUM = 3, IFTHEN_THEN_NUM = 4;
+	
 	/** "...->...;"の形式で書かれたルールにマッチ. 名前は付けられない. */
-	private static final Pattern WHOLE_ARROW_PATTERN = Pattern.compile("\\A(.+)->(.+);\\s*\\z");
+	private static final Pattern WHOLE_ARROW_PATTERN = Pattern.compile(
+			"\\A(.+)->(.+);\\s*\\z", Pattern.CASE_INSENSITIVE);
+			//0 1     2
 	/**
 	 * {@link Matcher#group(int)}で取り出す際の定数.
 	 * {@code WHOLE_ARROW_PATTERN}の括弧()の変更に合わせること.
 	 */
-	private static final int IF_PATTERN_ARROW = 1, THEN_PATTERN_ARROW = 2;
+	private static final int ARROW_IF_NUM = 1, ARROW_THEN_NUM = 2;
 
 	/** コメントアウトの"#"以降にマッチ. "#"から行末まで削除するために使う. */
 	private static final Pattern COMMENT_PATTERN = Pattern.compile("#.*$");
+	/** 1文字以上の空白文字にマッチ. 行揃えのために使われている余分な空白文字を半角スペース1文字に置換する. */
+	private static final Pattern SPACE_CHARACTERS_PATTERN = Pattern.compile("\\s+");
 
+	
 	public static RDFRulesSet readRDFRulesSet(Path rulesDir) {
 		try (Stream<Path> files = Files.walk(rulesDir)) {
 			return files.filter(Files::isRegularFile)
@@ -64,6 +71,8 @@ public class RDFRuleReader {
 			rulesString = Files.lines(rulesFile)
 					.map(COMMENT_PATTERN::matcher)	// コメントアウトを検知
 					.map(m -> m.replaceAll(""))		// #から行末まで削除
+					.map(SPACE_CHARACTERS_PATTERN::matcher)	// 1文字以上連続した空白文字を検知
+					.map(m -> m.replaceAll(" "))			// 半角スペース1文字に置換
 					.collect(Collectors.joining());
 			rulesString = removeBOM(rulesString);
 		} catch (IOException e) {
@@ -98,11 +107,11 @@ public class RDFRuleReader {
 		Matcher matcherIFTHEN = WHOLE_IFTHEN_PATTERN.matcher(ruleString);
 		Matcher matcherArrow = WHOLE_ARROW_PATTERN.matcher(ruleString);
 		return matcherIFTHEN.matches()
-				? new RDFRule(matcherIFTHEN.group(NAME_IFTHEN), matcherIFTHEN.group(IF_PATTERN_IFTHEN),
-						matcherIFTHEN.group(THEN_PATTERN_IFTHEN))
+				? new RDFRule(matcherIFTHEN.group(IFTHEN_NAME_NUM), matcherIFTHEN.group(IFTHEN_IF_NUM),
+						matcherIFTHEN.group(IFTHEN_THEN_NUM))
 				: matcherArrow.matches()
-						? new RDFRule("arrowRule", matcherIFTHEN.group(IF_PATTERN_ARROW),
-								matcherIFTHEN.group(THEN_PATTERN_ARROW))
+						? new RDFRule("arrowRule", matcherIFTHEN.group(ARROW_IF_NUM),
+								matcherIFTHEN.group(ARROW_THEN_NUM))
 						: RDFRule.EMPTY_RULE;
 	}
 }
