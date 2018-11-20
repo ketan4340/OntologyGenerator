@@ -15,6 +15,7 @@ public enum Namespace {
 	SIO("sio", "http://semanticscience.org/resource/"),
 	
 	JASS("jass", "http://www.uec.ac.jp/k-lab/k-tanabe/jass/"),
+	MOS("mos", "http://www.uec.ac.jp/k-lab/k-tanabe/mos/"),
 	
 	GOO("goo", "http://dictionary.goo.ne.jp/jn#"),
 	
