@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.word.Adjunct;
+import grammar.word.Categorem;
 import grammar.word.Phrase;
 import grammar.word.Word;
 
@@ -32,7 +33,7 @@ public class SerialClause extends Clause<Phrase> {
 	public static SerialClause connectClauses(Clause<?>... clauses) {
 		int tailIndex = clauses.length-1;
 		List<Clause<?>> dependent = Arrays.asList(Arrays.copyOfRange(clauses, 0, tailIndex));
-		Word head = clauses[tailIndex].categorem;
+		Categorem head = clauses[tailIndex].categorem;
 		Phrase categorem = new Phrase(dependent, head); 
 		List<Adjunct> adjuncts = clauses[tailIndex].adjuncts;
 		List<Word> others = clauses[tailIndex].others;

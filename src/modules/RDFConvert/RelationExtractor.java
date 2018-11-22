@@ -45,7 +45,7 @@ public class RelationExtractor {
 
 	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, Path defaultJASSPath) {
 		this(RDFRuleReader.readRDFRules(extensionRulePath), RDFRuleReader.readRDFRulesSet(ontologyRulePath),
-				ModelFactory.createDefaultModel().read(defaultJASSPath.toString()));
+				ModelFactory.createDefaultModel().read(defaultJASSPath.toUri().getPath()));
 	}
 
 	/* ================================================== */

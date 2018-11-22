@@ -25,12 +25,12 @@ public class Phrase extends Categorem {
 	/** 従属部 */
 	private final List<? extends Clause<?>> dependent;
 	/** 主要部 */
-	private final Word head;
+	private final Categorem head;
 
 	/* ================================================== */
 	/* ================== Constructor =================== */
 	/* ================================================== */
-	public Phrase(List<? extends Clause<?>> dependent, Word head) {
+	public Phrase(List<? extends Clause<?>> dependent, Categorem head) {
 		super(concatMorphemes(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
@@ -53,7 +53,7 @@ public class Phrase extends Categorem {
 	public Phrase clone() {
 		List<Clause<?>> cloneDependent = dependent.stream()
 				.map(c -> c.clone()).collect(Collectors.toList());
-		Word cloneHead = head.clone();
+		Categorem cloneHead = head.clone();
 		return new Phrase(cloneDependent, cloneHead);
 	}
 
@@ -70,6 +70,7 @@ public class Phrase extends Categorem {
 				.addProperty(JASS.consistsOfDependent, clauseNode)
 				.addProperty(JASS.consistsOfHead, head.toRDF(model));
 	}
+	/*
 	@Override
 	public Resource createResource(Model m) {
 		String[] koto = {"こと", "事"};
@@ -79,26 +80,26 @@ public class Phrase extends Categorem {
 		 * 「こと」ならその直前の文節(従属部の最後尾)の自立語のリソース (「Xのこと」のX)
 		 * 「もの」なら空白ノード
 		 * そうでなければ主要部に、従属部の文節の情報を付け足していく
-		 */
+		 /
 		Resource r = 
 				Arrays.stream(koto).anyMatch(mk -> head.subPoS1().equals("非自立")&&head.infinitive().equals(mk))?
 						depcopy.remove(depcopy.size()-1).getCategorem().createResource(m) :
 				Arrays.stream(mono).anyMatch(mk -> head.subPoS1().equals("非自立")&&head.infinitive().equals(mk))?
-						m.createResource() : head.toRDF(m);
+						m.createResource() : head.createResource(m);
 		
 		depcopy.forEach(dep -> {
-			Resource depResource = dep.getCategorem().toRDF(m);
+			Resource depResource = dep.getCategorem().createResource(m);
 			if ( dep.endWith(new String[][]{{"形容詞","-連用テ接続"}}, true) ) {
 				// "大きい"など。連用テ接続は"大きく(て)"のように並列する表現
 				r.addProperty(MoS.attributeOf, depResource);
 
 			} else if ( dep.endWith(new String[][]{{"連体詞"}}, true)) {
 				// "大きな"、"こういう"、"あの"、など。
-				// "大きな"は"大きい"の活用形ではないことに注意				
+				// "大きな"は"大きい"の活用形ではないことに注意	
 				r.addProperty(DCTerms.relation, depResource);
 			} else if ( dep.endWith(new String[][]{{"助詞","連体化"}}, true)) {
 				// "の"のみ該当
-				r.addProperty(MoS.attributeOf, depResource);
+				r.addProperty(DCTerms.relation, depResource);
 			} else if ( dep.endWith(new String[][]{{"助動詞","体言接続"}}, true)) {
 				// "変な"の"な"など
 				r.addProperty(MoS.attributeOf, depResource);
@@ -108,6 +109,7 @@ public class Phrase extends Categorem {
 		});
 		return r;
 	}
+	*/
 
 	/* ================================================== */
 	/* ================== Object Method ================= */ 
