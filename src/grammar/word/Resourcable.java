@@ -1,6 +1,9 @@
 package grammar.word;
 
-public interface Resourcable {
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 
+public interface Resourcable {
 	String toResourceURI();
+	Resource createResource(Model m);
 }

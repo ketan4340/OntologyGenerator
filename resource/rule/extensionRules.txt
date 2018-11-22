@@ -33,7 +33,7 @@ IF (ex:object) {
        jass:consistsOfClauses/rdf:rest*/rdf:first ?clsO .
   ?clsO jass:dependTo ?clsP ; # 目的語は述語に係る
         jass:consistsOfAdjuncts/rdf:rest*/rdf:first
-            [jass:mainPoS "助詞" ; jass:infinitive ?adjinf] . 
+            [jass:subPoS1 "格助詞" ; jass:infinitive ?adjinf] . 
   FILTER(?clsO != ?clsS) . # 主語は目的語ではない
   VALUES (?inf ?case) {
     ("が" jass:caseGAclause) 

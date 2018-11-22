@@ -34,7 +34,13 @@ public class Categorem extends Word implements Resourcable {
 	}
 	@Override
 	public String toResourceURI() {
+		if (this.mainPoS().equals("名詞"))
+			return GOO.uri + name();
 		return GOO.uri + infinitive();
+	}
+	@Override
+	public Resource createResource(Model m) {
+		return m.createResource(toResourceURI());
 	}
 
 	/* ================================================== */
@@ -44,7 +50,7 @@ public class Categorem extends Word implements Resourcable {
 	public Resource toRDF(Model model) {
 		return super.toRDF(model)
 				.addProperty(RDF.type, JASS.Categorem)
-				.addProperty(JASS.means, model.createResource(toResourceURI()));
+				.addProperty(JASS.means, createResource(model));
 	}
 
 }

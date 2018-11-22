@@ -13,26 +13,23 @@ IF (hasPart(をもつ/がある)) {
 
 # 動詞 (schema:Action)
 IF (Action) {
-  ?stc a jass:Sentence ; jass:predicate ?clsP . 
+  ?stc a jass:Sentence ; jass:predicate ?clsP .
   ?clsP jass:consistsOfCategorem [jass:mainPoS "動詞" ; jass:means ?rsrcVb] .
-  ?clsP jass:consistsOfAdjuncts ?adjlistP .  
+  ?clsP jass:consistsOfAdjuncts ?adjlistP .
   { 
   # 能動態 (受動態ではない)
-    # 動詞に付属語がない
-    # 付属語があるならそれが"れる"か"られる"以外
-    FILTER(?adjlistP = rdf:nil || 
-      NOT EXISTS{
-        ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf] .
-        FILTER( ?reruinf NOT IN("れる","られる") )        
-      }
-    )
+    FILTER(?adjlistP = rdf:nil ||	# 動詞に付属語がない 
+           NOT EXISTS {				# 付属語があるならそれが"れる"か"られる"以外
+             ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf] .
+             FILTER( ?reruinf IN("れる","られる") )        
+           })
     ?stc jass:subject/jass:categoremMeans ?rsrcS . 
     # "に"または"を"を付属語に持つ文節を対象とみなす
     OPTIONAL { ?stc (jass:caseNIclause|jass:caseWOclause)/jass:categoremMeans ?rsrcO . }
   } UNION { 
   # 受動態
-    ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf]. 
     # 付属語が存在し、それが"れる"か"られる"
+    ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf]. 
     FILTER( ?reruinf IN("れる","られる") ) 
     ?stc jass:subject/jass:categoremMeans ?rsrcO .
     # "に"を付属語に持つ文節の自立語を動作主体とみなす 

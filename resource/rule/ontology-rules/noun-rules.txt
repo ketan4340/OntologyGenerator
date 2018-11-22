@@ -1,9 +1,9 @@
 # 数値と単位
 IF (numeral value) {
   ?stc 	rdf:type jass:Sentence ;
-  		jass:subject/jass:categoremMeans ?rsc_S ;
- 		jass:predicate ?cls_P .
-  ?cls_P jass:consistsOfCategorem ?prs .
+  		jass:subject/jass:categoremMeans ?rsrcS ;
+ 		jass:predicate ?clsP .
+  ?clsP jass:consistsOfCategorem ?prs .
 #  ?prs jass:consistsOfDependent/rdf:rest/rdf:first/jass:name ?length .
 #  FILTER regex(?length, "長$")
   ?prs jass:consistsOfHead/jass:consistsOfMorphemes/rdf:rest* (?valrsc ?unitrsc) .
@@ -11,7 +11,7 @@ IF (numeral value) {
   ?unitrsc jass:name ?unit .
   FILTER(regex(str(?val), "[0-9０-９]+?(\\.[0-9０-９]+?)??"))
 } THEN {
-  ?rsc_S sio:SIO_000216 _:bn .
+  ?rsrcS sio:SIO_000216 _:bn .
 #  _:bn rdf:type ?length .
   _:bn rdf:value ?val .
   _:bn sio:SIO_000221 ?unit .
@@ -20,16 +20,16 @@ IF (numeral value) {
 # 総称 (owl:sameAs)
 IF (equivalentClass) {
   ?stc rdf:type jass:Sentence ; 
-       jass:subject/jass:categoremMeans ?rsc_S ; 
-       jass:predicate ?Scls_P .
-  ?Scls_P jass:consistsOfCategorem 	?prs .
+       jass:subject/jass:categoremMeans ?rsrcS ; 
+       jass:predicate ?SclsP .
+  ?SclsP jass:consistsOfCategorem 	?prs .
   ?prs jass:consistsOfHead/jass:infinitive ?equiv .
   FILTER(?equiv IN("総称", "通称", "別称", "異称", "別名"))
   ?prs jass:consistsOfDependent/rdf:rest* ?node . # 形態素の最後尾
   ?node rdf:rest rdf:nil ;
-	rdf:first/jass:categoremMeans ?rsc_p .
+	rdf:first/jass:categoremMeans ?rsrcp .
 }THEN{
-  ?rsc_S owl:equivalentClass ?rsc_p .
+  ?rsrcS owl:equivalentClass ?rsrcp .
 };
 
 # サ変接続の動詞
@@ -49,25 +49,25 @@ IF (Action(サ変)) {
 # 形容詞的名詞
 IF (attributive) {
   ?stc a jass:Sentence ;
-	jass:subject/jass:categoremMeans ?rsc_S ;
-	jass:predicate ?cls_P . 
-  ?cls_P jass:consistsOfCategorem ?wrd_P .
-  ?wrd_P jass:feature "attributive" ;
-	jass:means ?rsc_P . 
+	jass:subject/jass:categoremMeans ?rsrcS ;
+	jass:predicate ?clsP . 
+  ?clsP jass:consistsOfCategorem ?wrdP .
+  ?wrdP jass:feature "attributive" ;
+	jass:means ?rsrcP . 
 }THEN{
-  ?rsc_S jass:attributeOf ?rsc_P .
+  ?rsrcS jass:attributeOf ?rsrcP .
 };
 
 
 # 概念階層 (rdfs:subClassOf)
 IF (subClassOf) {
   ?stc a jass:Sentence ;
-	jass:subject/jass:categoremMeans ?rsc_S ;
-	jass:predicate ?cls_P . 
-  ?cls_P jass:consistsOfCategorem ?wrd_P .
-  ?wrd_P jass:mainPoS "名詞" ;
-	jass:means ?rsc_P . 
-  MINUS{?wrd_P jass:subPoS1 "接尾".}
+	jass:subject/jass:categoremMeans ?rsrcS ;
+	jass:predicate ?clsP . 
+  ?clsP jass:consistsOfCategorem ?wrdP .
+  ?wrdP jass:mainPoS "名詞" ;
+	jass:means ?rsrcP . 
+  MINUS{?wrdP jass:subPoS1 "接尾".}
 } THEN {
-  ?rsc_S rdfs:subClassOf ?rsc_P .
+  ?rsrcS rdfs:subClassOf ?rsrcP .
 };

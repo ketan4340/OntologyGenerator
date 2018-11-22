@@ -37,7 +37,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	private final int id;
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
 	public Sentence(List<Clause<?>> clauses) {
 		super(clauses);
@@ -50,7 +50,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 
 	/* ================================================== */
-	/* ==========        Member  Method        ========== */
+	/* ================== Member Method ================= */
 	/* ================================================== */
 
 	/**
@@ -253,16 +253,18 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		}
 
 		/* 述語を収集 */
-		String[][] tagParticle = {{"助詞", "-て"}};	// "て"以外の助詞
-		String[][] tagAdverb = {{"副詞"}};
-		String[][] tagAuxiliary = {{"助動詞", "体言接続"}};
+		// これら以外なら述語とみなす
+		String[][] tagParticle = {{"助詞", "-て"}};			// "て"以外の助詞
+		String[][] tagAdverb = {{"副詞"}};					// "すぐに"、"おそらく"など
+		String[][] tagAuxiliary = {{"助動詞", "体言接続"}};	// "〜で"など
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDependingThisClause(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
 			if ( !cls2Last.endWith(tagParticle, true) &&
 					!cls2Last.endWith(tagAdverb, true) &&
-					!cls2Last.endWith(tagAuxiliary, true) )
-				predicates.add(cls2Last);
+					!cls2Last.endWith(tagAuxiliary, true) &&
+					cls2Last.getDepending() != nextChild(cls2Last))	// 最後の文節に係るものは除外
+					predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);
 		predicates.retainAll(children);
@@ -462,9 +464,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 
-	/* ================================================== */
-	/* ==========        Output  Method        ========== */
-	/* ================================================== */
+	/* ================== Output Method ================= */
 	public void printM() {
 		System.out.println(
 				morphemes().stream().map(Morpheme::name).collect(Collectors.joining("'")));
@@ -504,7 +504,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 
 	/* ================================================== */
-	/* ==========       Interface Method       ========== */
+	/* ================ Interface Method ================ */
 	/* ================================================== */
 	@Override
 	public int id() {return id;}
@@ -516,7 +516,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	public Resource toRDF(Model model) {
 		List<Resource> clauseResources = getChildren().stream()
 				.map(m -> m.toRDF(model)).collect(Collectors.toList());
-		clauseDepending2RDF(clauseResources);
+		clauseDepend2RDF(clauseResources);
 		Resource clauseNode = model.createList(clauseResources.iterator());
 
 		Resource sentenceResource = model.createResource(getURI())
@@ -524,19 +524,22 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				.addProperty(JASS.consistsOfClauses, clauseNode);
 		return sentenceResource;
 	}
-	private void clauseDepending2RDF(List<Resource> clauseResources) {
+	private void clauseDepend2RDF(List<Resource> clauseResources) {
 		children.forEach(cls -> {
-			Resource clause = clauseResources.stream().filter(c -> Objects.equals(c.getURI(), cls.getURI())).findAny().orElse(null);
+			Resource clauseResource = clauseResources.stream()
+					.filter(c -> Objects.equals(c.getURI(), cls.getURI()))
+					.findAny().orElse(null);
 			Clause<?> depending = cls.getDepending();
-			Optional<Resource> dependingResource = depending == SingleClause.ROOT? Optional.empty():
+			Optional<Resource> dependingResource = depending==SingleClause.ROOT? 
+					Optional.empty():
 					clauseResources.stream().filter(c -> Objects.equals(c.getURI(), depending.getURI())).findAny();
-			dependingResource.ifPresent(d -> clause.addProperty(JASS.dependTo, d));
+			dependingResource.ifPresent(d -> clauseResource.addProperty(JASS.dependTo, d));
 		});
 	}
 
 
 	/* ================================================== */
-	/* ==========        Object  Method        ========== */
+	/* ================== Object Method ================= */
 	/* ================================================== */
 	@Override
 	public String toString() {

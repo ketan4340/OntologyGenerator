@@ -16,16 +16,17 @@ import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
+import grammar.word.Categorem;
 import grammar.word.Word;
 
-public abstract class Clause<W extends Word> extends SyntacticParent<Word>
+public abstract class Clause<C extends Categorem> extends SyntacticParent<Word>
 implements GrammarInterface, RDFizable {
 	private static int clausesSum = 0;
 
 	private final int id;
 
 	/** 文節の子要素 */
-	protected W categorem;				// 自立語
+	protected C categorem;				// 自立語
 	protected List<Adjunct> adjuncts; 	// 付属語
 	protected List<Word> others;		// 。などの記号
 
@@ -35,7 +36,7 @@ implements GrammarInterface, RDFizable {
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
 	/* ================================================== */
-	public Clause(W categorem, List<Adjunct> adjuncts, List<Word> others) {
+	public Clause(C categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
 		this.id = clausesSum++;
 		this.categorem = categorem;
@@ -185,7 +186,8 @@ implements GrammarInterface, RDFizable {
 	public Resource toRDF(Model model) {
 		Resource categoremResource = categorem.toRDF(model);
 		Resource adjunctNode = model.createList(
-				adjuncts.stream().map(m -> m.toRDF(model)).iterator());
+				adjuncts.stream().map(m -> m.toRDF(model)).iterator()
+				);
 
 		Resource clauseResource = model.createResource(getURI())
 				.addProperty(RDF.type, JASS.Clause)
@@ -197,10 +199,10 @@ implements GrammarInterface, RDFizable {
 	/* ================================================== */
 	/* ==========        Getter, Setter        ========== */
 	/* ================================================== */
-	public W getCategorem() {
+	public C getCategorem() {
 		return categorem;
 	}
-	public void setCategorem(W categorem) {
+	public void setCategorem(C categorem) {
 		this.categorem = categorem;
 	}
 	public List<Adjunct> getAdjuncts() {
