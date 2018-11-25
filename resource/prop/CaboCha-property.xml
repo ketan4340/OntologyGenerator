@@ -4,15 +4,15 @@
 	<comment>コメント</comment>
 	<!-- 必須: OSごとのCaboCha起動コマンド -->
 	<entry key="command-windows">cmd /c cabocha</entry>
-	<entry key="command-macos">/usr/local/bin/cabocha</entry>
+	<entry key="command-macos">../OntologyGenerator//usr/local/bin/cabocha</entry>
 	
 	<!-- 必須: CaboCha実行プロセスの最大待ち時間 (秒) -->
 	<entry key="wait">100</entry>
 	
 	<!-- 必須: CaboCha実行時に使う入出力用一時ファイルのパス -->
 	<!-- "output-file"オプションとは関係なく使われる可能性がある。同じパスでもいい -->
-	<entry key="input-tmpfile">tmp/cabochaexec/CaboChaInput.tmp</entry>
-	<entry key="output-tmpfile">tmp/cabochaexec/CaboChaOutput.tmp</entry>
+	<entry key="input-tmpfile">../OntologyGenerator/tmp/cabochaexec/CaboChaInput.tmp</entry>
+	<entry key="output-tmpfile">../OntologyGenerator/tmp/cabochaexec/CaboChaOutput.tmp</entry>
 	
 	<!-- 任意: CaboChaのオプション -->
 	<!-- インスタンス生成時や生成後に設定し直すことも可能 -->
@@ -21,5 +21,5 @@
 	<entry key="input-file"></entry> <!-- メソッドの引数として渡すので通常最初から設定はしない -->
 	<entry key="output-file"></entry>
 	<entry key="sysdic-dir"></entry>
-	<entry key="usrdic-file">resource/usrdic/user.dic</entry>
+	<entry key="usrdic-file">../OntologyGenerator/resource/usrdic/user.dic</entry>
 </properties>

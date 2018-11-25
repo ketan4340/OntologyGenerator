@@ -100,7 +100,7 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFile_str) {
-		textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
+		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
 		//textFile_str = "resource/input/test/single.txt";
@@ -140,7 +140,7 @@ public class Generator {
 	public Model generate(List<NaturalLanguage> naturalLanguages) {
 		System.out.println("Start.");
 
-		/********** 構文解析モジュール  **********/
+		/********** 構文解析モジュール **********/
 		List<Sentence> sentenceList = new SyntacticParser(PATH_CABOCHA_PROP).parseSentences(naturalLanguages);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();

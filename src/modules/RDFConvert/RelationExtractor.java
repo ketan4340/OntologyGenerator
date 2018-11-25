@@ -44,8 +44,9 @@ public class RelationExtractor {
 	}
 
 	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, Path defaultJASSPath) {
-		this(RDFRuleReader.readRDFRules(extensionRulePath), RDFRuleReader.readRDFRulesSet(ontologyRulePath),
-				ModelFactory.createDefaultModel().read(defaultJASSPath.toUri().getPath()));
+		this(RDFRuleReader.readRDFRules(extensionRulePath), 
+				RDFRuleReader.readRDFRulesSet(ontologyRulePath),
+				ModelFactory.createDefaultModel().read(defaultJASSPath.toUri().normalize().getPath()));
 	}
 
 	/* ================================================== */
@@ -95,7 +96,7 @@ public class RelationExtractor {
 		// 拡張は全てのルールをチェックする
 		JASSMap.forEachKey(this::extendsJASSModel);
 		// 変換
-		// 変換は1つでもルールにマッチした時点でその後のマッチングを止める
+		// 変換は1つでもルールにマッチした時点で同じファイル内のマッチングを止める
 		JASSMap.entrySet().forEach(e -> {
 			Model convertingModel = e.getKey();
 			IDTuple idt = e.getValue();

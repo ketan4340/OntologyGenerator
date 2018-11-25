@@ -3,21 +3,21 @@
 <properties>
 	<comment>コメント</comment>
 	<!-- 実行に必要 -->
-	<entry key="extension_rule-file">resource/rule/extensionRules.txt</entry>
-	<entry key="ontology_rules-dir">resource/rule/ontology-rules</entry>
-	<entry key="default-JASS-file">resource/ontology/SyntaxOntology.owl</entry>
-	<entry key="noun-file">resource/noun/nouns.txt</entry>
+	<entry key="extension_rule-file">../OntologyGenerator/resource/rule/extensionRules.txt</entry>
+	<entry key="ontology_rules-dir">../OntologyGenerator/resource/rule/ontology-rules</entry>
+	<entry key="default-JASS-file">../OntologyGenerator/resource/ontology/SyntaxOntology.owl</entry>
+	<entry key="noun-file">../OntologyGenerator/resource/noun/nouns.txt</entry>
 	<entry key="sparql-endpoint">http://dbpedia.org/sparql</entry>
 	<entry key="max-size-of-INstatement">1000</entry>
-	<entry key="cabocha-prop">resource/prop/CaboCha-property.xml</entry>
+	<entry key="cabocha-prop">../OntologyGenerator/resource/prop/CaboCha-property.xml</entry>
 
 	<!-- 途中生成物 (ログ) の出力先 -->
-	<entry key="output-shortsentence">tmp/log/text/shortsentence</entry>
-	<entry key="output-convertedJASS-turtle">tmp/log/jass/jass</entry>
-	<entry key="output-usedrules">tmp/log/rule/rule</entry>
+	<entry key="output-shortsentence">../OntologyGenerator/tmp/log/text/shortsentence</entry>
+	<entry key="output-convertedJASS-turtle">../OntologyGenerator/tmp/log/jass/jass</entry>
+	<entry key="output-usedrules">../OntologyGenerator/tmp/log/rule/rule</entry>
 
 	<!-- 最終成果物の出力先 -->
-	<entry key="output-ontology-turtle">dest/turtle/ontology</entry>
-	<entry key="output-id_triple">dest/csv/RDFtriple</entry>
+	<entry key="output-ontology-turtle">../OntologyGenerator/dest/turtle/ontology</entry>
+	<entry key="output-id_triple">../OntologyGenerator/dest/csv/RDFtriple</entry>
 	
 </properties>
