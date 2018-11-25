@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class SyntacticParent<C> {
+public abstract class SyntacticParent<C extends SyntacticChild> {
 	protected List<C> children;
 
 	/* ================================================== */
@@ -67,7 +67,7 @@ public abstract class SyntacticParent<C> {
 		return children.isEmpty()? null : children.get(children.size()-1);
 	}
 
-
+	
 	/* ================================================== */
 	/* ================== Getter, Setter ================ */
 	/* ================================================== */	

@@ -17,9 +17,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
 import grammar.clause.SerialClause;
@@ -31,7 +31,7 @@ import grammar.word.Word;
 import pos.TagsFactory;
 
 public class Sentence extends SyntacticParent<Clause<?>>
-		implements GrammarInterface, RDFizable {
+		implements SyntacticChild, GrammarInterface {
 	private static int SENTENCE_SUM = 0;
 
 	private final int id;
@@ -508,10 +508,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ================================================== */
 	@Override
 	public int id() {return id;}
+	
 	@Override
 	public String name() {
 		return getChildren().stream().map(c -> c.name()).collect(Collectors.joining());
 	}
+	
 	@Override
 	public Resource toRDF(Model model) {
 		List<Resource> clauseResources = getChildren().stream()
@@ -524,15 +526,16 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				.addProperty(JASS.consistsOfClauses, clauseNode);
 		return sentenceResource;
 	}
+	
 	private void clauseDepend2RDF(List<Resource> clauseResources) {
 		children.forEach(cls -> {
-			Resource clauseResource = clauseResources.stream()
+			Resource clauseResource = clauseResources.parallelStream()
 					.filter(c -> Objects.equals(c.getURI(), cls.getURI()))
 					.findAny().orElse(null);
 			Clause<?> depending = cls.getDepending();
 			Optional<Resource> dependingResource = depending==SingleClause.ROOT? 
 					Optional.empty():
-					clauseResources.stream().filter(c -> Objects.equals(c.getURI(), depending.getURI())).findAny();
+					clauseResources.parallelStream().filter(c -> Objects.equals(c.getURI(), depending.getURI())).findAny();
 			dependingResource.ifPresent(d -> clauseResource.addProperty(JASS.dependTo, d));
 		});
 	}

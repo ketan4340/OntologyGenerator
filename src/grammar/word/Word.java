@@ -8,15 +8,15 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
 import pos.CabochaPoSInterface;
 
 public class Word extends SyntacticParent<Morpheme>
-		implements RDFizable, GrammarInterface, CabochaPoSInterface {
+		implements SyntacticChild, GrammarInterface, CabochaPoSInterface {
 	private static int WORD_SUM = 0;
 
 	private final int id;

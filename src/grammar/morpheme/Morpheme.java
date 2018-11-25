@@ -8,15 +8,15 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
 import dic.Immutable;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import pos.CabochaPoSInterface;
 import pos.CabochaTags;
 
-public final class Morpheme implements GrammarInterface,
-	CabochaPoSInterface, RDFizable, Immutable {
+public final class Morpheme implements SyntacticChild, GrammarInterface,
+	CabochaPoSInterface, Immutable {
 	private static int MORPHEME_SUM = 0;
 
 	private final int id;			// 通し番号

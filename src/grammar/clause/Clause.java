@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
@@ -20,7 +20,7 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 
 public abstract class Clause<C extends Categorem> extends SyntacticParent<Word>
-implements GrammarInterface, RDFizable {
+implements SyntacticChild, GrammarInterface {
 	private static int clausesSum = 0;
 
 	private final int id;

@@ -7,15 +7,14 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import data.RDF.rule.RDFizable;
 import data.RDF.vocabulary.JASS;
-import data.id.Identifiable;
 import grammar.GrammarInterface;
+import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.sentence.Sentence;
 
 public class Paragraph extends SyntacticParent<Sentence>
-	implements Identifiable, GrammarInterface, RDFizable {
+	implements SyntacticChild, GrammarInterface {
 	private static int paragraphSum = 0;
 
 	private final int id;
