@@ -25,6 +25,7 @@ import grammar.naturalLanguage.NaturalLanguage;
 import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
 import modules.OutputManager;
+import modules.RDFConvert.EntityLinker;
 import modules.RDFConvert.RelationExtractor;
 import modules.syntacticParse.SyntacticParser;
 import modules.textRevision.SentenceReviser;
@@ -102,8 +103,9 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		textFile_str = "resource/input/test/single.txt";
+		//textFile_str = "resource/input/test/single.txt";
 		//textFile_str = "resource/input/test/failed.txt";
+		textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
 		if (Objects.nonNull(textFile_str)) {
 			Path textFilePath = Paths.get(textFile_str);
@@ -168,7 +170,7 @@ public class Generator {
 		// 全てのModelIDMapを統合し、JASS語彙の定義を取り除く
 		Model unionOntology = ontologyMap.uniteModels();
 		
-		/*
+		///*
 		// DBpediaとのエンティティリンキング
 		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
 		el.executeBySameLabelIdentification(unionOntology);
