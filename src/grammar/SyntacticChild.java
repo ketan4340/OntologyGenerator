@@ -1,7 +1,7 @@
 package grammar;
 
-import data.RDF.rule.RDFizable;
+import data.RDF.rule.JassModelizable;
 
-public interface SyntacticChild extends RDFizable {
+public interface SyntacticChild extends JassModelizable {
 
 }

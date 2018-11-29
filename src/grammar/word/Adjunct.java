@@ -33,8 +33,8 @@ public class Adjunct extends Word {
 	/**********  Interface Method  **********/
 	/****************************************/
 	@Override
-	public Resource toRDF(Model model) {
-		return super.toRDF(model)
+	public Resource toJASS(Model model) {
+		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Adjunct);
 	}
 

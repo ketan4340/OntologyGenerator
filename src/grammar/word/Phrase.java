@@ -61,16 +61,16 @@ public class Phrase extends Categorem {
 	/* ================ Interface Method ================ */ 
 	/* ================================================== */
 	@Override
-	public Resource toRDF(Model model) {
+	public Resource toJASS(Model model) {
 		Resource clauseNode = model.createList(
-				dependent.stream().map(m -> m.toRDF(model)).iterator());
+				dependent.stream().map(m -> m.toJASS(model)).iterator());
 
-		return super.toRDF(model)
+		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Phrase)
 				.addProperty(JASS.consistsOfDependent, clauseNode)
-				.addProperty(JASS.consistsOfHead, head.toRDF(model));
+				.addProperty(JASS.consistsOfHead, head.toJASS(model));
 	}
-	/*
+	
 	@Override
 	public Resource createResource(Model m) {
 		String[] koto = {"こと", "事"};
@@ -80,7 +80,7 @@ public class Phrase extends Categorem {
 		 * 「こと」ならその直前の文節(従属部の最後尾)の自立語のリソース (「Xのこと」のX)
 		 * 「もの」なら空白ノード
 		 * そうでなければ主要部に、従属部の文節の情報を付け足していく
-		 /
+		 */
 		Resource r = 
 				Arrays.stream(koto).anyMatch(mk -> head.subPoS1().equals("非自立")&&head.infinitive().equals(mk))?
 						depcopy.remove(depcopy.size()-1).getCategorem().createResource(m) :
@@ -109,7 +109,7 @@ public class Phrase extends Categorem {
 		});
 		return r;
 	}
-	*/
+	
 
 	/* ================================================== */
 	/* ================== Object Method ================= */ 

@@ -23,6 +23,7 @@ import data.id.IDTuple;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
+import grammar.word.Resourcable;
 
 public class RelationExtractor {
 
@@ -74,7 +75,8 @@ public class RelationExtractor {
 		ModelIDMap modelIDMap = new ModelIDMap();
 		sentenceMap.forEach((stc, id) -> {
 			Model model = ModelFactory.createDefaultModel().add(defaultJASSModel);
-			modelIDMap.put(stc.toRDF(model).getModel(), id);
+			stc.toJASS(model);
+			modelIDMap.put(model, id);
 		});
 		return modelIDMap;
 	}
@@ -104,7 +106,9 @@ public class RelationExtractor {
 			modelWithRule.forEach(mr -> {
 				IDTuple idt_clone = idt.clone();
 				idt_clone.setRDFRuleID(String.valueOf(mr.rule.id()));
-				ontologyMap.put(mr.model, idt_clone);
+				Model m = mr.model;
+				Resourcable.replaceProxy2CategoremResource(m);
+				ontologyMap.put(m, idt_clone);
 			});
 		});
 		return ontologyMap;
@@ -127,7 +131,7 @@ public class RelationExtractor {
 
 	/**
 	 * JASSモデルに対し、全てのRDFルールズを適用し、マッチするとJenaモデルを生成する。
-	 * 1つのRDFルールに対し、たかだか1つまでしかマッチしない。
+	 * 1つのRDFルールズに対し、たかだか1つまでしかマッチしない。
 	 * 1つもマッチしなければ空のセットを返す。
 	 * 生成されたJenaモデルはマッチしたルールとのタプルとして返される。
 	 * @param jass
@@ -148,23 +152,21 @@ public class RelationExtractor {
 	}
 	
 	private Optional<Moderule> solveConstructQuery(Model model, RDFRule rule) {
-		Model m = QueryExecutionFactory.create(createQuery(rule), model).execConstruct();
+		Query query = QueryFactory.create(createPrefixes4Query() + rule.toQueryString());
+		Model m = QueryExecutionFactory.create(query, model).execConstruct();
 		return m.isEmpty() ? Optional.empty() : Optional.of(new Moderule(m, rule));
-	}
-
-	private Query createQuery(RDFRule rule) {
-		return QueryFactory.create(createPrefixes4Query() + rule.toQueryString());
 	}
 
 	private String createPrefixes4Query() {
 		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
-				.map(e -> "PREFIX " + e.getKey() + ": <" + e.getValue() + ">").collect(Collectors.joining(" "));
+				.map(e -> "PREFIX " + e.getKey() + ": <" + e.getValue() + ">")
+				.collect(Collectors.joining(" "));
 	}
 	
 	public Model removeJASSOntology(Model m) {
 		return m.difference(defaultJASSModel);
 	}
-
+	
 	/* ================================================== */
 	/* ===================== Getter ===================== */
 	/* ================================================== */

@@ -515,13 +515,13 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 	
 	@Override
-	public Resource toRDF(Model model) {
+	public Resource toJASS(Model model) {
 		List<Resource> clauseResources = getChildren().stream()
-				.map(m -> m.toRDF(model)).collect(Collectors.toList());
+				.map(m -> m.toJASS(model)).collect(Collectors.toList());
 		clauseDepend2RDF(clauseResources);
 		Resource clauseNode = model.createList(clauseResources.iterator());
 
-		Resource sentenceResource = model.createResource(getURI())
+		Resource sentenceResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Sentence)
 				.addProperty(JASS.consistsOfClauses, clauseNode);
 		return sentenceResource;
@@ -530,12 +530,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	private void clauseDepend2RDF(List<Resource> clauseResources) {
 		children.forEach(cls -> {
 			Resource clauseResource = clauseResources.parallelStream()
-					.filter(c -> Objects.equals(c.getURI(), cls.getURI()))
+					.filter(c -> Objects.equals(c.getURI(), cls.getJassURI()))
 					.findAny().orElse(null);
 			Clause<?> depending = cls.getDepending();
 			Optional<Resource> dependingResource = depending==SingleClause.ROOT? 
 					Optional.empty():
-					clauseResources.parallelStream().filter(c -> Objects.equals(c.getURI(), depending.getURI())).findAny();
+					clauseResources.parallelStream().filter(c -> Objects.equals(c.getURI(), depending.getJassURI())).findAny();
 			dependingResource.ifPresent(d -> clauseResource.addProperty(JASS.dependTo, d));
 		});
 	}

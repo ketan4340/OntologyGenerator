@@ -183,13 +183,13 @@ implements SyntacticChild, GrammarInterface {
 		return linedupWords(categorem, adjuncts, others);
 	}
 	@Override
-	public Resource toRDF(Model model) {
-		Resource categoremResource = categorem.toRDF(model);
+	public Resource toJASS(Model model) {
+		Resource categoremResource = categorem.toJASS(model);
 		Resource adjunctNode = model.createList(
-				adjuncts.stream().map(m -> m.toRDF(model)).iterator()
+				adjuncts.stream().map(m -> m.toJASS(model)).iterator()
 				);
 
-		Resource clauseResource = model.createResource(getURI())
+		Resource clauseResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Clause)
 				.addProperty(JASS.consistsOfCategorem, categoremResource)
 				.addProperty(JASS.consistsOfAdjuncts, adjunctNode);

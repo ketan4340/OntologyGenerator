@@ -41,14 +41,14 @@ public class Paragraph extends SyntacticParent<Sentence>
 		return getChildren().stream().map(s -> s.name()).collect(Collectors.joining());
 	}
 	@Override
-	public String getURI() {
+	public String getJassURI() {
 		return JASS.uri+getClass().getSimpleName()+id();
 	}
 	@Override
-	public Resource toRDF(Model model) {
-		Resource sentenceNode = model.createList(getChildren().stream().map(m -> m.toRDF(model)).iterator());
+	public Resource toJASS(Model model) {
+		Resource sentenceNode = model.createList(getChildren().stream().map(m -> m.toJASS(model)).iterator());
 
-		Resource paragraphResource = model.createResource(getURI())
+		Resource paragraphResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Paragraph)
 				.addProperty(JASS.consistsOfSentences, sentenceNode);
 		return paragraphResource;

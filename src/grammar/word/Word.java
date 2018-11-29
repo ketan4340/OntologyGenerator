@@ -60,12 +60,6 @@ public class Word extends SyntacticParent<Morpheme>
 		return new Word(children);
 	}
 
-	public String withPunc() {
-		return getChildren().stream()
-				.map(Morpheme::name)
-				.collect(Collectors.joining("'"));
-	}
-
 	/* ================================================== */
 	/* ================ Interface Method ================ */ 
 	/* ================================================== */
@@ -114,11 +108,11 @@ public class Word extends SyntacticParent<Morpheme>
 		return children.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
 	}
 	@Override
-	public Resource toRDF(Model model) {
+	public Resource toJASS(Model model) {
 		Resource morphemeNode = model.createList(children.stream()
-				.map(m -> m.toRDF(model)).iterator());
+				.map(m -> m.toJASS(model)).iterator());
 
-		Resource wordResource = model.createResource(getURI())
+		Resource wordResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Word)
 				.addProperty(JASS.consistsOfMorphemes, morphemeNode)
 				.addLiteral(JASS.name, name())

@@ -32,25 +32,28 @@ public class Categorem extends Word implements Resourcable {
 	public Categorem clone() {
 		return new Categorem(children);
 	}
+	
+	/* ================================================== */
+	/* ================ Interface Method ================ */ 
+	/* ================================================== */
 	@Override
-	public String toResourceURI() {
+	public Resource toJASS(Model model) {
+		return super.toJASS(model)
+				.addProperty(RDF.type, JASS.Categorem)
+				.addProperty(JASS.means, createResource(model));
+	}
+	@Override
+	public String resourceURI() {
 		if (this.mainPoS().equals("名詞"))
 			return GOO.uri + name();
 		return GOO.uri + infinitive();
 	}
 	@Override
 	public Resource createResource(Model m) {
-		return m.createResource(toResourceURI());
+		return m.createResource(resourceURI());
 	}
-
-	/* ================================================== */
-	/* ================ Interface Method ================ */ 
-	/* ================================================== */
 	@Override
-	public Resource toRDF(Model model) {
-		return super.toRDF(model)
-				.addProperty(RDF.type, JASS.Categorem)
-				.addProperty(JASS.means, createResource(model));
+	public String proxyNodeURI() {
+		return JASS.getURI()+"pnode/"+getClass().getSimpleName().toLowerCase()+id();
 	}
-
 }

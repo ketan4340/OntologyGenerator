@@ -27,12 +27,12 @@ public class RDFRule implements Identifiable, GrammarInterface {
 	/* ================== Member Method ================= */
 	/* ================================================== */
 	public String toQueryString() {
-		return toCONSTRUCTPhrase() + toWHEREPhrase();
+		return toConstructPhrase() + toWherePhrase();
 	}
-	public String toCONSTRUCTPhrase() {
+	public String toConstructPhrase() {
 		return "CONSTRUCT {"+thenPattern+"} ";
 	}
-	public String toWHEREPhrase() {
+	public String toWherePhrase() {
 		return "WHERE {"+ifPattern+"} ";
 	}
 

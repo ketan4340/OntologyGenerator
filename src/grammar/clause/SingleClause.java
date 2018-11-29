@@ -74,8 +74,8 @@ public class SingleClause extends Clause<Categorem>{
 	/**********  Interface Method  **********/
 	/****************************************/
 	@Override
-	public Resource toRDF(Model model) {
-		return super.toRDF(model).addProperty(RDF.type, JASS.SingleClause);
+	public Resource toJASS(Model model) {
+		return super.toJASS(model).addProperty(RDF.type, JASS.SingleClause);
 	}
 
 	/****************************************/

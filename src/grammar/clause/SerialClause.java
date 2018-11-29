@@ -84,8 +84,8 @@ public class SerialClause extends Clause<Phrase> {
 		setOthers(newOthers);
 	}
 	@Override
-	public Resource toRDF(Model model) {
-		return super.toRDF(model).addProperty(RDF.type, JASS.SerialClause);
+	public Resource toJASS(Model model) {
+		return super.toJASS(model).addProperty(RDF.type, JASS.SerialClause);
 	}
 	
 	/****************************************/
