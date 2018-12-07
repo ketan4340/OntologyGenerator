@@ -33,8 +33,9 @@ public class JASS {
 	public static final Resource Phrase = resource("Phrase");
 	public static final Resource Categorem = resource("Categorem");
 	public static final Resource Adjunct = resource("Adjunct");
-	public static final Resource Concept = resource("Concept");
 	public static final Resource Morpheme = resource("Morpheme");
+	
+	public static final Resource Meaning = resource("Meaning");
 
 	/* ================================================== */
 	/* ================= Object Property ================ */
@@ -56,6 +57,8 @@ public class JASS {
 	public static final Property subject = property("subject");
 	public static final Property predicate = property("predicate");
 	public static final Property object = property("object");
+	
+	public static final Property coreNode = property("coreNode");
 	
 	/* ================================================== */
 	/* ================== Data Property ================= */

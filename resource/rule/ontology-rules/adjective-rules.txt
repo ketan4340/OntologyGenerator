@@ -29,7 +29,7 @@ IF (a lot at) {
            [jass:means ?rsrcO ; jass:mainPoS "名詞"] . 
 } THEN {
  _:x rdf:type owl:Class ; 
-     owl:intersectionOf (?rsrcS ?rsrcO) ; # 積集合
+     owl:intersectionOf (?rsrcS ?rsrcO) ; 
      mos:exist [a mos:Existence ;
                 schema:location ?rsrcLoc ;
                 mos:howMany mos:positive] .

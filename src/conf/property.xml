@@ -3,7 +3,7 @@
 <properties>
 	<comment>コメント</comment>
 	<!-- 実行に必要 -->
-	<entry key="extension_rule-file">../OntologyGenerator/resource/rule/extensionRules.txt</entry>
+	<entry key="extension_rule-file">../OntologyGenerator/resource/rule/expansionRules.txt</entry>
 	<entry key="ontology_rules-dir">../OntologyGenerator/resource/rule/ontology-rules</entry>
 	<entry key="default-JASS-file">../OntologyGenerator/resource/ontology/SyntaxOntology.owl</entry>
 	<entry key="noun-file">../OntologyGenerator/resource/noun/nouns.txt</entry>

@@ -104,16 +104,15 @@ public class Generator {
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
 		//textFile_str = "resource/input/test/single.txt";
-		//textFile_str = "resource/input/test/failed.txt";
-		textFile_str = "resource/input/test/hashire_merosu_c.txt";
+		textFile_str = "resource/input/test/failed.txt";
+		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
 		if (Objects.nonNull(textFile_str)) {
 			Path textFilePath = Paths.get(textFile_str);
-			//generate(textFilePath);
+			Model ontology = generate(textFilePath);
 			///* デバッグ用
-			generate(textFilePath).listStatements().toList()
-			.stream().limit(50)
-			.forEach(System.out::println);
+			if (ontology.size() < 50)
+				ontology.write(System.out, "TURTLE");
 			//*/
 		}	
 	}
@@ -146,7 +145,7 @@ public class Generator {
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		System.out.println("Syntactic parsed.");
-		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
+		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 		
 		/********** 文章整形モジュール **********/
 		SentenceReviser sr = new SentenceReviser();
@@ -182,7 +181,7 @@ public class Generator {
 		opm.outputDividedSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
 		// デフォルトJASSモデルは取り除いて出力
 		opm.outputOntologyAsTurtle(
-				jassMap.uniteModels().difference(re.defaultJASSModel).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
+				re.removeJASSOntology(unionOntology).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
 				PATH_CONVERTEDJASS_TURTLE);
 		opm.outputRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
 

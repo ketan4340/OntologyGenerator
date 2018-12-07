@@ -9,7 +9,9 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
+import data.RDF.vocabulary.MoS;
 import grammar.morpheme.Morpheme;
+import pos.CabochaTags;
 
 public class Categorem extends Word implements Resourcable {
 	public static final Categorem EMPTY_CATEGOREM = new Categorem(Collections.emptyList());
@@ -22,6 +24,9 @@ public class Categorem extends Word implements Resourcable {
 	}
 	public Categorem(Morpheme... morphemes) {
 		super(morphemes);
+	}
+	public Categorem(String name, CabochaTags tags) {
+		super(name, tags);
 	}
 
 	/* ================================================== */
@@ -40,20 +45,22 @@ public class Categorem extends Word implements Resourcable {
 	public Resource toJASS(Model model) {
 		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Categorem)
-				.addProperty(JASS.means, createResource(model));
+				.addProperty(JASS.means, createProxyNode(model));
+				//.addProperty(JASS.means, createResource(model));
 	}
 	@Override
 	public String resourceURI() {
-		if (this.mainPoS().equals("名詞"))
+		if (mainPoS().equals("名詞"))
 			return GOO.uri + name();
 		return GOO.uri + infinitive();
 	}
 	@Override
 	public Resource createResource(Model m) {
-		return m.createResource(resourceURI());
+		return m.createResource(resourceURI())
+				.addProperty(RDF.type, MoS.CategoremResource);
 	}
 	@Override
 	public String proxyNodeURI() {
-		return JASS.getURI()+"pnode/"+getClass().getSimpleName().toLowerCase()+id();
+		return JASS.getURI()+"proxynode/"+getClass().getSimpleName().toLowerCase()+id();
 	}
 }

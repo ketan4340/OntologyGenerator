@@ -13,7 +13,9 @@ import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.MorphemeFactory;
 import pos.CabochaPoSInterface;
+import pos.CabochaTags;
 
 public class Word extends SyntacticParent<Morpheme>
 		implements SyntacticChild, GrammarInterface, CabochaPoSInterface {
@@ -30,6 +32,9 @@ public class Word extends SyntacticParent<Morpheme>
 	}
 	public Word(Morpheme... morphemes) {
 		this(Arrays.asList(morphemes));
+	}
+	public Word(String name, CabochaTags tags) {
+		this(MorphemeFactory.getInstance().getMorpheme(name, tags));
 	}
 
 	/* ================================================== */
@@ -135,6 +140,6 @@ public class Word extends SyntacticParent<Morpheme>
 	public String toString() {
 		return children.stream().map(m -> m.toString()).collect(Collectors.joining());
 	}
-
+	
 
 }

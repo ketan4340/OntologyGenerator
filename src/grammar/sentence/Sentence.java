@@ -113,13 +113,13 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			setChildren(backup);
 			return false;
 		}
-		Set<Clause<?>> formerDependeds = clausesDependingThisClause(frontClause);
-		formerDependeds.addAll(clausesDependingThisClause(backClause));
+		Set<Clause<?>> formerDependeds = clausesDepending(frontClause);
+		formerDependeds.addAll(clausesDepending(backClause));
 		gatherDepending(sc, formerDependeds);
 		return true;
 	}
 
-	private Set<Clause<?>> clausesDependingThisClause(Clause<?> clause) {
+	private Set<Clause<?>> clausesDepending(Clause<?> clause) {
 		return getChildren().stream()
 				.filter(c -> c.getDepending() == clause)
 				.collect(Collectors.toSet());
@@ -258,7 +258,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		String[][] tagAdverb = {{"副詞"}};					// "すぐに"、"おそらく"など
 		String[][] tagAuxiliary = {{"助動詞", "体言接続"}};	// "〜で"など
 		List<Clause<?>> predicates = new ArrayList<>();
-		for (final Clause<?> cls2Last: clausesDependingThisClause(lastClause)) {
+		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
 			if ( !cls2Last.endWith(tagParticle, true) &&
 					!cls2Last.endWith(tagAdverb, true) &&

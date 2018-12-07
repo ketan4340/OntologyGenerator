@@ -25,6 +25,8 @@ public class MoS {
 	/* ================================================== */
 	public static final Resource Existence = resource("Existence");
 	public static final Resource Degree = resource("Degree");
+	public static final Resource CategoremResource = resource("CategoremResource");
+	
 
 	/* ================================================== */
 	/* ================= Object Property ================ */
@@ -32,6 +34,7 @@ public class MoS {
 	public static final Property exist = property("exist");
 	public static final Property attributeOf = property("attributeOf");
 	public static final Property howMany = property("howMany");
+	public static final Property of = property("of");
 	
 	/* ================================================== */
 	/* ================== Data Property ================= */

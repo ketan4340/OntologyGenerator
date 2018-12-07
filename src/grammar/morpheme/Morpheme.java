@@ -138,31 +138,22 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((tags == null) ? 0 : tags.hashCode());
+		result = prime * result + Objects.hashCode(name);
+		result = prime * result + Objects.hashCode(tags);
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (! (obj instanceof Morpheme))
 			return false;
 		Morpheme other = (Morpheme) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (tags == null) {
-			if (other.tags != null)
-				return false;
-		} else if (!tags.equals(other.tags))
-			return false;
-		return true;
+		return Objects.equals(this.name, other.name)
+				&& Objects.equals(this.tags, other.tags);
 	}
+	
 	@Override
 	public String toString() {
 		return Objects.toString(name, "nullMorpheme");

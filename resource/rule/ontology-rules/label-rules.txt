@@ -1,4 +1,3 @@
-# 総称 (owl:sameAs)
 IF (label) {
   ?word a jass:Word ;
         jass:mainPoS "名詞" ;

@@ -7,11 +7,7 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Bag;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ReifiedStatement;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -19,6 +15,8 @@ import data.RDF.rule.JassModelizable;
 import data.RDF.vocabulary.JASS;
 
 public interface Resourcable extends JassModelizable {
+	Model CATEGOREM_RSRC_POOL = ModelFactory.createDefaultModel();
+
 	/**
 	 * 自立語リソースのURI.
 	 * @return 自立語リソースのURI
@@ -37,60 +35,46 @@ public interface Resourcable extends JassModelizable {
 	 */
 	String proxyNodeURI();
 	/**
-	 * 指定のモデル内に代理ノードを生成する.
-	 * @param m 生成に使用するモデル
+	 * 指定のモデルに属する代理ノードを得る. 
+	 * すでに代理ノードが存在すればそれをモデルに追加してから返し、
+	 * なければ代理ノードに連なる具体化した自立語リソースの生成も行う.
+	 * @param jassModel 代理ノードが属するモデル
 	 * @return 代理ノード
 	 */
-	default Resource createProxyNode(Model m) {
-		return m.createResource(proxyNodeURI());
+	default Bag createProxyNode(Model jassModel) {
+		Bag proxyNode = CATEGOREM_RSRC_POOL.createBag(proxyNodeURI());
+		// すでに存在するかは、(代理ノード, rdf:type, JASS:Meaning)で確認
+		if (CATEGOREM_RSRC_POOL.contains(proxyNode, RDF.type, JASS.Meaning))
+			return proxyNode;
+
+		Model crModel = ModelFactory.createDefaultModel();
+		Resource cr = createResource(crModel);
+		
+		crModel.listStatements().toList().stream()	// 自立語リソースの全ステートメントを
+		.map(CATEGOREM_RSRC_POOL::createReifiedStatement)	// 具体化し
+		.forEach(proxyNode::add);					// RDFコンテナになっている代理ノードに追加する
+		proxyNode.addProperty(JASS.coreNode, cr).addProperty(RDF.type, JASS.Meaning);
+		crModel.close();
+		return proxyNode;
 	}
 
-	Model CATEGOREM_RESOURCES = ModelFactory.createDefaultModel();
 	String FORMER_QUERY_STRING = 
-			"PREFIX rdf: <"+ RDF.getURI() +'>' +
-			"PREFIX rdfs: <"+ RDFS.getURI() +'>' +
+			"PREFIX rdf: <"+ RDF.getURI() +"> " +
+			"PREFIX rdfs: <"+ RDFS.getURI() +"> " +
 			"CONSTRUCT {?s ?p ?o .}" +
-			"WHERE {<"; 
+			"WHERE {"; 
 	String LATTER_QUERY_STRING = 
-			"> a rdf:Bag ; " + 
-			"rdfs:member " +
-			"[rdf:subject ?s ; rdf:predicate ?p ; rdf:object ?o].}";
+			" rdf:type rdf:Bag ; " + 
+			" rdfs:member [rdf:subject ?s ; rdf:predicate ?p ; rdf:object ?o].}";
 	
-	default Model findCategoremResourceFromNode() {
-		String nodeString = proxyNodeURI();
-		Query query = QueryFactory.create(FORMER_QUERY_STRING + nodeString + LATTER_QUERY_STRING);
-		QueryExecution qexec = QueryExecutionFactory.create(query, CATEGOREM_RESOURCES);
-		Model resultModel = qexec.execConstruct();
-		
-		return resultModel;
+	static Model categoremResourcesOf(Resource proxyNode) {
+		Query query = QueryFactory.create(FORMER_QUERY_STRING + '<'+proxyNode.getURI()+'>' + LATTER_QUERY_STRING);
+		QueryExecution qexec = QueryExecutionFactory.create(query, CATEGOREM_RSRC_POOL);
+		return qexec.execConstruct();
+	}
+	static Resource coreNodeOf(Resource proxyNode) {
+		return CATEGOREM_RSRC_POOL.listObjectsOfProperty(proxyNode, JASS.coreNode)
+				.next().asResource();
 	}
 	
-	static Bag createReifiedStatementsBag(StmtIterator iter) {
-		Model model = ModelFactory.createDefaultModel();
-		Bag reifiedBag = model.createBag();
-		while (iter.hasNext()) {
-			Statement s = iter.nextStatement(); 
-			ReifiedStatement rs = s.createReifiedStatement();
-			reifiedBag.add(rs);
-		}
-		return reifiedBag;
-	}
-	
-	static void replaceProxy2CategoremResource(Model m) {
-		StmtIterator iter = m.listStatements(null, JASS.means, (RDFNode) null);
-		while (iter.hasNext()) {
-			Statement stmt = iter.nextStatement();
-			Resource s = stmt.getSubject();
-			Resource pnode = stmt.getObject().asResource();
-		}
-	}
-	
-	default Resource getProxyNode(Model m) {
-		Resource n = createProxyNode(m);
-		Model rm = ModelFactory.createDefaultModel();
-		Resource r = createResource(rm);
-		Bag bag = createReifiedStatementsBag(rm.listStatements());
-		CATEGOREM_RESOURCES.add(n, RDFS.seeAlso, r);
-		return n;
-	}
 }
