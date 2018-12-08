@@ -32,12 +32,17 @@ public abstract class SyntacticParent<C extends SyntacticChild> {
 		return before == children.set(beforeIndex, after);
 	}
 
-	public boolean containsSubConstituents(List<C> subConstituents) {
+	/** 
+	 * 指定の子要素のリストがこの親要素に順番を維持して含まれているか.
+	 * @param subChildren
+	 * @return 子要素が順番通りに含まれている場合、{@code true}
+	 */
+	public boolean containsChildren(List<C> subChildren) {
 		int size = children.size();
-		int subsize = subConstituents.size();
+		int subsize = subChildren.size();
 		for (int i = 0; i < size - subsize; i++) {
 			int fromIndex = i, toIndex = i + subsize;
-			if (subConstituents.equals(children.subList(fromIndex, toIndex)))
+			if (subChildren.equals(children.subList(fromIndex, toIndex)))
 				return true;
 		}
 		return false;
@@ -108,7 +113,7 @@ public abstract class SyntacticParent<C extends SyntacticChild> {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (! (obj instanceof SyntacticParent))
+		if (!(obj instanceof SyntacticParent))
 			return false;
 		SyntacticParent<?> other = (SyntacticParent<?>) obj;
 		return Objects.equals(children, other.children);

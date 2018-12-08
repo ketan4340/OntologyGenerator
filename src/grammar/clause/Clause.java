@@ -3,6 +3,7 @@ package grammar.clause;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -227,6 +228,32 @@ implements SyntacticChild, GrammarInterface {
 	/* ================================================== */
 	/* ==========        Object  Method        ========== */
 	/* ================================================== */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hashCode(categorem);
+		result = prime * result + Objects.hashCode(adjuncts);
+		result = prime * result + Objects.hashCode(others);
+		result = prime * result + id;
+		result = prime * result + Objects.hashCode(depending);
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof Clause<?>))
+			return false; 
+		Clause<?> other = (Clause<?>) obj;
+		return categorem.equals(other.categorem) && 
+				adjuncts.equals(other.adjuncts) &&
+				others.equals(other.others) &&
+				depending.equals(other.depending); 
+	}
+	
 	@Override
 	public String toString() {
 		return getChildren().stream()
