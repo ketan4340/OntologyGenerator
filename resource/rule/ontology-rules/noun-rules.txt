@@ -1,7 +1,7 @@
 # 数値と単位
 IF (numeral value) {
   ?stc 	rdf:type jass:Sentence ;
-  		jass:subject/jass:categoremMeans ?rsrcS ;
+  		jass:subject/jass:categorem/jass:means ?rsrcS ;
  		jass:predicate ?clsP .
   ?clsP jass:consistsOfCategorem ?prs .
 #  ?prs jass:consistsOfDependent/rdf:rest/rdf:first/jass:name ?length .
@@ -20,14 +20,14 @@ IF (numeral value) {
 # 総称 (owl:sameAs)
 IF (equivalentClass) {
   ?stc rdf:type jass:Sentence ; 
-       jass:subject/jass:categoremMeans ?rsrcS ; 
+       jass:subject/jass:categorem/jass:means ?rsrcS ; 
        jass:predicate ?SclsP .
   ?SclsP jass:consistsOfCategorem 	?prs .
   ?prs jass:consistsOfHead/jass:infinitive ?equiv .
   FILTER(?equiv IN("総称", "通称", "別称", "異称", "別名"))
   ?prs jass:consistsOfDependent/rdf:rest* ?node . # 形態素の最後尾
   ?node rdf:rest rdf:nil ;
-	rdf:first/jass:categoremMeans ?rsrcp .
+	rdf:first/jass:categorem/jass:means ?rsrcp .
 }THEN{
   ?rsrcS owl:equivalentClass ?rsrcp .
 };
@@ -35,10 +35,10 @@ IF (equivalentClass) {
 # サ変接続の動詞
 IF (Action(サ変)) {
   ?stc a jass:Sentence ; 
-       jass:subject/jass:categoremMeans ?rsrcS ; 
+       jass:subject/jass:categorem/jass:means ?rsrcS ; 
        jass:predicate/jass:consistsOfCategorem 
            [jass:subPoS1 "サ変接続" ; jass:means ?rsrcVb] .
-  OPTIONAL{?stc jass:object/jass:categoremMeans ?rsrcO . }
+  OPTIONAL{?stc jass:object/jass:categorem/jass:means ?rsrcO . }
 } THEN {
   _:v a ?rsrcVb ; 
       schema:agent ?rsrcS ;
@@ -49,7 +49,7 @@ IF (Action(サ変)) {
 # 形容詞的名詞
 IF (attributive) {
   ?stc a jass:Sentence ;
-	jass:subject/jass:categoremMeans ?rsrcS ;
+	jass:subject/jass:categorem/jass:means ?rsrcS ;
 	jass:predicate ?clsP . 
   ?clsP jass:consistsOfCategorem ?wrdP .
   ?wrdP jass:feature "attributive" ;
@@ -62,7 +62,7 @@ IF (attributive) {
 # 概念階層 (rdfs:subClassOf)
 IF (subClassOf) {
   ?stc a jass:Sentence ;
-	jass:subject/jass:categoremMeans ?rsrcS ;
+	jass:subject/jass:categorem/jass:means ?rsrcS ;
 	jass:predicate ?clsP . 
   ?clsP jass:consistsOfCategorem ?wrdP .
   ?wrdP jass:mainPoS "名詞" ;

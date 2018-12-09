@@ -1,11 +1,11 @@
 # 部分 (dcterms:hasPart)
 IF (hasPart(をもつ/がある)) {
   ?stc a jass:Sentence ;
-       jass:subject/jass:categoremMeans ?rsrcS ; 
+       jass:subject/jass:categorem/jass:means ?rsrcS ; 
        jass:predicate/jass:consistsOfCategorem/jass:infinitive ?has ; 
        jass:object ?clsO .
   ?clsO jass:consistsOfAdjuncts/rdf:first/jass:infinitive ?adjO ;
-        jass:categoremMeans ?rsrcO .
+        jass:categorem/jass:means ?rsrcO .
   FILTER( (?has IN("もつ","持つ") && ?adjO="を") || (?has="ある" && ?adjO="が") )
 } THEN {
   ?rsrcS dcterms:hasPart ?rsrcO .
@@ -23,17 +23,17 @@ IF (Action) {
              ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf] .
              FILTER( ?reruinf IN("れる","られる") )        
            })
-    ?stc jass:subject/jass:categoremMeans ?rsrcS . 
+    ?stc jass:subject/jass:categorem/jass:means ?rsrcS . 
     # "に"または"を"を付属語に持つ文節を対象とみなす
-    OPTIONAL { ?stc (jass:caseNIclause|jass:caseWOclause)/jass:categoremMeans ?rsrcO . }
+    OPTIONAL { ?stc (jass:caseNIclause|jass:caseWOclause)/jass:categorem/jass:means ?rsrcO . }
   } UNION { 
   # 受動態
     # 付属語が存在し、それが"れる"か"られる"
     ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf]. 
     FILTER( ?reruinf IN("れる","られる") ) 
-    ?stc jass:subject/jass:categoremMeans ?rsrcO .
+    ?stc jass:subject/jass:categorem/jass:means ?rsrcO .
     # "に"を付属語に持つ文節の自立語を動作主体とみなす 
-    OPTIONAL{ ?stc jass:caseNIclause/jass:categoremMeans ?rsrcS . }
+    OPTIONAL{ ?stc jass:caseNIclause/jass:categorem/jass:means ?rsrcS . }
   }
 } THEN {
   _:v a ?rsrcVb ; 

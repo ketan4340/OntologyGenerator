@@ -1,12 +1,5 @@
 # ここに書かれたルールは全て適用される
 
-# 文節からその自立語の概念を得るショートカット
-IF (ex:catMean) {
-  ?cls jass:consistsOfCategorem [jass:means ?Cpt] .
-} THEN {
-  ?cls jass:categoremMeans ?Cpt .
-};
-
 # 主語 (jass:subject)
 IF (ex:subject) {
   ?stc a jass:Sentence ; 

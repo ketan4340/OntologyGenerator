@@ -6,7 +6,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class JASS {
 
-	public static final String uri = "http://www.uec.ac.jp/k-lab/k-tanabe/jass/";
+	public static final String uri = "http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/jass/";
 
 	
 	public static final String getURI() {
