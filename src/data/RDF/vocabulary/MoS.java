@@ -5,7 +5,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 public class MoS {
-	public static final String uri = "http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/mos/";
+	public static final String uri = "http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/mos#";
 
 
 	public static final String getURI() {
@@ -39,7 +39,7 @@ public class MoS {
 	/* ================================================== */
 	/* ================== Data Property ================= */
 	/* ================================================== */
-	public static final Property name = property("");
+	public static final Property name = property("name");
 	
 
 }

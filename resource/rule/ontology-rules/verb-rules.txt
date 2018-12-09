@@ -2,9 +2,9 @@
 IF (hasPart(をもつ/がある)) {
   ?stc a jass:Sentence ;
        jass:subject/jass:categorem/jass:means ?rsrcS ; 
-       jass:predicate/jass:consistsOfCategorem/jass:infinitive ?has ; 
+       jass:predicate/jass:categorem/jass:infinitive ?has ; 
        jass:object ?clsO .
-  ?clsO jass:consistsOfAdjuncts/rdf:first/jass:infinitive ?adjO ;
+  ?clsO jass:adjuncts/rdf:first/jass:infinitive ?adjO ;
         jass:categorem/jass:means ?rsrcO .
   FILTER( (?has IN("もつ","持つ") && ?adjO="を") || (?has="ある" && ?adjO="が") )
 } THEN {
@@ -14,8 +14,8 @@ IF (hasPart(をもつ/がある)) {
 # 動詞 (schema:Action)
 IF (Action) {
   ?stc a jass:Sentence ; jass:predicate ?clsP .
-  ?clsP jass:consistsOfCategorem [jass:mainPoS "動詞" ; jass:means ?rsrcVb] .
-  ?clsP jass:consistsOfAdjuncts ?adjlistP .
+  ?clsP jass:categorem [jass:mainPoS "動詞" ; jass:means ?rsrcVb] .
+  ?clsP jass:adjuncts ?adjlistP .
   { 
   # 能動態 (受動態ではない)
     FILTER(?adjlistP = rdf:nil ||	# 動詞に付属語がない 

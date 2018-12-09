@@ -523,7 +523,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 		Resource sentenceResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Sentence)
-				.addProperty(JASS.consistsOfClauses, clauseNode);
+				.addProperty(JASS.clauses, clauseNode);
 		return sentenceResource;
 	}
 	

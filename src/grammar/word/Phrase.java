@@ -71,8 +71,8 @@ public class Phrase extends Categorem {
 
 		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Phrase)
-				.addProperty(JASS.consistsOfDependent, clauseNode)
-				.addProperty(JASS.consistsOfHead, head.toJASS(model));
+				.addProperty(JASS.dependent, clauseNode)
+				.addProperty(JASS.head, head.toJASS(model));
 	}
 	private static String[][] adj = new String[][]{{"形容詞","-連用テ接続"}};
 	private static String[][] pren = new String[][]{{"連体詞"}};

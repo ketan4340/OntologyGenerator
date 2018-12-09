@@ -145,7 +145,7 @@ public class Generator {
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		System.out.println("Syntactic parsed.");
-		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
+		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 		
 		/********** 文章整形モジュール **********/
 		SentenceReviser sr = new SentenceReviser();

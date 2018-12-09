@@ -119,7 +119,7 @@ public class Word extends SyntacticParent<Morpheme>
 
 		Resource wordResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Word)
-				.addProperty(JASS.consistsOfMorphemes, morphemeNode)
+				.addProperty(JASS.morphemes, morphemeNode)
 				.addLiteral(JASS.name, name())
 				.addLiteral(JASS.mainPoS, mainPoS())
 				.addLiteral(JASS.subPoS1, subPoS1())

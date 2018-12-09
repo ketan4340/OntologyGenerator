@@ -3,10 +3,8 @@ IF (numeral value) {
   ?stc 	rdf:type jass:Sentence ;
   		jass:subject/jass:categorem/jass:means ?rsrcS ;
  		jass:predicate ?clsP .
-  ?clsP jass:consistsOfCategorem ?prs .
-#  ?prs jass:consistsOfDependent/rdf:rest/rdf:first/jass:name ?length .
-#  FILTER regex(?length, "長$")
-  ?prs jass:consistsOfHead/jass:consistsOfMorphemes/rdf:rest* (?valrsc ?unitrsc) .
+  ?clsP jass:categorem ?prs .
+  ?prs jass:head/jass:morphemes/rdf:rest* (?valrsc ?unitrsc) .
   ?valrsc jass:name ?val .
   ?unitrsc jass:name ?unit .
   FILTER(regex(str(?val), "[0-9０-９]+?(\\.[0-9０-９]+?)??"))
@@ -22,10 +20,10 @@ IF (equivalentClass) {
   ?stc rdf:type jass:Sentence ; 
        jass:subject/jass:categorem/jass:means ?rsrcS ; 
        jass:predicate ?SclsP .
-  ?SclsP jass:consistsOfCategorem 	?prs .
-  ?prs jass:consistsOfHead/jass:infinitive ?equiv .
+  ?SclsP jass:categorem 	?prs .
+  ?prs jass:head/jass:infinitive ?equiv .
   FILTER(?equiv IN("総称", "通称", "別称", "異称", "別名"))
-  ?prs jass:consistsOfDependent/rdf:rest* ?node . # 形態素の最後尾
+  ?prs jass:dependent/rdf:rest* ?node . # 形態素の最後尾
   ?node rdf:rest rdf:nil ;
 	rdf:first/jass:categorem/jass:means ?rsrcp .
 }THEN{
@@ -36,7 +34,7 @@ IF (equivalentClass) {
 IF (Action(サ変)) {
   ?stc a jass:Sentence ; 
        jass:subject/jass:categorem/jass:means ?rsrcS ; 
-       jass:predicate/jass:consistsOfCategorem 
+       jass:predicate/jass:categorem 
            [jass:subPoS1 "サ変接続" ; jass:means ?rsrcVb] .
   OPTIONAL{?stc jass:object/jass:categorem/jass:means ?rsrcO . }
 } THEN {
@@ -51,11 +49,11 @@ IF (attributive) {
   ?stc a jass:Sentence ;
 	jass:subject/jass:categorem/jass:means ?rsrcS ;
 	jass:predicate ?clsP . 
-  ?clsP jass:consistsOfCategorem ?wrdP .
+  ?clsP jass:categorem ?wrdP .
   ?wrdP jass:feature "attributive" ;
 	jass:means ?rsrcP . 
 }THEN{
-  ?rsrcS jass:attributeOf ?rsrcP .
+  ?rsrcS mos:attributeOf ?rsrcP .
 };
 
 
@@ -64,7 +62,7 @@ IF (subClassOf) {
   ?stc a jass:Sentence ;
 	jass:subject/jass:categorem/jass:means ?rsrcS ;
 	jass:predicate ?clsP . 
-  ?clsP jass:consistsOfCategorem ?wrdP .
+  ?clsP jass:categorem ?wrdP .
   ?wrdP jass:mainPoS "名詞" ;
 	jass:means ?rsrcP . 
   MINUS{?wrdP jass:subPoS1 "接尾".}

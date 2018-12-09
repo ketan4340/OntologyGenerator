@@ -127,8 +127,6 @@ public class SentenceReviser {
 	private SentenceIDMap divideSentence(Map.Entry<Sentence, IDTuple> sentenceEntry) {
 		Sentence sentence = sentenceEntry.getKey();
 		IDTuple ids = sentenceEntry.getValue();
-		//PRINT
-		sentence.printDep();
 		List<Sentence> dividedSentences = Stream.of(sentence)
 				.map(Sentence::divide2)
 				.flatMap(List<Sentence>::stream)

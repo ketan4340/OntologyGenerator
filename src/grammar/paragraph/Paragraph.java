@@ -50,7 +50,7 @@ public class Paragraph extends SyntacticParent<Sentence>
 
 		Resource paragraphResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Paragraph)
-				.addProperty(JASS.consistsOfSentences, sentenceNode);
+				.addProperty(JASS.sentences, sentenceNode);
 		return paragraphResource;
 	}
 

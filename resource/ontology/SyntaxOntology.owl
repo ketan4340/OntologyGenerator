@@ -3,17 +3,17 @@
      xml:base="http://www.semanticweb.org/tanabekentaro/ontologies/2018/3/untitled-ontology-60"
      xmlns:dc="http://purl.org/dc/elements/1.1/"
      xmlns:goo="http://dictionary.goo.ne.jp/jn#"
-     xmlns:mos="http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/mos/"
+     xmlns:mos="http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/mos#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:sio="http://semanticscience.org/resource/"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:jass="http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/jass/"
+     xmlns:jass="http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/jass#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:schema="http://schema.org/"
      xmlns:dcterms="http://purl.org/dc/terms/">
-    <owl:Ontology rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/">
+    <owl:Ontology rdf:about="http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/jass#">
         <rdfs:comment xml:lang="ja">日本語文法の文構造に関するオントロジー</rdfs:comment>
         <rdfs:label xml:lang="ja">日本語文構造オントロジー</rdfs:label>
     </owl:Ontology>
@@ -31,183 +31,190 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/categoremMeans -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#adjuncts -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/categoremMeans">
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfWords"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesPhrase -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesPhrase">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase"/>
-        <rdfs:comment xml:lang="ja">句 (Phrase) を構成する要素．主要部 (Head) と従属部 (Dependent) のこと．</rdfs:comment>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfAdjuncts -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfAdjuncts">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Adjunct"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#adjuncts">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#clauseComponent"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#words"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#AdjunctList"/>
         <rdfs:comment xml:lang="ja">文節を構成する付属語のリスト</rdfs:comment>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfCategorem -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#categorem -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfCategorem">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesClause"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Categorem"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#categorem">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#clauseComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Categorem"/>
         <rdfs:comment xml:lang="ja">文節の自立語を指定する．</rdfs:comment>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfClauses -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#clauseComponent -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfClauses">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#clauseComponent">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#clauses -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#clauses">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#ClauseList"/>
         <rdfs:comment xml:lang="ja">文を構成する文節のリスト</rdfs:comment>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfDependent -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#coreNode -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfDependent">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesPhrase"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
-        <rdfs:comment xml:lang="ja">従属部を構成する文節のリスト</rdfs:comment>
-        <rdfs:label xml:lang="ja">従属部</rdfs:label>
-    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#coreNode"/>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfHead -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#dependTo -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfHead">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/composesPhrase"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
-        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">主要部</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfMorphemes -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfMorphemes">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Morpheme"/>
-        <rdfs:comment xml:lang="ja">単語および概念を構成する形態素のリスト</rdfs:comment>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfSentences -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfSentences">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Paragraph"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence"/>
-        <rdfs:comment xml:lang="ja">段落を構成する文のリスト</rdfs:comment>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfWords -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/consistsOfWords">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/dependTo -->
-
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/dependTo">
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#dependTo">
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:comment xml:lang="ja">文節が他のどの文節と係り受け関係にあるか．</rdfs:comment>
         <rdfs:label xml:lang="ja">係り先</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/means -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#dependent -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/means">
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
-        <rdfs:comment xml:lang="ja">単語が表す概念 (リソース) を示す．</rdfs:comment>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#dependent">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#phraseComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Phrase"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:comment xml:lang="ja">従属部を構成する文節のリスト</rdfs:comment>
+        <rdfs:label xml:lang="ja">従属部</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/object -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#head -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/object">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceElement"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#head">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#phraseComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Phrase"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">主要部</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent">
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#means -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#means">
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#DictionaryResource"/>
+        <rdfs:comment xml:lang="ja">単語に対応するリソースを示す．</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#morphemes -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#morphemes">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#MorphemeList"/>
+        <rdfs:comment xml:lang="ja">単語および概念を構成する形態素のリスト</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#object -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#object">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentenceElement"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:label xml:lang="ja">目的語</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#phraseComponent -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/partOf"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#phraseComponent">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Phrase"/>
+        <rdfs:comment xml:lang="ja">句 (Phrase) を構成する要素．主要部 (Head) と従属部 (Dependent) のこと．</rdfs:comment>
+    </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/predicate -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#predicate -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/predicate">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceElement"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#predicate">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentenceElement"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:label xml:lang="ja">述語</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceElement -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentenceElement -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceElement">
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentenceElement">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:label xml:lang="ja">文の成分</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subject -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentences -->
 
-    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subject">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/sentenceElement"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentences">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Paragraph"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#SentenceList"/>
+        <rdfs:comment xml:lang="ja">段落を構成する文のリスト</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#subject -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#subject">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#sentenceElement"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:label xml:lang="ja">主語</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#words -->
+
+    <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#words">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#languageComponent"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#WordList"/>
     </owl:ObjectProperty>
     
 
@@ -223,131 +230,131 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/conjugation -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#conjugation -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/conjugation">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#conjugation">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">活用型</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/feature -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#feature -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/feature">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#feature">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/infinitive -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#infinitive -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/infinitive">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#infinitive">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">原形</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/inflection -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#inflection -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/inflection">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#inflection">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">活用形</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/kana -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#kana -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/kana">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#kana">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">読み仮名</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/mainPoS -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#mainPoS -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/mainPoS">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#mainPoS">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#pos"/>
         <rdfs:label xml:lang="ja">品詞</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/name -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#name -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/name">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#name">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">表層形 (入力通りの文字列)</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#pos -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#pos">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">品詞</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/pronunciation -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#pronunciation -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pronunciation">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature"/>
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#pronunciation">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="ja">発音</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS1 -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#subPoS1 -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS1">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#subPoS1">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#pos"/>
         <rdfs:label xml:lang="ja">品詞細分類1</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS2 -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#subPoS2 -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS2">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#subPoS2">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#pos"/>
         <rdfs:label xml:lang="ja">品詞細分類2</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS3 -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#subPoS3 -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/subPoS3">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/pos"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#subPoS3">
+        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#pos"/>
         <rdfs:label xml:lang="ja">品詞細分類3</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature -->
 
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/wordFeature">
-        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature">
+        <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:comment xml:lang="ja">単語の特徴．品詞，原形，読みなど．</rdfs:comment>
     </owl:DatatypeProperty>
@@ -365,125 +372,202 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Adjunct -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Adjunct -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Adjunct">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Adjunct">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:label xml:lang="ja">付属語</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Categorem -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#AdjunctList -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Categorem">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#AdjunctList">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#WordList"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Categorem -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Categorem">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word"/>
         <rdfs:label xml:lang="ja">自立語</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">文節</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#ClauseList -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#ClauseList">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList"/>
+    </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/LanguageUnit -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#DictionaryResource -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/LanguageUnit">
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#DictionaryResource"/>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#GooResource -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#GooResource">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#DictionaryResource"/>
+        <rdfs:comment xml:lang="ja">goo国語辞典に載っている見出し語のリソース</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageUnit -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageUnit">
         <rdfs:label xml:lang="ja">言葉の単位</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Morpheme -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Morpheme -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Morpheme">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Morpheme">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">形態素</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Paragraph -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#MorphemeList -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Paragraph">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#MorphemeList">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Paragraph -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Paragraph">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">段落</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#ParagraphList -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Phrase">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#ParagraphList">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Phrase -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Phrase">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Categorem"/>
         <rdfs:label xml:lang="ja">句</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/PoS -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#PoS -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/PoS">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#PoS">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">品詞</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Sentence">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Sentence">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">文</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/SerialClause -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#SentenceList -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SerialClause">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#SentenceList">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#SerialClause -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#SerialClause">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:label xml:lang="ja">連文節</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#SingleClause -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/SingleClause">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Clause"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#SingleClause">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
         <rdfs:label xml:lang="ja">単文節</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Word">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Word">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">単語</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Writing -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#WordList -->
 
-    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Writing">
-        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language"/>
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#WordList">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageList"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Writing -->
+
+    <owl:Class rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Writing">
+        <rdfs:subClassOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language"/>
         <rdfs:label xml:lang="ja">文章</rdfs:label>
     </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/1999/02/22-rdf-syntax-ns#List -->
+
+    <owl:Class rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
     
 
 
@@ -498,10 +582,10 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language -->
+    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language -->
 
-    <owl:NamedIndividual rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language">
-        <rdf:type rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass/LanguageUnit"/>
+    <owl:NamedIndividual rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language">
+        <rdf:type rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#LanguageUnit"/>
     </owl:NamedIndividual>
     
 
@@ -514,7 +598,7 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <rdf:Description rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass/Language">
+    <rdf:Description rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Language">
         <rdfs:label xml:lang="ja">言葉</rdfs:label>
     </rdf:Description>
 </rdf:RDF>

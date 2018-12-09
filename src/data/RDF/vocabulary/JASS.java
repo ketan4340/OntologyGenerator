@@ -6,7 +6,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class JASS {
 
-	public static final String uri = "http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/jass/";
+	public static final String uri = "http://www.sw.cei.uec.ac.jp/k-lab/k-tanabe/jass#";
 
 	
 	public static final String getURI() {
@@ -24,7 +24,9 @@ public class JASS {
 	/* ================================================== */
 	/* ====================== Class ===================== */
 	/* ================================================== */
-	public static final Resource Paragraph = resource("Paragraph");
+    public static final Resource Language = resource("Language");
+    public static final Resource Writing = resource("Writing");
+    public static final Resource Paragraph = resource("Paragraph");
 	public static final Resource Sentence = resource("Sentence");
 	public static final Resource Clause = resource("Clause");
 	public static final Resource SingleClause =	resource("SingleClause");
@@ -34,6 +36,7 @@ public class JASS {
 	public static final Resource Categorem = resource("Categorem");
 	public static final Resource Adjunct = resource("Adjunct");
 	public static final Resource Morpheme = resource("Morpheme");
+	public static final Resource PoS = resource("PoS");
 	
 	public static final Resource Meaning = resource("Meaning");
 
@@ -42,17 +45,17 @@ public class JASS {
 	/* ================================================== */
 	public static final Property means = property("means");
 	public static final Property dependTo = property("dependTo");
-	public static final Property partOf = property("partOf");
-	public static final Property consistsOfSentences = property("consistsOfSentences");
-	public static final Property consistsOfClauses = property("consistsOfClauses");
-	public static final Property consistsOfWords = property("consistsOfWords");
-	public static final Property consistsOfMorphemes = property("consistsOfMorphemes");
-	public static final Property composesClause = property("composesClause");
-	public static final Property consistsOfCategorem = property("consistsOfCategorem");
-	public static final Property consistsOfAdjuncts = property("consistsOfAdjuncts");
-	public static final Property composesPhrase = property("composesPhrase");
-	public static final Property consistsOfHead = property("consistsOfHead");
-	public static final Property consistsOfDependent = property("consistsOfDependent");
+	public static final Property languageComponent = property("languageComponent");
+	public static final Property sentences = property("sentences");
+	public static final Property clauses = property("clauses");
+	public static final Property words = property("words");
+	public static final Property morphemes = property("morphemes");
+	public static final Property clauseComponent = property("clauseComponent");
+	public static final Property categorem = property("categorem");
+	public static final Property adjuncts = property("adjuncts");
+	public static final Property phraseComponent = property("phraseComponent");
+	public static final Property head = property("head");
+	public static final Property dependent = property("dependent");
 	public static final Property sentenceElement = property("sentenceElement");
 	public static final Property subject = property("subject");
 	public static final Property predicate = property("predicate");

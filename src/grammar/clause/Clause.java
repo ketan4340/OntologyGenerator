@@ -192,8 +192,8 @@ implements SyntacticChild, GrammarInterface {
 
 		Resource clauseResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Clause)
-				.addProperty(JASS.consistsOfCategorem, categoremResource)
-				.addProperty(JASS.consistsOfAdjuncts, adjunctNode);
+				.addProperty(JASS.categorem, categoremResource)
+				.addProperty(JASS.adjuncts, adjunctNode);
 		return clauseResource;
 	}
 
