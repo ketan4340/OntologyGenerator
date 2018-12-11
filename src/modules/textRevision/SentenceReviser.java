@@ -12,30 +12,34 @@ import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
+import pos.Concatable;
 
 public class SentenceReviser {
 
+	/*
 	private static final String[][][] TAGS_CATEGOREM_ADJUNCTS = {
 			{{"サ変接続"}, {"動詞", "サ変・スル"}},
 			{{"動詞"}, {"動詞", "接尾"}}
 			};
+	 */
 	private static final String[][][] TAGS_NOUNPHRASE = {
 			{{"形容詞", "-連用テ接続"}},	// 連用テ接続は"大きくて"など
 			{{"連体詞"}},					// "大きな"、"こういう"、"あの"、など
 			{{"助詞", "連体化"}},			// "の"のみ該当
 			{{"助動詞", "体言接続"}},		// "変な"の"な"など
-			{{"名詞"}}
+			{{"名詞"}},
+			{{"体言接続特殊２"}}
 			};
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	public SentenceReviser() {
 	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	public void connectWord(SentenceIDMap sentenceMap) {
 		sentenceMap.forEachKey(this::connectWord);
 	}
@@ -67,11 +71,11 @@ public class SentenceReviser {
 	private void weldNumbers(Word w) {
 		List<Morpheme> mphs = w.getChildren();
 		Optional<IndexRange> numRange = rangeOfNumbers(mphs);
-		numRange.ifPresent(r -> {
-			List<Morpheme> subMph = mphs.subList(r.from, r.to);
-			Morpheme welded = Morpheme.concat(subMph);
+		numRange.ifPresent(ft -> {
+			List<Morpheme> subMph = mphs.subList(ft.from, ft.to);
+			Morpheme welded = Concatable.join(subMph);
 			subMph.clear();
-			mphs.add(r.from, welded);
+			mphs.add(ft.from, welded);
 		});
 	}
 

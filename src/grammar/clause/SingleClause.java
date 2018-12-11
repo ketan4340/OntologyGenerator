@@ -20,10 +20,9 @@ public class SingleClause extends Clause<Categorem>{
 	public static final SingleClause ROOT =
 			new SingleClause(Categorem.EMPTY_CATEGOREM, Collections.emptyList(), Collections.emptyList());
 
-
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	/**
 	 * 自立語，付属語のリスト，接辞のリストを受け取って初期化.
 	 * @param categorem
@@ -34,12 +33,12 @@ public class SingleClause extends Clause<Categorem>{
 		super(categorem, adjuncts, others);
 	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	/**
 	 * この文節に含まれる単語をOthers以外全て繋げて一つの名詞にする.
-	 * 構文解析結果を無視して変更する強力な処理なので注意.
+	 * 構文解析結果を無視して変更する破壊的な処理なので注意.
 	 * Phraseとは違い，修飾・被修飾の関係も消える.
 	 */
 	public boolean nounize() {
@@ -55,9 +54,9 @@ public class SingleClause extends Clause<Categorem>{
 	}
 
 
-	/****************************************/
-	/**********  Abstract  Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================= Abstract Method ================ */
+	/* ================================================== */
 	@Override
 	public SingleClause clone() {
 		Categorem cloneCategorem = this.categorem.clone();
@@ -69,23 +68,17 @@ public class SingleClause extends Clause<Categorem>{
 		return clone;
 	}
 
-
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================= Interface Method =============== */
+	/* ================================================== */
 	@Override
 	public Resource toJASS(Model model) {
 		return super.toJASS(model).addProperty(RDF.type, JASS.SingleClause);
 	}
 
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-
-
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return getChildren().stream()

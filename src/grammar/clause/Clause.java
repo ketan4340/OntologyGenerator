@@ -163,6 +163,10 @@ implements SyntacticChild, GrammarInterface {
 		}
 		return true;
 	}
+	
+	public boolean hasOnlyCategorem() {
+		return adjuncts.isEmpty() && others.isEmpty();
+	}
 
 	/* ================================================== */
 	/* ==========       Interface Method       ========== */

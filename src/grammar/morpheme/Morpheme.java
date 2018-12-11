@@ -1,8 +1,6 @@
 package grammar.morpheme;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -14,18 +12,19 @@ import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import pos.CabochaPoSInterface;
 import pos.CabochaTags;
+import pos.Concatable;
 
 public final class Morpheme implements SyntacticChild, GrammarInterface,
-	CabochaPoSInterface, Immutable {
+	CabochaPoSInterface, Immutable, Concatable<Morpheme> {
 	private static int MORPHEME_SUM = 0;
 
 	private final int id;			// 通し番号
 	private final String name;		// 形態素の文字列
 	private final CabochaTags tags;	// 品詞
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	Morpheme(String name, CabochaTags tags) {
 		this.id = MORPHEME_SUM++;
 		this.name = name;
@@ -34,21 +33,8 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 
 
 	/* ================================================== */
-	/* ================== Static Method ================= */
+	/* ================== Member Method ================= */
 	/* ================================================== */
-	public static Morpheme concat(List<Morpheme> morphemes) {
-		String newname = morphemes.stream()
-				.map(Morpheme::name)
-				.collect(Collectors.joining());
-		CabochaTags newtags = morphemes.stream()
-				.map(Morpheme::getTags)
-				.reduce(CabochaTags.EMPTY_TAGS, (c1, c2) -> CabochaTags.concat(c1, c2));
-		return MorphemeFactory.getInstance().getMorpheme(newname, newtags);
-	}
-
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
 	public boolean containsTag(String tag) {
 		return tags.contains(tag);
 	}
@@ -57,9 +43,9 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 		return tags;
 	}
 
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================ Interface Method ================ */
+	/* ================================================== */
 	@Override
 	public int id() {
 		return id;
@@ -125,15 +111,23 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());
 	}
+	
 	@Override
 	public Object[] initArgs() {
 		return new Object[] {name, tags};
 	}
+	
+	@Override
+	public Morpheme concat(Morpheme other) {
+		String newname = this.name + other.name;
+		CabochaTags newtags = this.tags.concat(other.tags);
+		return MorphemeFactory.getInstance().getMorpheme(newname, newtags);
+	}
 
-
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -46,21 +46,24 @@ public class Categorem extends Word implements Resourcable {
 		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Categorem)
 				.addProperty(JASS.means, createProxyNode(model));
-				//.addProperty(JASS.means, createResource(model));
 	}
+	
 	@Override
 	public String resourceURI() {
 		if (mainPoS().equals("名詞"))
 			return GOO.uri + name();
 		return GOO.uri + infinitive();
 	}
+	
 	@Override
 	public Resource createResource(Model m) {
 		return m.createResource(resourceURI())
 				.addProperty(RDF.type, MoS.CategoremResource);
 	}
+	
 	@Override
 	public String proxyNodeURI() {
 		return JASS.getURI()+"proxynode/"+getClass().getSimpleName().toLowerCase()+id();
 	}
+	
 }

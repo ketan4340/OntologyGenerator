@@ -16,9 +16,10 @@ import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
 import pos.CabochaPoSInterface;
 import pos.CabochaTags;
+import pos.Concatable;
 
 public class Word extends SyntacticParent<Morpheme>
-		implements SyntacticChild, GrammarInterface, CabochaPoSInterface {
+		implements SyntacticChild, GrammarInterface, CabochaPoSInterface, Concatable<Word> {
 	private static int WORD_SUM = 0;
 
 	private final int id;
@@ -131,6 +132,12 @@ public class Word extends SyntacticParent<Morpheme>
 				.addLiteral(JASS.kana, yomi())
 				.addLiteral(JASS.pronunsiation, pronunciation());
 		return wordResource;
+	}
+	
+	@Override
+	public Word concat(Word other) {
+		
+		return null;
 	}
 
 	/* ================================================== */

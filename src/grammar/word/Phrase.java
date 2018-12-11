@@ -35,11 +35,11 @@ public class Phrase extends Categorem {
 	/* ================== Constructor =================== */
 	/* ================================================== */
 	public Phrase(List<? extends Clause<?>> dependent, Categorem head) {
-		super(concatMorphemes(dependent, head));
+		super(collectMorphemes(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
 	}
-	private static List<Morpheme> concatMorphemes(List<? extends Clause<?>> dependent, Word head) {
+	private static List<Morpheme> collectMorphemes(List<? extends Clause<?>> dependent, Word head) {
 		Stream<Morpheme> dependentMorphemes = dependent.stream()
 				.flatMap(c -> c.getChildren().stream())
 				.flatMap(c -> c.getChildren().stream());

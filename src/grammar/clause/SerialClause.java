@@ -17,20 +17,17 @@ import grammar.word.Phrase;
 import grammar.word.Word;
 
 public class SerialClause extends Clause<Phrase> {
-
-
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Constructor =================== */
+	/* ================================================== */
 	private SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
 	}
-	
-	
-	/****************************************/
-	/**********   Static  Method   **********/
-	/****************************************/
-	public static SerialClause connectClauses(Clause<?>... clauses) {
+
+	/* ================================================== */
+	/* ================== Static Method ================= */
+	/* ================================================== */
+	public static SerialClause joinClauses(Clause<?>... clauses) {
 		int tailIndex = clauses.length-1;
 		List<Clause<?>> dependent = Arrays.asList(Arrays.copyOfRange(clauses, 0, tailIndex));
 		Categorem head = clauses[tailIndex].categorem;
@@ -42,10 +39,9 @@ public class SerialClause extends Clause<Phrase> {
 		return sc;
 	}
 	
-	
-	/****************************************/
-	/**********  Abstract  Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================= Abstract Method ================ */
+	/* ================================================== */
 	@Override
 	public SerialClause clone() {
 		Phrase cloneCategorem = this.categorem.clone();
@@ -56,14 +52,10 @@ public class SerialClause extends Clause<Phrase> {
 		clone.setDepending(getDepending());
 		return clone;
 	}
-	
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
-		
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ================= Interface Method =============== */
+	/* ================================================== */
 	/** 単語のリストから連文節の各要素をセット.使わない方がいいかも. */
 	@Deprecated
 	@Override
@@ -88,14 +80,9 @@ public class SerialClause extends Clause<Phrase> {
 		return super.toJASS(model).addProperty(RDF.type, JASS.SerialClause);
 	}
 	
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-
-
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return getChildren().stream()

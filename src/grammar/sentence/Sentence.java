@@ -70,7 +70,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return new Sentence(subClauses);
 	}
 
-
 	/**
 	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
 	 */
@@ -79,7 +78,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				.filter(c -> c.containsAnyWordsHave(tags))
 				.collect(Collectors.toList());
 	}
-
 
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
@@ -93,9 +91,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return null;
 	}
 
-
 	/**
 	 * 指定の文節をその右隣の文節に繋げる.
+	 * 元の文節・単語は連文節の中に内包される. 
 	 * @param frontClause 直後の文節と繋げる文節
 	 */
 	public boolean connect2Next(Clause<?> frontClause) {
@@ -107,7 +105,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 		List<Clause<?>> backup = new ArrayList<>(children);
 
-		SerialClause sc = SerialClause.connectClauses(frontClause, backClause);
+		SerialClause sc = SerialClause.joinClauses(frontClause, backClause);
 		if (!replace(backClause, sc)) return false;
 		if (!children.remove(frontClause)) {
 			setChildren(backup);
@@ -161,7 +159,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<Clause<?>> subjectList = subjectList(false);	// 主節のリスト
 
 		Clause<?> lastClause = tail();	// 文の最後尾の文節
-		if ((lastClause instanceof SingleClause) && 			// 最後尾の文節がClauseインスタンスで
+		if ((lastClause instanceof SingleClause) && 	// 最後尾の文節がClauseインスタンスで
 				(subjectList.contains(lastClause))) {	// 主節である場合
 			// おそらく固有名詞を正しく判定できていないせい
 			// 最後尾の文節は一つの名詞にする
@@ -381,16 +379,15 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		for (Map.Entry<Clause<?>, Boolean> entry: subjectsContinuity.entrySet()) {
 			Clause<?> subject = entry.getKey();		boolean sbjCnt = entry.getValue();
-			if (!sbjCnt)
-				break;		// 連続した主語の最後尾には必要ない
+			if (!sbjCnt) break;		// 連続した主語の最後尾には必要ない
 			// 助詞・連体化"の"を新たに用意
 			Adjunct no = new Adjunct(MorphemeFactory.getInstance().getMorpheme("の",TagsFactory.getInstance().getCabochaTags("助詞","連体化","*","*","*","*","の","ノ","ノ")));
-			ListIterator<Adjunct> itr = subject.getAdjuncts().listIterator();
-			while (itr.hasNext()) {
-				Adjunct adjunct = itr.next();
+			ListIterator<Adjunct> iter = subject.getAdjuncts().listIterator();
+			while (iter.hasNext()) {
+				Adjunct adjunct = iter.next();
 				for (final String[] tag: tag_Ha)
 					if (adjunct.hasAllTag(tag)) {
-						itr.set(no);	// "は"の代わりに"の"を挿入
+						iter.set(no);	// "は"の代わりに"の"を挿入
 						break;
 					}
 			}
@@ -423,17 +420,16 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<String> values = new ArrayList<>();
 
 		List<Clause<?>> subjectList = subjectList(true);	// 主語を整えたところで再定義
-		if(subjectList.isEmpty()) return "";
+		if (subjectList.isEmpty()) return "";
 
 		Clause<?> subjectClause = subjectList.get(0);			// 主節(!!最初の1つしか使っていない!!)
 		// 述節
 		Clause<?> predicateClause = subjectClause.getDepending();
-		if(predicateClause == null) return "";
+		if (predicateClause == null) return "";
 		Word predicateWord = predicateClause.getCategorem();	// 述語
-		if(predicateWord == null) return "";
+		if (predicateWord == null) return "";
 		// 述部(主節に続く全ての節)
 		//String predicatePart = subSentence(clauses.indexOf(subjectClause)+1, clauses.size()).toString();
-
 
 		//String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
 		//boolean not = predicateClause.haveSomeTagWord(tag_Not);	// 述語が否定かどうか
@@ -443,19 +439,19 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		String[][] tagAdjective = {{"形容詞"}, {"形容動詞語幹"}};
 
 		/* 述語が動詞 */
-		if( predicateClause.containsAnyWordsHave(tagVerb) ) {
+		if (predicateClause.containsAnyWordsHave(tagVerb)) {
 			String[][] tagPassive = {{"接尾", "れる"}, {"接尾", "られる"}};
-			if(predicateClause.containsAnyWordsHave(tagPassive))
+			if (predicateClause.containsAnyWordsHave(tagPassive))
 				values.add("passive");
 			else
 				values.add("verb");
 			values.add(predicateWord.infinitive());
 		/* 述語が形容詞 */
-		}else if(predicateClause.containsAnyWordsHave(tagAdjective)) {
+		} else if (predicateClause.containsAnyWordsHave(tagAdjective)) {
 			values.add("adjc");
 			values.add(predicateWord.infinitive());
 		/* 述語が名詞または助動詞 */
-		}else {
+		} else {
 			values.add("noun");
 			String predNoun =predicateWord.infinitive();
 			values.add(predNoun.substring(predNoun.length()-2));	// 最後の一文字だけ
@@ -470,13 +466,13 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				morphemes().stream().map(Morpheme::name).collect(Collectors.joining("'")));
 	}
 	public void printW() {
-		for(final Word word : words()) {
+		for (final Word word : words()) {
 			System.out.print("("+word.id()+")" + word.name());
 		}
 		System.out.println();
 	}
 	public void printC() {
-		for(final Clause<?> clause : children) {
+		for (final Clause<?> clause : children) {
 			System.out.print("("+clause.id()+")" + clause.toString());
 		}
 		System.out.println();
@@ -492,11 +488,11 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 	/** 文を区切りを挿入して出力する */
 	public void printS() {
-		for(final Word word : words()) { // Word単位で区切る
+		for (final Word word : words()) { // Word単位で区切る
 			System.out.print(word.name() + "|");
 		}
 		System.out.println();
-		for(final Clause<?> clause : children) { // Clause単位で区切る
+		for (final Clause<?> clause : children) { // Clause単位で区切る
 			System.out.print(clause.toString() + "|");
 		}
 		System.out.println();

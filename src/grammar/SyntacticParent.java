@@ -11,14 +11,7 @@ public abstract class SyntacticParent<C extends SyntacticChild> {
 	/* =================== Constructor ================== */
 	/* ================================================== */
 	public SyntacticParent(List<C> children) {
-		setChildren(children);
-		imprintThisOnChildren();
-	}
-
-	protected boolean imprintThisOnChildren() {
-		if (Objects.isNull(children))
-			return false;
-		return true;
+		this.children = children;
 	}
 
 
