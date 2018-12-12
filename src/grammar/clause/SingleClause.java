@@ -1,5 +1,6 @@
 package grammar.clause;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +33,11 @@ public class SingleClause extends Clause<Categorem>{
 	public SingleClause(Categorem categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
 	}
+	private SingleClause(SingleClause other) {
+		this(other.categorem.clone(), 
+				new ArrayList<>(other.adjuncts), 
+				new ArrayList<>(other.others));
+	}
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
@@ -59,11 +65,7 @@ public class SingleClause extends Clause<Categorem>{
 	/* ================================================== */
 	@Override
 	public SingleClause clone() {
-		Categorem cloneCategorem = this.categorem.clone();
-		List<Adjunct> cloneAdjuncts = this.adjuncts.stream().map(a -> a.clone()).collect(Collectors.toList());
-		List<Word> cloneOthers = this.others.stream().map(o -> o.clone()).collect(Collectors.toList());
-
-		SingleClause clone = new SingleClause(cloneCategorem, cloneAdjuncts, cloneOthers);
+		SingleClause clone = new SingleClause(this);
 		clone.setDepending(getDepending());
 		return clone;
 	}
@@ -84,4 +86,5 @@ public class SingleClause extends Clause<Categorem>{
 		return getChildren().stream()
 				.map(w -> Objects.toString(w, "Word"))
 				.collect(Collectors.joining("."));	}
+	
 }

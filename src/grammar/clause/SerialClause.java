@@ -17,13 +17,19 @@ import grammar.word.Phrase;
 import grammar.word.Word;
 
 public class SerialClause extends Clause<Phrase> {
+	
 	/* ================================================== */
 	/* ================== Constructor =================== */
 	/* ================================================== */
 	private SerialClause(Phrase categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(categorem, adjuncts, others);
 	}
-
+	private SerialClause(SerialClause other) {
+		this(other.categorem.clone(), 
+				new ArrayList<>(other.adjuncts), 
+				new ArrayList<>(other.others));
+	}
+	
 	/* ================================================== */
 	/* ================== Static Method ================= */
 	/* ================================================== */
@@ -44,11 +50,7 @@ public class SerialClause extends Clause<Phrase> {
 	/* ================================================== */
 	@Override
 	public SerialClause clone() {
-		Phrase cloneCategorem = this.categorem.clone();
-		List<Adjunct> cloneAdjuncts = this.adjuncts.stream().map(a -> a.clone()).collect(Collectors.toList());
-		List<Word> cloneOthers = this.others.stream().map(o -> o.clone()).collect(Collectors.toList());
-
-		SerialClause clone = new SerialClause(cloneCategorem, cloneAdjuncts, cloneOthers);
+		SerialClause clone = new SerialClause(this);
 		clone.setDepending(getDepending());
 		return clone;
 	}

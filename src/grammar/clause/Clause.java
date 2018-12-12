@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
+import grammar.Constituent;
 import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
@@ -19,7 +20,7 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 
 public abstract class Clause<C extends Categorem> extends SyntacticParent<Word>
-implements SyntacticChild, GrammarInterface {
+implements SyntacticChild, GrammarInterface, Constituent {
 	private static int SUM = 0;
 
 	private final int id;
@@ -50,6 +51,7 @@ implements SyntacticChild, GrammarInterface {
 		return words;
 	}
 
+
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
@@ -77,9 +79,8 @@ implements SyntacticChild, GrammarInterface {
 		return allDepending;
 	}
 
-	/** 全く同じClauseを複製する */
 	@Override
-	public abstract Clause<?> clone();
+	public abstract Clause<C> clone();
 
 	/**
 	 * 複数のClauseを係り受け関係を維持しつつ複製する

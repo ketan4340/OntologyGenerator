@@ -1,5 +1,6 @@
 package grammar.word;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ import language.pos.TagsFactory;
  * @author tanabekentaro
  */
 public class Phrase extends Categorem {
-
+	
 	/** 従属部 */
 	private final List<? extends Clause<?>> dependent;
 	/** 主要部 */
@@ -46,24 +47,27 @@ public class Phrase extends Categorem {
 		Stream<Morpheme> headMorphemes = head.getChildren().stream();
 		return Stream.concat(dependentMorphemes, headMorphemes).collect(Collectors.toList());
 	}
+	private Phrase(Phrase other) {
+		this(new ArrayList<>(other.dependent), 
+				other.head.clone());
+	}
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
+	/* ================================================== */
+
+
+	/* ================================================== */
+	/* ================ Interface Method ================ */ 
 	/* ================================================== */
 	/**
 	 * 全く同じPhraseを複製する
 	 */
 	@Override
 	public Phrase clone() {
-		List<Clause<?>> cloneDependent = dependent.stream()
-				.map(c -> c.clone()).collect(Collectors.toList());
-		Categorem cloneHead = head.clone();
-		return new Phrase(cloneDependent, cloneHead);
+		return new Phrase(this);
 	}
-
-	/* ================================================== */
-	/* ================ Interface Method ================ */ 
-	/* ================================================== */
+	
 	@Override
 	public Resource toJASS(Model model) {
 		Resource dependentList = 

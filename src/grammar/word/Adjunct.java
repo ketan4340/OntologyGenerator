@@ -1,5 +1,6 @@
 package grammar.word;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
@@ -24,19 +25,23 @@ public class Adjunct extends Word {
 	public Adjunct(String name, CabochaTags tags) {
 		super(name, tags);
 	}
+	private Adjunct(Adjunct other) {
+		this(new ArrayList<>(other.children));
+	}
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	/** 全く同じWordを複製する */
-	@Override
-	public Adjunct clone() {
-		return new Adjunct(children);
-	}
+
 	
 	/* ================================================== */
 	/* ================ Interface Method ================ */ 
 	/* ================================================== */
+	@Override
+	public Adjunct clone() {
+		return new Adjunct(this);
+	}
+
 	@Override
 	public Resource toJASS(Model model) {
 		return super.toJASS(model)

@@ -1,5 +1,6 @@
 package grammar.word;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
+import grammar.Constituent;
 import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
@@ -21,7 +23,8 @@ import language.pos.CabochaTags;
 import language.pos.Concatable;
 
 public class Word extends SyntacticParent<Morpheme>
-		implements SyntacticChild, GrammarInterface, CabochaPoSInterface, Concatable<Word> {
+		implements SyntacticChild, GrammarInterface, CabochaPoSInterface, 
+		Concatable<Word>, Constituent {
 	private static int SUM = 0;
 
 	private final int id;
@@ -39,6 +42,9 @@ public class Word extends SyntacticParent<Morpheme>
 	}
 	public Word(String name, CabochaTags tags) {
 		this(MorphemeFactory.getInstance().getMorpheme(name, tags));
+	}
+	private Word(Word word) {
+		this(new ArrayList<>(word.children));
 	}
 
 	/* ================================================== */
@@ -82,11 +88,6 @@ public class Word extends SyntacticParent<Morpheme>
 		return match;
 	}
 
-	/** 全く同じWordを複製する */
-	@Override
-	public Word clone() {
-		return new Word(children);
-	}
 
 	/* ================================================== */
 	/* ================ Interface Method ================ */ 
@@ -142,6 +143,10 @@ public class Word extends SyntacticParent<Morpheme>
 	@Override
 	public boolean containsAll(Collection<String> poss) {
 		return children.stream().anyMatch(m -> m.containsAll(poss));
+	}
+	@Override
+	public Word clone() {
+        return new Word(this);
 	}
 	
 	@Override

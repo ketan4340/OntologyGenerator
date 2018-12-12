@@ -2,6 +2,11 @@ package grammar;
 
 import data.RDF.rule.JassModelizable;
 
+/**
+ * 全ての言葉の単位.
+ * @author tanabekentaro
+ *
+ */
 public interface GrammarInterface extends JassModelizable {
 
 	/**

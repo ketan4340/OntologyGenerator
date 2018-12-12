@@ -8,6 +8,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+/** 
+ * 言葉の単位のうち、下位要素を持つもの.
+ * 文章({@code Writing})、段落({@code Paragraph})、文({@code Sentence})、文節({@code Clause})、単語({@code Word})が対象.
+ * @author tanabekentaro
+ *
+ * @param <C> 下位要素
+ */
 public abstract class SyntacticParent<C extends SyntacticChild> 
 		implements ListChangeListener<C> {
 	

@@ -1,5 +1,6 @@
 package grammar.word;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,19 +29,23 @@ public class Categorem extends Word implements Resourcable {
 	public Categorem(String name, CabochaTags tags) {
 		super(name, tags);
 	}
+	private Categorem(Categorem categorem) {
+		this(new ArrayList<>(categorem.children));
+	}
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	/** 全く同じWordを複製する */
-	@Override
-	public Categorem clone() {
-		return new Categorem(children);
-	}
+	
 	
 	/* ================================================== */
 	/* ================ Interface Method ================ */ 
 	/* ================================================== */
+	@Override
+	public Categorem clone() {
+		return new Categorem(this);
+	}
+
 	@Override
 	public Resource toJASS(Model model) {
 		return super.toJASS(model)
