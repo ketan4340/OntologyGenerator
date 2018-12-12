@@ -2,7 +2,7 @@ package grammar.morpheme;
 
 import java.util.function.Supplier;
 
-import pos.CabochaTags;
+import language.pos.CabochaTags;
 import util.Factory;
 
 public final class MorphemeFactory extends Factory<Morpheme> {

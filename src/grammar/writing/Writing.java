@@ -1,7 +1,14 @@
 package grammar.writing;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
+import data.RDF.vocabulary.JASS;
+import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.paragraph.Paragraph;
 
@@ -10,13 +17,41 @@ import grammar.paragraph.Paragraph;
  * @author tanabekentaro
  *
  */
-public class Writing extends SyntacticParent<Paragraph> {
-
+public class Writing extends SyntacticParent<Paragraph> 
+		implements GrammarInterface {
+	private static int WRITING_SUM = 0;
+	
+	private final int id; 
+	
 	/* ================================================== */
 	/* ==========          Constructor         ========== */
 	/* ================================================== */
-	public Writing(List<Paragraph> constituents) {
-		super(constituents);
+	public Writing(List<Paragraph> paragraphs) {
+		super(paragraphs);
+		this.id = WRITING_SUM++;
 	}
 
+	/* ================================================== */
+	/* ================ Interface Method ================ */
+	/* ================================================== */
+	@Override
+	public int id() {return id;}
+	@Override
+	public String name() {
+		return getChildren().stream().map(s -> s.name()).collect(Collectors.joining());
+	}
+	@Override
+	public Resource toJASS(Model model) {
+		Resource sentenceNode = model.createList(getChildren().stream().map(m -> m.toJASS(model)).iterator());
+
+		Resource paragraphResource = model.createResource(getJassURI())
+				.addProperty(RDF.type, JASS.Writing)
+				.addProperty(JASS.paragraphs, sentenceNode);
+		return paragraphResource;
+	}
+	@Override
+	public void onChanged(Change<? extends Paragraph> c) {
+		// TODO 自動生成されたメソッド・スタブ	
+	}
+	
 }

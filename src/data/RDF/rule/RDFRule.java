@@ -1,12 +1,11 @@
 package data.RDF.rule;
 
 import data.id.Identifiable;
-import grammar.GrammarInterface;
 
-public class RDFRule implements Identifiable, GrammarInterface {
+public class RDFRule implements Identifiable {
 	protected static final RDFRule EMPTY_RULE = new RDFRule("empty rule", "", "");
 
-	private static int sum = 0;
+	private static int SUM = 0;
 
 	private final int id;
 	private final String name;
@@ -17,7 +16,7 @@ public class RDFRule implements Identifiable, GrammarInterface {
 	/* =================== Constructor ================== */
 	/* ================================================== */
 	public RDFRule(String name, String ifPattern, String thenPattern) {
-		this.id = sum++;
+		this.id = SUM++;
 		this.name = name;
 		this.ifPattern = ifPattern;
 		this.thenPattern = thenPattern;
@@ -42,10 +41,6 @@ public class RDFRule implements Identifiable, GrammarInterface {
 	@Override
 	public int id() {
 		return id;
-	}
-	@Override
-	public String name() {
-		return name;
 	}
 
 

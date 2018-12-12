@@ -46,6 +46,7 @@ public class JASS {
 	public static final Property means = property("means");
 	public static final Property dependTo = property("dependTo");
 	public static final Property languageComponent = property("languageComponent");
+	public static final Property paragraphs = property("paragraphs");
 	public static final Property sentences = property("sentences");
 	public static final Property clauses = property("clauses");
 	public static final Property words = property("words");

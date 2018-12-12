@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -15,14 +14,13 @@ import data.RDF.vocabulary.JASS;
 import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
-import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
 
 public abstract class Clause<C extends Categorem> extends SyntacticParent<Word>
 implements SyntacticChild, GrammarInterface {
-	private static int clausesSum = 0;
+	private static int SUM = 0;
 
 	private final int id;
 
@@ -39,7 +37,7 @@ implements SyntacticChild, GrammarInterface {
 	/* ================================================== */
 	public Clause(C categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
-		this.id = clausesSum++;
+		this.id = SUM++;
 		this.categorem = categorem;
 		this.adjuncts = adjuncts;
 		this.others = others;
@@ -100,34 +98,6 @@ implements SyntacticChild, GrammarInterface {
 		}
 		return cloneClauses;
 	}
-
-	/**
-	 * 自立語と先頭の付属語がそれぞれ指定の品詞を持つ場合，結合する.
-	 * 名詞とサ変動詞 (使用+する) のような組み合わせに適用する.
-	 * @param categoremTag
-	 * @param adjunctTag
-	 * @return 結合に成功すれば真．そうでなければ偽．
-	 */
-	public boolean uniteAdjunct2Categorem(String[] categoremTag, String[] adjunctTag) {
-		if (adjuncts.isEmpty())
-			return false;	// 付属語がないなら意味がない
-		if (!categorem.hasAllTag(categoremTag))
-			return false;
-		if (!adjuncts.get(0).hasAllTag(adjunctTag))
-			return false;
-
-		// 付属語から先頭の単語を取り出す
-		Adjunct headAdjunct = adjuncts.remove(0);
-
-		List<Morpheme> morphemes = Stream
-				.concat(categorem.getChildren().stream(), headAdjunct.getChildren().stream())
-				.collect(Collectors.toList());
-
-		// この文節の自立語が参照する概念を更新
-		categorem.setChildren(morphemes);
-		return true;
-	}
-
 
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean containsWordHas(String[] tag) {
@@ -201,6 +171,11 @@ implements SyntacticChild, GrammarInterface {
 		return clauseResource;
 	}
 
+	@Override
+	public void onChanged(Change<? extends Word> c) {
+		// TODO 自動生成されたメソッド・スタブ	
+	}
+	
 	/* ================================================== */
 	/* ==========        Getter, Setter        ========== */
 	/* ================================================== */

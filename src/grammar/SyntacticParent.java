@@ -4,14 +4,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class SyntacticParent<C extends SyntacticChild> {
-	protected List<C> children;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+
+public abstract class SyntacticParent<C extends SyntacticChild> 
+		implements ListChangeListener<C> {
+	
+	protected ObservableList<C> children;
 
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
 	public SyntacticParent(List<C> children) {
-		this.children = children;
+		this.children = FXCollections.observableList(children);
+		this.children.addListener(this);
+		onChanged(null);
 	}
 
 
@@ -73,17 +81,15 @@ public abstract class SyntacticParent<C extends SyntacticChild> {
 
 	
 	/* ================================================== */
-	/* ================== Getter, Setter ================ */
+	/* ================= Interface Method =============== */
 	/* ================================================== */	
 	public List<C> getChildren() {
 		return children;
 	}
-	
 	public void setChildren(List<C> children) {
-		this.children = children;
+		
 	}
-
-
+	
 	/* ================================================== */
 	/* ================== Object Method ================= */
 	/* ================================================== */

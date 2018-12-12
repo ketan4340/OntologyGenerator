@@ -1,7 +1,9 @@
 package grammar.word;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -14,22 +16,23 @@ import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
-import pos.CabochaPoSInterface;
-import pos.CabochaTags;
-import pos.Concatable;
+import language.pos.CabochaPoSInterface;
+import language.pos.CabochaTags;
+import language.pos.Concatable;
 
 public class Word extends SyntacticParent<Morpheme>
 		implements SyntacticChild, GrammarInterface, CabochaPoSInterface, Concatable<Word> {
-	private static int WORD_SUM = 0;
+	private static int SUM = 0;
 
 	private final int id;
+	private byte coreMphmIdx;	// 1単語に128以上の形態素なんてないはず
 
 	/* ================================================== */
 	/* ================== Constructor =================== */
 	/* ================================================== */
 	public Word(List<Morpheme> morphemes) {
 		super(morphemes);
-		this.id = WORD_SUM++;
+		this.id = SUM++;
 	}
 	public Word(Morpheme... morphemes) {
 		this(Arrays.asList(morphemes));
@@ -39,8 +42,27 @@ public class Word extends SyntacticParent<Morpheme>
 	}
 
 	/* ================================================== */
+	/* ================== Static Method ================= */
+	/* ================================================== */
+	
+	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
+	public Morpheme coreMorpheme() {
+		return children.get(coreMphmIdx);
+	}
+	
+	private void setCoreMorphemeIndex(List<Morpheme> morphemes) {
+		this.coreMphmIdx = coreMorphemeIndex(morphemes);
+	}
+	private byte coreMorphemeIndex(List<Morpheme> morphemes) {
+		ListIterator<Morpheme> li = morphemes.listIterator(morphemes.size());
+		while (li.hasPrevious())
+			if (!li.previous().contains("接尾"))
+				return (byte)(li.previousIndex() + 1);
+		return (byte)morphemes.size(); 
+	}
+	
 	/**
 	 * 渡されたTagを"全て"持って入れば真、それ以外は偽を返す
 	 */
@@ -52,7 +74,7 @@ public class Word extends SyntacticParent<Morpheme>
 				not = true;
 				tag = tag.substring(1);	// -を消しておく
 			}
-			match = tail().containsTag(tag);
+			match = coreMorpheme().contains(tag);
 			match = not? !match : match;
 
 			if (!match) break;	// falseなら即終了
@@ -79,27 +101,27 @@ public class Word extends SyntacticParent<Morpheme>
 	}
 	@Override
 	public String mainPoS() {
-		return tail().mainPoS();
+		return coreMorpheme().mainPoS();
 	}
 	@Override
 	public String subPoS1() {
-		return tail().subPoS1();
+		return coreMorpheme().subPoS1();
 	}
 	@Override
 	public String subPoS2() {
-		return tail().subPoS2();
+		return coreMorpheme().subPoS2();
 	}
 	@Override
 	public String subPoS3() {
-		return tail().subPoS3();
+		return coreMorpheme().subPoS3();
 	}
 	@Override
 	public String inflection() {
-		return tail().inflection();
+		return coreMorpheme().inflection();
 	}
 	@Override
 	public String conjugation() {
-		return tail().conjugation();
+		return coreMorpheme().conjugation();
 	}
 	@Override
 	public String infinitive() {
@@ -113,6 +135,15 @@ public class Word extends SyntacticParent<Morpheme>
 	public String pronunciation() {
 		return children.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
 	}
+	@Override
+	public boolean contains(String pos) {
+		return children.stream().anyMatch(m -> m.contains(pos));
+	}
+	@Override
+	public boolean containsAll(Collection<String> poss) {
+		return children.stream().anyMatch(m -> m.containsAll(poss));
+	}
+	
 	@Override
 	public Resource toJASS(Model model) {
 		Resource morphemeNode = model.createList(children.stream()
@@ -136,10 +167,15 @@ public class Word extends SyntacticParent<Morpheme>
 	
 	@Override
 	public Word concat(Word other) {
-		
-		return null;
+		this.children.addAll(other.children);
+		return this;
 	}
 
+	@Override
+	public void onChanged(Change<? extends Morpheme> c) {
+		setCoreMorphemeIndex(children);
+	}
+	
 	/* ================================================== */
 	/* ================== Object Method ================= */ 
 	/* ================================================== */

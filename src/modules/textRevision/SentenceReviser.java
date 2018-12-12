@@ -12,23 +12,18 @@ import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
-import pos.Concatable;
+import language.pos.Concatable;
 
 public class SentenceReviser {
-
-	/*
-	private static final String[][][] TAGS_CATEGOREM_ADJUNCTS = {
-			{{"サ変接続"}, {"動詞", "サ変・スル"}},
-			{{"動詞"}, {"動詞", "接尾"}}
-			};
-	 */
+	private static final String[][][] TAGS_NOUNIZE = {
+			{{"体言接続特殊２"}}
+	};
 	private static final String[][][] TAGS_NOUNPHRASE = {
 			{{"形容詞", "-連用テ接続"}},	// 連用テ接続は"大きくて"など
 			{{"連体詞"}},					// "大きな"、"こういう"、"あの"、など
 			{{"助詞", "連体化"}},			// "の"のみ該当
 			{{"助動詞", "体言接続"}},		// "変な"の"な"など
-			{{"名詞"}},
-			{{"体言接続特殊２"}}
+			{{"名詞"}}
 			};
 
 	/* ================================================== */
@@ -43,29 +38,31 @@ public class SentenceReviser {
 	public void connectWord(SentenceIDMap sentenceMap) {
 		sentenceMap.forEachKey(this::connectWord);
 	}
-	public Sentence connectWord(Sentence sentence) {
+	
+	public void connectWord(Sentence sentence) {
 		// 別々の形態素に別れてしまっている数値を1つの形態素にする
 		Stream.of(sentence)
 		.map(Sentence::getChildren).flatMap(List::stream)
 		.map(Clause::words).flatMap(List::stream)
 		.forEach(w -> weldNumbers(w));
 
-		// サ変動詞と接尾をもつ動詞をつなげる
-		/*
-		Stream.of(TAGS_CATEGOREM_ADJUNCTS).forEach(tag_CA -> {
-			sentence.getChildren().forEach(c -> c.uniteAdjunct2Categorem(tag_CA[0], tag_CA[1]));
+		// 指定の品詞を持つ形態素を次の形態素と破壊的に結合する
+		Stream.of(TAGS_NOUNIZE).forEach(tag_n -> {
+			sentence.collectClausesHaveSome(tag_n).forEach(c -> {
+				sentence.nextChild(c);
+				
+			});
 		});
-		*/
+		
 		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
-		Stream.of(TAGS_NOUNPHRASE).forEach(tag_NP -> {
-			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
+		Stream.of(TAGS_NOUNPHRASE).forEach(tag_np -> {
+			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_np, true);
 					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
 				if (!sentence.connect2Next(matchedClause))
 					break;
-				matchedClause = sentence.findFirstClauseEndWith(tag_NP, true);
+				matchedClause = sentence.findFirstClauseEndWith(tag_np, true);
 			}
 		});
-		return sentence;
 	}
 
 	private void weldNumbers(Word w) {
@@ -83,7 +80,7 @@ public class SentenceReviser {
 		int from = -1, to = -1, i = 0;
 		boolean continuing = false;
 		for (Morpheme m : morphemes) {
-			if (m.containsTag("数")) {
+			if (m.contains("数")) {
 				if (!continuing) {	// 最初の数字。数字の連続の開始点
 					from = to = i;
 					continuing = true;

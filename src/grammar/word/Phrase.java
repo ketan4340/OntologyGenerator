@@ -18,7 +18,7 @@ import data.RDF.vocabulary.JASS;
 import data.RDF.vocabulary.MoS;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
-import pos.TagsFactory;
+import language.pos.TagsFactory;
 
 /**
  * 名詞句を想定

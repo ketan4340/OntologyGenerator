@@ -28,11 +28,11 @@ import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
 import grammar.word.Adjunct;
 import grammar.word.Word;
-import pos.TagsFactory;
+import language.pos.TagsFactory;
 
 public class Sentence extends SyntacticParent<Clause<?>>
 		implements SyntacticChild, GrammarInterface {
-	private static int SENTENCE_SUM = 0;
+	private static int SUM = 0;
 
 	private final int id;
 
@@ -41,7 +41,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ================================================== */
 	public Sentence(List<Clause<?>> clauses) {
 		super(clauses);
-		this.id = SENTENCE_SUM++;
+		this.id = SUM++;
 	}
 	public Sentence(List<Clause<?>> clauses, Map<Clause<?>, Integer> dependingMap) {
 		this(clauses);
@@ -107,10 +107,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 		SerialClause sc = SerialClause.joinClauses(frontClause, backClause);
 		if (!replace(backClause, sc)) return false;
-		if (!children.remove(frontClause)) {
-			setChildren(backup);
-			return false;
-		}
+		if (!children.remove(frontClause)) return false;
 		Set<Clause<?>> formerDependeds = clausesDepending(frontClause);
 		formerDependeds.addAll(clausesDepending(backClause));
 		gatherDepending(sc, formerDependeds);
@@ -535,8 +532,13 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			dependingResource.ifPresent(d -> clauseResource.addProperty(JASS.dependTo, d));
 		});
 	}
+	
+	@Override
+	public void onChanged(Change<? extends Clause<?>> c) {
+		// TODO 自動生成されたメソッド・スタブ	
+	}
 
-
+	
 	/* ================================================== */
 	/* ================== Object Method ================= */
 	/* ================================================== */

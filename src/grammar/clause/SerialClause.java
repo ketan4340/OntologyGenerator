@@ -57,7 +57,6 @@ public class SerialClause extends Clause<Phrase> {
 	/* ================= Interface Method =============== */
 	/* ================================================== */
 	/** 単語のリストから連文節の各要素をセット.使わない方がいいかも. */
-	@Deprecated
 	@Override
 	public void setChildren(List<Word> words) {
 		Phrase phrase = null;

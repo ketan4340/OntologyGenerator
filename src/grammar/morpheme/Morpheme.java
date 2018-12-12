@@ -1,5 +1,6 @@
 package grammar.morpheme;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import org.apache.jena.rdf.model.Model;
@@ -10,13 +11,13 @@ import data.RDF.vocabulary.JASS;
 import dic.Immutable;
 import grammar.GrammarInterface;
 import grammar.SyntacticChild;
-import pos.CabochaPoSInterface;
-import pos.CabochaTags;
-import pos.Concatable;
+import language.pos.CabochaPoSInterface;
+import language.pos.CabochaTags;
+import language.pos.Concatable;
 
 public final class Morpheme implements SyntacticChild, GrammarInterface,
 	CabochaPoSInterface, Immutable, Concatable<Morpheme> {
-	private static int MORPHEME_SUM = 0;
+	private static int SUM = 0;
 
 	private final int id;			// 通し番号
 	private final String name;		// 形態素の文字列
@@ -26,7 +27,7 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	/* =================== Constructor ================== */
 	/* ================================================== */
 	Morpheme(String name, CabochaTags tags) {
-		this.id = MORPHEME_SUM++;
+		this.id = SUM++;
 		this.name = name;
 		this.tags = tags;
 	}
@@ -35,13 +36,6 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	public boolean containsTag(String tag) {
-		return tags.contains(tag);
-	}
-
-	public CabochaTags getTags() {
-		return tags;
-	}
 
 	/* ================================================== */
 	/* ================ Interface Method ================ */
@@ -95,7 +89,14 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	public String pronunciation() {
 		return tags.pronunciation();
 	}
-
+	@Override
+	public boolean contains(String pos) {
+		return tags.contains(pos);
+	}
+	@Override
+	public boolean containsAll(Collection<String> poss) {
+		return tags.containsAll(poss);
+	}
 	@Override
 	public Resource toJASS(Model model) {
 		return model.createResource(getJassURI())

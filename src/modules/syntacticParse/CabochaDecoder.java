@@ -14,8 +14,8 @@ import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
-import pos.CabochaTags;
-import pos.TagsFactory;
+import language.pos.CabochaTags;
+import language.pos.TagsFactory;
 import util.StringListUtil;
 
 public class CabochaDecoder {

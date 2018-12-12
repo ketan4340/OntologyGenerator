@@ -11,7 +11,7 @@ import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
 import data.RDF.vocabulary.MoS;
 import grammar.morpheme.Morpheme;
-import pos.CabochaTags;
+import language.pos.CabochaTags;
 
 public class Categorem extends Word implements Resourcable {
 	public static final Categorem EMPTY_CATEGOREM = new Categorem(Collections.emptyList());

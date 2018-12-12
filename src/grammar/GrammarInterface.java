@@ -1,6 +1,8 @@
 package grammar;
 
-public interface GrammarInterface {
+import data.RDF.rule.JassModelizable;
+
+public interface GrammarInterface extends JassModelizable {
 
 	/**
 	 * 付加情報なしの単純な文字列を返す.

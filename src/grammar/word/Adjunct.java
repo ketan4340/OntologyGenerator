@@ -8,7 +8,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.morpheme.Morpheme;
-import pos.CabochaTags;
+import language.pos.CabochaTags;
 
 public class Adjunct extends Word {
 

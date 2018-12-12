@@ -15,7 +15,7 @@ import grammar.sentence.Sentence;
 
 public class Paragraph extends SyntacticParent<Sentence>
 	implements SyntacticChild, GrammarInterface {
-	private static int paragraphSum = 0;
+	private static int SUM = 0;
 
 	private final int id;
 
@@ -24,7 +24,7 @@ public class Paragraph extends SyntacticParent<Sentence>
 	/* ================================================== */
 	public Paragraph(List<Sentence> sentences) {
 		super(sentences);
-		this.id = paragraphSum++;
+		this.id = SUM++;
 	}
 
 	/* ================================================== */
@@ -53,8 +53,10 @@ public class Paragraph extends SyntacticParent<Sentence>
 				.addProperty(JASS.sentences, sentenceNode);
 		return paragraphResource;
 	}
-
-
+	@Override
+	public void onChanged(Change<? extends Sentence> c) {
+		// TODO 自動生成されたメソッド・スタブ	
+	}
 
 	/* ================================================== */
 	/* ==========        Object  Method        ========== */
