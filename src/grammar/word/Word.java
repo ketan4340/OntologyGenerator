@@ -59,8 +59,8 @@ public class Word extends SyntacticParent<Morpheme>
 		ListIterator<Morpheme> li = morphemes.listIterator(morphemes.size());
 		while (li.hasPrevious())
 			if (!li.previous().contains("接尾"))
-				return (byte)(li.previousIndex() + 1);
-		return (byte)morphemes.size(); 
+				return (byte)(li.previousIndex()+1);
+		return (byte)(morphemes.size()-1); 
 	}
 	
 	/**
