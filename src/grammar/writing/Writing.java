@@ -42,11 +42,13 @@ public class Writing extends SyntacticParent<Paragraph>
 	}
 	@Override
 	public Resource toJASS(Model model) {
-		Resource paragraphNode = model.createList(getChildren().stream().map(m -> m.toJASS(model)).iterator());
+		Resource paragraphList = 
+				model.createList(getChildren().stream().map(m -> m.toJASS(model)).iterator())
+				.addProperty(RDF.type, JASS.ParagraphList);
 
 		Resource writingResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Writing)
-				.addProperty(JASS.paragraphs, paragraphNode);
+				.addProperty(JASS.paragraphs, paragraphList);
 		return writingResource;
 	}
 	@Override

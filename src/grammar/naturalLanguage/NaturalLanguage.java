@@ -6,27 +6,28 @@ import java.util.stream.Stream;
 
 import data.id.Identifiable;
 
-public class NaturalLanguage implements Identifiable{
-	private static int sum = 0;
+public class NaturalLanguage implements Identifiable {
+	private static int SUM = 0;
 	
-	public final int id;
+	private final int id;
 	private String text;
 
 	
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	public NaturalLanguage(String text) {
-		this.id = sum++;
-		setText(text);
+		this.id = SUM++;
+		this.text = text;
 	}
 	public NaturalLanguage() {
 		this("");
 	}
 
-	/****************************************/
-	/**********   Static  Method   **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* ================== Static Method ================= */
+	/* ================================================== */
 	/** List<NaturalLanguage> -> List<String> */
 	public static List<String> toStringList(List<NaturalLanguage> nlList) {
 		return nlList.stream().map(NaturalLanguage::toString).collect(Collectors.toList());
@@ -45,34 +46,25 @@ public class NaturalLanguage implements Identifiable{
 	}
 	
 	
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
 
-	/****************************************/
-	/**********   Getter, Setter   **********/
-	/****************************************/
-	public int getID() {
-		return id;
-	}
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	public String getText() {
 		return text;
 	}
-	public void setText(String text) {
-		this.text = text;
-	}
 	
-	/****************************************/
-	/**********  Interface Method  **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================ Interface Method ================ */
+	/* ================================================== */
 	@Override
 	public int id() {
-		return getID();
+		return id;
 	}
 
-	/****************************************/
-	/**********   Object  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
 	@Override
 	public String toString() {
 		return text;

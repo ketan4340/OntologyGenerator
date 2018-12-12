@@ -66,18 +66,19 @@ public class Phrase extends Categorem {
 	/* ================================================== */
 	@Override
 	public Resource toJASS(Model model) {
-		Resource clauseNode = model.createList(
-				dependent.stream().map(m -> m.toJASS(model)).iterator());
+		Resource dependentList = 
+				model.createList(dependent.stream().map(m -> m.toJASS(model)).iterator())
+				.addProperty(RDF.type, JASS.ClauseList);
 
 		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Phrase)
-				.addProperty(JASS.dependent, clauseNode)
+				.addProperty(JASS.dependent, dependentList)
 				.addProperty(JASS.head, head.toJASS(model));
 	}
-	private static String[][] adj = new String[][]{{"形容詞","-連用テ接続"}};
-	private static String[][] pren = new String[][]{{"連体詞"}};
-	private static String[][] part = new String[][]{{"助詞","連体化"}};
-	private static String[][] aux = new String[][]{{"助動詞","体言接続"}};
+	private static String[][] ADJ = new String[][]{{"形容詞","-連用テ接続"}};
+	private static String[][] PREN = new String[][]{{"連体詞"}};
+	private static String[][] PART = new String[][]{{"助詞","連体化"}};
+	private static String[][] AUX = new String[][]{{"助動詞","体言接続"}};
 	@Override
 	public Resource createResource(Model m) {
 		TagsFactory factory = TagsFactory.getInstance();
@@ -120,19 +121,19 @@ public class Phrase extends Categorem {
 		
 		depcopy.forEach(dep -> {
 			Resource depRsrc = dep.getCategorem().createResource(m);
-			if (dep.endWith(adj, true)) {
+			if (dep.endWith(ADJ, true)) {
 				// "大きい"など。連用テ接続は"大きく(て)"のように並列する表現
 				Resource d_anon = m.createResource().addProperty(MoS.attributeOf, depRsrc);
 				RDFList list = m.createList(new RDFNode[]{r, d_anon});
 				m.createResource().addProperty(OWL2.intersectionOf, list);
-			} else if (dep.endWith(pren, true)) {
+			} else if (dep.endWith(PREN, true)) {
 				// "大きな"、"こういう"、"あの"、など。
 				// "大きな"は"大きい"の活用形ではないことに注意	
 				r.addProperty(DCTerms.relation, depRsrc);
-			} else if (dep.endWith(part, true)) {
+			} else if (dep.endWith(PART, true)) {
 				// "の"のみ該当
 				r.addProperty(MoS.of, depRsrc);
-			} else if (dep.endWith(aux, true)) {
+			} else if (dep.endWith(AUX, true)) {
 				// "変な"の"な"など
 				Resource d_anon = m.createResource().addProperty(MoS.attributeOf, depRsrc);
 				RDFList list = m.createList(new RDFNode[]{r, d_anon});

@@ -38,13 +38,19 @@ public class JASS {
 	public static final Resource Morpheme = resource("Morpheme");
 	public static final Resource PoS = resource("PoS");
 	
+	public static final Resource LanguageList = resource("LanguageList");
+	public static final Resource ParagraphList = resource("ParagraphList");
+	public static final Resource SentenceList = resource("SentenceList");
+	public static final Resource ClauseList = resource("ClauseList");
+	public static final Resource WordList = resource("WordList");
+	public static final Resource AdjunctList = resource("AdjunctList");
+	public static final Resource MorphemeList = resource("MorphemeList");
+	
 	public static final Resource Meaning = resource("Meaning");
 
 	/* ================================================== */
 	/* ================= Object Property ================ */
 	/* ================================================== */
-	public static final Property means = property("means");
-	public static final Property dependTo = property("dependTo");
 	public static final Property languageComponent = property("languageComponent");
 	public static final Property paragraphs = property("paragraphs");
 	public static final Property sentences = property("sentences");
@@ -57,11 +63,15 @@ public class JASS {
 	public static final Property phraseComponent = property("phraseComponent");
 	public static final Property head = property("head");
 	public static final Property dependent = property("dependent");
+	
 	public static final Property sentenceElement = property("sentenceElement");
 	public static final Property subject = property("subject");
 	public static final Property predicate = property("predicate");
 	public static final Property object = property("object");
 	
+	public static final Property dependTo = property("dependTo");
+
+	public static final Property means = property("means");
 	public static final Property coreNode = property("coreNode");
 	
 	/* ================================================== */

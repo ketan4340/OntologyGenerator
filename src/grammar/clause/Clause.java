@@ -33,7 +33,7 @@ implements SyntacticChild, GrammarInterface {
 
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
 	public Clause(C categorem, List<Adjunct> adjuncts, List<Word> others) {
 		super(linedupWords(categorem, adjuncts, others));
@@ -51,7 +51,7 @@ implements SyntacticChild, GrammarInterface {
 	}
 
 	/* ================================================== */
-	/* ==========        Member  Method        ========== */
+	/* ================== Member Method ================= */
 	/* ================================================== */
 	/**
 	 * この文節を構成する単語のリスト.
@@ -139,7 +139,7 @@ implements SyntacticChild, GrammarInterface {
 	}
 
 	/* ================================================== */
-	/* ==========       Interface Method       ========== */
+	/* ================ Interface Method ================ */
 	/* ================================================== */
 	@Override
 	public int id() {
@@ -160,14 +160,14 @@ implements SyntacticChild, GrammarInterface {
 	@Override
 	public Resource toJASS(Model model) {
 		Resource categoremResource = categorem.toJASS(model);
-		Resource adjunctNode = model.createList(
-				adjuncts.stream().map(m -> m.toJASS(model)).iterator()
-				);
+		Resource adjunctList = 
+				model.createList(adjuncts.stream().map(m -> m.toJASS(model)).iterator())
+				.addProperty(RDF.type, JASS.AdjunctList);
 
 		Resource clauseResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Clause)
 				.addProperty(JASS.categorem, categoremResource)
-				.addProperty(JASS.adjuncts, adjunctNode);
+				.addProperty(JASS.adjuncts, adjunctList);
 		return clauseResource;
 	}
 
@@ -176,9 +176,7 @@ implements SyntacticChild, GrammarInterface {
 		// TODO 自動生成されたメソッド・スタブ	
 	}
 	
-	/* ================================================== */
-	/* ==========        Getter, Setter        ========== */
-	/* ================================================== */
+	/* ================= Getter, Setter ================= */
 	public C getCategorem() {
 		return categorem;
 	}
@@ -205,7 +203,7 @@ implements SyntacticChild, GrammarInterface {
 	}
 
 	/* ================================================== */
-	/* ==========        Object  Method        ========== */
+	/* ================== Object Method ================= */
 	/* ================================================== */
 	@Override
 	public int hashCode() {
@@ -214,10 +212,10 @@ implements SyntacticChild, GrammarInterface {
 		result = prime * result + Objects.hashCode(categorem);
 		result = prime * result + Objects.hashCode(adjuncts);
 		result = prime * result + Objects.hashCode(others);
-		result = prime * result + id;
 		result = prime * result + Objects.hashCode(depending);
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

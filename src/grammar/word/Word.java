@@ -146,12 +146,13 @@ public class Word extends SyntacticParent<Morpheme>
 	
 	@Override
 	public Resource toJASS(Model model) {
-		Resource morphemeNode = model.createList(children.stream()
-				.map(m -> m.toJASS(model)).iterator());
+		Resource morphemeList = 
+				model.createList(children.stream().map(m -> m.toJASS(model)).iterator())
+				.addProperty(RDF.type, JASS.MorphemeList);
 
 		Resource wordResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Word)
-				.addProperty(JASS.morphemes, morphemeNode)
+				.addProperty(JASS.morphemes, morphemeList)
 				.addLiteral(JASS.name, name())
 				.addLiteral(JASS.mainPoS, mainPoS())
 				.addLiteral(JASS.subPoS1, subPoS1())
@@ -179,6 +180,8 @@ public class Word extends SyntacticParent<Morpheme>
 	/* ================================================== */
 	/* ================== Object Method ================= */ 
 	/* ================================================== */
+	
+	
 	@Override
 	public String toString() {
 		return children.stream().map(m -> m.toString()).collect(Collectors.joining());

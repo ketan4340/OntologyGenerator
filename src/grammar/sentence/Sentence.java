@@ -512,11 +512,13 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<Resource> clauseResources = getChildren().stream()
 				.map(m -> m.toJASS(model)).collect(Collectors.toList());
 		clauseDepend2RDF(clauseResources);
-		Resource clauseNode = model.createList(clauseResources.iterator());
+		Resource clauseList = 
+				model.createList(clauseResources.iterator())
+				.addProperty(RDF.type, JASS.ClauseList);
 
 		Resource sentenceResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Sentence)
-				.addProperty(JASS.clauses, clauseNode);
+				.addProperty(JASS.clauses, clauseList);
 		return sentenceResource;
 	}
 	

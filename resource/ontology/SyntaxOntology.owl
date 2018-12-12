@@ -97,7 +97,7 @@
     <owl:ObjectProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#dependent">
         <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#phraseComponent"/>
         <rdfs:domain rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Phrase"/>
-        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#Clause"/>
+        <rdfs:range rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#ClauseList"/>
         <rdfs:comment xml:lang="ja">従属部を構成する文節のリスト</rdfs:comment>
         <rdfs:label xml:lang="ja">従属部</rdfs:label>
     </owl:ObjectProperty>

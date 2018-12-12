@@ -8,29 +8,22 @@ public class NaturalParagraph {
 	private List<NaturalLanguage> texts;
 	
 	
-	/***********************************/
-	/**********  Constructor  **********/
-	/***********************************/
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	public NaturalParagraph(List<NaturalLanguage> texts) {
-		setTexts(texts);
+		this.texts = texts;
 	}
 	public NaturalParagraph(NaturalLanguage[] texts) {
 		this(Arrays.asList(texts));
 	}
 	
 
-	/***********************************/
-	/**********  MemberMethod **********/
-	/***********************************/
-		
-	/***********************************/
-	/********** Getter/Setter **********/
-	/***********************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	public List<NaturalLanguage> getTexts() {
 		return texts;
-	}
-	public void setTexts(List<NaturalLanguage> texts) {
-		this.texts = texts;
 	}
 	
 }
