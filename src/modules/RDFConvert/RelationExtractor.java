@@ -24,7 +24,7 @@ import data.RDF.rule.RDFRuleReader;
 import data.RDF.rule.RDFRules;
 import data.RDF.rule.RDFRulesSet;
 import data.RDF.vocabulary.JASS;
-import data.id.IDTuple;
+import data.id.IDTupleByStatement;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
@@ -33,7 +33,7 @@ import grammar.word.Resourcable;
 public class RelationExtractor {
 
 	/** 標準のJASSオントロジー */
-	public final Model defaultJASSModel;
+	private final Model defaultJASSModel;
 
 	/** 拡張ルール */
 	private final RDFRules extensionRules;
@@ -121,7 +121,7 @@ public class RelationExtractor {
 			*/
 			Set<Moderule> modelWithRule = converts(jass);
 			modelWithRule.forEach(mr -> {
-				IDTuple idt_clone = idt.clone();
+				IDTupleByStatement idt_clone = idt.clone();
 				idt_clone.setRDFRuleID(String.valueOf(mr.rule.id()));
 				Model m = mr.model;
 				replaceProxy2CategoremResource(m, proxyNodes);
@@ -227,5 +227,9 @@ public class RelationExtractor {
 
 	public RDFRulesSet getOntologyRules() {
 		return ontologyRulesSet;
+	}
+	
+	public Model getDefaultJassModel() {
+		return defaultJASSModel;
 	}
 }

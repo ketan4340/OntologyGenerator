@@ -1,4 +1,4 @@
-package util.tuple;
+package data.id;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class Tuple extends ArrayList<String> {
-	private static final long serialVersionUID = -201286752453864379L;
+	private static final long serialVersionUID = 2591868802199455877L;
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
 	public Tuple(int size, String initValue) {
 		super(Collections.nCopies(size, initValue));
@@ -25,7 +25,7 @@ public class Tuple extends ArrayList<String> {
 
 
 	/* ================================================== */
-	/* ==========        Member  Method        ========== */
+	/* ================== Member Method ================= */
 	/* ================================================== */
 	public String toCSV() {
 		return String.join(",", this);

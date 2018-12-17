@@ -65,7 +65,7 @@ public class Generator {
 		MAX_SIZE_OF_INSTATEMENT = Integer.valueOf(prop.getProperty("max-size-of-INstatement"));
 		PATH_CABOCHA_PROP = Paths.get(prop.getProperty("cabocha-prop"));
 		
-		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+RUNTIME+".txt");
+		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+".txt");
 		PATH_CONVERTEDJASS_TURTLE = Paths.get(prop.getProperty("output-convertedJASS-turtle")+RUNTIME+".ttl");
 		PATH_USEDRULES = Paths.get(prop.getProperty("output-usedrules")+RUNTIME+".rule");
 		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle")+RUNTIME+".ttl");
@@ -103,15 +103,15 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		//textFile_str = "resource/input/test/single.txt";
-		textFile_str = "resource/input/test/failed.txt";
+		textFile_str = "resource/input/test/single.txt";
+		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
 		if (Objects.nonNull(textFile_str)) {
 			Path textFilePath = Paths.get(textFile_str);
 			Model ontology = generate(textFilePath);
 			///* デバッグ用
-			if (ontology.size() < 50)
+			if (ontology.size() < 100)
 				ontology.write(System.out, "TURTLE");
 			//*/
 		}	
@@ -157,7 +157,7 @@ public class Generator {
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
 
-		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
+		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 
 		/********** 関係抽出モジュール **********/
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
@@ -176,17 +176,17 @@ public class Generator {
 		System.out.println("Entity linked.");
 		//*/
 
-		OutputManager opm = new OutputManager();
+		OutputManager opm = OutputManager.getInstance();
 		// ログや生成物の出力
-		opm.outputDividedSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
+		opm.writeSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
 		// デフォルトJASSモデルは取り除いて出力
-		opm.outputOntologyAsTurtle(
-				re.removeJASSOntology(unionOntology).setNsPrefixes(re.defaultJASSModel.getNsPrefixMap()), 
+		opm.writeJassModel(
+				re.removeJASSOntology(jassMap.uniteModels()).setNsPrefixes(re.getDefaultJassModel().getNsPrefixMap()), 
 				PATH_CONVERTEDJASS_TURTLE);
-		opm.outputRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
+		opm.writeRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
 
-		opm.outputIDAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
-		opm.outputOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
+		opm.writeIDTupleAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
+		opm.writeOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
 
 		System.out.println("Finished.");
 		System.out.println("input sentences: " + naturalLanguages.size());

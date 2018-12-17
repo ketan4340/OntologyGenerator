@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import data.id.IDTuple;
+import data.id.IDTupleByStatement;
 import data.id.SentenceIDMap;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
@@ -48,17 +48,19 @@ public class SentenceReviser {
 
 		// 指定の品詞を持つ形態素を次の形態素と破壊的に結合する
 		Stream.of(TAGS_NOUNIZE).forEach(tag_n -> {
-			sentence.collectClausesHaveSome(tag_n).forEach(c -> {
-				sentence.nextChild(c);
-				
-			});
+			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_n, true);
+					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
+				if (!sentence.connect2Next(matchedClause, true))
+					break;
+				matchedClause = sentence.findFirstClauseEndWith(tag_n, true);
+			}
 		});
 		
 		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
 		Stream.of(TAGS_NOUNPHRASE).forEach(tag_np -> {
 			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_np, true);
 					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
-				if (!sentence.connect2Next(matchedClause))
+				if (!sentence.connect2Next(matchedClause, false))
 					break;
 				matchedClause = sentence.findFirstClauseEndWith(tag_np, true);
 			}
@@ -125,9 +127,9 @@ public class SentenceReviser {
 	 * @param sentenceEntry 	キーが文，値がIDタプルのマップエントリ
 	 * @return
 	 */
-	private SentenceIDMap divideSentence(Map.Entry<Sentence, IDTuple> sentenceEntry) {
+	private SentenceIDMap divideSentence(Map.Entry<Sentence, IDTupleByStatement> sentenceEntry) {
 		Sentence sentence = sentenceEntry.getKey();
-		IDTuple ids = sentenceEntry.getValue();
+		IDTupleByStatement ids = sentenceEntry.getValue();
 		List<Sentence> dividedSentences = Stream.of(sentence)
 				.map(Sentence::divide2)
 				.flatMap(List<Sentence>::stream)

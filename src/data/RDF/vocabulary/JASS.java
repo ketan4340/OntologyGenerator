@@ -83,10 +83,10 @@ public class JASS {
 	public static final Property subPoS1 = property("subPoS1");
 	public static final Property subPoS2 = property("subPoS2");
 	public static final Property subPoS3 = property("subPoS3");
-	public static final Property inflection = property("inflection");
 	public static final Property conjugation = property("conjugation");
+	public static final Property inflection = property("inflection");
 	public static final Property infinitive = property("infinitive");
-	public static final Property kana = property("kana");
-	public static final Property pronunsiation = property("pronunciation");	
+	public static final Property yomi = property("yomi");
+	public static final Property pronunciation = property("pronunciation");	
 
 }

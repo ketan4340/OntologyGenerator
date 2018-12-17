@@ -11,22 +11,25 @@ import org.apache.jena.rdf.model.Model;
 import data.RDF.rule.RDFRules;
 import data.RDF.rule.RDFRulesSet;
 import data.id.IDRelation;
-import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 
-public class OutputManager {
-
+public final class OutputManager {
+	private static OutputManager INSTANCE = new OutputManager();
 
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
-	public OutputManager() {}
-
+	private OutputManager() {}
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	public void outputDividedSentences(SentenceIDMap sentenceMap, Path path) {
+	public static OutputManager getInstance() { return INSTANCE; }
+
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
+	public void writeSentences(SentenceIDMap sentenceMap, Path path) {
 		try {
 			Files.createDirectories(path.getParent());
 			Files.write(path, sentenceMap.toStringList());
@@ -35,16 +38,16 @@ public class OutputManager {
 		}
 	}
 
-	public void outputJASSGraph(ModelIDMap jassMap, Path path) {
+	public void writeJassModel(Model jass, Path path) {
 		try (final OutputStream os = Files.newOutputStream(path)) {
 			Files.createDirectories(path.getParent());
-			jassMap.uniteModels().write(os, "TURTLE");
+			jass.write(os, "TURTLE");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void outputRDFRules(RDFRules rules, Path path) {
+	public void writeRDFRules(RDFRules rules, Path path) {
 		try {
 			Files.createDirectories(path.getParent());
 			Files.write(path, rules.toStringList());
@@ -53,7 +56,7 @@ public class OutputManager {
 		}
 	}
 
-	public void outputRDFRulesSet(RDFRules exrules, RDFRulesSet rules, Path path) {
+	public void writeRDFRulesSet(RDFRules exrules, RDFRulesSet rules, Path path) {
 		try {
 			Files.createDirectories(path.getParent());
 			Files.write(path, exrules.toStringList());
@@ -63,7 +66,7 @@ public class OutputManager {
 		}
 	}
 
-	public void outputOntologyAsTurtle(Model model, Path path) {
+	public void writeOntologyAsTurtle(Model model, Path path) {
 		try (final OutputStream os = Files.newOutputStream(path)) {
 			Files.createDirectories(path.getParent());
 			model.write(os, "TURTLE");
@@ -72,7 +75,7 @@ public class OutputManager {
 		}
 	}
 
-	public void outputOntologyAsRDFXML(Model model, Path path) {
+	public void writeOntologyAsRDFXML(Model model, Path path) {
 		try (final OutputStream os = Files.newOutputStream(path)) {
 			Files.createDirectories(path.getParent());
 			model.write(os, "RDF/XML");
@@ -81,7 +84,7 @@ public class OutputManager {
 		}
 	}
 
-	public void outputIDAsCSV(IDRelation IDRelation, Path path) {
+	public void writeIDTupleAsCSV(IDRelation IDRelation, Path path) {
 		try {
 			Files.createDirectories(path.getParent());
 			Files.write(path, IDRelation.toStringList());

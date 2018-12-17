@@ -12,7 +12,7 @@
 	<entry key="cabocha-prop">../OntologyGenerator/resource/prop/CaboCha-property.xml</entry>
 
 	<!-- 途中生成物 (ログ) の出力先 -->
-	<entry key="output-shortsentence">../OntologyGenerator/tmp/log/text/shortsentence</entry>
+	<entry key="output-shortsentence">../OntologyGenerator/tmp/log/text/sentence</entry>
 	<entry key="output-convertedJASS-turtle">../OntologyGenerator/tmp/log/jass/jass</entry>
 	<entry key="output-usedrules">../OntologyGenerator/tmp/log/rule/rule</entry>
 

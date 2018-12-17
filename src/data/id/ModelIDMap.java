@@ -13,23 +13,23 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	
 	public static int modelSum = 0;
 	
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	public ModelIDMap() {
 		super();
 	}
 	public ModelIDMap(int initialCapacity) {
 		super(initialCapacity);
 	}
-	public ModelIDMap(LinkedHashMap<Model, IDTuple> m) {
+	public ModelIDMap(LinkedHashMap<Model, IDTupleByStatement> m) {
 		super(m);
 	}
 
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	public void setModelID() {}
 	/*
 	//TODO
@@ -39,6 +39,10 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 		forEach((k, v) -> v.setRDFRuleID(k.id()));
 	}
 	*/
+	public void setModel() {
+		
+	}
+	
 	public Model uniteModels() {
 		Model unionModel = ModelFactory.createDefaultModel();
 		forEachKey(unionModel::add);
@@ -57,6 +61,11 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 		StatementIDMap newStatementMap = new StatementIDMap();
 		replaceMap.forEach((m, sts) -> sts.forEach(st -> newStatementMap.put(st, get(m).clone())));
 		return newStatementMap;
+	}
+	
+	public IDRelation createIDRelation() {
+		setModel();
+		return new IDRelation(values());
 	}
 
 }

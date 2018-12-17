@@ -11,23 +11,24 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 
 	private static int sum = 0;
 
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	public StatementIDMap() {
 		super();
 	}
 	public StatementIDMap(int initialCapacity) {
 		super(initialCapacity);
 	}
-	public StatementIDMap(LinkedHashMap<Statement, IDTuple> m) {
+	public StatementIDMap(LinkedHashMap<Statement, IDTupleByStatement> m) {
 		super(m);
 	}
 
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	public void setStatementID() {
 		forEachValue(idt -> idt.setTripleID(String.valueOf(sum++)));
 	}
@@ -40,15 +41,12 @@ public class StatementIDMap extends IDLinkedMap<Statement> {
 	public void setObjectString() {
 		forEach((stmt, idt) -> idt.setObject(RDFUtil.toResourceStringAsQName(stmt.getObject())));
 	}
-	public void setStatement() {
+
+	public IDRelation createIDRelation() {
 		setStatementID();
 		setSubjectString();
 		setPredicateString();
 		setObjectString();
-	}
-
-	public IDRelation createIDRelation() {
-		setStatement();
 		return new IDRelation(values());
 	}
 

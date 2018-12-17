@@ -13,34 +13,32 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	private static final long serialVersionUID = -2957160502289250254L;
 
 
-
-	/****************************************/
-	/**********   Static  Method   **********/
-	/****************************************/
-	public static SentenceIDMap createFromList(List<Sentence> sentenceList) {
-		LinkedHashMap<Sentence, IDTuple> lhm = sentenceList.stream()
-				.collect(Collectors.toMap(s -> s, s -> new IDTuple(""), (e1, e2) -> e1, LinkedHashMap::new));
-		return new SentenceIDMap(lhm);
-	}
-
-	/****************************************/
-	/**********     Constructor    **********/
-	/****************************************/
+	/* ================================================== */
+	/* =================== Constructor ================== */
+	/* ================================================== */
 	public SentenceIDMap() {
 		super();
 	}
 	public SentenceIDMap(int initialCapacity) {
 		super(initialCapacity);
 	}
-	public SentenceIDMap(LinkedHashMap<Sentence, IDTuple> m) {
+	public SentenceIDMap(LinkedHashMap<Sentence, IDTupleByStatement> m) {
 		super(m);
 	}
 
 
+	/* ================================================== */
+	/* ================== Static Method ================= */
+	/* ================================================== */
+	public static SentenceIDMap createFromList(List<Sentence> sentenceList) {
+		LinkedHashMap<Sentence, IDTupleByStatement> lhm = sentenceList.stream()
+				.collect(Collectors.toMap(s -> s, s -> new IDTupleByStatement(""), (e1, e2) -> e1, LinkedHashMap::new));
+		return new SentenceIDMap(lhm);
+	}
 
-	/****************************************/
-	/**********   Member  Method   **********/
-	/****************************************/
+	/* ================================================== */
+	/* ================== Member Method ================= */
+	/* ================================================== */
 	public void setLongSentence() {
 		forEach((s, idt) -> {
 			idt.setLongSentenceID(String.valueOf(s.id()));

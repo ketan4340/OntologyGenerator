@@ -41,62 +41,36 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	/* ================ Interface Method ================ */
 	/* ================================================== */
 	@Override
-	public int id() {
-		return id;
-	}
+	public int id() { return id; }
 	//@Override
 	public int compareTo(Morpheme o) {
 		int comparison = name.compareTo(o.name);
 		return comparison!=0? comparison : tags.compareTo(o.tags);
 	}
 	@Override
-	public String name() {
-		return name;
-	}
+	public String name() { return name; }
 	@Override
-	public String mainPoS() {
-		return tags.mainPoS();
-	}
+	public String mainPoS() { return tags.mainPoS(); }
 	@Override
-	public String subPoS1() {
-		return tags.subPoS1();
-	}
+	public String subPoS1() { return tags.subPoS1(); }
 	@Override
-	public String subPoS2() {
-		return tags.subPoS2();
-	}
+	public String subPoS2() { return tags.subPoS2(); }
 	@Override
-	public String subPoS3() {
-		return tags.subPoS3();
-	}
+	public String subPoS3() { return tags.subPoS3(); }
 	@Override
-	public String conjugation() {
-		return tags.conjugation();
-	}
+	public String conjugation() { return tags.conjugation(); }
 	@Override
-	public String inflection() {
-		return tags.inflection();
-	}
+	public String inflection() { return tags.inflection(); }
 	@Override
-	public String infinitive() {
-		return tags.infinitive();
-	}
+	public String infinitive() { return tags.infinitive(); }
 	@Override
-	public String yomi() {
-		return tags.yomi();
-	}
+	public String yomi() { return tags.yomi(); }
 	@Override
-	public String pronunciation() {
-		return tags.pronunciation();
-	}
+	public String pronunciation() { return tags.pronunciation(); }
 	@Override
-	public boolean contains(String pos) {
-		return tags.contains(pos);
-	}
+	public boolean contains(String pos) { return tags.contains(pos); }
 	@Override
-	public boolean containsAll(Collection<String> poss) {
-		return tags.containsAll(poss);
-	}
+	public boolean containsAll(Collection<String> poss) { return tags.containsAll(poss); }
 	@Override
 	public Resource toJASS(Model model) {
 		return model.createResource(getJassURI())
@@ -110,9 +84,9 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 				.addLiteral(JASS.conjugation, conjugation())
 				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.infinitive, infinitive())
-				.addLiteral(JASS.kana, yomi())
-				.addLiteral(JASS.pronunsiation, pronunciation());
-		*/
+				.addLiteral(JASS.yomi, yomi())
+				.addLiteral(JASS.pronunciation, pronunciation());
+		//*/
 	}
 	
 	@Override

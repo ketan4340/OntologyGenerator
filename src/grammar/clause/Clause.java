@@ -15,6 +15,7 @@ import grammar.Constituent;
 import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
+import grammar.morpheme.Morpheme;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
@@ -63,6 +64,12 @@ implements SyntacticChild, GrammarInterface, Constituent {
 		words.add(categorem);
 		words.addAll(adjuncts);
 		return words;
+	}
+	public List<Morpheme> morphemes() {
+		return words().stream()
+				.map(Word::getChildren)
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -226,10 +233,10 @@ implements SyntacticChild, GrammarInterface, Constituent {
 		if (!(obj instanceof Clause<?>))
 			return false; 
 		Clause<?> other = (Clause<?>) obj;
-		return categorem.equals(other.categorem) && 
-				adjuncts.equals(other.adjuncts) &&
-				others.equals(other.others) &&
-				depending.equals(other.depending); 
+		return Objects.equals(this.categorem, other.categorem) && 
+				Objects.equals(this.adjuncts, other.adjuncts) &&
+				Objects.equals(this.others, other.others) &&
+				Objects.equals(this.depending, other.depending);
 	}
 	
 	@Override

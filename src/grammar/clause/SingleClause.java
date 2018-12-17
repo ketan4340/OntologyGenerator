@@ -13,11 +13,13 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.MorphemeFactory;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
+import language.pos.TagsFactory;
 
-public class SingleClause extends Clause<Categorem>{
+public class SingleClause extends Clause<Categorem> {
 	public static final SingleClause ROOT =
 			new SingleClause(Categorem.EMPTY_CATEGOREM, Collections.emptyList(), Collections.emptyList());
 
@@ -39,6 +41,28 @@ public class SingleClause extends Clause<Categorem>{
 				new ArrayList<>(other.others));
 	}
 
+	/* ================================================== */
+	/* ================== Static Method ================= */
+	/* ================================================== */
+	/**
+	 * 2つの文節の破壊的結合. 前の文節の形態素は全て後ろの文節の自立語に入れられる. 元の文節の情報は取り出せなくなる不可逆処理.
+	 * @param front 前の文節
+	 * @param back 後ろの文節
+	 * @return 結合してできた文節
+	 */
+	public static SingleClause concatClauseDestructive(Clause<?> front, SingleClause back) {
+		List<Morpheme> newCatMorp = front.morphemes();
+		// 前の文節の形態素の原形を表層系に変える. CaboChaの仕様への対応策
+		newCatMorp = newCatMorp.stream().map(m -> MorphemeFactory.getInstance().getMorpheme(
+				m.name(), 
+				TagsFactory.getInstance().getCabochaTags(m.mainPoS(), m.subPoS1(), m.subPoS2(), m.subPoS3(), m.conjugation(), m.inflection(), m.name(), m.yomi(), m.pronunciation())
+				)).collect(Collectors.toList());
+		newCatMorp.addAll(back.categorem.getChildren());
+		Categorem newCat = new Categorem(newCatMorp);
+		back.setCategorem(newCat);
+		return back;
+	}
+	
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */

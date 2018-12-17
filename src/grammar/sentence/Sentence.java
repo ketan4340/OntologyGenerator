@@ -58,9 +58,8 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	 * @param dependingMap 各文節がこの文の何番目の文節に係るか記録されたマップ
 	 */
 	private void initializeDepending(Map<Clause<?>, Integer> dependingMap) {
-		dependingMap.entrySet().stream().forEach(e -> {
-			Clause<?> c = e.getKey();
-			int idxDep2 = e.getValue();
+		dependingMap.forEach((c, idxDep2) -> {
+			//System.out.println(c + ": "+idxDep2);
 			c.setDepending(idxDep2 == -1? SingleClause.ROOT: children.get(idxDep2));
 		});
 	}
@@ -95,24 +94,32 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	 * 指定の文節をその右隣の文節に繋げる.
 	 * 元の文節・単語は連文節の中に内包される. 
 	 * @param frontClause 直後の文節と繋げる文節
+	 * @param destructive 破壊的結合をするかどうか
 	 */
-	public boolean connect2Next(Clause<?> frontClause) {
+	public boolean connect2Next(Clause<?> frontClause, boolean destructive) {
 		if (!children.contains(frontClause)) return false;
 		if (!frontClause.getOthers().isEmpty()) return false;		// 前の文節に接辞(句読点など)があれば繋げない
 
 		Clause<?> backClause = nextChild(frontClause);
 		if (backClause == null || backClause == SingleClause.ROOT) return false;
 
-		List<Clause<?>> backup = new ArrayList<>(children);
-
-		SerialClause sc = SerialClause.joinClauses(frontClause, backClause);
-		if (!replace(backClause, sc)) return false;
+		Clause<?> concatClause;
+		if (destructive) {
+			if (!(backClause instanceof SingleClause))
+				return false;
+			concatClause = SingleClause.concatClauseDestructive(frontClause, (SingleClause) backClause);
+		} else {
+			concatClause = SerialClause.join(frontClause, backClause);
+		}
+		
+		if (!replace(backClause, concatClause)) return false;
 		if (!children.remove(frontClause)) return false;
 		Set<Clause<?>> formerDependeds = clausesDepending(frontClause);
 		formerDependeds.addAll(clausesDepending(backClause));
-		gatherDepending(sc, formerDependeds);
+		gatherDepending(concatClause, formerDependeds);
 		return true;
 	}
+	
 
 	private Set<Clause<?>> clausesDepending(Clause<?> clause) {
 		return getChildren().stream()
@@ -391,7 +398,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		}
 		String[][] tags_NP = {{"助詞", "連体化"}};
 		List<Clause<?>> clauses_NP = collectClausesHaveSome(tags_NP);
-		clauses_NP.forEach(this::connect2Next);
+		clauses_NP.forEach(c -> connect2Next(c, false));
 	}
 
 

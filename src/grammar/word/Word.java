@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -93,61 +94,35 @@ public class Word extends SyntacticParent<Morpheme>
 	/* ================ Interface Method ================ */ 
 	/* ================================================== */
 	@Override
-	public int id() {
-		return id;
-	}
+	public int id() { return id; }
 	@Override
-	public String name() {
-		return children.stream().map(Morpheme::name).collect(Collectors.joining());
-	}
+	public String name() { return children.stream().map(Morpheme::name).collect(Collectors.joining()); }
 	@Override
-	public String mainPoS() {
-		return coreMorpheme().mainPoS();
-	}
+	public String mainPoS() { return coreMorpheme().mainPoS(); }
 	@Override
-	public String subPoS1() {
-		return coreMorpheme().subPoS1();
-	}
+	public String subPoS1() { return coreMorpheme().subPoS1(); }
 	@Override
-	public String subPoS2() {
-		return coreMorpheme().subPoS2();
-	}
+	public String subPoS2() { return coreMorpheme().subPoS2(); }
 	@Override
-	public String subPoS3() {
-		return coreMorpheme().subPoS3();
-	}
+	public String subPoS3() { return coreMorpheme().subPoS3(); }
 	@Override
-	public String inflection() {
-		return coreMorpheme().inflection();
-	}
+	public String inflection() { return coreMorpheme().inflection(); }
 	@Override
-	public String conjugation() {
-		return coreMorpheme().conjugation();
-	}
+	public String conjugation() { return coreMorpheme().conjugation(); }
 	@Override
-	public String infinitive() {
-		return children.stream().map(m -> m.infinitive()).collect(Collectors.joining());
-	}
+	public String infinitive() { return children.stream().map(m -> m.infinitive()).collect(Collectors.joining()); }
 	@Override
-	public String yomi() {
-		return children.stream().map(m -> m.yomi()).collect(Collectors.joining());
-	}
+	public String yomi() { return children.stream().map(m -> m.yomi()).collect(Collectors.joining()); }
 	@Override
-	public String pronunciation() {
-		return children.stream().map(m -> m.pronunciation()).collect(Collectors.joining());
-	}
+	public String pronunciation() { return children.stream().map(m -> m.pronunciation()).collect(Collectors.joining()); }
+	
 	@Override
-	public boolean contains(String pos) {
-		return children.stream().anyMatch(m -> m.contains(pos));
-	}
+	public boolean contains(String pos) { return children.stream().anyMatch(m -> m.contains(pos)); }
 	@Override
-	public boolean containsAll(Collection<String> poss) {
-		return children.stream().anyMatch(m -> m.containsAll(poss));
-	}
+	public boolean containsAll(Collection<String> poss) { return children.stream().anyMatch(m -> m.containsAll(poss)); }
+	
 	@Override
-	public Word clone() {
-        return new Word(this);
-	}
+	public Word clone() { return new Word(this); }
 	
 	@Override
 	public Resource toJASS(Model model) {
@@ -166,8 +141,8 @@ public class Word extends SyntacticParent<Morpheme>
 				.addLiteral(JASS.conjugation, conjugation())
 				.addLiteral(JASS.inflection, inflection())
 				.addLiteral(JASS.infinitive, infinitive())
-				.addLiteral(JASS.kana, yomi())
-				.addLiteral(JASS.pronunsiation, pronunciation());
+				.addLiteral(JASS.yomi, yomi())
+				.addLiteral(JASS.pronunciation, pronunciation());
 		return wordResource;
 	}
 	
@@ -185,7 +160,27 @@ public class Word extends SyntacticParent<Morpheme>
 	/* ================================================== */
 	/* ================== Object Method ================= */ 
 	/* ================================================== */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hashCode(id);	//TODO
+		result = prime * result + Objects.hashCode(children);
+		return result;
+	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof Word))
+			return false; 
+		Word other = (Word) obj;
+		return Objects.equals(this.id, other.id) &&
+				Objects.equals(this.children, other.children);
+	}
 	
 	@Override
 	public String toString() {

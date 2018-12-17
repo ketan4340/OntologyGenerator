@@ -1,8 +1,6 @@
 package data.id;
 
-import util.tuple.Tuple;
-
-public class IDTuple extends Tuple {
+public class IDTupleByStatement extends Tuple {
 	private static final long serialVersionUID = -3501992033602856621L;
 
 	private static final int SIZE 				= 10;
@@ -31,12 +29,12 @@ public class IDTuple extends Tuple {
 			"Score");
 
 	/* ================================================== */
-	/* ==========          Constructor         ========== */
+	/* =================== Constructor ================== */
 	/* ================================================== */
-	public IDTuple(String initValue) {
+	public IDTupleByStatement(String initValue) {
 		super(SIZE, initValue);
 	}
-	public IDTuple(String longSentenceID, String longSentence,
+	public IDTupleByStatement(String longSentenceID, String longSentence,
 			String shortSentenceID, String shortSentence,
 			String rdfRuleID, String tripleID,
 			String subject, String predicate, String object,  String score) {
@@ -54,11 +52,10 @@ public class IDTuple extends Tuple {
 	}
 
 
-
 	/* ================================================== */
-	/* ==========        Member  Method        ========== */
+	/* ================== Member Method ================= */
 	/* ================================================== */
-	public void copy(IDTuple t) {
+	public void copy(IDTupleByStatement t) {
 		setLongSentenceID(t.getLongSentenceID());
 		setLongSentence(t.getLongSentence());
 		setShortSentenceID(t.getShortSentenceID());
@@ -71,9 +68,8 @@ public class IDTuple extends Tuple {
 		setScore(t.getScore());
 	}
 
-	/* ================================================== */
-	/* ==========        Getter, Setter        ========== */
-	/* ================================================== */
+
+	/* ================= Getter, Setter ================= */
 	public String getLongSentenceID() {
 		return get(LONGSENTENCE_ID);
 	}
@@ -137,11 +133,11 @@ public class IDTuple extends Tuple {
 
 
 	/* ================================================== */
-	/* ==========        Object  Method        ========== */
+	/* ================== Object Method ================= */
 	/* ================================================== */
 	@Override
-	public IDTuple clone() {
-		return new IDTuple(
+	public IDTupleByStatement clone() {
+		return new IDTupleByStatement(
 				getLongSentenceID(),
 				getLongSentence(),
 				getShortSentenceID(),
@@ -153,4 +149,5 @@ public class IDTuple extends Tuple {
 				getObject(),
 				getScore());
 	}
+
 }

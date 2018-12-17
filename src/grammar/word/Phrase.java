@@ -1,6 +1,5 @@
 package grammar.word;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,28 +27,27 @@ import language.pos.TagsFactory;
 public class Phrase extends Categorem {
 	
 	/** 従属部 */
-	private final List<? extends Clause<?>> dependent;
+	private final Dependent dependent;
 	/** 主要部 */
 	private final Categorem head;
 
 	/* ================================================== */
 	/* ================== Constructor =================== */
 	/* ================================================== */
-	public Phrase(List<? extends Clause<?>> dependent, Categorem head) {
+	public Phrase(Dependent dependent, Categorem head) {
 		super(collectMorphemes(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
 	}
-	private static List<Morpheme> collectMorphemes(List<? extends Clause<?>> dependent, Word head) {
-		Stream<Morpheme> dependentMorphemes = dependent.stream()
+	private static List<Morpheme> collectMorphemes(Dependent dependent, Word head) {
+		Stream<Morpheme> dependentMorphemes = dependent.getChildren().stream()
 				.flatMap(c -> c.getChildren().stream())
 				.flatMap(c -> c.getChildren().stream());
 		Stream<Morpheme> headMorphemes = head.getChildren().stream();
 		return Stream.concat(dependentMorphemes, headMorphemes).collect(Collectors.toList());
 	}
 	private Phrase(Phrase other) {
-		this(new ArrayList<>(other.dependent), 
-				other.head.clone());
+		this(other.dependent.clone(), other.head.clone());
 	}
 
 	/* ================================================== */
@@ -71,7 +69,7 @@ public class Phrase extends Categorem {
 	@Override
 	public Resource toJASS(Model model) {
 		Resource dependentList = 
-				model.createList(dependent.stream().map(m -> m.toJASS(model)).iterator())
+				model.createList(dependent.getChildren().stream().map(m -> m.toJASS(model)).iterator())
 				.addProperty(RDF.type, JASS.ClauseList);
 
 		return super.toJASS(model)
@@ -91,7 +89,7 @@ public class Phrase extends Categorem {
 		Stream<Word> monoWords = Stream.of("もの", "物")
 				.map(s -> new Word(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "モノ", "モノ")));
 
-		List<? extends Clause<?>> depcopy = new LinkedList<>(dependent);
+		List<? extends Clause<?>> depcopy = new LinkedList<>(dependent.getChildren());
 		/*
 		 * 「こと」ならその直前の文節(従属部の最後尾)の自立語のリソース (「Xのこと」のX部分)
 		 * 「もの」なら空白ノード
@@ -155,7 +153,7 @@ public class Phrase extends Categorem {
 	@Override
 	public String toString() {
 		return "[" +
-				dependent.stream()
+				dependent.getChildren().stream()
 				.map(Clause::toString)
 				.collect(Collectors.joining("/")) + "-" +
 				head.toString() + "]";
