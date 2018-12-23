@@ -20,7 +20,6 @@ import org.apache.jena.rdf.model.Model;
 import cabocha.Cabocha;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
-import data.id.StatementIDMap;
 import grammar.naturalLanguage.NaturalLanguage;
 import grammar.naturalLanguage.NaturalParagraph;
 import grammar.sentence.Sentence;
@@ -103,8 +102,8 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		textFile_str = "resource/input/test/single.txt";
-		//textFile_str = "resource/input/test/failed.txt";
+		//textFile_str = "resource/input/test/single.txt";
+		textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
 		if (Objects.nonNull(textFile_str)) {
@@ -154,6 +153,8 @@ public class Generator {
 		/** Step2: 長文分割 **/
 		/* 長文を分割し複数の短文に分ける */
 		sr.divideEachSentence(sentenceMap);
+		// 主語結合
+		sentenceMap.forEachKey(s -> s.uniteSubject());
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
 
@@ -163,7 +164,7 @@ public class Generator {
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
 		ModelIDMap jassMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap ontologyMap = re.convertMap_JASSModel2RDFModel(jassMap);
-		StatementIDMap statementMap = re.convertMap_Model2Statements(ontologyMap);
+		//StatementIDMap statementMap = re.convertMap_Model2Statements(ontologyMap);
 		System.out.println("Relation extracted.");
 		
 		// 全てのModelIDMapを統合し、JASS語彙の定義を取り除く
@@ -185,7 +186,7 @@ public class Generator {
 				PATH_CONVERTEDJASS_TURTLE);
 		opm.writeRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
 
-		opm.writeIDTupleAsCSV(statementMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
+		opm.writeIDTupleAsCSV(ontologyMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
 		opm.writeOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
 
 		System.out.println("Finished.");

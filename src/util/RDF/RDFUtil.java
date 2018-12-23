@@ -16,9 +16,8 @@ public class RDFUtil {
 	public static final String toResourceStringAsQName(RDFNode object) {
 		Model m = object.getModel();
 		if (object.isURIResource()) {
-			if (Objects.nonNull(m))
-				return m.shortForm(object.asResource().getURI());
-			return object.asResource().getURI();
+			String uri = object.asResource().getURI();
+			return Objects.nonNull(m)? m.shortForm(uri): uri;
 		} else if (object.isAnon())		// 空白ノード
 			return BLANK_NODE_PREFIX + object.toString();
 		else if (object.isLiteral())	// リテラル

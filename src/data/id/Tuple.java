@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Tuple extends ArrayList<String> {
+public class Tuple extends ArrayList<String> implements TupleInterface {
 	private static final long serialVersionUID = 2591868802199455877L;
 
 	/* ================================================== */
@@ -27,10 +27,10 @@ public class Tuple extends ArrayList<String> {
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
+	@Override
 	public String toCSV() {
 		return String.join(",", this);
 	}
-
 
 	@Override
 	public boolean add(String e) throws UnsupportedOperationException {return false;}

@@ -22,7 +22,7 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	public SentenceIDMap(int initialCapacity) {
 		super(initialCapacity);
 	}
-	public SentenceIDMap(LinkedHashMap<Sentence, IDTupleByStatement> m) {
+	public SentenceIDMap(LinkedHashMap<Sentence, IDTuple> m) {
 		super(m);
 	}
 
@@ -31,34 +31,32 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/* ================== Static Method ================= */
 	/* ================================================== */
 	public static SentenceIDMap createFromList(List<Sentence> sentenceList) {
-		LinkedHashMap<Sentence, IDTupleByStatement> lhm = sentenceList.stream()
-				.collect(Collectors.toMap(s -> s, s -> new IDTupleByStatement(""), (e1, e2) -> e1, LinkedHashMap::new));
-		return new SentenceIDMap(lhm);
+		return sentenceList.stream()
+				//.collect(Collectors.toMap(s -> s, s -> new IDTupleByStatement(""), (e1, e2) -> e1, LinkedHashMap::new));
+				.collect(Collectors.toMap(s -> s, s -> new IDTupleByModel(""), (e1, e2) -> e1, SentenceIDMap::new));
 	}
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
 	public void setLongSentence() {
-		forEach((s, idt) -> {
-			idt.setLongSentenceID(String.valueOf(s.id()));
-			idt.setLongSentence(s.name());
-		});
+		forEach((s, idt) -> idt.setLongSentence(s));
 	}
 	public void setShortSentence() {
-		forEach((s, idt) -> {
-			idt.setShortSentenceID(String.valueOf(s.id()));
-			idt.setShortSentence(s.name());
-		});
+		forEach((s, idt) -> idt.setShortSentence(s));
 	}
 
 	public List<String> toStringList() {
 		return keySet().stream().map(Sentence::name).collect(Collectors.toList());
 	}
+	
 	public SentenceIDMap replaceSentence2Sentences(Map<Sentence, List<Sentence>> replaceMap) {
 		SentenceIDMap sm = new SentenceIDMap();
-		replaceMap.forEach((st, sts) ->
-		sts.forEach(s -> sm.put(s, get(st).clone()))
+		replaceMap.forEach(
+				(from, toList) -> {
+					IDTuple cloneTuple = get(from).clone();
+					toList.forEach(s -> sm.put(s, cloneTuple));
+				}
 		);
 		return sm;
 	}

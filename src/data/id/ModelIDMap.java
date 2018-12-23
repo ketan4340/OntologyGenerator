@@ -22,7 +22,7 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	public ModelIDMap(int initialCapacity) {
 		super(initialCapacity);
 	}
-	public ModelIDMap(LinkedHashMap<Model, IDTupleByStatement> m) {
+	public ModelIDMap(LinkedHashMap<Model, IDTuple> m) {
 		super(m);
 	}
 
@@ -40,7 +40,7 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	}
 	*/
 	public void setModel() {
-		
+		forEach((m, idt) -> idt.setModel(m));
 	}
 	
 	public Model uniteModels() {
@@ -51,8 +51,8 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	
 	public ModelIDMap replaceModel2Models(Map<Model, List<Model>> replaceMap) {
 		ModelIDMap newModelMap = new ModelIDMap();
-		replaceMap.forEach((md, mds) -> 
-		mds.forEach(m -> newModelMap.put(md, get(md).clone()))
+		replaceMap.forEach(
+				(md, mds) -> mds.forEach(m -> newModelMap.put(md, get(md).clone()))
 		);
 		return newModelMap;
 	}
@@ -65,7 +65,7 @@ public class ModelIDMap extends IDLinkedMap<Model> {
 	
 	public IDRelation createIDRelation() {
 		setModel();
-		return new IDRelation(values());
+		return new IDRelation(IDTupleByModel.ATTRIBUTES, values());
 	}
 
 }

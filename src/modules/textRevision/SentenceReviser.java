@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import data.id.IDTupleByStatement;
 import data.id.SentenceIDMap;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
@@ -127,28 +126,23 @@ public class SentenceReviser {
 	 * @param sentenceEntry 	キーが文，値がIDタプルのマップエントリ
 	 * @return
 	 */
-	private SentenceIDMap divideSentence(Map.Entry<Sentence, IDTupleByStatement> sentenceEntry) {
-		Sentence sentence = sentenceEntry.getKey();
-		IDTupleByStatement ids = sentenceEntry.getValue();
-		List<Sentence> dividedSentences = Stream.of(sentence)
+	private List<Sentence> divideSentence(Sentence sentence) {
+		return Stream.of(sentence)
 				.map(Sentence::divide2)
 				.flatMap(List<Sentence>::stream)
 				.map(Sentence::divide3)
 				.flatMap(List<Sentence>::stream)
 				.collect(Collectors.toList());
-
-		SentenceIDMap sm = SentenceIDMap.createFromList(dividedSentences);
-		sm.forEachValue(t -> t.copy(ids));
-
-		return sm;
 	}
 	public void divideEachSentence(SentenceIDMap sentenceMap) {
+		Map<Sentence, List<Sentence>> replaceMap = 
+				sentenceMap.keySet().stream()
+				.collect(Collectors.toMap(s->s, s->divideSentence(s)));
 		SentenceIDMap clone = new SentenceIDMap(sentenceMap);
+		
+		SentenceIDMap x = clone.replaceSentence2Sentences(replaceMap);
+		// sentenceMap.rep~だとなぜかヌルポに
 		sentenceMap.clear();
-		clone.entrySet().stream()
-		.map(this::divideSentence)
-		.flatMap(m -> m.entrySet().stream())
-		.peek(e -> e.getKey().uniteSubject())	// 主語結合
-		.forEach(e -> sentenceMap.put(e.getKey(), e.getValue()));
+		sentenceMap.putAll(x);
 	}
 }

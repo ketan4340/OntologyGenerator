@@ -24,7 +24,7 @@ import data.RDF.rule.RDFRuleReader;
 import data.RDF.rule.RDFRules;
 import data.RDF.rule.RDFRulesSet;
 import data.RDF.vocabulary.JASS;
-import data.id.IDTupleByStatement;
+import data.id.IDTuple;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
@@ -121,8 +121,8 @@ public class RelationExtractor {
 			*/
 			Set<Moderule> modelWithRule = converts(jass);
 			modelWithRule.forEach(mr -> {
-				IDTupleByStatement idt_clone = idt.clone();
-				idt_clone.setRDFRuleID(String.valueOf(mr.rule.id()));
+				IDTuple idt_clone = idt.clone();
+				idt_clone.setRDFRuleID(mr.rule);
 				Model m = mr.model;
 				replaceProxy2CategoremResource(m, proxyNodes);
 				ontologyMap.put(m, idt_clone);
