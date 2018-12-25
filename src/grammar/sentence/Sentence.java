@@ -80,14 +80,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
-	 * @param tags
-	 * @return 最後の単語が指定の品詞である文節
+	 * @param tags 品詞配列
+	 * @param ignoreSign 記号を無視するか否か
+	 * @return 最後の単語が指定の品詞である文節のうち、この文の最初に現れるもの.
 	 */
 	public Clause<?> findFirstClauseEndWith(String[][] tags, boolean ignoreSign) {
-		for (Clause<?> clause : children)
-			if (clause.endWith(tags, ignoreSign))
-				return clause;
-		return null;
+		return children.stream().filter(c -> c.endWith(tags, ignoreSign)).findFirst().orElse(null);
 	}
 
 	/**
@@ -415,52 +413,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				.map(Word::getChildren)
 				.flatMap(List::stream)
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * 決定木のレコード生成.
-	 */
-	public String toRecord() {
-		List<String> values = new ArrayList<>();
-
-		List<Clause<?>> subjectList = subjectList(true);	// 主語を整えたところで再定義
-		if (subjectList.isEmpty()) return "";
-
-		Clause<?> subjectClause = subjectList.get(0);			// 主節(!!最初の1つしか使っていない!!)
-		// 述節
-		Clause<?> predicateClause = subjectClause.getDepending();
-		if (predicateClause == null) return "";
-		Word predicateWord = predicateClause.getCategorem();	// 述語
-		if (predicateWord == null) return "";
-		// 述部(主節に続く全ての節)
-		//String predicatePart = subSentence(clauses.indexOf(subjectClause)+1, clauses.size()).toString();
-
-		//String[][] tag_Not = {{"助動詞", "ない"}, {"助動詞", "不変化型", "ん"},  {"助動詞", "不変化型", "ぬ"}};
-		//boolean not = predicateClause.haveSomeTagWord(tag_Not);	// 述語が否定かどうか
-
-		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
-		String[][] tagVerb = {{"動詞"}, {"サ変接続"}};
-		String[][] tagAdjective = {{"形容詞"}, {"形容動詞語幹"}};
-
-		/* 述語が動詞 */
-		if (predicateClause.containsAnyWordsHave(tagVerb)) {
-			String[][] tagPassive = {{"接尾", "れる"}, {"接尾", "られる"}};
-			if (predicateClause.containsAnyWordsHave(tagPassive))
-				values.add("passive");
-			else
-				values.add("verb");
-			values.add(predicateWord.infinitive());
-		/* 述語が形容詞 */
-		} else if (predicateClause.containsAnyWordsHave(tagAdjective)) {
-			values.add("adjc");
-			values.add(predicateWord.infinitive());
-		/* 述語が名詞または助動詞 */
-		} else {
-			values.add("noun");
-			String predNoun =predicateWord.infinitive();
-			values.add(predNoun.substring(predNoun.length()-2));	// 最後の一文字だけ
-		}
-		return values.stream().collect(Collectors.joining(","));
 	}
 
 
