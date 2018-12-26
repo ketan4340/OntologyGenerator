@@ -35,23 +35,22 @@ public class RecordCreator {
 		// "ぬ"}};
 		// boolean not = predicateClause.haveSomeTagWord(tag_Not); // 述語が否定かどうか
 
-		/* 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか */
-		String[][] tagVerb = { { "動詞" }, { "サ変接続" } };
-		String[][] tagAdjective = { { "形容詞" }, { "形容動詞語幹" } };
-
-		/* 述語が動詞 */
-		if (predicateClause.containsAnyWordsHave(tagVerb)) {
-			String[][] tagPassive = { { "接尾", "れる" }, { "接尾", "られる" } };
-			if (predicateClause.containsAnyWordsHave(tagPassive))
+		// 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか
+			// 述語が動詞
+		if (predicateClause.containsWordHas(new String[]{ "動詞" }) ||
+				predicateClause.containsWordHas(new String[]{ "サ変接続" })) {
+			if (predicateClause.containsWordHas(new String[]{ "接尾", "れる" }) || 
+					predicateClause.containsWordHas(new String[]{ "接尾", "られる" }))
 				values.add("passive");
 			else
 				values.add("verb");
 			values.add(predicateWord.infinitive());
-			/* 述語が形容詞 */
-		} else if (predicateClause.containsAnyWordsHave(tagAdjective)) {
+			// 述語が形容詞
+		} else if (predicateClause.containsWordHas(new String[]{"形容詞"}) ||
+				predicateClause.containsWordHas(new String[]{"形容動詞語幹"})) {
 			values.add("adjc");
 			values.add(predicateWord.infinitive());
-			/* 述語が名詞または助動詞 */
+			// 述語が名詞または助動詞
 		} else {
 			values.add("noun");
 			String predNoun = predicateWord.infinitive();

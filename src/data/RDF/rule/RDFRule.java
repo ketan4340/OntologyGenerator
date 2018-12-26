@@ -39,9 +39,7 @@ public class RDFRule implements Identifiable {
 	/* ================ Interface Method ================ */
 	/* ================================================== */
 	@Override
-	public int id() {
-		return id;
-	}
+	public int id() { return id; }
 
 
 	/* ================================================== */

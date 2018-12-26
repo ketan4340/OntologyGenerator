@@ -102,8 +102,8 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		//textFile_str = "resource/input/test/single.txt";
-		textFile_str = "resource/input/test/failed.txt";
+		textFile_str = "resource/input/test/single.txt";
+		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
 		if (Objects.nonNull(textFile_str)) {
@@ -158,7 +158,7 @@ public class Generator {
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
 
-		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
+		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 
 		/********** 関係抽出モジュール **********/
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);

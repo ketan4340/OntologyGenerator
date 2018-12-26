@@ -7,10 +7,11 @@ IF (a lot at) {
        jass:predicate/jass:categorem  
          [jass:mainPoS "形容詞" ; jass:infinitive "多い"] ;
        jass:caseNIclause ?clsNI .
-  ?clsNI jass:categorem [jass:means ?rsrcLoc ; 
-                         jass:mainPoS "名詞" ; 
-                         jass:subPoS1|jass:subPoS2|jass:subPoS3 "一般" ; 
-                         jass:subPoS1 ?hijiritsu] .
+  ?clsNI jass:categorem [
+      jass:means ?rsrcLoc ; 
+      jass:mainPoS "名詞" ; 
+      jass:subPoS1|jass:subPoS2|jass:subPoS3 "一般" ; 
+      jass:subPoS1 ?hijiritsu] .
   FILTER(?hijiritsu != "非自立")
 } THEN {
   ?rsrcS mos:exist [a mos:Existence ;

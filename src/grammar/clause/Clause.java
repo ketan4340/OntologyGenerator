@@ -109,18 +109,7 @@ implements SyntacticChild, GrammarInterface, Constituent {
 
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean containsWordHas(String[] tag) {
-		for (final Word word: words())
-			if (word.hasAllTag(tag))
-				return true;
-		return false;
-	}
-
-	/** 指定の品詞配列の"ある"品詞を，"全て"持つWordが含まれているか判定 */
-	public boolean containsAnyWordsHave(String[][] tags) {
-		for (String[] tag : tags)
-			if (containsWordHas(tag))
-				return true;
-		return false;
+		return words().stream().anyMatch(w -> w.hasAllTag(tag));
 	}
 
 	/**

@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -72,9 +73,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/**
 	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
 	 */
-	public List<Clause<?>> collectClausesHaveSome(String[][] tags) {
+	public List<Clause<?>> clausesHave(String[] tags) {
 		return children.stream()
-				.filter(c -> c.containsAnyWordsHave(tags))
+				.filter(c -> c.containsWordHas(tags))
 				.collect(Collectors.toList());
 	}
 
@@ -334,33 +335,30 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return true;
 	}
 
+	private static final String[] POS_HA = {"係助詞", "は"};
+	private static final String[] POS_GA = {"格助詞", "が"};
+	private static final String[] POS_DE = {"格助詞", "で"};
+	private static final String[] POS_NI = {"格助詞", "に"};
 	/**
 	 * 主語のリストを得る.
 	 */
 	public List<Clause<?>> subjectList(boolean includeGa) {
 		List<Clause<?>> subjectList;
-
+		List<Clause<?>> clause_Ha_List = clausesHave(POS_HA);	// 係助詞"は"を含むClause
+		List<Clause<?>> clause_De_List = clausesHave(POS_DE);	// 格助詞"で"を含むClause
+		List<Clause<?>> clause_Ni_List = clausesHave(POS_NI);	// 格助詞"に"を含むClause
 		if (includeGa) {	// "が"は最初の一つのみ!!
-			String[][] tags_Ha_Ga = {{"係助詞", "は"}, {"格助詞", "が"}};	// "は"
-			String[][] tags_Ga = {{"格助詞", "が"}};	//"が"
-			String[][] tag_De = {{"格助詞", "で"}};	// "で"
-			String[][] tag_Ni = {{"格助詞", "に"}};	// "に"
-			List<Clause<?>> clause_Ha_Ga_List = collectClausesHaveSome(tags_Ha_Ga);	// 係助詞"は"を含むClause
-			List<Clause<?>> clause_Ga_List = collectClausesHaveSome(tags_Ga);	// 係助詞"は"を含むClause
-			List<Clause<?>> clause_De_List = collectClausesHaveSome(tag_De);	// 格助詞"で"を含むClause
-			List<Clause<?>> clause_Ni_List = collectClausesHaveSome(tag_Ni);	// 格助詞"に"を含むClause
-			if (!clause_Ga_List.isEmpty())	clause_Ga_List.remove(0);
+			List<Clause<?>> clause_Ga_List = clausesHave(POS_GA);	// 係助詞"は"を含むClause
+			// 係助詞"は"あるいは"が"を含むClause
+			List<Clause<?>> clause_Ha_Ga_List = 
+					Stream.concat(clause_Ha_List.stream(), clause_Ga_List.stream())
+					.collect(Collectors.toList());
+			if (!clause_Ga_List.isEmpty()) clause_Ga_List.remove(0); // "が"は最初の一つのみ許可
 			clause_Ha_Ga_List.removeAll(clause_Ga_List);
 			clause_Ha_Ga_List.removeAll(clause_De_List);	// "は"と"が"を含むClauseのうち、"で"を含まないものが主語("では"を除外するため)
 			clause_Ha_Ga_List.removeAll(clause_Ni_List);	// "は"と"が"を含むClauseのうち、"に"を含まないものが主語("には"を除外するため)
 			subjectList = clause_Ha_Ga_List;
 		} else {
-			String[][] tags_Ha = {{"係助詞", "は"}};	// "は"
-			String[][] tag_De = {{"格助詞", "で"}};	// "で"
-			String[][] tag_Ni = {{"格助詞", "に"}};	// "に"
-			List<Clause<?>> clause_Ha_List = collectClausesHaveSome(tags_Ha);	// 係助詞"は"を含むClause
-			List<Clause<?>> clause_De_List = collectClausesHaveSome(tag_De);	// 格助詞"で"を含むClause
-			List<Clause<?>> clause_Ni_List = collectClausesHaveSome(tag_Ni);	// 格助詞"に"を含むClause
 			clause_Ha_List.removeAll(clause_De_List);	// "は"を含むClauseのうち、"で"を含まないものが主語
 			clause_Ha_List.removeAll(clause_Ni_List);	// "は"を含むClauseのうち、"に"を含まないものが主語
 			subjectList = clause_Ha_List;		// 主語のリスト
@@ -376,8 +374,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		// 主節の連続性を表す真偽値のリスト
 		Map<Clause<?>, Boolean> subjectsContinuity = getContinuity(subjectList);
 		//System.out.println("subjContinuity: " + subjectsContinuity);
-		String[][] tag_Ha = {{"係助詞", "は"}};
-		//String[][] tag_Ga = {{"格助詞", "が"}};
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
 		for (Map.Entry<Clause<?>, Boolean> entry: subjectsContinuity.entrySet()) {
 			Clause<?> subject = entry.getKey();		boolean sbjCnt = entry.getValue();
@@ -387,15 +383,14 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			ListIterator<Adjunct> iter = subject.getAdjuncts().listIterator();
 			while (iter.hasNext()) {
 				Adjunct adjunct = iter.next();
-				for (final String[] tag: tag_Ha)
-					if (adjunct.hasAllTag(tag)) {
+					if (adjunct.hasAllTag(POS_HA)) {
 						iter.set(no);	// "は"の代わりに"の"を挿入
 						break;
 					}
 			}
 		}
-		String[][] tags_NP = {{"助詞", "連体化"}};
-		List<Clause<?>> clauses_NP = collectClausesHaveSome(tags_NP);
+		String[] pos_NP = {"助詞", "連体化"};
+		List<Clause<?>> clauses_NP = clausesHave(pos_NP);
 		clauses_NP.forEach(c -> connect2Next(c, false));
 	}
 

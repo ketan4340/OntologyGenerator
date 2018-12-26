@@ -71,7 +71,9 @@ public class Word extends SyntacticParent<Morpheme>
 	}
 	
 	/**
-	 * 渡されたTagを"全て"持って入れば真、それ以外は偽を返す
+	 * 渡されたTagを"全て"持っていれば真、それ以外は偽を返す.
+	 * 空の品詞配列を渡すと真を返す.
+	 * Tag名の前に-をつけるとそのタグを含まない時に真とする.
 	 */
 	public boolean hasAllTag(String[] tags) {
 		boolean match = true;	// デフォがtrueなので空の配列は任意の品詞とみなされる

@@ -84,44 +84,39 @@ public class Phrase extends Categorem {
 	@Override
 	public Resource createResource(Model m) {
 		TagsFactory factory = TagsFactory.getInstance();
-		Stream<Word> kotoWords = Stream.of("こと", "事")
+		Stream<Word> kotoWords = Stream.of("こと", "事", "コト")
 				.map(s -> new Word(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "コト", "コト")));
-		Stream<Word> monoWords = Stream.of("もの", "物")
+		Stream<Word> monoWords = Stream.of("もの", "物", "モノ")
 				.map(s -> new Word(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "モノ", "モノ")));
 
-		List<? extends Clause<?>> depcopy = new LinkedList<>(dependent.getChildren());
+		List<? extends Clause<?>> dpdtCopy = new LinkedList<>(dependent.getChildren());
 		/*
-		 * 「こと」ならその直前の文節(従属部の最後尾)の自立語のリソース (「Xのこと」のX部分)
-		 * 「もの」なら空白ノード
-		 * そうでなければ主要部に、従属部の文節の情報を付け足していく
+		「こと」ならその直前の文節(従属部の最後尾)の自立語のリソース (「Xのこと」のX部分)
+		「もの」なら空白ノード
+		そうでなければ主要部に、従属部の文節の情報を付け足していく
 		 */
 		Resource r;
-		if (kotoWords.anyMatch(head::equals)) {
-			Categorem prevDep = depcopy.remove(depcopy.size()-1).getCategorem();
-			Resource prevRsrc = prevDep.createResource(m);
-			if (prevDep.mainPoS().equals("名詞")) {
-				r = depcopy.isEmpty()?
-						prevRsrc :
-						m.createResource().addProperty(RDF.type, prevRsrc);
-			} else if (prevDep.mainPoS().equals("動詞")) {
-				prevRsrc.addProperty(RDFS.subClassOf, m.createResource("https://schema.org/Action"));
-				r = depcopy.isEmpty()?
-						prevRsrc :
-						m.createResource().addProperty(RDF.type, prevRsrc);
-			} else {
-				r = m.createResource()
-						.addProperty(MoS.attributeOf, prevRsrc);
+		if (kotoWords.anyMatch(head::equals)) {			// こと
+			Categorem dpdtTail = dpdtCopy.remove(dpdtCopy.size()-1).getCategorem();
+			Resource dpdtTailRsrc = dpdtTail.createResource(m);
+			if (dpdtTail.mainPoS().equals("名詞")) {
+				r = dpdtCopy.isEmpty()? dpdtTailRsrc :
+						m.createResource().addProperty(RDFS.subClassOf, dpdtTailRsrc);
+			} else if (dpdtTail.mainPoS().equals("動詞")) {
+				dpdtTailRsrc.addProperty(RDFS.subClassOf, m.createResource("https://schema.org/Action"));
+				r = dpdtCopy.isEmpty()? dpdtTailRsrc :
+						m.createResource().addProperty(RDF.type, dpdtTailRsrc);
+			} else {	// 名詞と動詞以外はまずない。とりあえず空白ノード
+				r = m.createResource().addProperty(MoS.attributeOf, dpdtTailRsrc);
 			}
-		} else if (monoWords.anyMatch(head::equals)) {
-			Categorem prevDep = depcopy.remove(depcopy.size()-1).getCategorem();
-			Resource main = prevDep.createResource(m);
-			r = m.createResource()
-					.addProperty(RDF.type, main);
+		} else if (monoWords.anyMatch(head::equals)) {	// もの
+			Resource dpdtTailRsrc = dpdtCopy.remove(dpdtCopy.size()-1).getCategorem().createResource(m);
+			r = m.createResource().addProperty(RDF.type, dpdtTailRsrc);
 		} else {
 			r = m.createResource().addProperty(RDF.type, head.createResource(m));
 		}
 		
-		depcopy.forEach(dep -> {
+		dpdtCopy.forEach(dep -> {
 			Resource depRsrc = dep.getCategorem().createResource(m);
 			if (dep.endWith(ADJ, true)) {
 				// "大きい"など。連用テ接続は"大きく(て)"のように並列する表現
@@ -141,7 +136,6 @@ public class Phrase extends Categorem {
 				RDFList list = m.createList(new RDFNode[]{r, d_anon});
 				m.createResource().addProperty(OWL2.intersectionOf, list);
 			} else {
-				
 			}
 		});
 		return r;
