@@ -1,10 +1,12 @@
 package grammar.clause;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -16,6 +18,8 @@ import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
+import grammar.pattern.ClausePattern;
+import grammar.pattern.WordPattern;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
 import grammar.word.Word;
@@ -44,7 +48,11 @@ implements SyntacticChild, GrammarInterface, Constituent {
 		this.adjuncts = adjuncts;
 		this.others = others;
 	}
-	private static List<Word> linedupWords(Word categorem, List<? extends Word> adjuncts, List<? extends Word> others) {
+	private static List<Word> linedupWords(
+			Word categorem, 
+			List<? extends Word> adjuncts, 
+			List<? extends Word> others) 
+	{
 		List<Word> words = new ArrayList<>(5);
 		words.add(categorem);
 		words.addAll(adjuncts);
@@ -108,25 +116,34 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	}
 
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
-	public boolean containsWordHas(String[] tag) {
-		return words().stream().anyMatch(w -> w.hasAllTag(tag));
+	public boolean containsWordHas(WordPattern wp) {
+		return words().stream().anyMatch(w -> w.matches(wp));
 	}
 
 	/**
-	 * このClauseの最後尾が渡された品詞のWordなら真. 複数の単語が連続しているか調べたければ品詞配列を複数指定可能.
-	 * @param tags 品詞の配列
+	 * この文節が渡された単語指定配列に適合するかを判定する. 複数の単語が連続しているか調べたければ品詞.
+	 * @param cp 文節指定パターン
 	 * @param ignoreSign 文節末尾の接辞，記号 (、や。)を無視するか否か
 	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
 	 */
-	public boolean endWith(String[][] tags, boolean ignoreSign) {
-		int tagIndex = tags.length-1;
+	public boolean matchWith(ClausePattern cp, boolean ignoreSign) {
 		List<Word> words = ignoreSign? words() : getChildren();
-		for (ListIterator<Word> li = words.listIterator(words.size());
-				li.hasPrevious() && tagIndex>=0; tagIndex--) {
-			Word word = li.previous();		// wordも
-			String[] tag = tags[tagIndex];	// tagも後ろから遡る
-			if (!word.hasAllTag(tag))
-				return false;
+		int startmin = 0, startmax = words.size() - cp.size();
+		if (startmax < 0) return false;
+		if (cp.getForwardMatch() && cp.getBackwardMatch() && startmin != startmax) 
+			return false;
+		List<Integer> startIndexes = 
+				cp.getForwardMatch()? Arrays.asList(startmin) : 
+				cp.getBackwardMatch()? Arrays.asList(startmax) : 
+					IntStream.range(startmin, startmax).boxed().collect(Collectors.toList());
+		for (int idx : startIndexes) {
+			ListIterator<Word> itr_w = words.listIterator(idx);
+			ListIterator<WordPattern> itr_wp = cp.listIterator();
+			while (itr_w.hasNext() && itr_wp.hasNext()) {
+				Word word = itr_w.next();
+				WordPattern wp = itr_wp.next();
+				if (!word.matches(wp)) return false;
+			}	
 		}
 		return true;
 	}
@@ -183,14 +200,8 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	public List<Adjunct> getAdjuncts() {
 		return adjuncts;
 	}
-	public void setAdjuncts(List<Adjunct> adjuncts) {
-		this.adjuncts = adjuncts;
-	}
 	public List<Word> getOthers() {
 		return others;
-	}
-	public void setOthers(List<Word> others) {
-		this.others = others;
 	}
 	public Clause<?> getDepending() {
 		return depending;

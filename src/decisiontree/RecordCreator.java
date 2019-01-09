@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import grammar.clause.Clause;
+import grammar.pattern.WordPattern;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
 
@@ -37,17 +38,17 @@ public class RecordCreator {
 
 		// 述語が[<名詞>である。]なのか[<動詞>する。]なのか[<形容詞>。]なのか
 			// 述語が動詞
-		if (predicateClause.containsWordHas(new String[]{ "動詞" }) ||
-				predicateClause.containsWordHas(new String[]{ "サ変接続" })) {
-			if (predicateClause.containsWordHas(new String[]{ "接尾", "れる" }) || 
-					predicateClause.containsWordHas(new String[]{ "接尾", "られる" }))
+		if (predicateClause.containsWordHas(new WordPattern("動詞")) ||
+				predicateClause.containsWordHas(new WordPattern("サ変接続"))) {
+			if (predicateClause.containsWordHas(new WordPattern("接尾", "れる")) || 
+					predicateClause.containsWordHas(new WordPattern("接尾", "られる")))
 				values.add("passive");
 			else
 				values.add("verb");
 			values.add(predicateWord.infinitive());
 			// 述語が形容詞
-		} else if (predicateClause.containsWordHas(new String[]{"形容詞"}) ||
-				predicateClause.containsWordHas(new String[]{"形容動詞語幹"})) {
+		} else if (predicateClause.containsWordHas(new WordPattern("形容詞")) ||
+				predicateClause.containsWordHas(new WordPattern("形容動詞語幹"))) {
 			values.add("adjc");
 			values.add(predicateWord.infinitive());
 			// 述語が名詞または助動詞

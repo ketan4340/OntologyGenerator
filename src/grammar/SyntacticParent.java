@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
  * 文章({@code Writing})、段落({@code Paragraph})、文({@code Sentence})、文節({@code Clause})、単語({@code Word})が対象.
  * @author tanabekentaro
  *
- * @param <C> 下位要素
+ * @param <C> 下位要素の型
  */
 public abstract class SyntacticParent<C extends SyntacticChild> 
 		implements ListChangeListener<C> {
@@ -55,7 +55,12 @@ public abstract class SyntacticParent<C extends SyntacticChild>
 		}
 		return false;
 	}
-
+	public boolean remove(C o) {
+		return children.remove(o);
+	}
+	public List<C> subList(int fromIndex, int toIndex) {
+		return children.subList(fromIndex, toIndex);
+	}
 	public int indexOfChild(C predicate) {
 		return children.indexOf(predicate);
 	}
@@ -92,9 +97,6 @@ public abstract class SyntacticParent<C extends SyntacticChild>
 	/* ================================================== */	
 	public List<C> getChildren() {
 		return children;
-	}
-	public void setChildren(List<C> children) {
-		
 	}
 	
 	/* ================================================== */

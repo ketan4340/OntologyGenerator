@@ -45,6 +45,9 @@ public class SerialClause extends Clause<Phrase> {
 		sc.setDepending(clauses[tailIndex].depending);
 		return sc;
 	}
+	public static SerialClause join(List<Clause<?>> clauses) {
+		return join(clauses.toArray(new Clause[clauses.size()]));
+	}
 	
 	/* ================================================== */
 	/* ================= Abstract Method ================ */
@@ -59,24 +62,6 @@ public class SerialClause extends Clause<Phrase> {
 	/* ================================================== */
 	/* ================= Interface Method =============== */
 	/* ================================================== */
-	/** 単語のリストから連文節の各要素をセット.使わない方がいいかも. */
-	@Override
-	public void setChildren(List<Word> words) {
-		Phrase phrase = null;
-		List<Adjunct> newAdjuncts = new ArrayList<>(2);
-		List<Word> newOthers = new ArrayList<>(2);
-		for (Word word : words) {
-			if (word instanceof Phrase)
-				phrase = (Phrase) word;
-			else if (word instanceof Adjunct)
-				newAdjuncts.add((Adjunct) word);
-			else
-				newOthers.add(word);
-		}
-		setCategorem(phrase);
-		setAdjuncts(newAdjuncts);
-		setOthers(newOthers);
-	}
 	@Override
 	public Resource toJASS(Model model) {
 		return super.toJASS(model).addProperty(RDF.type, JASS.SerialClause);

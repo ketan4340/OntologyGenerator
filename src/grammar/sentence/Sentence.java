@@ -1,6 +1,7 @@
 package grammar.sentence;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -27,6 +28,8 @@ import grammar.clause.SerialClause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
+import grammar.pattern.ClausePattern;
+import grammar.pattern.WordPattern;
 import grammar.word.Adjunct;
 import grammar.word.Word;
 import language.pos.TagsFactory;
@@ -53,14 +56,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-
 	/**
 	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
 	 * @param dependingMap 各文節がこの文の何番目の文節に係るか記録されたマップ
 	 */
 	private void initializeDepending(Map<Clause<?>, Integer> dependingMap) {
 		dependingMap.forEach((c, idxDep2) -> {
-			//System.out.println(c + ": "+idxDep2);
 			c.setDepending(idxDep2 == -1? SingleClause.ROOT: children.get(idxDep2));
 		});
 	}
@@ -73,20 +74,20 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/**
 	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
 	 */
-	public List<Clause<?>> clausesHave(String[] tags) {
+	public List<Clause<?>> clausesHave(WordPattern wp) {
 		return children.stream()
-				.filter(c -> c.containsWordHas(tags))
+				.filter(c -> c.containsWordHas(wp))
 				.collect(Collectors.toList());
 	}
 
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
-	 * @param tags 品詞配列
+	 * @param cp 文節パターン
 	 * @param ignoreSign 記号を無視するか否か
 	 * @return 最後の単語が指定の品詞である文節のうち、この文の最初に現れるもの.
 	 */
-	public Clause<?> findFirstClauseEndWith(String[][] tags, boolean ignoreSign) {
-		return children.stream().filter(c -> c.endWith(tags, ignoreSign)).findFirst().orElse(null);
+	public Clause<?> findFirstClauseMatching(ClausePattern cp, boolean ignoreSign) {
+		return children.stream().filter(c -> c.matchWith(cp, ignoreSign)).findFirst().orElse(null);
 	}
 
 	/**
@@ -119,13 +120,43 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return true;
 	}
 	
+	public boolean concatClausesDestructive(String[] frontPos, String[] backPos) {
+		Clause<?> c;
+		SingleClause frontClause;
+		if ((c = findClause(frontPos)) instanceof SingleClause)
+			frontClause = SingleClause.class.cast(c);
+		else 
+			return false;
+		SingleClause backClause;
+		if ((c = findClause(frontPos)) instanceof SingleClause)
+			backClause = SingleClause.class.cast(c);
+		else 
+			return false;
+		
+		SingleClause newc = SingleClause.concatClauseDestructive(frontClause, backClause);
+		return replaceClause(Arrays.asList(new Clause<?>[]{frontClause, backClause}), newc);
+	}
+
+	public boolean joinClauses(String[][] posArray) {
+		List<Clause<?>> clauseList = Stream.of(posArray)
+			.map(this::findClause)
+			.collect(Collectors.toList());
+		SerialClause newc = SerialClause.join(clauseList);
+		return replaceClause(clauseList, newc);
+	}
+
+	public Clause<?> findClause(String[] pos) {
+		return null;
+	}
+	public boolean replaceClause(List<Clause<?>> befores, Clause<?> after) {
+		return false;
+	}
 
 	private Set<Clause<?>> clausesDepending(Clause<?> clause) {
 		return getChildren().stream()
 				.filter(c -> c.getDepending() == clause)
 				.collect(Collectors.toSet());
 	}
-
 
 	/** 渡したClauseが文中で連続しているかを<clause, Boolean>のMapで返す */
 	/* 例:indexのリストが(2,3,4,6,8,9)なら(T,T,F,F,T,F) */
@@ -150,7 +181,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 		return continuity;
 	}
-
 
 	/**
 	 * 主語係り先分割
@@ -255,15 +285,18 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 		/* 述語を収集 */
 		// これら以外なら述語とみなす
-		String[][] tagParticle = {{"助詞", "-て"}};			// "て"以外の助詞
-		String[][] tagAdverb = {{"副詞"}};					// "すぐに"、"おそらく"など
-		String[][] tagAuxiliary = {{"助動詞", "体言接続"}};	// "〜で"など
+		ClausePattern tagParticle = 
+				ClausePattern.Reader.read(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
+		ClausePattern tagAdverb = 
+				ClausePattern.Reader.read(new String[][]{{"副詞"}, {"%o", "$"}});				// "すぐに"、"おそらく"など
+		ClausePattern tagAuxiliary = 
+				ClausePattern.Reader.read(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});	// "〜で"など
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !cls2Last.endWith(tagParticle, true) &&
-					!cls2Last.endWith(tagAdverb, true) &&
-					!cls2Last.endWith(tagAuxiliary, true) &&
+			if ( !cls2Last.matchWith(tagParticle, true) &&
+					!cls2Last.matchWith(tagAdverb, true) &&
+					!cls2Last.matchWith(tagAuxiliary, true) &&
 					cls2Last.getDepending() != nextChild(cls2Last))	// 最後の文節に係るものは除外
 					predicates.add(cls2Last);
 		}
@@ -335,10 +368,10 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return true;
 	}
 
-	private static final String[] POS_HA = {"係助詞", "は"};
-	private static final String[] POS_GA = {"格助詞", "が"};
-	private static final String[] POS_DE = {"格助詞", "で"};
-	private static final String[] POS_NI = {"格助詞", "に"};
+	private static final WordPattern POS_HA = new WordPattern("係助詞", "は");
+	private static final WordPattern POS_GA = new WordPattern("格助詞", "が");
+	private static final WordPattern POS_DE = new WordPattern("格助詞", "で");
+	private static final WordPattern POS_NI = new WordPattern("格助詞", "に");
 	/**
 	 * 主語のリストを得る.
 	 */
@@ -383,13 +416,13 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			ListIterator<Adjunct> iter = subject.getAdjuncts().listIterator();
 			while (iter.hasNext()) {
 				Adjunct adjunct = iter.next();
-					if (adjunct.hasAllTag(POS_HA)) {
+					if (adjunct.matches(POS_HA)) {
 						iter.set(no);	// "は"の代わりに"の"を挿入
 						break;
 					}
 			}
 		}
-		String[] pos_NP = {"助詞", "連体化"};
+		WordPattern pos_NP = new WordPattern("助詞", "連体化");
 		List<Clause<?>> clauses_NP = clausesHave(pos_NP);
 		clauses_NP.forEach(c -> connect2Next(c, false));
 	}

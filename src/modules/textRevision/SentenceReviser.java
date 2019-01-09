@@ -9,21 +9,22 @@ import java.util.stream.Stream;
 import data.id.SentenceIDMap;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
+import grammar.pattern.ClausePattern;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
 import language.pos.Concatable;
 
 public class SentenceReviser {
-	private static final String[][][] TAGS_NOUNIZE = {
-			{{"体言接続特殊２"}}
+	private static final ClausePattern[] TAGS_NOUNIZE = {
+			ClausePattern.Reader.read(new String[][]{{"体言接続特殊２"}})
 	};
-	private static final String[][][] TAGS_NOUNPHRASE = {
-			{{"形容詞", "-連用テ接続"}},	// 連用テ接続は"大きくて"など
-			{{"連体詞"}},					// "大きな"、"こういう"、"あの"、など
-			{{"助詞", "連体化"}},			// "の"のみ該当
-			{{"助動詞", "体言接続"}},		// "変な"の"な"など
-			{{"名詞"}},
-			{{"動詞"}, {"もの", "非自立"}}
+	private static final ClausePattern[] TAGS_NOUNPHRASE = {
+			ClausePattern.Reader.read(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}}),	// 連用テ接続は"大きくて"など
+			ClausePattern.Reader.read(new String[][]{{"連体詞"}, {"%o", "$"}}),				// "大きな"、"こういう"、"あの"、など
+			ClausePattern.Reader.read(new String[][]{{"助詞", "連体化"}, {"%o", "$"}}),		// "の"のみ該当
+			ClausePattern.Reader.read(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}}),		// "変な"の"な"など
+			ClausePattern.Reader.read(new String[][]{{"名詞"}, {"%o", "$"}})
+			//{{"動詞"}, {"もの", "非自立"}}
 			};
 
 	/* ================================================== */
@@ -48,21 +49,21 @@ public class SentenceReviser {
 
 		// 指定の品詞を持つ形態素を次の形態素と破壊的に結合する
 		Stream.of(TAGS_NOUNIZE).forEach(tag_n -> {
-			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_n, true);
+			for (Clause<?> matchedClause = sentence.findFirstClauseMatching(tag_n, true);
 					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
 				if (!sentence.connect2Next(matchedClause, true))
 					break;
-				matchedClause = sentence.findFirstClauseEndWith(tag_n, true);
+				matchedClause = sentence.findFirstClauseMatching(tag_n, true);
 			}
 		});
 		
 		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
 		Stream.of(TAGS_NOUNPHRASE).forEach(tag_np -> {
-			for (Clause<?> matchedClause = sentence.findFirstClauseEndWith(tag_np, true);
+			for (Clause<?> matchedClause = sentence.findFirstClauseMatching(tag_np, true);
 					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
 				if (!sentence.connect2Next(matchedClause, false))
 					break;
-				matchedClause = sentence.findFirstClauseEndWith(tag_np, true);
+				matchedClause = sentence.findFirstClauseMatching(tag_np, true);
 			}
 		});
 	}
@@ -89,15 +90,13 @@ public class SentenceReviser {
 				}
 				to++;
 			} else if (m.name().equals(".") || m.name().equals(",")) {
-				if (continuing)	{// 数字が連続中の小数点・カンマはOK。ループ継続
+				if (continuing)	// 数字が連続中の小数点・カンマはOK。ループ継続
 					to++;
-				} else {			// 数字の間に入っていない小数点・カンマはスルー
+				else			// 直前に数字がない小数点・カンマはスルー
 					continuing = false;
-				}
 			} else {
-				if (continuing)	{// 連続中に数字・小数点・カンマ以外がきたら終了
+				if (continuing)	// 連続中に数字・小数点・カンマ以外がきたら終了
 					break;
-				}
 			}
 			i++;
 		}

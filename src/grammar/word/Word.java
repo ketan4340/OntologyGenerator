@@ -19,6 +19,7 @@ import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
+import grammar.pattern.WordPattern;
 import language.pos.CabochaPoSInterface;
 import language.pos.CabochaTags;
 import language.pos.Concatable;
@@ -75,17 +76,15 @@ public class Word extends SyntacticParent<Morpheme>
 	 * 空の品詞配列を渡すと真を返す.
 	 * Tag名の前に-をつけるとそのタグを含まない時に真とする.
 	 */
-	public boolean hasAllTag(String[] tags) {
-		boolean match = true;	// デフォがtrueなので空の配列は任意の品詞とみなされる
-		for (String tag: tags) {
+	public boolean matches(WordPattern wp) {
+		boolean match = true;	// 空の配列は任意の品詞とみなされ、常に真を返す。
+		for (String tag : wp) {
 			boolean not = false;	// NOT検索用のフラグ
 			if (tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
 				not = true;
 				tag = tag.substring(1);	// -を消しておく
 			}
-			match = coreMorpheme().contains(tag);
-			match = not? !match : match;
-
+			match = not? !coreMorpheme().contains(tag) : coreMorpheme().contains(tag);
 			if (!match) break;	// falseなら即終了
 		}
 		return match;
