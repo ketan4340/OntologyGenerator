@@ -1,6 +1,5 @@
 package grammar.pattern;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -19,12 +18,6 @@ public class ClausePattern implements List<WordPattern> {
 	private ClausePattern() {
 		this.wps = new ArrayList<>();
 	}
-	private ClausePattern(List<WordPattern> wps) {
-		this.wps = new ArrayList<>(wps);
-	}
-	private ClausePattern(WordPattern... wps) {
-		this.wps = new ArrayList<>(Arrays.asList(wps));
-	}
 	
 	
 	public boolean getForwardMatch() {
@@ -41,27 +34,24 @@ public class ClausePattern implements List<WordPattern> {
 	}
 
 	
-	public static class Reader {
-		private static final String OPTION_KEY = "%o";
-		private static final String FORWARD_MATCH_KEY = "^";
-		private static final String BACKWARD_MATCH_KEY = "$";
+	private static final String OPTION_KEY = "%o";
+	private static final String FORWARD_MATCH_KEY = "^";
+	private static final String BACKWARD_MATCH_KEY = "$";
 
 
-		public static ClausePattern read(String[][] strss) {
-			ClausePattern cp = new ClausePattern(); 
-			for (String[] strs : strss) {
-				WordPattern wp = new WordPattern(strs);
-				if (wp.contains(OPTION_KEY)) {
-					if (wp.contains(FORWARD_MATCH_KEY))
-						cp.setForwardMatch();
-					if (wp.contains(BACKWARD_MATCH_KEY))
-						cp.setBackwardMatch();
-				} else
-					cp.add(wp);
-			}
-			return cp;
+	public static ClausePattern compile(String[][] strss) {
+		ClausePattern cp = new ClausePattern();
+		for (String[] strs : strss) {
+			WordPattern wp = new WordPattern(strs);
+			if (wp.contains(OPTION_KEY)) {
+				if (wp.contains(FORWARD_MATCH_KEY))
+					cp.setForwardMatch();
+				if (wp.contains(BACKWARD_MATCH_KEY))
+					cp.setBackwardMatch();
+			} else
+				cp.add(wp);
 		}
-
+		return cp;
 	}
 	
 	

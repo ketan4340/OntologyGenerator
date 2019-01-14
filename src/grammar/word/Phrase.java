@@ -79,10 +79,10 @@ public class Phrase extends Categorem {
 				.addProperty(JASS.head, head.toJASS(model));
 	}
 	
-	private static final ClausePattern ADJ = ClausePattern.Reader.read(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}});
-	private static final ClausePattern PREN = ClausePattern.Reader.read(new String[][]{{"連体詞"}, {"%o", "$"}});
-	private static final ClausePattern PART = ClausePattern.Reader.read(new String[][]{{"助詞", "連体化"}, {"%o", "$"}});
-	private static final ClausePattern AUX = ClausePattern.Reader.read(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});
+	private static final ClausePattern ADJ = ClausePattern.compile(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}});
+	private static final ClausePattern PREN = ClausePattern.compile(new String[][]{{"連体詞"}, {"%o", "$"}});
+	private static final ClausePattern PART = ClausePattern.compile(new String[][]{{"助詞", "連体化"}, {"%o", "$"}});
+	private static final ClausePattern AUX = ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});
 	@Override
 	public Resource createResource(Model m) {
 		TagsFactory factory = TagsFactory.getInstance();

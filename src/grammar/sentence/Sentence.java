@@ -66,7 +66,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		});
 	}
 
-	public Sentence subSentence(int fromIndex, int toIndex) {
+	public Sentence subsentence(int fromIndex, int toIndex) {
 		List<Clause<?>> subClauses = new ArrayList<>(children.subList(fromIndex, toIndex));
 		return new Sentence(subClauses);
 	}
@@ -128,7 +128,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		else 
 			return false;
 		SingleClause backClause;
-		if ((c = findClause(frontPos)) instanceof SingleClause)
+		if ((c = findClause(backPos)) instanceof SingleClause)
 			backClause = SingleClause.class.cast(c);
 		else 
 			return false;
@@ -227,7 +227,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			predicate.setDepending(SingleClause.ROOT);	// 文末の述語となるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;		// 述語も含めて切り取るため+1
 			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");
-			Sentence subSent = subSentence(fromIndex, toIndex);
+			Sentence subSent = subsentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
 			List<Clause<?>> commonSubjects = SingleClause.cloneAll(commonSubjectsOrigin);
 
@@ -286,11 +286,11 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		/* 述語を収集 */
 		// これら以外なら述語とみなす
 		ClausePattern tagParticle = 
-				ClausePattern.Reader.read(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
+				ClausePattern.compile(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
 		ClausePattern tagAdverb = 
-				ClausePattern.Reader.read(new String[][]{{"副詞"}, {"%o", "$"}});				// "すぐに"、"おそらく"など
+				ClausePattern.compile(new String[][]{{"副詞"}, {"%o", "$"}});				// "すぐに"、"おそらく"など
 		ClausePattern tagAuxiliary = 
-				ClausePattern.Reader.read(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});	// "〜で"など
+				ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});	// "〜で"など
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
@@ -319,7 +319,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			toIndex = indexOfChild(predicate) + 1;	// 述語も含めて切り取るため+1
 			//System.out.println("divide3.subList(" + fromIndex + ", " + toIndex + ")");
 			//TODO *from>to problem
-			Sentence subSent = subSentence(fromIndex, toIndex);
+			Sentence subSent = subsentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
 			List<Clause<?>> commonSubjects = SingleClause.cloneAll(commonSubjectsOrigin);
 

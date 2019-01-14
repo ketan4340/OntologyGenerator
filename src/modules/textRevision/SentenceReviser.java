@@ -16,14 +16,14 @@ import language.pos.Concatable;
 
 public class SentenceReviser {
 	private static final ClausePattern[] TAGS_NOUNIZE = {
-			ClausePattern.Reader.read(new String[][]{{"体言接続特殊２"}})
+			ClausePattern.compile(new String[][]{{"体言接続特殊２"}})
 	};
 	private static final ClausePattern[] TAGS_NOUNPHRASE = {
-			ClausePattern.Reader.read(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}}),	// 連用テ接続は"大きくて"など
-			ClausePattern.Reader.read(new String[][]{{"連体詞"}, {"%o", "$"}}),				// "大きな"、"こういう"、"あの"、など
-			ClausePattern.Reader.read(new String[][]{{"助詞", "連体化"}, {"%o", "$"}}),		// "の"のみ該当
-			ClausePattern.Reader.read(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}}),		// "変な"の"な"など
-			ClausePattern.Reader.read(new String[][]{{"名詞"}, {"%o", "$"}})
+			ClausePattern.compile(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}}),	// 連用テ接続は"大きくて"など
+			ClausePattern.compile(new String[][]{{"連体詞"}, {"%o", "$"}}),				// "大きな"、"こういう"、"あの"、など
+			ClausePattern.compile(new String[][]{{"助詞", "連体化"}, {"%o", "$"}}),		// "の"のみ該当
+			ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}}),		// "変な"の"な"など
+			ClausePattern.compile(new String[][]{{"名詞"}, {"%o", "$"}})
 			//{{"動詞"}, {"もの", "非自立"}}
 			};
 
