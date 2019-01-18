@@ -30,7 +30,7 @@ public class SubsentencePattern implements List<ClausePattern> {
 	}
 	
 	public SubsentenceMatcher matcher(Sentence s) {
-		return new SubsentenceMatcher();
+		return new SubsentenceMatcher(s);
 	}
 	
 	@Override

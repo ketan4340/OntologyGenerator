@@ -47,30 +47,18 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		super(clauses);
 		this.id = SUM++;
 	}
-	public Sentence(List<Clause<?>> clauses, Map<Clause<?>, Integer> dependingMap) {
-		this(clauses);
-		initializeDepending(dependingMap);
-	}
-
 
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	/**
-	 * CaboChaがClause生成時に記録した係り受けマップを元に係り先dependingをセットする
-	 * @param dependingMap 各文節がこの文の何番目の文節に係るか記録されたマップ
-	 */
-	private void initializeDepending(Map<Clause<?>, Integer> dependingMap) {
-		dependingMap.forEach((c, idxDep2) -> {
-			c.setDepending(idxDep2 == -1? SingleClause.ROOT: children.get(idxDep2));
-		});
+	public void initDependency(DependencyMap dm) {
+		dm.forEach((from, to) -> from.setDepending(to));
 	}
-
 	public Sentence subsentence(int fromIndex, int toIndex) {
 		List<Clause<?>> subClauses = new ArrayList<>(children.subList(fromIndex, toIndex));
 		return new Sentence(subClauses);
 	}
-
+	
 	/**
 	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
 	 */
@@ -199,21 +187,19 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			((SingleClause) lastClause).nounize();
 			subjectList.remove(lastClause);
 		}
-
 		if (subjectList.isEmpty()) return shortSentList;	// 文中に主語がなければ終了
 
 		// 主節の連続性を表す真偽値のリスト
 		Map<Clause<?>, Boolean> subjectsContinuity = getContinuity(subjectList);
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
-		List<Clause<?>> commonSubjectsOrigin = new ArrayList<>(subjectList.size());
+		ClauseSequence commonSubjectsOrigin = new ClauseSequence();
 		for (Map.Entry<Clause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
 			commonSubjectsOrigin.add(entry.getKey());
-			if (!entry.getValue())	// 主語の連続が途切れたら
-				break;				// 核主語集め完了
+			if (!entry.getValue()) break;	// 主語の連続が途切れたら核主語集め完了
 		}
 		// 後続の多くの述語に係る、核たる主語
 		Clause<?> mainSubject = commonSubjectsOrigin.get(commonSubjectsOrigin.size()-1);
-		List<Clause<?>> predicates = mainSubject.allDependings();
+		List<Clause<?>> predicates = allDependings(mainSubject);
 		predicates.retainAll(children);
 
 		if (predicates.size() <= 1) {	// 述語が一つならスルー
@@ -229,9 +215,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");
 			Sentence subSent = subsentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
-			List<Clause<?>> commonSubjects = SingleClause.cloneAll(commonSubjectsOrigin);
+			ClauseSequence commonSubjects = commonSubjectsOrigin.cloneAll();
 
-			if (fromIndex!=0) {		// 最初の分割文は、新たに主語を挿入する必要ない
+			if (fromIndex!=0) {		// 最初の分割文以外は、新たに主語を挿入する
 				Clause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭文節
 				if (subjectList.contains(subSentFirst))				// それが主語なら
 					commonSubjectsOrigin.add(subSentFirst);			// 後続の短文にも係るので保管
@@ -255,6 +241,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return shortSentList;
 	}
 
+	private static final ClausePattern PARTICLE = 
+			ClausePattern.compile(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
+	private static final ClausePattern ADVERB = 
+			ClausePattern.compile(new String[][]{{"副詞"}, {"%o", "$"}});				// "すぐに"、"おそらく"など
+	private static final ClausePattern AUXILIARY = 
+			ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});	// "〜で"など
 	/**
 	 * 述語係り元分割
 	 * 述語に係る{動詞,形容詞,名詞,~だ,接続助詞}ごとに分割
@@ -276,27 +268,19 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		// 主節の連続性を表す真偽値のリスト
 		LinkedHashMap<Clause<?>, Boolean> subjectsContinuity = getContinuity(subjectList);
 		// 文頭に連続で並ぶ主語は文全体に係るとみなし、集めて使い回す
-		List<Clause<?>> commonSubjectsOrigin = new ArrayList<>(subjectList.size());
+		ClauseSequence commonSubjectsOrigin = new ClauseSequence();
 		for (Map.Entry<Clause<?>, Boolean> entry : subjectsContinuity.entrySet()) {
 		 	commonSubjectsOrigin.add(entry.getKey());
-			if (!entry.getValue())	// 主語の連続が途切れたら
-				break;				// 核主語集め完了
+			if (!entry.getValue()) break;	// 主語の連続が途切れたら核主語集め完了
 		}
 
 		/* 述語を収集 */
-		// これら以外なら述語とみなす
-		ClausePattern tagParticle = 
-				ClausePattern.compile(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
-		ClausePattern tagAdverb = 
-				ClausePattern.compile(new String[][]{{"副詞"}, {"%o", "$"}});				// "すぐに"、"おそらく"など
-		ClausePattern tagAuxiliary = 
-				ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});	// "〜で"など
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !cls2Last.matchWith(tagParticle, true) &&
-					!cls2Last.matchWith(tagAdverb, true) &&
-					!cls2Last.matchWith(tagAuxiliary, true) &&
+			if ( !cls2Last.matchWith(PARTICLE, true) &&
+					!cls2Last.matchWith(ADVERB, true) &&
+					!cls2Last.matchWith(AUXILIARY, true) &&
 					cls2Last.getDepending() != nextChild(cls2Last))	// 最後の文節に係るものは除外
 					predicates.add(cls2Last);
 		}
@@ -321,7 +305,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			//TODO *from>to problem
 			Sentence subSent = subsentence(fromIndex, toIndex);
 			// 文頭の主語は全ての分割後の文に係る
-			List<Clause<?>> commonSubjects = SingleClause.cloneAll(commonSubjectsOrigin);
+			ClauseSequence commonSubjects = commonSubjectsOrigin.cloneAll();
 
 			if (fromIndex != 0) {		// 最初の分割文は、新たに主語を挿入する必要ない
 				Clause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭
@@ -348,6 +332,20 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 	/**
+	 * この文節が係る文節，その文節が係る文節，と辿っていき，経由した全ての文節をリストにして返す.
+	 * @return この文節から係る全ての文節
+	 */
+	public List<Clause<?>> allDependings(Clause<?> c) {
+		List<Clause<?>> allDepending = new ArrayList<>();
+		Clause<?> depto = c.getDepending();
+		while (depto != null) {
+			allDepending.add(depto);
+			depto = depto.getDepending();
+		}
+		return allDepending;
+	}
+	
+	/**
 	 * 文節の係り先が文中にないような場合，渡されたClauseにdependを向ける
 	 */
 	private boolean gatherDepending(Clause<?> target) {
@@ -367,7 +365,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		memberClauses.forEach(mc -> mc.setDepending(target));
 		return true;
 	}
-
+	
 	private static final WordPattern POS_HA = new WordPattern("係助詞", "は");
 	private static final WordPattern POS_GA = new WordPattern("格助詞", "が");
 	private static final WordPattern POS_DE = new WordPattern("格助詞", "で");
@@ -386,7 +384,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			List<Clause<?>> clause_Ha_Ga_List = 
 					Stream.concat(clause_Ha_List.stream(), clause_Ga_List.stream())
 					.collect(Collectors.toList());
-			if (!clause_Ga_List.isEmpty()) clause_Ga_List.remove(0); // "が"は最初の一つのみ許可
+			if (!clause_Ga_List.isEmpty()) clause_Ga_List.remove(0); // "が"は最初の一つのみ残す
 			clause_Ha_Ga_List.removeAll(clause_Ga_List);
 			clause_Ha_Ga_List.removeAll(clause_De_List);	// "は"と"が"を含むClauseのうち、"で"を含まないものが主語("では"を除外するため)
 			clause_Ha_Ga_List.removeAll(clause_Ni_List);	// "は"と"が"を含むClauseのうち、"に"を含まないものが主語("には"を除外するため)
@@ -524,7 +522,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	
 	@Override
 	public void onChanged(Change<? extends Clause<?>> c) {
-		// TODO 自動生成されたメソッド・スタブ	
 	}
 
 	

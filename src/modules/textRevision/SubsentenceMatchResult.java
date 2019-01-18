@@ -1,8 +1,6 @@
 package modules.textRevision;
 
-import java.util.List;
-
-import grammar.clause.Clause;
+import grammar.sentence.ClauseSequence;
 
 /** 
  * {@code MatchResult}の模倣.
@@ -14,6 +12,6 @@ public interface SubsentenceMatchResult {
 	public boolean find();
 	public int start();
     public int end();
-    public List<Clause<?>> group();
+    public ClauseSequence group();
     
 }

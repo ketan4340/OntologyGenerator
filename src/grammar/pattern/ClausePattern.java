@@ -32,12 +32,10 @@ public class ClausePattern implements List<WordPattern> {
 	public void setBackwardMatch() {
 		options.setBackwardMatch();
 	}
-
 	
 	private static final String OPTION_KEY = "%o";
 	private static final String FORWARD_MATCH_KEY = "^";
 	private static final String BACKWARD_MATCH_KEY = "$";
-
 
 	public static ClausePattern compile(String[][] strss) {
 		ClausePattern cp = new ClausePattern();

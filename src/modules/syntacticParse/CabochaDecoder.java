@@ -1,15 +1,16 @@
 package modules.syntacticParse;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import grammar.clause.Clause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
+import grammar.sentence.DependencyMap;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
@@ -22,7 +23,7 @@ public class CabochaDecoder {
 
 	private static final int MAXIMUM_TAGS_LENGTH = 9;
 
-	private Map<Clause<?>, Integer> dependingMap = new HashMap<>();
+	private final Set<Indexes> dependingIndexSet = new HashSet<>();
 
 	/* ================================================== */
 	/* =================== Constructor ================== */
@@ -43,19 +44,21 @@ public class CabochaDecoder {
 	}
 
 	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
-		dependingMap.clear();
 		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割
 		List<Clause<?>> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
 				.collect(Collectors.toList());
-		return new Sentence(clauses, dependingMap);
+		DependencyMap dm = compileDependencyMap(clauses);
+		dependingIndexSet.clear();
+		Sentence s = new Sentence(clauses);
+		s.initDependency(dm);
+		return s;
 	}
 
 	public SingleClause decode2Clause(List<String> parsedInfo4clause) {
 		//// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
 		Indexes cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
-		int depIndex = cabochaClauseIndexes.dependIndex;			// 係る先の文節の番号. ex) "-1D"の"-1"部分
 		int subjEndIndex = cabochaClauseIndexes.subjectEndIndex+1;	// 主辞の終端の番号. ex) "0/1"の"0"部分
 		int funcEndIndex = cabochaClauseIndexes.functionEndIndex+1;	// 機能語の終端の番号. ex) "0/1"の"1"部分
 		// List#sublistは返り値のサブリストに引数endIndex番目の要素は含まれないので1を足しておく
@@ -74,10 +77,8 @@ public class CabochaDecoder {
 				.stream()
 				.map(wordInfo -> decode2Word(Arrays.asList(wordInfo)))
 				.collect(Collectors.toList());
-
-		SingleClause clause = new SingleClause(headWord, functionWords, otherWords);
-		dependingMap.put(clause, depIndex);
-		return clause;
+		dependingIndexSet.add(cabochaClauseIndexes);
+		return new SingleClause(headWord, functionWords, otherWords);
 	}
 
 	public Word decode2Word(List<List<String>> parsedInfo4word) {
@@ -113,6 +114,14 @@ public class CabochaDecoder {
 	/* ================================================== */
 	/* ==========    Cabocha専用メソッドの実装    ========== */
 	/* ================================================== */
+	private DependencyMap compileDependencyMap(List<Clause<?>> clauses) {
+		return dependingIndexSet.stream().collect(
+				Collectors.toMap(
+						idxs -> clauses.get(idxs.thisIndex),
+						idxs -> idxs.dependIndex==-1 ? SingleClause.ROOT : clauses.get(idxs.dependIndex), 
+						(k1, k2) -> k1,
+						DependencyMap::new));
+	}
 	private CabochaTags getTagsSuppliedSingleByteChar(String[] tagArray, String infinitive) {
 		TagsFactory factory = TagsFactory.getInstance();
 		if (tagArray.length < MAXIMUM_TAGS_LENGTH)	// sizeが9未満．つまり半角文字
@@ -127,18 +136,21 @@ public class CabochaDecoder {
 	 */
 	private Indexes cabochaClauseIndexes(String cabochaClauseInfo) {
 		String[] clauseInfos = cabochaClauseInfo.split(" ");				// "*","0","-1D","0/1","0.000000..."
+		int thisIndex = Integer.decode(clauseInfos[1]);
 		int depIndex = Integer.decode(clauseInfos[2].substring(0, clauseInfos[2].length()-1));	// -1で'D'を除去.
 		String[] subjFuncIndexes = clauseInfos[3].split("/");				// ex) "0/1"->("0","1")
 		int subjEndIndex = Integer.decode(subjFuncIndexes[0]);				// 主辞の終端の番号. ex) "0/1"の"0"部分
 		int funcEndIndex = Integer.decode(subjFuncIndexes[1]);				// 機能語の終端の番号. ex) "0/1"の"1"部分
-		Indexes indexes = new Indexes(depIndex, subjEndIndex, funcEndIndex);
+		Indexes indexes = new Indexes(thisIndex, depIndex, subjEndIndex, funcEndIndex);
 		return indexes;
 	}
 	private class Indexes {
-		protected int dependIndex;
-		protected int subjectEndIndex;
-		protected int functionEndIndex;
-		public Indexes(int dependIndex, int subjectEndIndex, int functionEndIndex) {
+		protected final int thisIndex; 
+		protected final int dependIndex;
+		protected final int subjectEndIndex;
+		protected final int functionEndIndex;
+		public Indexes(int thisIndex, int dependIndex, int subjectEndIndex, int functionEndIndex) {
+			this.thisIndex = thisIndex;
 			this.dependIndex = dependIndex;
 			this.subjectEndIndex = subjectEndIndex;
 			this.functionEndIndex = functionEndIndex;

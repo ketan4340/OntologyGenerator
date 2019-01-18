@@ -90,7 +90,7 @@ public class SingleClause extends Clause<Categorem> {
 	@Override
 	public SingleClause clone() {
 		SingleClause clone = new SingleClause(this);
-		clone.setDepending(getDepending());
+		//clone.setDepending(getDepending());
 		return clone;
 	}
 

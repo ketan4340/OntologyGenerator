@@ -1,15 +1,14 @@
 package modules.textRevision;
 
-import java.util.List;
-import java.util.regex.Matcher;
-
-import grammar.clause.Clause;
+import grammar.sentence.ClauseSequence;
+import grammar.sentence.Sentence;
 
 public class SubsentenceMatcher implements SubsentenceMatchResult {
 
-	public SubsentenceMatcher() {
-		// TODO 自動生成されたコンストラクター・スタブ
-		Matcher m;
+	private final Sentence sentence;
+	
+	public SubsentenceMatcher(Sentence sentence) {
+		this.sentence = sentence;
 	}
 
 	
@@ -42,7 +41,7 @@ public class SubsentenceMatcher implements SubsentenceMatchResult {
 		return 0;
 	}
 	@Override
-	public List<Clause<?>> group() {
+	public ClauseSequence group() {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}

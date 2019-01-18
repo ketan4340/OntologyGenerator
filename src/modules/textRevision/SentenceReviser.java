@@ -50,9 +50,10 @@ public class SentenceReviser {
 		// 指定の品詞を持つ形態素を次の形態素と破壊的に結合する
 		Stream.of(TAGS_NOUNIZE).forEach(tag_n -> {
 			for (Clause<?> matchedClause = sentence.findFirstClauseMatching(tag_n, true);
-					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
-				if (!sentence.connect2Next(matchedClause, true))
-					break;
+					matchedClause != null;
+					matchedClause = sentence.findFirstClauseMatching(tag_n, true)) 
+			{	// 指定の品詞で終わる文節がなくなるまで繰り返し
+				if (!sentence.connect2Next(matchedClause, true)) break;
 				matchedClause = sentence.findFirstClauseMatching(tag_n, true);
 			}
 		});
@@ -60,10 +61,10 @@ public class SentenceReviser {
 		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
 		Stream.of(TAGS_NOUNPHRASE).forEach(tag_np -> {
 			for (Clause<?> matchedClause = sentence.findFirstClauseMatching(tag_np, true);
-					matchedClause != null; ) {	// 指定の品詞で終わる文節がなくなるまで繰り返し
-				if (!sentence.connect2Next(matchedClause, false))
-					break;
-				matchedClause = sentence.findFirstClauseMatching(tag_np, true);
+					matchedClause != null; 
+					matchedClause = sentence.findFirstClauseMatching(tag_np, true)) 
+			{	// 指定の品詞で終わる文節がなくなるまで繰り返し
+				if (!sentence.connect2Next(matchedClause, false)) break;
 			}
 		});
 	}

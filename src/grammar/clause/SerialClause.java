@@ -55,7 +55,7 @@ public class SerialClause extends Clause<Phrase> {
 	@Override
 	public SerialClause clone() {
 		SerialClause clone = new SerialClause(this);
-		clone.setDepending(getDepending());
+		//clone.setDepending(getDepending());
 		return clone;
 	}
 

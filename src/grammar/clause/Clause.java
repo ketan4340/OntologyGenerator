@@ -51,8 +51,8 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	private static List<Word> linedupWords(
 			Word categorem, 
 			List<? extends Word> adjuncts, 
-			List<? extends Word> others) 
-	{
+			List<? extends Word> others
+	) {
 		List<Word> words = new ArrayList<>(5);
 		words.add(categorem);
 		words.addAll(adjuncts);
@@ -80,40 +80,9 @@ implements SyntacticChild, GrammarInterface, Constituent {
 				.collect(Collectors.toList());
 	}
 
-	/**
-	 * この文節が係る文節，その文節が係る文節，と辿っていき，経由した全ての文節をリストにして返す.
-	 * @return この文節から係る全ての文節
-	 */
-	public List<Clause<?>> allDependings() {
-		List<Clause<?>> allDepending = new ArrayList<>();
-		Clause<?> depto = depending;
-		while (depto != null) {
-			allDepending.add(depto);
-			depto = depto.getDepending();
-		}
-		return allDepending;
-	}
 
 	@Override
 	public abstract Clause<C> clone();
-
-	/**
-	 * 複数のClauseを係り受け関係を維持しつつ複製する
-	 */
-	public static List<Clause<?>> cloneAll(List<Clause<?>> originClauses) {
-		// まずは複製
-		List<Clause<?>> cloneClauses = originClauses.stream().map(Clause::clone).collect(Collectors.toList());
-		ListIterator<Clause<?>> itr_origin = originClauses.listIterator();
-		ListIterator<Clause<?>> itr_clone = cloneClauses.listIterator();
-
-		// 係り先があれば整え、なければnull
-		while (itr_origin.hasNext() && itr_clone.hasNext()) {
-			Clause<?> origin = itr_origin.next(), clone = itr_clone.next();
-			int index2Dep = originClauses.indexOf(origin.getDepending());
-			clone.setDepending(index2Dep != -1? cloneClauses.get(index2Dep): null);
-		}
-		return cloneClauses;
-	}
 
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean containsWordHas(WordPattern wp) {
@@ -215,12 +184,12 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	/* ================================================== */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+		final byte prime = 31;
 		int result = super.hashCode();
 		result = prime * result + Objects.hashCode(categorem);
 		result = prime * result + Objects.hashCode(adjuncts);
 		result = prime * result + Objects.hashCode(others);
-		result = prime * result + Objects.hashCode(depending);
+		//result = prime * result + Objects.hashCode(depending);
 		return result;
 	}
 	
@@ -235,8 +204,8 @@ implements SyntacticChild, GrammarInterface, Constituent {
 		Clause<?> other = (Clause<?>) obj;
 		return Objects.equals(this.categorem, other.categorem) && 
 				Objects.equals(this.adjuncts, other.adjuncts) &&
-				Objects.equals(this.others, other.others) &&
-				Objects.equals(this.depending, other.depending);
+				Objects.equals(this.others, other.others);
+				//Objects.equals(this.depending, other.depending);
 	}
 	
 	@Override
