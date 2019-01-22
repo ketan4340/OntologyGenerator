@@ -1,7 +1,6 @@
 package grammar.sentence;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -54,30 +53,26 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	public void initDependency(DependencyMap dm) {
 		dm.forEach((from, to) -> from.setDepending(to));
 	}
-	public Sentence subsentence(int fromIndex, int toIndex) {
-		List<Clause<?>> subClauses = new ArrayList<>(children.subList(fromIndex, toIndex));
+	public Sentence subsentence(int beginIndex, int endIndex) {
+		List<Clause<?>> subClauses = new ArrayList<>(children.subList(beginIndex, endIndex));
 		return new Sentence(subClauses);
 	}
 	
-	/**
-	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
-	 */
-	public List<Clause<?>> clausesHave(WordPattern wp) {
-		return children.stream()
-				.filter(c -> c.containsWordHas(wp))
-				.collect(Collectors.toList());
+	public ClauseSequence subClauseSequence(int beginIndex, int endIndex) {
+		List<Clause<?>> subClauses = children.subList(beginIndex, endIndex);
+		return new ClauseSequence(subClauses);
 	}
-
+	
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
 	 * @param cp 文節パターン
 	 * @param ignoreSign 記号を無視するか否か
 	 * @return 最後の単語が指定の品詞である文節のうち、この文の最初に現れるもの.
 	 */
-	public Clause<?> findFirstClauseMatching(ClausePattern cp, boolean ignoreSign) {
-		return children.stream().filter(c -> c.matchWith(cp, ignoreSign)).findFirst().orElse(null);
+	public Optional<Clause<?>> findFirstClauseMatching(ClausePattern cp) {
+		return children.stream().filter(cp::matches).findFirst();
 	}
-
+	
 	/**
 	 * 指定の文節をその右隣の文節に繋げる.
 	 * 元の文節・単語は連文節の中に内包される. 
@@ -106,44 +101,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		formerDependeds.addAll(clausesDepending(backClause));
 		gatherDepending(concatClause, formerDependeds);
 		return true;
-	}
-	
-	public boolean concatClausesDestructive(String[] frontPos, String[] backPos) {
-		Clause<?> c;
-		SingleClause frontClause;
-		if ((c = findClause(frontPos)) instanceof SingleClause)
-			frontClause = SingleClause.class.cast(c);
-		else 
-			return false;
-		SingleClause backClause;
-		if ((c = findClause(backPos)) instanceof SingleClause)
-			backClause = SingleClause.class.cast(c);
-		else 
-			return false;
-		
-		SingleClause newc = SingleClause.concatClauseDestructive(frontClause, backClause);
-		return replaceClause(Arrays.asList(new Clause<?>[]{frontClause, backClause}), newc);
-	}
-
-	public boolean joinClauses(String[][] posArray) {
-		List<Clause<?>> clauseList = Stream.of(posArray)
-			.map(this::findClause)
-			.collect(Collectors.toList());
-		SerialClause newc = SerialClause.join(clauseList);
-		return replaceClause(clauseList, newc);
-	}
-
-	public Clause<?> findClause(String[] pos) {
-		return null;
-	}
-	public boolean replaceClause(List<Clause<?>> befores, Clause<?> after) {
-		return false;
-	}
-
-	private Set<Clause<?>> clausesDepending(Clause<?> clause) {
-		return getChildren().stream()
-				.filter(c -> c.getDepending() == clause)
-				.collect(Collectors.toSet());
 	}
 
 	/** 渡したClauseが文中で連続しているかを<clause, Boolean>のMapで返す */
@@ -278,9 +235,9 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !cls2Last.matchWith(PARTICLE, true) &&
-					!cls2Last.matchWith(ADVERB, true) &&
-					!cls2Last.matchWith(AUXILIARY, true) &&
+			if ( !PARTICLE.matches(cls2Last) &&
+					!ADVERB.matches(cls2Last) &&
+					!AUXILIARY.matches(cls2Last) &&
 					cls2Last.getDepending() != nextChild(cls2Last))	// 最後の文節に係るものは除外
 					predicates.add(cls2Last);
 		}
@@ -359,11 +316,16 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		}
 		return true;
 	}
-	private boolean gatherDepending(Clause<?> target, Collection<Clause<?>> memberClauses) {
+	public boolean gatherDepending(Clause<?> target, Collection<Clause<?>> memberClauses) {
 		if (!children.contains(target)) return false;
 		if (!children.containsAll(memberClauses)) return false;
 		memberClauses.forEach(mc -> mc.setDepending(target));
 		return true;
+	}
+	public Set<Clause<?>> clausesDepending(Clause<?> clause) {
+		return getChildren().stream()
+				.filter(c -> c.getDepending() == clause)
+				.collect(Collectors.toSet());
 	}
 	
 	private static final WordPattern POS_HA = new WordPattern("係助詞", "は");
@@ -425,7 +387,15 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		clauses_NP.forEach(c -> connect2Next(c, false));
 	}
 
-
+	/**
+	 * 渡された品詞のいずれかに一致するWordを含むclauseを返す.
+	 */
+	public List<Clause<?>> clausesHave(WordPattern wp) {
+		return children.stream()
+				.filter(c -> c.containsWordHas(wp))
+				.collect(Collectors.toList());
+	}
+	
 	/** ClauseのリストからWordのリストにする */
 	public List<Word> words() {
 		return children.stream()
@@ -519,11 +489,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			dependingResource.ifPresent(d -> clauseResource.addProperty(JASS.dependTo, d));
 		});
 	}
-	
-	@Override
-	public void onChanged(Change<? extends Clause<?>> c) {
-	}
-
 	
 	/* ================================================== */
 	/* ================== Object Method ================= */

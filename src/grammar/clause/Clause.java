@@ -1,12 +1,9 @@
 package grammar.clause;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -18,7 +15,6 @@ import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
-import grammar.pattern.ClausePattern;
 import grammar.pattern.WordPattern;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
@@ -88,34 +84,6 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	public boolean containsWordHas(WordPattern wp) {
 		return words().stream().anyMatch(w -> w.matches(wp));
 	}
-
-	/**
-	 * この文節が渡された単語指定配列に適合するかを判定する. 複数の単語が連続しているか調べたければ品詞.
-	 * @param cp 文節指定パターン
-	 * @param ignoreSign 文節末尾の接辞，記号 (、や。)を無視するか否か
-	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
-	 */
-	public boolean matchWith(ClausePattern cp, boolean ignoreSign) {
-		List<Word> words = ignoreSign? words() : getChildren();
-		int startmin = 0, startmax = words.size() - cp.size();
-		if (startmax < 0) return false;
-		if (cp.getForwardMatch() && cp.getBackwardMatch() && startmin != startmax) 
-			return false;
-		List<Integer> startIndexes = 
-				cp.getForwardMatch()? Arrays.asList(startmin) : 
-				cp.getBackwardMatch()? Arrays.asList(startmax) : 
-					IntStream.range(startmin, startmax).boxed().collect(Collectors.toList());
-		for (int idx : startIndexes) {
-			ListIterator<Word> itr_w = words.listIterator(idx);
-			ListIterator<WordPattern> itr_wp = cp.listIterator();
-			while (itr_w.hasNext() && itr_wp.hasNext()) {
-				Word word = itr_w.next();
-				WordPattern wp = itr_wp.next();
-				if (!word.matches(wp)) return false;
-			}	
-		}
-		return true;
-	}
 	
 	public boolean hasOnlyCategorem() {
 		return adjuncts.isEmpty() && others.isEmpty();
@@ -152,11 +120,6 @@ implements SyntacticChild, GrammarInterface, Constituent {
 				.addProperty(JASS.categorem, categoremResource)
 				.addProperty(JASS.adjuncts, adjunctList);
 		return clauseResource;
-	}
-
-	@Override
-	public void onChanged(Change<? extends Word> c) {
-		// TODO 自動生成されたメソッド・スタブ	
 	}
 	
 	/* ================= Getter, Setter ================= */

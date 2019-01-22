@@ -7,11 +7,12 @@ import grammar.sentence.ClauseSequence;
  */
 public interface SubsentenceMatchResult {
 
-	public boolean matches();
-	public boolean lookingAt();
+	//public boolean matches();
+	//public boolean lookingAt();
 	public boolean find();
 	public int start();
     public int end();
     public ClauseSequence group();
-    
+    public ClauseSequence group(int group);
+    public int groupCount();
 }

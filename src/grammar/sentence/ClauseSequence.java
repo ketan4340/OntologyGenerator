@@ -1,6 +1,7 @@
 package grammar.sentence;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -25,6 +26,9 @@ public class ClauseSequence implements List<Clause<?>>, Cloneable {
 	}
 	public ClauseSequence(List<Clause<?>> clauses) {
 		this.clauses = clauses;
+	}
+	public ClauseSequence(Clause<?>... clauses) {
+		this.clauses = Arrays.asList(clauses);
 	}
 
 	public ClauseSequence cloneAll() {

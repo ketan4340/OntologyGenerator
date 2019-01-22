@@ -1,5 +1,6 @@
 package grammar.pattern;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -9,7 +10,12 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import grammar.clause.Clause;
+import grammar.word.Word;
 
 public class ClausePattern implements List<WordPattern> {
 	private final List<WordPattern> wps;
@@ -19,6 +25,34 @@ public class ClausePattern implements List<WordPattern> {
 		this.wps = new ArrayList<>();
 	}
 	
+	/**
+	 * この文節が渡された単語指定配列に適合するかを判定する. 複数の単語が連続しているか調べたければ品詞.
+	 * @param cp 文節指定パターン
+	 * @param ignoreSign 文節末尾の接辞，記号 (、や。)を無視するか否か
+	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
+	 */
+	public boolean matches(Clause<?> c) {
+		boolean ignoreSign = true;	// 元々はこのメソッドの引数だったが、毎回trueなので取り出した
+		List<Word> words = ignoreSign? c.words() : c.getChildren();
+		int startmin = 0, startmax = words.size() - size();
+		if (startmax < 0) return false;
+		if (getForwardMatch() && getBackwardMatch() && startmin != startmax) 
+			return false;
+		List<Integer> startIndexes = 
+				getForwardMatch()? Arrays.asList(startmin) : 
+				getBackwardMatch()? Arrays.asList(startmax) : 
+					IntStream.range(startmin, startmax).boxed().collect(Collectors.toList());
+		for (int idx : startIndexes) {
+			ListIterator<Word> itr_w = words.listIterator(idx);
+			ListIterator<WordPattern> itr_wp = listIterator();
+			while (itr_w.hasNext() && itr_wp.hasNext()) {
+				Word word = itr_w.next();
+				WordPattern wp = itr_wp.next();
+				if (!word.matches(wp)) return false;
+			}	
+		}
+		return true;
+	}
 	
 	public boolean getForwardMatch() {
 		return options.getForwardMatch();

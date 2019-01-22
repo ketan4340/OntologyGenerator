@@ -16,7 +16,7 @@ import grammar.SyntacticParent;
 import grammar.clause.Clause;
 
 public class Dependent extends SyntacticParent<Clause<?>>
-implements SyntacticChild, GrammarInterface, Constituent {
+		implements SyntacticChild, GrammarInterface, Constituent {
 	private static int SUM = 0;
 
 	private final int id;
@@ -52,11 +52,6 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	public Resource toJASS(Model model) {
 		return model.createList(children.stream().map(m -> m.toJASS(model)).iterator())
 		.addProperty(RDF.type, JASS.ClauseList);
-	}
-
-	@Override
-	public void onChanged(Change<? extends Clause<?>> c) {
-		// TODO 自動生成されたメソッド・スタブ
 	}
 
 }

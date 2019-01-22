@@ -51,9 +51,5 @@ public class Writing extends SyntacticParent<Paragraph>
 				.addProperty(JASS.paragraphs, paragraphList);
 		return writingResource;
 	}
-	@Override
-	public void onChanged(Change<? extends Paragraph> c) {
-		// TODO 自動生成されたメソッド・スタブ	
-	}
-	
+
 }

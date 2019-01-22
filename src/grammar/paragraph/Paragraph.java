@@ -55,10 +55,6 @@ public class Paragraph extends SyntacticParent<Sentence>
 				.addProperty(JASS.sentences, sentenceList);
 		return paragraphResource;
 	}
-	@Override
-	public void onChanged(Change<? extends Sentence> c) {
-		// TODO 自動生成されたメソッド・スタブ	
-	}
 
 	/* ================================================== */
 	/* ==========        Object  Method        ========== */

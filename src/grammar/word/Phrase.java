@@ -120,19 +120,19 @@ public class Phrase extends Categorem {
 		
 		dpdtCopy.forEach(dep -> {
 			Resource depRsrc = dep.getCategorem().createResource(m);
-			if (dep.matchWith(ADJ, true)) {
+			if (ADJ.matches(dep)) {
 				// "大きい"など。連用テ接続は"大きく(て)"のように並列する表現
 				Resource d_anon = m.createResource().addProperty(MoS.attributeOf, depRsrc);
 				RDFList list = m.createList(new RDFNode[]{r, d_anon});
 				m.createResource().addProperty(OWL2.intersectionOf, list);
-			} else if (dep.matchWith(PREN, true)) {
+			} else if (PREN.matches(dep)) {
 				// "大きな"、"こういう"、"あの"、など。
 				// "大きな"は"大きい"の活用形ではないことに注意	
 				r.addProperty(DCTerms.relation, depRsrc);
-			} else if (dep.matchWith(PART, true)) {
+			} else if (PART.matches(dep)) {
 				// "の"のみ該当
 				r.addProperty(MoS.of, depRsrc);
-			} else if (dep.matchWith(AUX, true)) {
+			} else if (AUX.matches(dep)) {
 				// "変な"の"な"など
 				Resource d_anon = m.createResource().addProperty(MoS.attributeOf, depRsrc);
 				RDFList list = m.createList(new RDFNode[]{r, d_anon});

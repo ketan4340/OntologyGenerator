@@ -1,5 +1,6 @@
 package modules.textRevision;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,23 +9,31 @@ import java.util.stream.Stream;
 
 import data.id.SentenceIDMap;
 import grammar.clause.Clause;
+import grammar.clause.SerialClause;
 import grammar.morpheme.Morpheme;
+import grammar.pattern.BiClausePattern;
 import grammar.pattern.ClausePattern;
+import grammar.pattern.SubsentencePattern;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
 import language.pos.Concatable;
 
 public class SentenceReviser {
-	private static final ClausePattern[] TAGS_NOUNIZE = {
-			ClausePattern.compile(new String[][]{{"体言接続特殊２"}})
+	private static final ClausePattern[] NOUNIZE_PATTERNS = {
+			ClausePattern.compile(new String[][]{{"体言接続特殊２"}, {"%o", "$"}})
 	};
-	private static final ClausePattern[] TAGS_NOUNPHRASE = {
-			ClausePattern.compile(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}}),	// 連用テ接続は"大きくて"など
-			ClausePattern.compile(new String[][]{{"連体詞"}, {"%o", "$"}}),				// "大きな"、"こういう"、"あの"、など
-			ClausePattern.compile(new String[][]{{"助詞", "連体化"}, {"%o", "$"}}),		// "の"のみ該当
-			ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}}),		// "変な"の"な"など
-			ClausePattern.compile(new String[][]{{"名詞"}, {"%o", "$"}})
-			//{{"動詞"}, {"もの", "非自立"}}
+	private static final SubsentencePattern[] NOUNPHRASE_PATTERNS = {
+			// 連用テ接続は"大きくて"など
+			BiClausePattern.compile(new String[][][]{{{"形容詞", "-連用テ接続"}, {"%o", "$"}},{}}),	
+			// "大きな"、"こういう"、"あの"、など
+			BiClausePattern.compile(new String[][][]{{{"連体詞"}, {"%o", "$"}}, {}}), 
+			// "の"のみ該当
+			BiClausePattern.compile(new String[][][]{{{"助詞", "連体化"}, {"%o", "$"}}, {}}), 
+			// "変な"の"な"など
+			BiClausePattern.compile(new String[][][]{{{"助動詞", "体言接続"}, {"%o", "$"}}, {}}), 
+			BiClausePattern.compile(new String[][][]{{{"名詞"}, {"%o", "$"}}, {}}), 
+			// "光るもの"など
+			BiClausePattern.compile(new String[][][]{{{"動詞"}, {"%o", "$"}}, {{"もの", "非自立"}, {"%o", "^"}}}), 
 			};
 
 	/* ================================================== */
@@ -46,27 +55,30 @@ public class SentenceReviser {
 		.map(Sentence::getChildren).flatMap(List::stream)
 		.map(Clause::words).flatMap(List::stream)
 		.forEach(w -> weldNumbers(w));
-
-		// 指定の品詞を持つ形態素を次の形態素と破壊的に結合する
-		Stream.of(TAGS_NOUNIZE).forEach(tag_n -> {
-			for (Clause<?> matchedClause = sentence.findFirstClauseMatching(tag_n, true);
-					matchedClause != null;
-					matchedClause = sentence.findFirstClauseMatching(tag_n, true)) 
-			{	// 指定の品詞で終わる文節がなくなるまで繰り返し
-				if (!sentence.connect2Next(matchedClause, true)) break;
-				matchedClause = sentence.findFirstClauseMatching(tag_n, true);
-			}
-		});
 		
-		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
-		Stream.of(TAGS_NOUNPHRASE).forEach(tag_np -> {
-			for (Clause<?> matchedClause = sentence.findFirstClauseMatching(tag_np, true);
-					matchedClause != null; 
-					matchedClause = sentence.findFirstClauseMatching(tag_np, true)) 
+		// 指定の品詞を持つ形態素を次の形態素と破壊的に結合する
+		Arrays.stream(NOUNIZE_PATTERNS).forEach(np -> {
+			for (Optional<Clause<?>> matchedClause_opt = sentence.findFirstClauseMatching(np);
+					matchedClause_opt.isPresent();
+					matchedClause_opt = sentence.findFirstClauseMatching(np)) 
 			{	// 指定の品詞で終わる文節がなくなるまで繰り返し
-				if (!sentence.connect2Next(matchedClause, false)) break;
+				if (matchedClause_opt.isPresent()) {
+					Clause<?> c = matchedClause_opt.get();
+					if (!sentence.connect2Next(c, true)) break;
+				}
 			}
 		});
+
+		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
+		for (boolean connected = false; connected; ) {
+			connected = false;
+			for (SubsentencePattern np : NOUNPHRASE_PATTERNS) {
+				SubsentenceMatcher matcher = np.matcher(sentence);
+				boolean result = matcher.replaceFirst(SerialClause::join);
+				connected = connected || result; // どの文節列パターンでも結合されなかった場合終了			
+			}
+		}
+		
 	}
 
 	private void weldNumbers(Word w) {

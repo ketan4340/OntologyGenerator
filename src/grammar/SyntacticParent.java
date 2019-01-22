@@ -1,12 +1,9 @@
 package grammar;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 
 /** 
  * 言葉の単位のうち、下位要素を持つもの.
@@ -15,18 +12,15 @@ import javafx.collections.ObservableList;
  *
  * @param <C> 下位要素の型
  */
-public abstract class SyntacticParent<C extends SyntacticChild> 
-		implements ListChangeListener<C> {
+public abstract class SyntacticParent<C extends SyntacticChild> {
 	
-	protected ObservableList<C> children;
+	protected List<C> children;
 
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
 	public SyntacticParent(List<C> children) {
-		this.children = FXCollections.observableList(children);
-		this.children.addListener(this);
-		onChanged(null);
+		this.children = new ArrayList<>(children);
 	}
 
 

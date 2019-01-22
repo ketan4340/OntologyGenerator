@@ -19,7 +19,7 @@ public class SubsentencePattern implements List<ClausePattern> {
 	private final List<ClausePattern> cls;
 
 	
-	private SubsentencePattern() {
+	protected SubsentencePattern() {
 		this.cls = new ArrayList<>();
 	}
 	
@@ -30,7 +30,7 @@ public class SubsentencePattern implements List<ClausePattern> {
 	}
 	
 	public SubsentenceMatcher matcher(Sentence s) {
-		return new SubsentenceMatcher(s);
+		return new SubsentenceMatcher(this, s);
 	}
 	
 	@Override
