@@ -31,9 +31,11 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	/* ================== Static Method ================= */
 	/* ================================================== */
 	public static SentenceIDMap createFromList(List<Sentence> sentenceList) {
-		return sentenceList.stream()
-				//.collect(Collectors.toMap(s -> s, s -> new IDTupleByStatement(""), (e1, e2) -> e1, LinkedHashMap::new));
-				.collect(Collectors.toMap(s -> s, s -> new IDTupleByModel(""), (e1, e2) -> e1, SentenceIDMap::new));
+		return sentenceList.stream().collect(Collectors.toMap(
+				s -> s, 
+				s -> new IDTupleByModel(""), 
+				(e1, e2) -> e1, 
+				SentenceIDMap::new));
 	}
 
 	/* ================================================== */
@@ -53,10 +55,11 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 	public SentenceIDMap replaceSentence2Sentences(Map<Sentence, List<Sentence>> replaceMap) {
 		SentenceIDMap sm = new SentenceIDMap();
 		replaceMap.forEach(
-				(from, toList) -> {
-					IDTuple cloneTuple = get(from).clone();
-					toList.forEach(s -> sm.put(s, cloneTuple));
-				}
+				(from, toList) -> 
+					toList.forEach(s -> {
+						IDTuple cloneTuple = get(from).clone();						
+						sm.put(s, cloneTuple);	
+					})
 		);
 		return sm;
 	}

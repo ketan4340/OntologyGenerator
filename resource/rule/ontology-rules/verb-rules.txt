@@ -26,7 +26,7 @@ IF (Action) {
     ?stc jass:subject/jass:categorem/jass:means ?rsrcS . 
     # "に"または"を"を付属語に持つ文節を対象とみなす
     OPTIONAL { ?stc (jass:caseNIclause|jass:caseWOclause)/jass:categorem/jass:means ?rsrcO . }
-  } UNION { 
+  } UNION {
   # 受動態
     # 付属語が存在し、それが"れる"か"られる"
     ?adjlistP rdf:rest*/rdf:first [jass:subPoS1 "接尾" ; jass:infinitive ?reruinf]. 

@@ -42,4 +42,13 @@ public class MoS {
 	public static final Property name = property("name");
 	
 
+	/* ================================================== */
+	/* =================== Individual =================== */
+	/* ================================================== */
+	public static final Resource maximum = resource("maximum");
+	public static final Resource positive = resource("positive");
+	public static final Resource medium = resource("medium");
+	public static final Resource negative = resource("negative");
+	public static final Resource minimum = resource("minimum");
+
 }

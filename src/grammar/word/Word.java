@@ -30,7 +30,6 @@ public class Word extends SyntacticParent<Morpheme>
 	private static int SUM = 0;
 
 	private final int id;
-	//private byte coreMphmIdx;	// 1単語に128以上の形態素なんてないはず
 
 	/* ================================================== */
 	/* ================== Constructor =================== */
@@ -38,7 +37,6 @@ public class Word extends SyntacticParent<Morpheme>
 	public Word(List<Morpheme> morphemes) {
 		super(morphemes);
 		this.id = SUM++;
-		//setCoreMorphemeIndex(morphemes);
 	}
 	public Word(Morpheme... morphemes) {
 		this(Arrays.asList(morphemes));
@@ -58,25 +56,12 @@ public class Word extends SyntacticParent<Morpheme>
 	/* ================== Member Method ================= */
 	/* ================================================== */
 	public Morpheme coreMorpheme() {
-		//return children.get(coreMphmIdx);
 		ListIterator<Morpheme> li = children.listIterator(children.size());
 		while (li.hasPrevious())
 			if (!li.previous().contains("接尾"))
 				return children.get(li.previousIndex()+1);
 		return tail();
 	}
-	/*
-	private void setCoreMorphemeIndex(List<Morpheme> morphemes) {
-		this.coreMphmIdx = coreMorphemeIndex(morphemes);
-	}
-	private byte coreMorphemeIndex(List<Morpheme> morphemes) {
-		ListIterator<Morpheme> li = morphemes.listIterator(morphemes.size());
-		while (li.hasPrevious())
-			if (!li.previous().contains("接尾"))
-				return (byte)(li.previousIndex()+1);
-		return (byte)(morphemes.size()-1); 
-	}
-	*/
 	
 	/**
 	 * 渡されたTagを"全て"持っていれば真、それ以外は偽を返す.
@@ -96,7 +81,6 @@ public class Word extends SyntacticParent<Morpheme>
 		}
 		return match;
 	}
-
 
 	/* ================================================== */
 	/* ================ Interface Method ================ */ 

@@ -8,7 +8,7 @@ import org.apache.jena.rdf.model.Statement;
 
 import data.RDF.rule.RDFRule;
 import grammar.sentence.Sentence;
-import util.RDF.RDFUtil;
+import util.RDFUtil;
 
 public class IDTupleByStatement extends Tuple implements IDTuple {
 	private static final long serialVersionUID = -3501992033602856621L;

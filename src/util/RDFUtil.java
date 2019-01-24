@@ -1,4 +1,4 @@
-package util.RDF;
+package util;
 
 import java.util.Objects;
 

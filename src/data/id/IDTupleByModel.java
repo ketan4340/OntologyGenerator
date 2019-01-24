@@ -39,13 +39,13 @@ public class IDTupleByModel extends Tuple implements IDTuple {
 	}
 	public IDTupleByModel(String longSentenceID, String longSentence,
 			String shortSentenceID, String shortSentence,
-			String rdfRuleID, String triple,  String score) {
+			String rdfRuleID, String model,  String score) {
 		super(	longSentenceID,
 				longSentence,
 				shortSentenceID,
 				shortSentence,
 				rdfRuleID,
-				triple,
+				model,
 				score
 				);
 	}
@@ -68,13 +68,13 @@ public class IDTupleByModel extends Tuple implements IDTuple {
 	}
 	@Override
 	public void setLongSentence(Sentence longSentence) {
-		setLongSentence(longSentence.name());
 		setLongSentenceID(String.valueOf(longSentence.id()));
+		setLongSentence(longSentence.name());
 	}
 	@Override
 	public void setShortSentence(Sentence shortSentence) {
-		setShortSentence(shortSentence.name());
 		setShortSentenceID(String.valueOf(shortSentence.id()));
+		setShortSentence(shortSentence.name());
 	}
 	@Override
 	public void setRDFRuleID(RDFRule rule) {

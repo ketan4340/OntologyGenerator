@@ -3,6 +3,7 @@ package modules.syntacticParse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import grammar.sentence.DependencyMap;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
+import grammar.word.NamedEntityTag;
 import grammar.word.Word;
 import language.pos.CabochaTags;
 import language.pos.TagsFactory;
@@ -43,7 +45,7 @@ public class CabochaDecoder {
 		return sentences;
 	}
 
-	public Sentence decode2Sentence(List<String> parsedInfo4sentence) {
+	private Sentence decode2Sentence(List<String> parsedInfo4sentence) {
 		List<List<String>> clauseInfoList = StringListUtil.splitStartWith("\\A(\\* ).*", parsedInfo4sentence);	// "* "ごとに分割
 		List<Clause<?>> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
@@ -55,7 +57,7 @@ public class CabochaDecoder {
 		return s;
 	}
 
-	public SingleClause decode2Clause(List<String> parsedInfo4clause) {
+	private SingleClause decode2Clause(List<String> parsedInfo4clause) {
 		//// 一要素目は文節に関する情報
 		// ex) * 0 -1D 0/1 0.000000...
 		Indexes cabochaClauseIndexes = cabochaClauseIndexes(parsedInfo4clause.get(0));
@@ -81,36 +83,40 @@ public class CabochaDecoder {
 		return new SingleClause(headWord, functionWords, otherWords);
 	}
 
-	public Word decode2Word(List<List<String>> parsedInfo4word) {
+	private Word decode2Word(List<List<String>> parsedInfo4word) {
 		// 一つの単語が複数の形態素からなる場合もあるのでListで渡される
 		List<Morpheme> morphemes = parsedInfo4word.stream()
 				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
 				.collect(Collectors.toList());
 		return new Word(morphemes);
 	}
-	public Categorem decode2Categorem(List<List<String>> parsedInfo4word) {
+	private Categorem decode2Categorem(List<List<String>> parsedInfo4word) {
 		List<Morpheme> morphemes = parsedInfo4word.stream()
 				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
 				.collect(Collectors.toList());
-		return new Categorem(morphemes);
+		Categorem c = new Categorem(morphemes);
+		// 固有表現タグは自立語の一番目の形態素に含まれているという仮定に基づくget(0)
+		String[] morphemeInfos = parsedInfo4word.get(0).get(0).split("\t");
+		String netag_str = morphemeInfos.length>3 ? morphemeInfos[2] : null;
+		c.setNETag(NETagOf(netag_str));
+		return c;
 	}
-	public Adjunct decode2Adjunct(List<List<String>> parsedInfo4word) {
+	private Adjunct decode2Adjunct(List<List<String>> parsedInfo4word) {
 		List<Morpheme> morphemes = parsedInfo4word.stream()
 				.map(morphemeInfo -> decode2Morpheme(morphemeInfo))
 				.collect(Collectors.toList());
 		return new Adjunct(morphemes);
 	}
 
-	public Morpheme decode2Morpheme(List<String> parsedInfo4morpheme) {
+	private Morpheme decode2Morpheme(List<String> parsedInfo4morpheme) {
 		// CaboChaの場合は形態素の情報は必ず一行なのでget(0)
 		String[] morphemeInfos = parsedInfo4morpheme.get(0).split("\t");
 		String name = morphemeInfos[0];
 		String[] tagArray = morphemeInfos[1].split(",");
-		CabochaTags tags = getTagsSuppliedSingleByteChar(tagArray, name);
+		CabochaTags tags = supplyPoSIfSingleByteChar(tagArray, name);
 		return MorphemeFactory.getInstance().getMorpheme(name, tags);
 	}
-
-
+	
 	/* ================================================== */
 	/* ==========    Cabocha専用メソッドの実装    ========== */
 	/* ================================================== */
@@ -122,7 +128,7 @@ public class CabochaDecoder {
 						(k1, k2) -> k1,
 						DependencyMap::new));
 	}
-	private CabochaTags getTagsSuppliedSingleByteChar(String[] tagArray, String infinitive) {
+	private CabochaTags supplyPoSIfSingleByteChar(String[] tagArray, String infinitive) {
 		TagsFactory factory = TagsFactory.getInstance();
 		if (tagArray.length < MAXIMUM_TAGS_LENGTH)	// sizeが9未満．つまり半角文字
 			return factory.getCabochaTags(tagArray[0], tagArray[1], tagArray[2], tagArray[3], tagArray[4], tagArray[5], infinitive, infinitive, infinitive);
@@ -154,6 +160,24 @@ public class CabochaDecoder {
 			this.dependIndex = dependIndex;
 			this.subjectEndIndex = subjectEndIndex;
 			this.functionEndIndex = functionEndIndex;
+		}
+	}
+	
+	private NamedEntityTag NETagOf(String netag_str) {
+		if (Objects.isNull(netag_str) || netag_str.equals("O"))
+			return null;
+		netag_str = netag_str.substring(2);
+		switch (netag_str) {
+			case "OPTIONAL": return NamedEntityTag.OPTIONAL;
+			case "ORGANIZATION": return NamedEntityTag.ORGANIZATION;
+			case "PERSON": return NamedEntityTag.PERSON;
+			case "LOCATION": return NamedEntityTag.LOCATION;
+			case "ARTIFACT": return NamedEntityTag.ARTIFACT;
+			case "DATE": return NamedEntityTag.DATE;
+			case "TIME": return NamedEntityTag.TIME;
+			case "MONEY": return NamedEntityTag.MONEY;
+			case "PERCENT": return NamedEntityTag.PERCENT;
+			default: return null;
 		}
 	}
 

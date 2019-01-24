@@ -198,6 +198,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return shortSentList;
 	}
 
+	// 末尾がこれら以外なら述語とみなす
 	private static final ClausePattern PARTICLE = 
 			ClausePattern.compile(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
 	private static final ClausePattern ADVERB = 

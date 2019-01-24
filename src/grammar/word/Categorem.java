@@ -3,6 +3,7 @@ package grammar.word;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -12,11 +13,12 @@ import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
 import data.RDF.vocabulary.MoS;
 import grammar.morpheme.Morpheme;
-import language.pos.CabochaTags;
 
 public class Categorem extends Word implements Resourcable {
 	public static final Categorem EMPTY_CATEGOREM = new Categorem(Collections.emptyList());
 
+	private Optional<NamedEntityTag> netag = Optional.empty();
+	
 	/* ================================================== */
 	/* ================== Constructor =================== */
 	/* ================================================== */
@@ -26,9 +28,6 @@ public class Categorem extends Word implements Resourcable {
 	public Categorem(Morpheme... morphemes) {
 		super(morphemes);
 	}
-	public Categorem(String name, CabochaTags tags) {
-		super(name, tags);
-	}
 	private Categorem(Categorem categorem) {
 		this(new ArrayList<>(categorem.children));
 	}
@@ -36,7 +35,12 @@ public class Categorem extends Word implements Resourcable {
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	
+	public void setNETag(NamedEntityTag netag) {
+		this.netag = Optional.ofNullable(netag);
+	}
+	public Optional<NamedEntityTag> getNETag() {
+		return netag;
+	}
 	
 	/* ================================================== */
 	/* ================ Interface Method ================ */ 
@@ -48,9 +52,11 @@ public class Categorem extends Word implements Resourcable {
 
 	@Override
 	public Resource toJASS(Model model) {
-		return super.toJASS(model)
+		Resource categoremResource = super.toJASS(model)
 				.addProperty(RDF.type, JASS.Categorem)
 				.addProperty(JASS.means, createProxyNode(model));
+		netag.ifPresent(t -> categoremResource.addProperty(JASS.namedEntity, t.toJASS()));
+		return categoremResource;
 	}
 	
 	@Override

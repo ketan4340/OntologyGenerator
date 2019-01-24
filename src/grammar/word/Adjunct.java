@@ -9,7 +9,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.morpheme.Morpheme;
-import language.pos.CabochaTags;
 
 public class Adjunct extends Word {
 
@@ -21,9 +20,6 @@ public class Adjunct extends Word {
 	}
 	public Adjunct(Morpheme... morphemes) {
 		super(morphemes);
-	}
-	public Adjunct(String name, CabochaTags tags) {
-		super(name, tags);
 	}
 	private Adjunct(Adjunct other) {
 		this(new ArrayList<>(other.children));

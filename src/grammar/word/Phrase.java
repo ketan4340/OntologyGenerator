@@ -18,6 +18,7 @@ import data.RDF.vocabulary.JASS;
 import data.RDF.vocabulary.MoS;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
+import grammar.morpheme.MorphemeFactory;
 import grammar.pattern.ClausePattern;
 import language.pos.TagsFactory;
 
@@ -39,6 +40,7 @@ public class Phrase extends Categorem {
 		super(collectMorphemes(dependent, head));
 		this.dependent = dependent;
 		this.head = head;
+		setNETag(head.getNETag().orElse(null));
 	}
 	private static List<Morpheme> collectMorphemes(Dependent dependent, Word head) {
 		Stream<Morpheme> dependentMorphemes = dependent.getChildren().stream()
@@ -87,9 +89,9 @@ public class Phrase extends Categorem {
 	public Resource createResource(Model m) {
 		TagsFactory factory = TagsFactory.getInstance();
 		Stream<Word> kotoWords = Stream.of("こと", "事", "コト")
-				.map(s -> new Word(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "コト", "コト")));
+				.map(s -> new Word(MorphemeFactory.getInstance().getMorpheme(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "コト", "コト"))));
 		Stream<Word> monoWords = Stream.of("もの", "物", "モノ")
-				.map(s -> new Word(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "モノ", "モノ")));
+				.map(s -> new Word(MorphemeFactory.getInstance().getMorpheme(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "モノ", "モノ"))));
 
 		List<? extends Clause<?>> dpdtCopy = new LinkedList<>(dependent.getChildren());
 		/*

@@ -37,6 +37,7 @@ public class JASS {
 	public static final Resource Adjunct = resource("Adjunct");
 	public static final Resource Morpheme = resource("Morpheme");
 	public static final Resource PoS = resource("PoS");
+	public static final Resource NETag = resource("NETag");
 	
 	public static final Resource LanguageList = resource("LanguageList");
 	public static final Resource ParagraphList = resource("ParagraphList");
@@ -63,6 +64,7 @@ public class JASS {
 	public static final Property phraseComponent = property("phraseComponent");
 	public static final Property head = property("head");
 	public static final Property dependent = property("dependent");
+	public static final Property namedEntity = property("namedEntity");
 	
 	public static final Property sentenceElement = property("sentenceElement");
 	public static final Property subject = property("subject");
@@ -87,6 +89,20 @@ public class JASS {
 	public static final Property inflection = property("inflection");
 	public static final Property infinitive = property("infinitive");
 	public static final Property yomi = property("yomi");
-	public static final Property pronunciation = property("pronunciation");	
-
+	public static final Property pronunciation = property("pronunciation");
+	
+	
+	/* ================================================== */
+	/* =================== Individual =================== */
+	/* ================================================== */
+	public static final Resource optional = resource("optional");
+	public static final Resource organization = resource("organization");
+	public static final Resource person = resource("person");
+	public static final Resource location = resource("location");
+	public static final Resource artifact = resource("artifact");
+	public static final Resource date = resource("date");
+	public static final Resource time = resource("time");
+	public static final Resource money = resource("money");
+	public static final Resource percent = resource("percent");
+	
 }

@@ -1,6 +1,8 @@
 package data.id;
 
-public interface TupleInterface {
+import java.util.List;
+
+public interface TupleInterface extends List<String> {
 
 	String toCSV();
 }

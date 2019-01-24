@@ -31,10 +31,11 @@ import modules.textRevision.SentenceReviser;
 import util.StringListUtil;
 
 public class Generator {
+	//private static final Path PATH_NOUN_WORDS;
+	private static final Path PATH_DATE_WORDS;
 	private static final Path PATH_EXTENSION_RULE;
 	private static final Path PATH_ONTOLOGY_RULES;
 	private static final Path PATH_DEFAULT_JASS;
-	//private static final Path PATH_NOUN_WORDS;
 	private static final List<String> URL_SPARQL_ENDPOINTS;
 	private static final int MAX_SIZE_OF_INSTATEMENT;
 	private static final Path PATH_CABOCHA_PROP;
@@ -54,11 +55,11 @@ public class Generator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
+		PATH_DATE_WORDS = Paths.get(prop.getProperty("date_words-file"));
 		PATH_EXTENSION_RULE = Paths.get(prop.getProperty("extension_rule-file"));
 		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
 		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
-		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
 		URL_SPARQL_ENDPOINTS = Pattern.compile(",").splitAsStream(prop.getProperty("sparql-endpoint"))
 				.map(String::trim).collect(Collectors.toList());
 		MAX_SIZE_OF_INSTATEMENT = Integer.valueOf(prop.getProperty("max-size-of-INstatement"));
@@ -102,7 +103,7 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		//textFile_str = "resource/input/test/single.txt";
+		textFile_str = "resource/input/test/single.txt";
 		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
@@ -140,7 +141,9 @@ public class Generator {
 		System.out.println("Start.");
 
 		/********** 構文解析モジュール **********/
-		List<Sentence> sentenceList = new SyntacticParser(PATH_CABOCHA_PROP).parseSentences(naturalLanguages);
+		SyntacticParser sp = new SyntacticParser(PATH_CABOCHA_PROP);
+		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
+		sp.supplyDatesNamedEntityTag(sentenceList, PATH_DATE_WORDS);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		System.out.println("Syntactic parsed.");
@@ -158,13 +161,13 @@ public class Generator {
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
 
-		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
-
+		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
+		sentenceMap.forEach((s, id) -> System.out.println(id));
+		
 		/********** 関係抽出モジュール **********/
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
 		ModelIDMap jassMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap ontologyMap = re.convertMap_JASSModel2RDFModel(jassMap);
-		//StatementIDMap statementMap = re.convertMap_Model2Statements(ontologyMap);
 		System.out.println("Relation extracted.");
 		
 		// 全てのModelIDMapを統合し、JASS語彙の定義を取り除く

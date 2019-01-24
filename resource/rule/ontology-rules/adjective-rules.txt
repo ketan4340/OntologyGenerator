@@ -16,24 +16,23 @@ IF (a lot at) {
 } THEN {
   ?rsrcS mos:exist [a mos:Existence ;
                     schema:location ?rsrcLoc ;
-                    mos:howMany mos:positive] .
+                    mos:howMany mos:positive].
 };
 
 # 「SはXが多い」
-IF (a lot at) {
+IF (a lot of) {
   ?stc a jass:Sentence ;
        jass:subject/jass:categorem/jass:means ?rsrcS ;
        jass:predicate/jass:categorem 
          [jass:mainPoS "形容詞" ; jass:infinitive "多い"] ;
        jass:caseGAclause ?clsGA .
   ?clsGA jass:categorem 
-           [jass:means ?rsrcO ; jass:mainPoS "名詞"] . 
+           [jass:means ?rsrcO ; jass:mainPoS "名詞"]. 
 } THEN {
  _:x rdf:type owl:Class ; 
      owl:intersectionOf (?rsrcS ?rsrcO) ; 
      mos:exist [a mos:Existence ;
-                schema:location ?rsrcLoc ;
-                mos:howMany mos:positive] .
+                mos:howMany mos:positive].
 };
 
 # 主語リソースの一部に形容詞で表す特徴がある
@@ -42,16 +41,16 @@ IF (attributeOf+) {
   	   jass:subject/jass:categorem/jass:means ?rsrcS ;
   	   jass:predicate ?clsP .
   ?clsP jass:categorem 
-        [jass:mainPoS "形容詞" ; jass:means ?rsrcAdj] .
+        [jass:mainPoS "形容詞" ; jass:means ?rsrcAdj].
   ?cls_DP jass:dependTo ?clsP ;
           jass:categorem/jass:means ?rsrcDP ; 
           jass:adjuncts/rdf:rest*/rdf:first
-            [jass:mainPoS "助詞" ; jass:infinitive ?prt] .
+            [jass:mainPoS "助詞" ; jass:infinitive ?prt].
   FILTER(?prt IN("が","も"))
 }THEN{
   ?rsrcS dcterms:hasPart [
       a ?rsrcDP ;
-      mos:attributeOf ?rsrcAdj] .
+      mos:attributeOf ?rsrcAdj].
 };
 
 # 主語リソースに形容詞で表される特徴がある
@@ -60,7 +59,7 @@ IF (attributeOf) {
        jass:subject/jass:categorem/jass:means ?rsrcS ;
        jass:predicate ?clsP .
   ?clsP jass:categorem 
-          [jass:mainPoS "形容詞" ; jass:means ?rsrcAdj] .
+          [jass:mainPoS "形容詞" ; jass:means ?rsrcAdj].
 }THEN{
   ?rsrcS mos:attributeOf ?rsrcAdj .
 };

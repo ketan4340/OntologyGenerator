@@ -17,6 +17,7 @@ import grammar.pattern.SubsentencePattern;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
 import language.pos.Concatable;
+import util.Range;
 
 public class SentenceReviser {
 	private static final ClausePattern[] NOUNIZE_PATTERNS = {
@@ -83,16 +84,16 @@ public class SentenceReviser {
 
 	private void weldNumbers(Word w) {
 		List<Morpheme> mphs = w.getChildren();
-		Optional<IndexRange> numRange = rangeOfNumbers(mphs);
+		Optional<Range> numRange = rangeOfNumbers(mphs);
 		numRange.ifPresent(ft -> {
-			List<Morpheme> subMph = mphs.subList(ft.from, ft.to);
+			List<Morpheme> subMph = mphs.subList(ft.from(), ft.to());
 			Morpheme welded = Concatable.join(subMph);
 			subMph.clear();
-			mphs.add(ft.from, welded);
+			mphs.add(ft.from(), welded);
 		});
 	}
 
-	private Optional<IndexRange> rangeOfNumbers(List<Morpheme> morphemes) {
+	private Optional<Range> rangeOfNumbers(List<Morpheme> morphemes) {
 		int from = -1, to = -1, i = 0;
 		boolean continuing = false;
 		for (Morpheme m : morphemes) {
@@ -123,15 +124,7 @@ public class SentenceReviser {
 			else
 				break;
 		}
-		return Optional.of(new IndexRange(from, to));
-	}
-	private static class IndexRange {
-		public final int from;
-		public final int to;
-		public IndexRange(int from, int to) {
-			this.from = from;
-			this.to = to;
-		}
+		return Optional.of(new Range(from, to));
 	}
 	
 	/**
@@ -151,11 +144,9 @@ public class SentenceReviser {
 		Map<Sentence, List<Sentence>> replaceMap = 
 				sentenceMap.keySet().stream()
 				.collect(Collectors.toMap(s->s, s->divideSentence(s)));
-		SentenceIDMap clone = new SentenceIDMap(sentenceMap);
 		
-		SentenceIDMap x = clone.replaceSentence2Sentences(replaceMap);
-		// sentenceMap.rep~だとなぜかヌルポに
+		SentenceIDMap replacedSntcIDMap = sentenceMap.replaceSentence2Sentences(replaceMap);
 		sentenceMap.clear();
-		sentenceMap.putAll(x);
+		sentenceMap.putAll(replacedSntcIDMap);
 	}
 }

@@ -1,14 +1,12 @@
 package data.id;
 
-import java.util.List;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 
 import data.RDF.rule.RDFRule;
 import grammar.sentence.Sentence;
 
-public interface IDTuple extends TupleInterface, List<String>, Cloneable {
+public interface IDTuple extends TupleInterface, Cloneable {
 	String primaryKey();
 	String secondaryKey();
 	
