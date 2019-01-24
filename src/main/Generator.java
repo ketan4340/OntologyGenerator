@@ -36,6 +36,7 @@ public class Generator {
 	private static final Path PATH_EXTENSION_RULE;
 	private static final Path PATH_ONTOLOGY_RULES;
 	private static final Path PATH_DEFAULT_JASS;
+	private static final boolean USE_ENTITY_LINKING;
 	private static final List<String> URL_SPARQL_ENDPOINTS;
 	private static final int MAX_SIZE_OF_INSTATEMENT;
 	private static final Path PATH_CABOCHA_PROP;
@@ -60,6 +61,7 @@ public class Generator {
 		PATH_EXTENSION_RULE = Paths.get(prop.getProperty("extension_rule-file"));
 		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
 		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
+		USE_ENTITY_LINKING = Boolean.valueOf(prop.getProperty("use-entity_linking"));
 		URL_SPARQL_ENDPOINTS = Pattern.compile(",").splitAsStream(prop.getProperty("sparql-endpoint"))
 				.map(String::trim).collect(Collectors.toList());
 		MAX_SIZE_OF_INSTATEMENT = Integer.valueOf(prop.getProperty("max-size-of-INstatement"));
@@ -161,7 +163,7 @@ public class Generator {
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
 
-		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
+		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 		
 		/********** 関係抽出モジュール **********/
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
@@ -169,18 +171,17 @@ public class Generator {
 		ModelIDMap ontologyMap = re.convertMap_JASSModel2RDFModel(jassMap);
 		System.out.println("Relation extracted.");
 		
-		// 全てのModelIDMapを統合し、JASS語彙の定義を取り除く
+		// 全てのModelIDMapを統合し１つのModelに
 		Model unionOntology = ontologyMap.uniteModels();
 		
-		///*
-		// DBpediaとのエンティティリンキング
-		EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
-		el.executeBySameLabelIdentification(unionOntology);
-		System.out.println("Entity linked.");
-		//*/
+		if (USE_ENTITY_LINKING) {	// DBpediaとのエンティティリンキング
+			EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
+			el.executeBySameLabelIdentification(unionOntology);
+			System.out.println("Entity linked.");
+		}
 
-		OutputManager opm = OutputManager.getInstance();
 		// ログや生成物の出力
+		OutputManager opm = OutputManager.getInstance();
 		opm.writeSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
 		// デフォルトJASSモデルは取り除いて出力
 		opm.writeJassModel(

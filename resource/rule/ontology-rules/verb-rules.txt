@@ -11,6 +11,39 @@ IF (hasPart(をもつ/がある)) {
   ?rsrcS dcterms:hasPart ?rsrcO .
 };
 
+# に/でみられる
+IF (is seen) {
+  ?stc a jass:Sentence ;
+       jass:subject/jass:categorem/jass:means ?rsrcS ; 
+       jass:predicate [
+           jass:categorem/jass:infinitive ?seeninf ; 
+           jass:adjuncts/rdf:first/jass:infinitive ?rareruinf].
+  FILTER( ?seeninf IN("みる","見る") && ?rareruinf = "られる")
+  {
+    ?stc jass:caseNIclause|jass:caseDEclause ?clsNIDE .
+    ?clsNIDE jass:categorem [
+        jass:means ?rsrcLoc ;
+        jass:namedEntity ?location].
+    {
+      MINUS {?clsNIDE jass:categorem/jass:namedEntity ?location}  	#そもそも固有表現タグがない
+    }UNION{
+      FILTER(?location NOT IN(jass:date, jass:time)) #あるならそれは時間
+    }
+    # 述語「みられる」に係る「〜に」「〜で」には時間か場所が入るのを想定しているので、
+    # 逆にいえば時間じゃなければ場所だろうという考え     
+  } UNION {
+    ?stc jass:caseNIclause ?clsNI .
+    ?clsNI jass:categorem [
+        jass:means ?rsrcDate ; 
+        jass:namedEntity ?datetime].
+    FILTER( ?datetime IN(jass:date, jass:time) )
+  }
+} THEN {
+  ?rsrcS mos:exist [a mos:Existence ;
+                    schema:location ?rsrcLoc ;
+                    schema:startDate ?rsrcDate].
+};
+
 # 動詞 (schema:Action)
 IF (Action) {
   ?stc a jass:Sentence ; jass:predicate ?clsP .
