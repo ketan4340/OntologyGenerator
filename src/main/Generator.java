@@ -161,8 +161,7 @@ public class Generator {
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
 
-		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
-		sentenceMap.forEach((s, id) -> System.out.println(id));
+		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 		
 		/********** 関係抽出モジュール **********/
 		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
