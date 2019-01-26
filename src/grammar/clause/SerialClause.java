@@ -70,6 +70,7 @@ public class SerialClause extends Clause<Phrase> {
 	/* ================================================== */
 	/* ================== Object Method ================= */
 	/* ================================================== */
+	
 	@Override
 	public String toString() {
 		return getChildren().stream()

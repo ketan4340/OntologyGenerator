@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
  *
  * @param <C> 下位要素の型
  */
-public abstract class SyntacticParent<C extends SyntacticChild> {
+public abstract class SyntacticParent<C extends SyntacticChild> implements GrammarInterface {
 	
-	protected List<C> children;
+	protected final List<C> children;
 
 	/* ================================================== */
 	/* =================== Constructor ================== */
@@ -85,7 +85,9 @@ public abstract class SyntacticParent<C extends SyntacticChild> {
 		return children.isEmpty() ? null : children.get(children.size() - 1);
 	}
 
-	
+	public <P extends SyntacticParent<C>> boolean idEquals(P object) {
+		return this.id() == object.id();
+	}
 	/* ================================================== */
 	/* ================= Interface Method =============== */
 	/* ================================================== */	
@@ -97,28 +99,24 @@ public abstract class SyntacticParent<C extends SyntacticChild> {
 	/* ================== Object Method ================= */
 	/* ================================================== */
 	@Override
-	public String toString() {
-		return children.stream()
-				.map(C::toString)
-				.collect(Collectors.joining());
-	}
-
-	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Objects.hashCode(children);
-		return result;
+		return children.hashCode();
 	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (!(obj instanceof SyntacticParent))
 			return false;
-		SyntacticParent<?> other = (SyntacticParent<?>) obj;
-		return Objects.equals(children, other.children);
+		SyntacticParent<?> other = SyntacticParent.class.cast(obj);
+		return Objects.equals(this.getChildren(), other.getChildren());
+	}
+	
+	@Override
+	public String toString() {
+		return children.stream()
+				.map(C::toString)
+				.collect(Collectors.joining());
 	}
 
 }

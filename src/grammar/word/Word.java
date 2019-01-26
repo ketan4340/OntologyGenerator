@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
@@ -14,7 +13,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.Constituent;
-import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
@@ -25,7 +23,7 @@ import language.pos.CabochaTags;
 import language.pos.Concatable;
 
 public class Word extends SyntacticParent<Morpheme>
-		implements SyntacticChild, GrammarInterface, CabochaPoSInterface, 
+		implements SyntacticChild, CabochaPoSInterface, 
 		Concatable<Word>, Constituent {
 	private static int SUM = 0;
 
@@ -147,27 +145,27 @@ public class Word extends SyntacticParent<Morpheme>
 	/* ================================================== */
 	/* ================== Object Method ================= */ 
 	/* ================================================== */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hashCode(id);	//TODO
-		result = prime * result + Objects.hashCode(children);
-		return result;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (!(obj instanceof Word))
-			return false; 
-		Word other = (Word) obj;
-		return Objects.equals(this.id, other.id) &&
-				Objects.equals(this.children, other.children);
-	}
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = super.hashCode();
+//		result = prime * result + Objects.hashCode(id);	//TODO
+//		result = prime * result + Objects.hashCode(children);
+//		return result;
+//	}
+//	
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (!super.equals(obj))
+//			return false;
+//		if (!(obj instanceof Word))
+//			return false; 
+//		Word other = (Word) obj;
+//		return Objects.equals(this.id, other.id) &&
+//				Objects.equals(this.children, other.children);
+//	}
 	
 	@Override
 	public String toString() {

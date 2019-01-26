@@ -129,24 +129,26 @@ public class SentenceReviser {
 	
 	/**
 	 * 長文分割.
-	 * @param sentenceEntry 	キーが文，値がIDタプルのマップエントリ
-	 * @return
+	 * @param sentenceMap 	キーが文，値がIDタプルのマップエントリ
 	 */
-	private List<Sentence> divideSentence(Sentence sentence) {
-		return Stream.of(sentence)
-				.map(Sentence::divide2)
-				.flatMap(List<Sentence>::stream)
-				.map(Sentence::divide3)
-				.flatMap(List<Sentence>::stream)
-				.collect(Collectors.toList());
-	}
 	public void divideEachSentence(SentenceIDMap sentenceMap) {
 		Map<Sentence, List<Sentence>> replaceMap = 
 				sentenceMap.keySet().stream()
 				.collect(Collectors.toMap(s->s, s->divideSentence(s)));
-		
-		SentenceIDMap replacedSntcIDMap = sentenceMap.replaceSentence2Sentences(replaceMap);
+		//sentenceMap.forEachKey(s -> System.out.println(replaceMap.containsKey(s) +"--"+ s.hashCode() + s.name()));
+		//replaceMap.forEach((s, ls) -> System.out.println(sentenceMap.containsKey(s) + "--" + s.hashCode() + s.name()));
+		// なぜかsentenceMapから直接replaceSentence~を呼ぶと、replaceMapにキーとなる文が存在しないと言われヌルポが発生する
+		// クローンからreplaceSentence~を呼べば動く。わけわかめ
+		SentenceIDMap clone = new SentenceIDMap(sentenceMap);
+		SentenceIDMap replacedSntcIDMap = clone.replaceSentence2Sentences(replaceMap);
 		sentenceMap.clear();
 		sentenceMap.putAll(replacedSntcIDMap);
+	}
+	
+	private List<Sentence> divideSentence(Sentence sentence) {
+		return Stream.of(sentence)
+				.map(Sentence::divide2).flatMap(List<Sentence>::stream)
+				.map(Sentence::divide3).flatMap(List<Sentence>::stream)
+				.collect(Collectors.toList());
 	}
 }

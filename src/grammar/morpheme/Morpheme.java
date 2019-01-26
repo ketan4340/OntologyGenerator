@@ -75,18 +75,6 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	public Resource toJASS(Model model) {
 		return model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Morpheme);
-		/*
-				.addLiteral(JASS.name, name())
-				.addLiteral(JASS.mainPoS, mainPoS())
-				.addLiteral(JASS.subPoS1, subPoS1())
-				.addLiteral(JASS.subPoS2, subPoS2())
-				.addLiteral(JASS.subPoS3, subPoS3())
-				.addLiteral(JASS.conjugation, conjugation())
-				.addLiteral(JASS.inflection, inflection())
-				.addLiteral(JASS.infinitive, infinitive())
-				.addLiteral(JASS.yomi, yomi())
-				.addLiteral(JASS.pronunciation, pronunciation());
-		//*/
 	}
 	
 	@Override
@@ -107,27 +95,22 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	/* ================================================== */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Objects.hashCode(name);
-		result = prime * result + Objects.hashCode(tags);
-		return result;
+		return Objects.hash(name, tags);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (! (obj instanceof Morpheme))
+		if (!(obj instanceof Morpheme))
 			return false;
 		Morpheme other = (Morpheme) obj;
 		return Objects.equals(this.name, other.name)
 				&& Objects.equals(this.tags, other.tags);
 	}
-	
+		
 	@Override
 	public String toString() {
 		return Objects.toString(name, "nullMorpheme");
 	}
-
 }

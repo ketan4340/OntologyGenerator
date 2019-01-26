@@ -57,7 +57,7 @@ public class SentenceIDMap extends IDLinkedMap<Sentence> {
 		replaceMap.forEach(
 				(from, toList) -> 
 					toList.forEach(s -> {
-						IDTuple cloneTuple = get(from).clone();						
+						IDTuple cloneTuple = get(from).clone();
 						sm.put(s, cloneTuple);	
 					})
 		);

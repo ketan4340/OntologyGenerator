@@ -11,7 +11,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.Constituent;
-import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.morpheme.Morpheme;
@@ -21,7 +20,7 @@ import grammar.word.Categorem;
 import grammar.word.Word;
 
 public abstract class Clause<C extends Categorem> extends SyntacticParent<Word>
-implements SyntacticChild, GrammarInterface, Constituent {
+implements SyntacticChild, Constituent {
 	private static int SUM = 0;
 
 	private final int id;
@@ -147,24 +146,16 @@ implements SyntacticChild, GrammarInterface, Constituent {
 	/* ================================================== */
 	@Override
 	public int hashCode() {
-		final byte prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hashCode(categorem);
-		result = prime * result + Objects.hashCode(adjuncts);
-		result = prime * result + Objects.hashCode(others);
-		//result = prime * result + Objects.hashCode(depending);
-		return result;
+		return Objects.hash(categorem, adjuncts, others);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
-			return false;
-		if (!(obj instanceof Clause<?>))
+		if (!(obj instanceof Clause))
 			return false; 
-		Clause<?> other = (Clause<?>) obj;
+		Clause<?> other = Clause.class.cast(obj);
 		return Objects.equals(this.categorem, other.categorem) && 
 				Objects.equals(this.adjuncts, other.adjuncts) &&
 				Objects.equals(this.others, other.others);

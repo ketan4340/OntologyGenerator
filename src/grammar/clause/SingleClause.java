@@ -52,14 +52,15 @@ public class SingleClause extends Clause<Categorem> {
 	 */
 	public static SingleClause concatClauseDestructive(Clause<?> front, SingleClause back) {
 		List<Morpheme> newCatMorp = front.morphemes();
-		// 前の文節の形態素の原形を表層系に変える. CaboChaの仕様への対応策
+		// 前の文節の形態素の原形を表層形に変える. CaboChaの仕様への対応策
 		newCatMorp = newCatMorp.stream().map(m -> MorphemeFactory.getInstance().getMorpheme(
 				m.name(), 
-				TagsFactory.getInstance().getCabochaTags(m.mainPoS(), m.subPoS1(), m.subPoS2(), m.subPoS3(), m.conjugation(), m.inflection(), m.name(), m.yomi(), m.pronunciation())
-				)).collect(Collectors.toList());
+				TagsFactory.getInstance().getCabochaTags(m.mainPoS(), m.subPoS1(), m.subPoS2(), m.subPoS3(), 
+						m.conjugation(), m.inflection(), m.name(), m.yomi(), m.pronunciation())
+				))
+				.collect(Collectors.toList());
 		newCatMorp.addAll(back.categorem.getChildren());
-		Categorem newCat = new Categorem(newCatMorp);
-		back.setCategorem(newCat);
+		back.setCategorem(new Categorem(newCatMorp));
 		return back;
 	}
 	
@@ -90,7 +91,6 @@ public class SingleClause extends Clause<Categorem> {
 	@Override
 	public SingleClause clone() {
 		SingleClause clone = new SingleClause(this);
-		//clone.setDepending(getDepending());
 		return clone;
 	}
 

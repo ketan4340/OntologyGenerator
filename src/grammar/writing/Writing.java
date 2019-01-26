@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.GrammarInterface;
 import grammar.SyntacticParent;
 import grammar.paragraph.Paragraph;
 
@@ -17,8 +16,7 @@ import grammar.paragraph.Paragraph;
  * @author tanabekentaro
  *
  */
-public class Writing extends SyntacticParent<Paragraph> 
-		implements GrammarInterface {
+public class Writing extends SyntacticParent<Paragraph> {
 	private static int WRITING_SUM = 0;
 	
 	private final int id; 

@@ -10,13 +10,12 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
 import grammar.Constituent;
-import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
 
 public class Dependent extends SyntacticParent<Clause<?>>
-		implements SyntacticChild, GrammarInterface, Constituent {
+		implements SyntacticChild, Constituent {
 	private static int SUM = 0;
 
 	private final int id;

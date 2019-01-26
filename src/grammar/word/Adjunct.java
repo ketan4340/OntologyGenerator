@@ -2,6 +2,7 @@ package grammar.word;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -42,6 +43,23 @@ public class Adjunct extends Word {
 	public Resource toJASS(Model model) {
 		return super.toJASS(model)
 				.addProperty(RDF.type, JASS.Adjunct);
+	}
+	
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
+	@Override
+	public int hashCode() {
+		return children.hashCode();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Categorem))
+			return false;
+		Adjunct other = Adjunct.class.cast(obj);
+		return Objects.equals(this.getChildren(), other.getChildren());
 	}
 	
 }

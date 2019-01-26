@@ -3,6 +3,7 @@ package grammar.word;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.jena.rdf.model.Model;
@@ -75,6 +76,25 @@ public class Categorem extends Word implements Resourcable {
 	@Override
 	public String proxyNodeURI() {
 		return JASS.getURI()+"proxynode/"+getClass().getSimpleName().toLowerCase()+id();
+	}
+	
+	
+	/* ================================================== */
+	/* ================== Object Method ================= */
+	/* ================================================== */
+	@Override
+	public int hashCode() {
+		return Objects.hash(children, netag);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Categorem))
+			return false;
+		Categorem other = Categorem.class.cast(obj);
+		return Objects.equals(this.getChildren(), other.getChildren()) &&
+				Objects.equals(this.netag, other.netag);
 	}
 	
 }

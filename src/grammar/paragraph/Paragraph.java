@@ -8,13 +8,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.sentence.Sentence;
 
-public class Paragraph extends SyntacticParent<Sentence>
-	implements SyntacticChild, GrammarInterface {
+public class Paragraph extends SyntacticParent<Sentence> implements SyntacticChild {
 	private static int SUM = 0;
 
 	private final int id;

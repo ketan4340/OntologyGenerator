@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.JASS;
-import grammar.GrammarInterface;
 import grammar.SyntacticChild;
 import grammar.SyntacticParent;
 import grammar.clause.Clause;
@@ -35,7 +33,7 @@ import grammar.word.Word;
 import language.pos.TagsFactory;
 
 public class Sentence extends SyntacticParent<Clause<?>>
-		implements SyntacticChild, GrammarInterface {
+		implements SyntacticChild {
 	private static int SUM = 0;
 
 	private final int id;
@@ -67,7 +65,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/**
 	 * 指定の品詞が末尾に並んでいる文節のうち，最初の一つを返す.
 	 * @param cp 文節パターン
-	 * @param ignoreSign 記号を無視するか否か
 	 * @return 最後の単語が指定の品詞である文節のうち、この文の最初に現れるもの.
 	 */
 	public Optional<Clause<?>> findFirstClauseMatching(ClausePattern cp) {
@@ -474,11 +471,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	
 	@Override
 	public Resource toJASS(Model model) {
-		List<Resource> clauseResources = getChildren().stream()
-				.map(m -> m.toJASS(model)).collect(Collectors.toList());
+		LinkedHashMap<Clause<?>, Resource> clauseResources = getChildren().stream()
+				.collect(Collectors.toMap(c -> c, c -> c.toJASS(model), (k1,k2)->k1,
+						LinkedHashMap::new));
 		clauseDepend2RDF(clauseResources);
 		Resource clauseList = 
-				model.createList(clauseResources.iterator())
+				model.createList(clauseResources.values().iterator())
 				.addProperty(RDF.type, JASS.ClauseList);
 
 		Resource sentenceResource = model.createResource(getJassURI())
@@ -487,16 +485,12 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		return sentenceResource;
 	}
 	
-	private void clauseDepend2RDF(List<Resource> clauseResources) {
-		children.forEach(cls -> {
-			Resource clauseResource = clauseResources.parallelStream()
-					.filter(c -> Objects.equals(c.getURI(), cls.getJassURI()))
-					.findAny().orElse(null);
+	private void clauseDepend2RDF(LinkedHashMap<Clause<?>, Resource> clauseResources) {
+		clauseResources.forEach((cls, rsrc) -> {
 			Clause<?> depending = cls.getDepending();
-			Optional<Resource> dependingResource = depending==SingleClause.ROOT? 
-					Optional.empty():
-					clauseResources.parallelStream().filter(c -> Objects.equals(c.getURI(), depending.getJassURI())).findAny();
-			dependingResource.ifPresent(d -> clauseResource.addProperty(JASS.dependTo, d));
+			Optional<Resource> dependingResource = 
+					Optional.ofNullable(clauseResources.get(depending));
+			dependingResource.ifPresent(d -> rsrc.addProperty(JASS.dependTo, d));
 		});
 	}
 	
@@ -509,25 +503,21 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				.map(Clause::toString)
 				.collect(Collectors.joining("/"));
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + id;
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Sentence other = (Sentence) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}
+	
+//	@Override
+//	public int hashCode() {
+//		return children.hashCode();
+//	}
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (!super.equals(obj))
+//			return false;
+//		if (!(obj instanceof Sentence))
+//			return false;
+//		Sentence other = (Sentence) obj;
+//		return true;
+//	}
 	
 }

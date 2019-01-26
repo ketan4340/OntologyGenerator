@@ -2,6 +2,7 @@ package grammar.word;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -148,6 +149,21 @@ public class Phrase extends Categorem {
 	/* ================================================== */
 	/* ================== Object Method ================= */ 
 	/* ================================================== */
+	@Override
+	public int hashCode() {
+		return Objects.hash(dependent, head);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Phrase))
+			return false;
+		Phrase other = Phrase.class.cast(obj);
+		return Objects.equals(this.dependent, other.dependent) && 
+				Objects.equals(this.head, other.head);
+	}
+	
 	@Override
 	public String toString() {
 		return "[" +
