@@ -11,7 +11,6 @@ import grammar.clause.Clause;
 import grammar.clause.SingleClause;
 import grammar.morpheme.Morpheme;
 import grammar.morpheme.MorphemeFactory;
-import grammar.sentence.DependencyMap;
 import grammar.sentence.Sentence;
 import grammar.word.Adjunct;
 import grammar.word.Categorem;
@@ -25,12 +24,13 @@ public class CabochaDecoder {
 
 	private static final int MAXIMUM_TAGS_LENGTH = 9;
 
-	private final Set<Indexes> dependingIndexSet = new HashSet<>();
-
+	private final Set<Indexes> dependingIndexSet;
+	
 	/* ================================================== */
 	/* =================== Constructor ================== */
 	/* ================================================== */
 	public CabochaDecoder() {
+		this.dependingIndexSet = new HashSet<>();
 	}
 
 
@@ -50,11 +50,8 @@ public class CabochaDecoder {
 		List<Clause<?>> clauses = clauseInfoList.stream()
 				.map(clauseInfo -> decode2Clause(clauseInfo))
 				.collect(Collectors.toList());
-		DependencyMap dm = compileDependencyMap(clauses);
-		dependingIndexSet.clear();
-		Sentence s = new Sentence(clauses);
-		s.initDependency(dm);
-		return s;
+		initDependency(clauses, dependingIndexSet);
+		return new Sentence(clauses);
 	}
 
 	private SingleClause decode2Clause(List<String> parsedInfo4clause) {
@@ -120,13 +117,13 @@ public class CabochaDecoder {
 	/* ================================================== */
 	/* ==========    Cabocha専用メソッドの実装    ========== */
 	/* ================================================== */
-	private DependencyMap compileDependencyMap(List<Clause<?>> clauses) {
-		return dependingIndexSet.stream().collect(
-				Collectors.toMap(
-						idxs -> clauses.get(idxs.thisIndex),
-						idxs -> idxs.dependIndex==-1 ? SingleClause.ROOT : clauses.get(idxs.dependIndex), 
-						(k1, k2) -> k1,
-						DependencyMap::new));
+	private static void initDependency(List<Clause<?>> clauses, Set<Indexes> depIndexesSet) {
+		depIndexesSet.stream().forEach(idxs -> {
+			Clause<?> fromC = clauses.get(idxs.thisIndex);
+			Clause<?> toC = idxs.dependIndex==-1 ? SingleClause.ROOT : clauses.get(idxs.dependIndex);
+			fromC.setDepending(toC);
+		});
+		depIndexesSet.clear();
 	}
 	private CabochaTags supplyPoSIfSingleByteChar(String[] tagArray, String infinitive) {
 		TagsFactory factory = TagsFactory.getInstance();
@@ -160,6 +157,10 @@ public class CabochaDecoder {
 			this.dependIndex = dependIndex;
 			this.subjectEndIndex = subjectEndIndex;
 			this.functionEndIndex = functionEndIndex;
+		}
+		@Override
+		public String toString() {
+			return "this:"+thisIndex+", dep:"+dependIndex+", sbj:"+subjectEndIndex+", fnc:"+functionEndIndex;
 		}
 	}
 	

@@ -49,9 +49,6 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	/* ================================================== */
 	/* ================== Member Method ================= */
 	/* ================================================== */
-	public void initDependency(DependencyMap dm) {
-		dm.forEach((from, to) -> from.setDepending(to));
-	}
 	public Sentence subsentence(int beginIndex, int endIndex) {
 		List<Clause<?>> subClauses = new ArrayList<>(children.subList(beginIndex, endIndex));
 		return new Sentence(subClauses);
@@ -156,20 +153,18 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		Clause<?> mainSubject = commonSubjectsOrigin.get(commonSubjectsOrigin.size()-1);
 		List<Clause<?>> predicates = allDependings(mainSubject);
 		predicates.retainAll(children);
-
 		if (predicates.size() <= 1)	// 述語が一つならスルー
 			return Collections.singletonList(this);
-
+		
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;
 		for (final Clause<?> predicate: predicates) {
 			predicate.setDepending(SingleClause.ROOT);	// 文末の述語となるので係り先はなし(null)
 			toIndex = indexOfChild(predicate) + 1;		// 述語も含めて切り取るため+1
 			//System.out.println("divide2.subList(" + fromIndex + ", " + toIndex + ")");
-			Sentence subSent = subsentence(fromIndex, toIndex);
+			Sentence subSent = subsentence(fromIndex, toIndex);//TODO
 			// 文頭の主語は全ての分割後の文に係る
 			ClauseSequence commonSubjects = commonSubjectsOrigin.cloneAll();
-
 			if (fromIndex!=0) {		// 最初の分割文以外は、新たに主語を挿入する
 				Clause<?> subSentFirst = subSent.children.get(0);	// 分割文の先頭文節
 				if (subjectList.contains(subSentFirst))				// それが主語なら
@@ -253,7 +248,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 				predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);
-		//predicates.retainAll(children);
+		predicates.retainAll(children);
 		predicates.sort(Comparator.comparing(c -> indexOfChild(c)));
 
 		if (predicates.size() <= 1) // 述語が一つならスルー

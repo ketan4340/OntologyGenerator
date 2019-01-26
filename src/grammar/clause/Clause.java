@@ -156,10 +156,11 @@ implements SyntacticChild, Constituent {
 		if (!(obj instanceof Clause))
 			return false; 
 		Clause<?> other = Clause.class.cast(obj);
-		return Objects.equals(this.categorem, other.categorem) && 
+		return //Objects.equals(this.id, other.id) &&
+				Objects.equals(this.categorem, other.categorem) && 
 				Objects.equals(this.adjuncts, other.adjuncts) &&
-				Objects.equals(this.others, other.others);
-				//Objects.equals(this.depending, other.depending);
+				Objects.equals(this.others, other.others) && 
+				Objects.equals(this.depending, other.depending);
 	}
 	
 	@Override

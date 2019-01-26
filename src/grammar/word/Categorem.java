@@ -93,7 +93,8 @@ public class Categorem extends Word implements Resourcable {
 		if (!(obj instanceof Categorem))
 			return false;
 		Categorem other = Categorem.class.cast(obj);
-		return Objects.equals(this.getChildren(), other.getChildren()) &&
+		return Objects.equals(this.id(), other.id()) &&
+				Objects.equals(this.getChildren(), other.getChildren()) &&
 				Objects.equals(this.netag, other.netag);
 	}
 	
