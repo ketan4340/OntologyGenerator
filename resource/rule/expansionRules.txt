@@ -1,11 +1,16 @@
 # ここに書かれたルールは全て適用される
 
 # 主語 (jass:subject)
+# 「には」「では」は除く
 IF (ex:subject) {
   ?stc a jass:Sentence ; 
        jass:clauses/rdf:rest*/rdf:first ?cls .
   ?cls jass:adjuncts/rdf:rest*/rdf:first 
-           [jass:mainPoS "助詞" ; jass:infinitive "は"] .
+           [jass:mainPoS "助詞" ; jass:infinitive "は"].
+  MINUS{?cls jass:adjuncts/rdf:rest*/rdf:first 
+           [jass:mainPoS "助詞" ; jass:infinitive "で"]}
+  MINUS{?cls jass:adjuncts/rdf:rest*/rdf:first 
+           [jass:mainPoS "助詞" ; jass:infinitive "に"]}
 }THEN{
   ?stc jass:subject ?cls .
 };

@@ -114,7 +114,7 @@ implements SyntacticChild, GrammarInterface, Constituent {
 		Resource adjunctList = 
 				model.createList(adjuncts.stream().map(m -> m.toJASS(model)).iterator())
 				.addProperty(RDF.type, JASS.AdjunctList);
-
+		// others(記号)は出さなくていいかな
 		Resource clauseResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Clause)
 				.addProperty(JASS.categorem, categoremResource)

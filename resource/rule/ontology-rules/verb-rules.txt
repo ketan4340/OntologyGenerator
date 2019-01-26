@@ -19,19 +19,21 @@ IF (is seen) {
            jass:categorem/jass:infinitive ?seeninf ; 
            jass:adjuncts/rdf:first/jass:infinitive ?rareruinf].
   FILTER( ?seeninf IN("みる","見る") && ?rareruinf = "られる")
-  {
+  OPTIONAL{ # 場所
     ?stc jass:caseNIclause|jass:caseDEclause ?clsNIDE .
-    ?clsNIDE jass:categorem [
-        jass:means ?rsrcLoc ;
-        jass:namedEntity ?location].
+    ?clsNIDE jass:categorem ?ctgrNIDE .
     {
-      MINUS {?clsNIDE jass:categorem/jass:namedEntity ?location}  	#そもそも固有表現タグがない
+      ?ctgrNIDE jass:means ?rsrcLoc .
+      MINUS {?ctgrNIDE jass:namedEntity []}  	#そもそも固有表現タグがない
     } UNION {
-      FILTER(?location NOT IN(jass:date, jass:time)) #あるならそれは時間
+      ?ctgrNIDE jass:means ?rsrcLoc ;
+                jass:namedEntity ?location .
+      FILTER(?location NOT IN(jass:date, jass:time)) #あるならそれは時間以外
     }
     # 述語「みられる」に係る「〜に」「〜で」には時間か場所が入るのを想定しているので、
-    # 逆にいえば時間じゃなければ場所だろうという考え     
-  } UNION {
+    # 逆にいえば時間じゃなければ場所だろうという考え
+  }    
+  OPTIONAL{ # 時間
     ?stc jass:caseNIclause ?clsNI .
     ?clsNI jass:categorem [
         jass:means ?rsrcDate ; 
