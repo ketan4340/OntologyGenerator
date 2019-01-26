@@ -50,9 +50,10 @@ public class Generator {
 	private static final Path PATH_DIVIDED_SENTENCES;
 	private static final Path PATH_CONVERTEDJASS_TURTLE;
 	private static final Path PATH_USEDRULES;
-	private static final Path PATH_ONTOLOGY_TURTLE;
 	private static final Path PATH_ID_TRIPLE_CSV;
-
+	private static final Path PATH_ONTOLOGY_TURTLE;
+	private static final Path PATH_ONTOLOGY_TURTLE_EL;
+	
 	static {
 		Properties prop = new Properties();
 		try (InputStream is = Cabocha.class.getClassLoader().getResourceAsStream("conf/property.xml")) {
@@ -75,8 +76,9 @@ public class Generator {
 		PATH_DIVIDED_SENTENCES = Paths.get(prop.getProperty("output-shortsentence")+".txt");
 		PATH_CONVERTEDJASS_TURTLE = Paths.get(prop.getProperty("output-convertedJASS-turtle")+RUNTIME+".ttl");
 		PATH_USEDRULES = Paths.get(prop.getProperty("output-usedrules")+RUNTIME+".rule");
-		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle")+RUNTIME+".ttl");
 		PATH_ID_TRIPLE_CSV = Paths.get(prop.getProperty("output-id_triple")+RUNTIME+".csv");
+		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle")+RUNTIME+".ttl");
+		PATH_ONTOLOGY_TURTLE_EL = Paths.get(prop.getProperty("output-ontology-turtle")+"el"+RUNTIME+".ttl");
 	}
 	
 
@@ -187,7 +189,6 @@ public class Generator {
 				re.removeJASSOntology(jassMap.uniteModels()).setNsPrefixes(DEFAULT_JASS.getNsPrefixMap()), 
 				PATH_CONVERTEDJASS_TURTLE);
 		opm.writeRDFRulesSet(EXTENSION_RULES, ONTOLOGY_RULES_SET, PATH_USEDRULES);
-
 		opm.writeIDTupleAsCSV(ontologyMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
 		opm.writeOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
 
@@ -195,12 +196,13 @@ public class Generator {
 		System.out.println("input sentences: " + naturalLanguages.size());
 		System.out.println("-> divided sentences: " + sentenceMap.size());
 		System.out.println("ontology size: " + unionOntology.size());
-
+		
 		if (USE_ENTITY_LINKING) {	// DBpediaとのエンティティリンキング
 			EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
 			el.executeBySameLabelIdentification(jassMap.uniteModels(), unionOntology);
 			System.out.println("Entity linked.");
 			System.out.println("ontology size: " + unionOntology.size());
+			opm.writeOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE_EL);
 		}
 		
 		return unionOntology;
