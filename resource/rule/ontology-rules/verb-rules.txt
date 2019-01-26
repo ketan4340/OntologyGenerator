@@ -26,7 +26,7 @@ IF (is seen) {
         jass:namedEntity ?location].
     {
       MINUS {?clsNIDE jass:categorem/jass:namedEntity ?location}  	#そもそも固有表現タグがない
-    }UNION{
+    } UNION {
       FILTER(?location NOT IN(jass:date, jass:time)) #あるならそれは時間
     }
     # 述語「みられる」に係る「〜に」「〜で」には時間か場所が入るのを想定しているので、

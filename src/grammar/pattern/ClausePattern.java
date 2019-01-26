@@ -27,13 +27,11 @@ public class ClausePattern implements List<WordPattern> {
 	
 	/**
 	 * この文節が渡された単語指定配列に適合するかを判定する. 複数の単語が連続しているか調べたければ品詞.
-	 * @param cp 文節指定パターン
-	 * @param ignoreSign 文節末尾の接辞，記号 (、や。)を無視するか否か
+	 * @param c 文節
 	 * @return 文節の最後の単語が指定の品詞なら真，そうでなければ偽
 	 */
 	public boolean matches(Clause<?> c) {
-		boolean ignoreSign = true;	// 元々はこのメソッドの引数だったが、毎回trueなので取り出した
-		List<Word> words = ignoreSign? c.words() : c.getChildren();
+		List<Word> words = getCheckSign()? c.getChildren() : c.words();
 		int startmin = 0, startmax = words.size() - size();
 		if (startmax < 0) return false;
 		if (getForwardMatch() && getBackwardMatch() && startmin != startmax) 
@@ -60,16 +58,23 @@ public class ClausePattern implements List<WordPattern> {
 	public boolean getBackwardMatch() {
 		return options.getBackwardMatch();
 	}
+	public boolean getCheckSign() {
+		return options.getCheckSign();
+	}
 	public void setForwardMatch() {
 		options.setForwardMatch();
 	}
 	public void setBackwardMatch() {
 		options.setBackwardMatch();
 	}
+	public void setCheckSign() {
+		options.setCheckSign();
+	}
 	
 	private static final String OPTION_KEY = "%o";
 	private static final String FORWARD_MATCH_KEY = "^";
 	private static final String BACKWARD_MATCH_KEY = "$";
+	private static final String CHEK_SIGN_KEY = ",.";
 
 	public static ClausePattern compile(String[][] strss) {
 		ClausePattern cp = new ClausePattern();
@@ -80,6 +85,8 @@ public class ClausePattern implements List<WordPattern> {
 					cp.setForwardMatch();
 				if (wp.contains(BACKWARD_MATCH_KEY))
 					cp.setBackwardMatch();
+				if (wp.contains(CHEK_SIGN_KEY))
+					cp.setCheckSign();
 			} else
 				cp.add(wp);
 		}

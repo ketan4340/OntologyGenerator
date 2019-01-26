@@ -1,6 +1,5 @@
 package modules.RDFConvert;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
 import data.RDF.rule.RDFRule;
-import data.RDF.rule.RDFRuleReader;
 import data.RDF.rule.RDFRules;
 import data.RDF.rule.RDFRulesSet;
 import data.RDF.vocabulary.JASS;
@@ -29,6 +27,7 @@ import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import data.id.StatementIDMap;
 import grammar.word.Resourcable;
+import util.RDFUtil;
 
 public class RelationExtractor {
 
@@ -47,12 +46,6 @@ public class RelationExtractor {
 		this.extensionRules = extensionRules;
 		this.ontologyRulesSet = ontologyRuleSet;
 		this.defaultJASSModel = jassModel;
-	}
-
-	public RelationExtractor(Path extensionRulePath, Path ontologyRulePath, Path defaultJASSPath) {
-		this(RDFRuleReader.readRDFRules(extensionRulePath), 
-				RDFRuleReader.readRDFRulesSet(ontologyRulePath),
-				ModelFactory.createDefaultModel().read(defaultJASSPath.toUri().normalize().getPath()));
 	}
 
 	/* ================================================== */
@@ -111,14 +104,9 @@ public class RelationExtractor {
 	}
 	
 	private ModelIDMap convertsAll(ModelIDMap jassMap) {
-		//Resourcable.CATEGOREM_RSRC_POOL.write(System.out, "N-TRIPLE");
 		ModelIDMap ontologyMap = new ModelIDMap();
 		jassMap.forEach((jass, idt) -> {
 			Set<Resource> proxyNodes = findsProxyNodes(jass);
-			/*
-			System.out.print("proxy node:  ");
-			proxyNodes.forEach(pn -> System.out.print(pn.getLocalName() + ", "));System.out.println();//PRINT
-			*/
 			Set<Moderule> modelWithRule = converts(jass);
 			modelWithRule.forEach(mr -> {
 				IDTuple idt_clone = idt.clone();
@@ -167,15 +155,9 @@ public class RelationExtractor {
 	}
 	
 	private Optional<Moderule> solveConstructQuery(Model m, RDFRule r) {
-		Query query = QueryFactory.create(createPrefixes4Query() + r.toQueryString());
+		Query query = QueryFactory.create(RDFUtil.createPrefixDeclaration(defaultJASSModel) + r.toQueryString());
 		Model resultModel = QueryExecutionFactory.create(query, m).execConstruct();
 		return resultModel.isEmpty() ? Optional.empty() : Optional.of(new Moderule(resultModel, r));
-	}
-
-	private String createPrefixes4Query() {
-		return defaultJASSModel.getNsPrefixMap().entrySet().parallelStream()
-				.map(e -> "PREFIX " + e.getKey() + ": <" + e.getValue() + ">")
-				.collect(Collectors.joining(" "));
 	}
 	
 	public Model removeJASSOntology(Model m) {
@@ -193,10 +175,6 @@ public class RelationExtractor {
 	 * @param proxyNodes 代理ノードの集合
 	 */
 	static void replaceProxy2CategoremResource(Model m, Collection<? extends Resource> proxyNodes) {
-		/*
-		System.out.println("before");
-		m.write(System.out, "N-TRIPLE");//PRINT
-		*/
 		proxyNodes.forEach(pn -> {
 			Resource coreNode = Resourcable.coreNodeOf(pn);
 			m.listStatements(null, null, pn).toList().stream().forEach(stmt -> {
@@ -208,28 +186,8 @@ public class RelationExtractor {
 				m.remove(stmt);
 			});
 			Model categoremResources = Resourcable.categoremResourcesOf(pn);
-			//System.out.println(m.shortForm(pn.getURI()) + " \tcategorem resources: " + categoremResources.size());
 			m.add(categoremResources);
 		});
-		/*
-		System.out.println("after");
-		m.write(System.out, "N-TRIPLE");//PRINT
-		System.out.println();
-		*/
 	}
 	
-	/* ================================================== */
-	/* ===================== Getter ===================== */
-	/* ================================================== */
-	public RDFRules getExtensionRules() {
-		return extensionRules;
-	}
-
-	public RDFRulesSet getOntologyRules() {
-		return ontologyRulesSet;
-	}
-	
-	public Model getDefaultJassModel() {
-		return defaultJASSModel;
-	}
 }

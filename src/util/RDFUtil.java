@@ -1,9 +1,11 @@
 package util;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.shared.PrefixMapping;
 
 public class RDFUtil {
 	private static final String BLANK_NODE_PREFIX = "_:";
@@ -24,6 +26,12 @@ public class RDFUtil {
 			return object.asLiteral().toString();
 		else 
 			return object.toString();
+	}
+	
+	public static String createPrefixDeclaration(PrefixMapping pm) {
+		return pm.getNsPrefixMap().entrySet().parallelStream()
+				.map(e -> "PREFIX " + e.getKey() + ": <" + e.getValue() + ">")
+				.collect(Collectors.joining(" "));
 	}
 	
 }

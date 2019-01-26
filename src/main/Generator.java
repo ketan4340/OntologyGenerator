@@ -16,8 +16,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 import cabocha.Cabocha;
+import data.RDF.rule.RDFRuleReader;
+import data.RDF.rule.RDFRules;
+import data.RDF.rule.RDFRulesSet;
 import data.id.ModelIDMap;
 import data.id.SentenceIDMap;
 import grammar.naturalLanguage.NaturalLanguage;
@@ -33,9 +37,9 @@ import util.StringListUtil;
 public class Generator {
 	//private static final Path PATH_NOUN_WORDS;
 	private static final Path PATH_DATE_WORDS;
-	private static final Path PATH_EXTENSION_RULE;
-	private static final Path PATH_ONTOLOGY_RULES;
-	private static final Path PATH_DEFAULT_JASS;
+	private static final RDFRules EXTENSION_RULES;
+	private static final RDFRulesSet ONTOLOGY_RULES_SET;
+	private static final Model DEFAULT_JASS;
 	private static final boolean USE_ENTITY_LINKING;
 	private static final List<String> URL_SPARQL_ENDPOINTS;
 	private static final int MAX_SIZE_OF_INSTATEMENT;
@@ -58,9 +62,10 @@ public class Generator {
 		}
 		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
 		PATH_DATE_WORDS = Paths.get(prop.getProperty("date_words-file"));
-		PATH_EXTENSION_RULE = Paths.get(prop.getProperty("extension_rule-file"));
-		PATH_ONTOLOGY_RULES = Paths.get(prop.getProperty("ontology_rules-dir"));
-		PATH_DEFAULT_JASS = Paths.get(prop.getProperty("default-JASS-file"));
+		EXTENSION_RULES = RDFRuleReader.readRDFRules(Paths.get(prop.getProperty("extension_rule-file")));
+		ONTOLOGY_RULES_SET = RDFRuleReader.readRDFRulesSet(Paths.get(prop.getProperty("ontology_rules-dir")));
+		DEFAULT_JASS = ModelFactory.createDefaultModel().read(
+				Paths.get(prop.getProperty("default-JASS-file")).toUri().normalize().getPath() );
 		USE_ENTITY_LINKING = Boolean.valueOf(prop.getProperty("use-entity_linking"));
 		URL_SPARQL_ENDPOINTS = Pattern.compile(",").splitAsStream(prop.getProperty("sparql-endpoint"))
 				.map(String::trim).collect(Collectors.toList());
@@ -166,28 +171,22 @@ public class Generator {
 		sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 		
 		/********** 関係抽出モジュール **********/
-		RelationExtractor re = new RelationExtractor(PATH_EXTENSION_RULE, PATH_ONTOLOGY_RULES, PATH_DEFAULT_JASS);
+		RelationExtractor re = new RelationExtractor(EXTENSION_RULES, ONTOLOGY_RULES_SET, DEFAULT_JASS);
 		ModelIDMap jassMap = re.convertMap_Sentence2JASSModel(sentenceMap);
 		ModelIDMap ontologyMap = re.convertMap_JASSModel2RDFModel(jassMap);
 		System.out.println("Relation extracted.");
 		
 		// 全てのModelIDMapを統合し１つのModelに
 		Model unionOntology = ontologyMap.uniteModels();
-		
-		if (USE_ENTITY_LINKING) {	// DBpediaとのエンティティリンキング
-			EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
-			el.executeBySameLabelIdentification(unionOntology);
-			System.out.println("Entity linked.");
-		}
 
 		// ログや生成物の出力
 		OutputManager opm = OutputManager.getInstance();
 		opm.writeSentences(sentenceMap, PATH_DIVIDED_SENTENCES);
 		// デフォルトJASSモデルは取り除いて出力
 		opm.writeJassModel(
-				re.removeJASSOntology(jassMap.uniteModels()).setNsPrefixes(re.getDefaultJassModel().getNsPrefixMap()), 
+				re.removeJASSOntology(jassMap.uniteModels()).setNsPrefixes(DEFAULT_JASS.getNsPrefixMap()), 
 				PATH_CONVERTEDJASS_TURTLE);
-		opm.writeRDFRulesSet(re.getExtensionRules(), re.getOntologyRules(), PATH_USEDRULES);
+		opm.writeRDFRulesSet(EXTENSION_RULES, ONTOLOGY_RULES_SET, PATH_USEDRULES);
 
 		opm.writeIDTupleAsCSV(ontologyMap.createIDRelation(), PATH_ID_TRIPLE_CSV);
 		opm.writeOntologyAsTurtle(unionOntology, PATH_ONTOLOGY_TURTLE);
@@ -197,6 +196,13 @@ public class Generator {
 		System.out.println("-> divided sentences: " + sentenceMap.size());
 		System.out.println("ontology size: " + unionOntology.size());
 
+		if (USE_ENTITY_LINKING) {	// DBpediaとのエンティティリンキング
+			EntityLinker el = new EntityLinker(URL_SPARQL_ENDPOINTS, MAX_SIZE_OF_INSTATEMENT);
+			el.executeBySameLabelIdentification(jassMap.uniteModels(), unionOntology);
+			System.out.println("Entity linked.");
+			System.out.println("ontology size: " + unionOntology.size());
+		}
+		
 		return unionOntology;
 	}
 

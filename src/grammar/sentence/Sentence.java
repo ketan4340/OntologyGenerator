@@ -2,6 +2,7 @@ package grammar.sentence;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -159,10 +160,8 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<Clause<?>> predicates = allDependings(mainSubject);
 		predicates.retainAll(children);
 
-		if (predicates.size() <= 1) {	// 述語が一つならスルー
-			shortSentList.add(this);
-			return shortSentList;
-		}
+		if (predicates.size() <= 1)	// 述語が一つならスルー
+			return Collections.singletonList(this);
 
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;
@@ -199,12 +198,26 @@ public class Sentence extends SyntacticParent<Clause<?>>
 	}
 
 	// 末尾がこれら以外なら述語とみなす
+	/*
 	private static final ClausePattern PARTICLE = 
 			ClausePattern.compile(new String[][]{{"助詞", "-て"}, {"%o", "$"}});		// "て"以外の助詞
 	private static final ClausePattern ADVERB = 
 			ClausePattern.compile(new String[][]{{"副詞"}, {"%o", "$"}});				// "すぐに"、"おそらく"など
 	private static final ClausePattern AUXILIARY = 
 			ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});	// "〜で"など
+	*/
+	private static final ClausePattern NOUN = 
+			ClausePattern.compile(new String[][]{{"名刺", "-て"}, {"%o", "$"}});
+	private static final ClausePattern VERB = 
+			ClausePattern.compile(new String[][]{{"動詞"}, {"%o", "$"}});
+	private static final ClausePattern ADJECTIVE = 
+			ClausePattern.compile(new String[][]{{"形容詞"}, {"%o", "$"}});
+	private static final ClausePattern AUXILIARY = 
+			ClausePattern.compile(new String[][]{{"助動詞", "-体言接続"}, {"%o", "$"}});
+	private static final ClausePattern PARTICLE1 = 
+			ClausePattern.compile(new String[][]{{"接続助詞"}, {"%o", "$"}});
+	private static final ClausePattern PARTICLE2 = //CaboChaの解析の誤りに対応するため
+			ClausePattern.compile(new String[][]{{"格助詞", "で"}, {"記号", "読点"}, {"%o", "$", ",."}});
 	/**
 	 * 述語係り元分割
 	 * 述語に係る{動詞,形容詞,名詞,~だ,接続助詞}ごとに分割
@@ -236,22 +249,18 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if ( !PARTICLE.matches(cls2Last) &&
-					!ADVERB.matches(cls2Last) &&
-					!AUXILIARY.matches(cls2Last) &&
-					cls2Last.getDepending() != nextChild(cls2Last))	// 最後の文節に係るものは除外
-					predicates.add(cls2Last);
+			if (( NOUN.matches(cls2Last) || VERB.matches(cls2Last) || 
+					ADJECTIVE.matches(cls2Last) || AUXILIARY.matches(cls2Last) ||
+					PARTICLE1.matches(cls2Last) || PARTICLE2.matches(cls2Last) ) && 
+				nextChild(cls2Last) != lastClause) // 次の文節が最後の文節であるものは除外
+				predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);
-		predicates.retainAll(children);
+		//predicates.retainAll(children);
 		predicates.sort(Comparator.comparing(c -> indexOfChild(c)));
 
-		//List<Integer> commonObjects = new ArrayList<Integer>();	// 複数の述語にかかる目的語を保管
-
-		if (predicates.size() <= 1) { // 述語が一つならスルー
-			partSentList.add(this);
-			return partSentList;
-		}
+		if (predicates.size() <= 1) // 述語が一つならスルー
+			return Collections.singletonList(this);
 
 		/* 文章分割(dependUpon依存) */
 		int fromIndex = 0, toIndex;

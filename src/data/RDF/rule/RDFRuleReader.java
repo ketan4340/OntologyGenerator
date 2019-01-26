@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,13 +68,8 @@ public class RDFRuleReader {
 	 */
 	public static RDFRules readRDFRules(Path rulesFile) {
 		String rulesString;
-		try {
-			rulesString = Files.lines(rulesFile)
-					.map(COMMENT_PATTERN::matcher)	// コメントアウトを検知
-					.map(m -> m.replaceAll(""))		// #から行末まで削除
-					.map(SPACE_CHARACTERS_PATTERN::matcher)	// 1文字以上連続した空白文字を検知
-					.map(m -> m.replaceAll(" "))			// 半角スペース1文字に置換
-					.collect(Collectors.joining());
+		try (Stream<String> lines = Files.lines(rulesFile)) {
+			rulesString = cleanupRuleString(lines.collect(Collectors.toList()));
 			rulesString = removeBOM(rulesString);
 		} catch (IOException e) {
 			rulesString = "";
@@ -82,6 +78,14 @@ public class RDFRuleReader {
 		return createRDFRules(rulesString);
 	}
 
+	private static String cleanupRuleString(List<String> rulesString) {
+		return rulesString.stream()
+			.map(COMMENT_PATTERN::matcher)			// コメントアウトを検知
+			.map(m -> m.replaceAll(""))				// #から行末まで削除
+			.map(SPACE_CHARACTERS_PATTERN::matcher)	// 1文字以上連続した空白文字を検知
+			.map(m -> m.replaceAll(" "))			// 半角スペース1文字に置換
+			.collect(Collectors.joining());	
+	}
 	/** BOM削除. */
 	private static String removeBOM(String s) {
 		return s.startsWith("\uFEFF") ? s.substring(1) : s;
@@ -92,7 +96,7 @@ public class RDFRuleReader {
 	 * @param rulesString
 	 * @return RDFルールセット
 	 */
-	private static RDFRules createRDFRules(String rulesString) {
+	public static RDFRules createRDFRules(String rulesString) {
 		return new RDFRules(SPLIT_RULES_PATTERN.splitAsStream(rulesString)
 				.map(RDFRuleReader::createRDFRule)
 				.collect(Collectors.toCollection(LinkedHashSet::new)));
@@ -103,7 +107,7 @@ public class RDFRuleReader {
 	 * @param ruleString
 	 * @return SPARQLルール
 	 */
-	private static RDFRule createRDFRule(String ruleString) {
+	public static RDFRule createRDFRule(String ruleString) {
 		Matcher matcherIFTHEN = WHOLE_IFTHEN_PATTERN.matcher(ruleString);
 		Matcher matcherArrow = WHOLE_ARROW_PATTERN.matcher(ruleString);
 		return matcherIFTHEN.matches()
