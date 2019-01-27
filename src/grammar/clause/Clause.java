@@ -81,7 +81,7 @@ implements SyntacticChild, Constituent {
 
 	/** 指定の品詞を"全て"持つWordが含まれているか判定 */
 	public boolean containsWordHas(WordPattern wp) {
-		return words().stream().anyMatch(w -> w.matches(wp));
+		return words().stream().anyMatch(wp::matches);
 	}
 	
 	public boolean hasOnlyCategorem() {

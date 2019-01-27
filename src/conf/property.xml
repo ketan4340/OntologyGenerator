@@ -8,7 +8,7 @@
 	<entry key="extension_rule-file">../OntologyGenerator/resource/rule/expansionRules.txt</entry>
 	<entry key="ontology_rules-dir">../OntologyGenerator/resource/rule/ontology-rules</entry>
 	<entry key="default-JASS-file">../OntologyGenerator/resource/ontology/SyntaxOntology.owl</entry>
-	<entry key="use-entity_linking">te</entry>
+	<entry key="use-entity_linking">true</entry>
 	<entry key="sparql-endpoint">http://dbpedia.org/sparql</entry>
 	<entry key="max-size-of-INstatement">1000</entry>
 	<entry key="cabocha-prop">../OntologyGenerator/resource/prop/CaboCha-property.xml</entry>

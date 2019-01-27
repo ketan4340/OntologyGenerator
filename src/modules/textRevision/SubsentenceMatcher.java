@@ -97,26 +97,35 @@ public final class SubsentenceMatcher {
 		return true;
 	}
 	private void replace(Range r, Function<ClauseSequence, Clause<?>> function) {
-		ClauseSequence cs = sentence.subClauseSequence(r.from(), r.to());
-		Clause<?> newcls = function.apply(cs);
-		cs.clear();
-		cs.add(newcls);
-		Set<Clause<?>> formerDependeds = cs.stream().map(sentence::clausesDepending).flatMap(Set::stream).collect(Collectors.toSet());
-		sentence.gatherDepending(newcls, formerDependeds);
+		ClauseSequence formerClauses = sentence.subClauseSequence(r.from(), r.to());
+		Clause<?> latterClause = function.apply(formerClauses);
+		Set<Clause<?>> formerDependeds = formerClauses.stream()
+				.map(sentence::clausesDependTo).flatMap(Set::stream)
+				.collect(Collectors.toSet());
+		formerDependeds.removeAll(formerClauses);	// これから消す文節は要らない
+		formerClauses.clear();
+		formerClauses.add(latterClause);
+		sentence.gatherDepending(latterClause, formerDependeds);
 	}
 	
 	private boolean match(int from, int to) {
 		return match(sentence.subClauseSequence(from, to));
 	}
     private boolean match(ClauseSequence cs) {
-		ListIterator<Clause<?>> cls_litr = cs.listIterator();
 		ListIterator<ClausePattern> cp_litr = parentPattern.listIterator();
-		while (cls_litr.hasNext() && cp_litr.hasNext()) {
-			if (!cp_litr.next().matches(cls_litr.next()))
+		ListIterator<Clause<?>> cls_litr = cs.listIterator();
+		while (cp_litr.hasNext() && cls_litr.hasNext()) {
+			Clause<?> cls = cls_litr.next();
+			if (!cp_litr.next().matches(cls))
 				return false;
+			// 各文節の係り先が後続の文節にないといけない
+			if (cls_litr.hasNext()) {// 最後尾は後続がないのでOK
+				List<Clause<?>> followingClauses = cs.subList(cls_litr.nextIndex(), cs.size());
+				if (!followingClauses.contains(cls.getDepending()))
+					return false;
+			}
 		}
 		return true;
     }
 
-    
 }

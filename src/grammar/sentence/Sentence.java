@@ -92,8 +92,8 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		
 		if (!replace(backClause, concatClause)) return false;
 		if (!children.remove(frontClause)) return false;
-		Set<Clause<?>> formerDependeds = clausesDepending(frontClause);
-		formerDependeds.addAll(clausesDepending(backClause));
+		Set<Clause<?>> formerDependeds = clausesDependTo(frontClause);
+		formerDependeds.addAll(clausesDependTo(backClause));
 		gatherDepending(concatClause, formerDependeds);
 		return true;
 	}
@@ -239,7 +239,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 
 		/* 述語を収集 */
 		List<Clause<?>> predicates = new ArrayList<>();
-		for (final Clause<?> cls2Last: clausesDepending(lastClause)) {
+		for (final Clause<?> cls2Last: clausesDependTo(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
 			if (( NOUN.matches(cls2Last) || VERB.matches(cls2Last) || 
 					ADJECTIVE.matches(cls2Last) || AUXILIARY.matches(cls2Last) ||
@@ -324,7 +324,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		memberClauses.forEach(mc -> mc.setDepending(target));
 		return true;
 	}
-	public Set<Clause<?>> clausesDepending(Clause<?> clause) {
+	public Set<Clause<?>> clausesDependTo(Clause<?> clause) {
 		return getChildren().stream()
 				.filter(c -> c.getDepending() == clause)
 				.collect(Collectors.toSet());
@@ -378,7 +378,7 @@ public class Sentence extends SyntacticParent<Clause<?>>
 			ListIterator<Adjunct> iter = subject.getAdjuncts().listIterator();
 			while (iter.hasNext()) {
 				Adjunct adjunct = iter.next();
-					if (adjunct.matches(POS_HA)) {
+					if (POS_HA.matches(adjunct)) {
 						iter.set(no);	// "は"の代わりに"の"を挿入
 						break;
 					}

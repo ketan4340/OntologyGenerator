@@ -1,7 +1,7 @@
 package grammar.pattern;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -37,16 +37,17 @@ public class ClausePattern implements List<WordPattern> {
 		if (getForwardMatch() && getBackwardMatch() && startmin != startmax) 
 			return false;
 		List<Integer> startIndexes = 
-				getForwardMatch()? Arrays.asList(startmin) : 
-				getBackwardMatch()? Arrays.asList(startmax) : 
-					IntStream.range(startmin, startmax).boxed().collect(Collectors.toList());
+				getForwardMatch()? Collections.singletonList(startmin) : 
+				getBackwardMatch()? Collections.singletonList(startmax) : 
+					IntStream.rangeClosed(startmin, startmax).boxed().collect(Collectors.toList());
+
 		for (int idx : startIndexes) {
 			ListIterator<Word> itr_w = words.listIterator(idx);
 			ListIterator<WordPattern> itr_wp = listIterator();
 			while (itr_w.hasNext() && itr_wp.hasNext()) {
 				Word word = itr_w.next();
 				WordPattern wp = itr_wp.next();
-				if (!word.matches(wp)) return false;
+				if (!wp.matches(word)) return false;
 			}	
 		}
 		return true;

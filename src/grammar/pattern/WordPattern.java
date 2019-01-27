@@ -7,16 +7,40 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import grammar.word.Word;
 
 public class WordPattern implements Set<String> {
 	private final Set<String> spcfs;
+	
 	
 	public WordPattern(String... spcfs) {
 		this.spcfs = new HashSet<>(Arrays.asList(spcfs));
 	}
 	public WordPattern(Collection<String> spcfs) {
 		this.spcfs = new HashSet<>(spcfs);
+	}
+	
+	/**
+	 * 渡されたTagを"全て"持っていれば真、それ以外は偽を返す.
+	 * 空の品詞配列を渡すと真を返す.
+	 * Tag名の前に-をつけるとそのタグを含まない時に真とする.
+	 */
+	public boolean matches(Word w) {
+		boolean match = true;	// 空の配列は任意の品詞とみなされ、常に真を返す。
+		for (String tag : spcfs) {
+			boolean not = false;	// NOT検索用のフラグ
+			if (tag.startsWith("-")) {	// Tag名の前に-をつけるとそのタグを含まない時にtrue
+				not = true;
+				tag = tag.substring(1);	// -を消しておく
+			}
+			match = w.coreMorpheme().contains(tag);
+			if (not) match = !match;
+			if (!match) break;	// falseなら即終了
+		}
+		return match;
 	}
 	
 	@Override
@@ -98,6 +122,11 @@ public class WordPattern implements Set<String> {
 	@Override
 	public Stream<String> parallelStream() {
 		return spcfs.parallelStream();
+	}
+	
+	@Override
+	public String toString() {
+		return spcfs.stream().collect(Collectors.joining(",","(",")"));
 	}
 	
 }

@@ -19,7 +19,7 @@ IF (equivalentClass) {
   ?stc rdf:type jass:Sentence ; 
        jass:subject/jass:categorem/jass:means ?rsrcS ; 
        jass:predicate ?SclsP .
-  ?SclsP jass:categorem 	?prs .
+  ?SclsP jass:categorem ?prs .
   ?prs jass:head/jass:infinitive ?equiv .
   FILTER(?equiv IN("総称", "通称", "別称", "異称", "別名"))
   ?prs jass:dependent/rdf:rest* ?node . # 形態素の最後尾

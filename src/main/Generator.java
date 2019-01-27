@@ -112,7 +112,7 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		textFile_str = "resource/input/test/single.txt";
+		//textFile_str = "resource/input/test/single.txt";
 		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		

@@ -13,7 +13,6 @@ import grammar.clause.SerialClause;
 import grammar.morpheme.Morpheme;
 import grammar.pattern.BiClausePattern;
 import grammar.pattern.ClausePattern;
-import grammar.pattern.SubsentencePattern;
 import grammar.sentence.Sentence;
 import grammar.word.Word;
 import language.pos.Concatable;
@@ -23,13 +22,13 @@ public class SentenceReviser {
 	private static final ClausePattern[] NOUNIZE_PATTERNS = {
 			ClausePattern.compile(new String[][]{{"体言接続特殊２"}, {"%o", "$"}})
 	};
-	private static final SubsentencePattern[] NOUNPHRASE_PATTERNS = {
+	private static final BiClausePattern[] NOUNPHRASE_PATTERNS = {
 			// 連用テ接続は"大きくて"など
 			BiClausePattern.compile(new String[][][]{{{"形容詞", "-連用テ接続"}, {"%o", "$"}},{}}),	
 			// "大きな"、"こういう"、"あの"、など
 			BiClausePattern.compile(new String[][][]{{{"連体詞"}, {"%o", "$"}}, {}}), 
 			// "の"のみ該当
-			BiClausePattern.compile(new String[][][]{{{"助詞", "連体化"}, {"%o", "$"}}, {}}), 
+			BiClausePattern.compile(new String[][][]{{{"助詞", "連体化"}, {"%o", "$"}}, {{"名詞", "-サ変接続"}}}), 
 			// "変な"の"な"など
 			BiClausePattern.compile(new String[][][]{{{"助動詞", "体言接続"}, {"%o", "$"}}, {}}), 
 			BiClausePattern.compile(new String[][][]{{{"名詞"}, {"%o", "$"}}, {}}), 
@@ -71,11 +70,11 @@ public class SentenceReviser {
 		});
 
 		// 名詞か形容詞が末尾につく文節を隣の文節につなげる
-		for (boolean connected = false; connected; ) {
+		for (boolean connected = true; connected; ) {
 			connected = false;
-			for (SubsentencePattern np : NOUNPHRASE_PATTERNS) {
-				SubsentenceMatcher matcher = np.matcher(sentence);
-				boolean result = matcher.replaceLast(SerialClause::join);
+			for (BiClausePattern pattern : NOUNPHRASE_PATTERNS) {
+				SubsentenceMatcher matcher = pattern.matcher(sentence);
+				boolean result = matcher.replaceFirst(SerialClause::join);
 				connected = connected || result; // どの文節列パターンでも結合されなかった場合終了			
 			}
 		}
