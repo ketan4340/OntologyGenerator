@@ -1,10 +1,9 @@
 # 数値と単位
 IF (numeral value) {
-  ?stc 	rdf:type jass:Sentence ;
-  		jass:subject/jass:categorem/jass:means ?rsrcS ;
- 		jass:predicate ?clsP .
-  ?clsP jass:categorem ?prs .
-  ?prs jass:head/jass:morphemes/rdf:rest* (?valrsc ?unitrsc) .
+  ?stc a jass:Sentence ;
+       jass:subject/jass:categorem/jass:means ?rsrcS ;
+       jass:predicate/jass:categorem ?prs .
+  ?prs jass:morphemes/rdf:rest* (?valrsc ?unitrsc) .
   ?valrsc jass:name ?val .
   ?unitrsc jass:name ?unit .
   FILTER(regex(str(?val), "[0-9０-９]+?(\\.[0-9０-９]+?)??"))

@@ -74,7 +74,17 @@ public final class Morpheme implements SyntacticChild, GrammarInterface,
 	@Override
 	public Resource toJASS(Model model) {
 		return model.createResource(getJassURI())
-				.addProperty(RDF.type, JASS.Morpheme);
+				.addProperty(RDF.type, JASS.Morpheme)
+				.addLiteral(JASS.name, name())
+				.addLiteral(JASS.mainPoS, mainPoS())
+				.addLiteral(JASS.subPoS1, subPoS1())
+				.addLiteral(JASS.subPoS2, subPoS2())
+				.addLiteral(JASS.subPoS3, subPoS3())
+				.addLiteral(JASS.conjugation, conjugation())
+				.addLiteral(JASS.inflection, inflection())
+				.addLiteral(JASS.infinitive, infinitive())
+				.addLiteral(JASS.yomi, yomi())
+				.addLiteral(JASS.pronunciation, pronunciation());
 	}
 	
 	@Override
