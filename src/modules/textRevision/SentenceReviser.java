@@ -28,7 +28,7 @@ public class SentenceReviser {
 			// "大きな"、"こういう"、"あの"、など
 			BiClausePattern.compile(new String[][][]{{{"連体詞"}, {"%o", "$"}}, {}}), 
 			// "の"のみ該当
-			BiClausePattern.compile(new String[][][]{{{"助詞", "連体化"}, {"%o", "$"}}, {{"名詞", "-サ変接続"}}}), 
+			BiClausePattern.compile(new String[][][]{{{"助詞", "連体化"}, {"%o", "$"}}, {}}), 
 			// "変な"の"な"など
 			BiClausePattern.compile(new String[][][]{{{"助動詞", "体言接続"}, {"%o", "$"}}, {}}), 
 			BiClausePattern.compile(new String[][][]{{{"名詞"}, {"%o", "$"}}, {}}), 
