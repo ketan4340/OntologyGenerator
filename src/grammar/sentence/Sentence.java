@@ -471,8 +471,8 @@ public class Sentence extends SyntacticParent<Clause<?>>
 						LinkedHashMap::new));
 		clauseDepend2RDF(clauseResources);
 		Resource clauseList = 
-				model.createList(clauseResources.values().iterator())
-				.addProperty(RDF.type, JASS.ClauseList);
+				model.createList(clauseResources.values().iterator());
+				//.addProperty(RDF.type, JASS.ClauseList);
 
 		Resource sentenceResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Sentence)

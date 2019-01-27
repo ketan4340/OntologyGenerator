@@ -25,7 +25,7 @@ IF (equivalentClass) {
   ?prs jass:dependent/rdf:rest* ?node . # 形態素の最後尾
   ?node rdf:rest rdf:nil ;
 	rdf:first/jass:categorem/jass:means ?rsrcp .
-}THEN{
+} THEN {
   ?rsrcS owl:equivalentClass ?rsrcp .
 };
 

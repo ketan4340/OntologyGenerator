@@ -111,8 +111,8 @@ implements SyntacticChild, Constituent {
 	public Resource toJASS(Model model) {
 		Resource categoremResource = categorem.toJASS(model);
 		Resource adjunctList = 
-				model.createList(adjuncts.stream().map(m -> m.toJASS(model)).iterator())
-				.addProperty(RDF.type, JASS.AdjunctList);
+				model.createList(adjuncts.stream().map(m -> m.toJASS(model)).iterator());
+				//.addProperty(RDF.type, JASS.AdjunctList);
 		// others(記号)は出さなくていいかな
 		Resource clauseResource = model.createResource(getJassURI())
 				.addProperty(RDF.type, JASS.Clause)

@@ -75,7 +75,7 @@ public class SentenceReviser {
 			connected = false;
 			for (SubsentencePattern np : NOUNPHRASE_PATTERNS) {
 				SubsentenceMatcher matcher = np.matcher(sentence);
-				boolean result = matcher.replaceFirst(SerialClause::join);
+				boolean result = matcher.replaceLast(SerialClause::join);
 				connected = connected || result; // どの文節列パターンでも結合されなかった場合終了			
 			}
 		}

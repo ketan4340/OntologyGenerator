@@ -63,7 +63,19 @@ public final class SubsentenceMatcher {
 		if (checkTimes < 1) 
 			return Optional.empty();
 		for (int ci = 0; ci < checkTimes; ci++) {
-			int from = ci, to = ci + patternsize;
+			int from = ci, to = from + patternsize;
+			if (match(from, to))
+		        return Optional.of(new Range(from, to));
+        }
+        return Optional.empty();
+	}
+	public Optional<Range> lastRange() {
+		int patternsize = parentPattern.size();
+		final int checkTimes = sentence.getChildren().size() - patternsize + 1;
+		if (checkTimes < 1) 
+			return Optional.empty();
+		for (int ci = 0; ci < checkTimes; ci++) {
+			int from = checkTimes - ci, to = from + patternsize;	// 後ろから遡る
 			if (match(from, to))
 		        return Optional.of(new Range(from, to));
         }
@@ -74,15 +86,23 @@ public final class SubsentenceMatcher {
 		Optional<Range> range_opt = firstRange();
 		if (!range_opt.isPresent()) 
 			return false;
-		range_opt.ifPresent(r -> {
-			ClauseSequence cs = sentence.subClauseSequence(r.from(), r.to());
-			Clause<?> newcls = function.apply(cs);
-			cs.clear();
-			cs.add(newcls);
-			Set<Clause<?>> formerDependeds = cs.stream().map(sentence::clausesDepending).flatMap(Set::stream).collect(Collectors.toSet());
-			sentence.gatherDepending(newcls, formerDependeds);
-		});
+		range_opt.ifPresent(r -> replace(r, function));
 		return true;
+	}
+	public boolean replaceLast(Function<ClauseSequence, Clause<?>> function) {
+		Optional<Range> range_opt = lastRange();
+		if (!range_opt.isPresent()) 
+			return false;
+		range_opt.ifPresent(r -> replace(r, function));
+		return true;
+	}
+	private void replace(Range r, Function<ClauseSequence, Clause<?>> function) {
+		ClauseSequence cs = sentence.subClauseSequence(r.from(), r.to());
+		Clause<?> newcls = function.apply(cs);
+		cs.clear();
+		cs.add(newcls);
+		Set<Clause<?>> formerDependeds = cs.stream().map(sentence::clausesDepending).flatMap(Set::stream).collect(Collectors.toSet());
+		sentence.gatherDepending(newcls, formerDependeds);
 	}
 	
 	private boolean match(int from, int to) {

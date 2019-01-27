@@ -78,7 +78,7 @@ public class Generator {
 		PATH_USEDRULES = Paths.get(prop.getProperty("output-usedrules")+RUNTIME+".rule");
 		PATH_ID_TRIPLE_CSV = Paths.get(prop.getProperty("output-id_triple")+RUNTIME+".csv");
 		PATH_ONTOLOGY_TURTLE = Paths.get(prop.getProperty("output-ontology-turtle")+RUNTIME+".ttl");
-		PATH_ONTOLOGY_TURTLE_EL = Paths.get(prop.getProperty("output-ontology-turtle")+"el"+RUNTIME+".ttl");
+		PATH_ONTOLOGY_TURTLE_EL = Paths.get(prop.getProperty("output-ontology-turtle")+RUNTIME+"el.ttl");
 	}
 	
 
@@ -112,7 +112,7 @@ public class Generator {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/whale.txt";
 		//textFile_str = "resource/input/test/literal.txt";
-		//textFile_str = "resource/input/test/single.txt";
+		textFile_str = "resource/input/test/single.txt";
 		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
