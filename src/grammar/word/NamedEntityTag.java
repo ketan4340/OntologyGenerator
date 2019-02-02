@@ -39,7 +39,7 @@ public enum NamedEntityTag {
     }
     
     
-    public Resource toJASS() {
+    public Resource getJASS() {
     	return individual;
     }
     

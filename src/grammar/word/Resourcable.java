@@ -23,11 +23,11 @@ public interface Resourcable extends JassModelizable {
 	 */
 	String resourceURI();
 	/**
-	 * このオブジェクトを表すリソースを指定のモデルによって生成する. 
+	 * このオブジェクトを表すリソースを指定のモデルの元に生成する. 
 	 * @param m 生成するリソースが属するモデル
 	 * @return このオブジェクトを表すリソース
 	 */
-	Resource createResource(Model m);
+	Resource createCategoremResource(Model m);
 	
 	/**
 	 * 代理ノードのURI.
@@ -48,12 +48,12 @@ public interface Resourcable extends JassModelizable {
 			return proxyNode;
 
 		Model crModel = ModelFactory.createDefaultModel();
-		Resource cr = createResource(crModel);
+		Resource ctgrRsrc = createCategoremResource(crModel);
 		
 		crModel.listStatements().toList().stream()	// 自立語リソースの全ステートメントを
 		.map(CATEGOREM_RSRC_POOL::createReifiedStatement)	// 具体化し
-		.forEach(proxyNode::add);					// RDFコンテナになっている代理ノードに追加する
-		proxyNode.addProperty(JASS.coreNode, cr).addProperty(RDF.type, JASS.Meaning);
+		.forEach(proxyNode::add);					// RDFコンテナである代理ノードに追加する
+		proxyNode.addProperty(JASS.coreNode, ctgrRsrc).addProperty(RDF.type, JASS.Meaning);
 		crModel.close();
 		return proxyNode;
 	}

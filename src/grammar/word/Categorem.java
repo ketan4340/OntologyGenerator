@@ -56,7 +56,7 @@ public class Categorem extends Word implements Resourcable {
 		Resource categoremResource = super.toJASS(model)
 				.addProperty(RDF.type, JASS.Categorem)
 				.addProperty(JASS.means, createProxyNode(model));
-		netag.ifPresent(t -> categoremResource.addProperty(JASS.namedEntity, t.toJASS()));
+		netag.ifPresent(t -> categoremResource.addProperty(JASS.namedEntity, t.getJASS()));
 		return categoremResource;
 	}
 	
@@ -68,7 +68,7 @@ public class Categorem extends Word implements Resourcable {
 	}
 	
 	@Override
-	public Resource createResource(Model m) {
+	public Resource createCategoremResource(Model m) {
 		return m.createResource(resourceURI())
 				.addProperty(RDF.type, MoS.CategoremResource);
 	}

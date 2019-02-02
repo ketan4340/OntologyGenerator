@@ -3,6 +3,7 @@ package grammar.word;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -82,68 +83,68 @@ public class Phrase extends Categorem {
 				.addProperty(JASS.head, head.toJASS(model));
 	}
 	
+	private static final Set<Word> KOTO_WORDS = Stream.of("こと", "事", "コト")
+			.map(s -> new Word(MorphemeFactory.getInstance().getMorpheme(
+					s, TagsFactory.getInstance().getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "コト", "コト"))))
+			.collect(Collectors.toSet());
+	private static final Set<Word> MONO_WORDS = Stream.of("もの", "物", "モノ")
+			.map(s -> new Word(MorphemeFactory.getInstance().getMorpheme(
+					s, TagsFactory.getInstance().getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "モノ", "モノ"))))
+			.collect(Collectors.toSet());
 	private static final ClausePattern ADJ = ClausePattern.compile(new String[][]{{"形容詞", "-連用テ接続"}, {"%o", "$"}});
 	private static final ClausePattern PREN = ClausePattern.compile(new String[][]{{"連体詞"}, {"%o", "$"}});
 	private static final ClausePattern PART = ClausePattern.compile(new String[][]{{"助詞", "連体化"}, {"%o", "$"}});
 	private static final ClausePattern AUX = ClausePattern.compile(new String[][]{{"助動詞", "体言接続"}, {"%o", "$"}});
 	@Override
-	public Resource createResource(Model m) {
-		TagsFactory factory = TagsFactory.getInstance();
-		Stream<Word> kotoWords = Stream.of("こと", "事", "コト")
-				.map(s -> new Word(MorphemeFactory.getInstance().getMorpheme(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "コト", "コト"))));
-		Stream<Word> monoWords = Stream.of("もの", "物", "モノ")
-				.map(s -> new Word(MorphemeFactory.getInstance().getMorpheme(s, factory.getCabochaTags("名詞", "非自立", "一般", "*", "*", "*", s, "モノ", "モノ"))));
-
+	public Resource createCategoremResource(Model m) {
 		List<? extends Clause<?>> dpdtCopy = new LinkedList<>(dependent.getChildren());
 		/*
 		「こと」ならその直前の文節(従属部の最後尾)の自立語のリソース (「Xのこと」のX部分)
 		「もの」なら空白ノード
 		そうでなければ主要部に、従属部の文節の情報を付け足していく
 		 */
-		Resource r;
-		if (kotoWords.anyMatch(head::equals)) {			// こと
+		Resource mainRsrc;
+		if (KOTO_WORDS.contains(head)) {			// こと
 			Categorem dpdtTail = dpdtCopy.remove(dpdtCopy.size()-1).getCategorem();
-			Resource dpdtTailRsrc = dpdtTail.createResource(m);
+			Resource dpdtTailRsrc = dpdtTail.createCategoremResource(m);
 			if (dpdtTail.mainPoS().equals("名詞")) {
-				r = dpdtCopy.isEmpty()? dpdtTailRsrc :
-						m.createResource().addProperty(RDFS.subClassOf, dpdtTailRsrc);
+				mainRsrc = dpdtTailRsrc;
 			} else if (dpdtTail.mainPoS().equals("動詞")) {
 				dpdtTailRsrc.addProperty(RDFS.subClassOf, m.createResource("https://schema.org/Action"));
-				r = dpdtCopy.isEmpty()? dpdtTailRsrc :
-						m.createResource().addProperty(RDF.type, dpdtTailRsrc);
+				mainRsrc = dpdtTailRsrc;
 			} else {	// 名詞と動詞以外はまずない。とりあえず空白ノード
-				r = m.createResource().addProperty(MoS.attributeOf, dpdtTailRsrc);
+				mainRsrc = m.createResource().addProperty(MoS.attributeOf, dpdtTailRsrc);
 			}
-		} else if (monoWords.anyMatch(head::equals)) {	// もの
-			Resource dpdtTailRsrc = dpdtCopy.remove(dpdtCopy.size()-1).getCategorem().createResource(m);
-			r = m.createResource().addProperty(RDF.type, dpdtTailRsrc);
-		} else {
-			r = m.createResource().addProperty(RDF.type, head.createResource(m));
+		} else if (MONO_WORDS.contains(head)) {	// もの
+			mainRsrc = m.createResource();
+		} else {								// 他一般名詞
+			//mainRsrc = m.createResource().addProperty(RDF.type, head.createCategoremResource(m));
+			mainRsrc = head.createCategoremResource(m);
 		}
 		
 		dpdtCopy.forEach(dep -> {
-			Resource depRsrc = dep.getCategorem().createResource(m);
+			Resource depRsrc = dep.getCategorem().createCategoremResource(m);
 			if (ADJ.matches(dep)) {
 				// "大きい"など。連用テ接続は"大きく(て)"のように並列する表現
 				Resource d_anon = m.createResource().addProperty(MoS.attributeOf, depRsrc);
-				RDFList list = m.createList(new RDFNode[]{r, d_anon});
+				RDFList list = m.createList(new RDFNode[]{mainRsrc, d_anon});
 				m.createResource().addProperty(OWL2.intersectionOf, list);
 			} else if (PREN.matches(dep)) {
 				// "大きな"、"こういう"、"あの"、など。
 				// "大きな"は"大きい"の活用形ではないことに注意	
-				r.addProperty(DCTerms.relation, depRsrc);
+				mainRsrc.addProperty(DCTerms.relation, depRsrc);
 			} else if (PART.matches(dep)) {
 				// "の"のみ該当
-				r.addProperty(MoS.of, depRsrc);
+				mainRsrc.addProperty(MoS.of, depRsrc);
 			} else if (AUX.matches(dep)) {
 				// "変な"の"な"など
 				Resource d_anon = m.createResource().addProperty(MoS.attributeOf, depRsrc);
-				RDFList list = m.createList(new RDFNode[]{r, d_anon});
+				RDFList list = m.createList(new RDFNode[]{mainRsrc, d_anon});
 				m.createResource().addProperty(OWL2.intersectionOf, list);
 			} else {
 			}
 		});
-		return r;
+		return mainRsrc;
 	}
 	
 	/* ================================================== */
