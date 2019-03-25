@@ -29,6 +29,18 @@ IF (equivalentClass) {
   ?rsrcS owl:equivalentClass ?rsrcp .
 };
 
+# 形容詞的名詞
+IF (attributive) {
+  ?stc a jass:Sentence ;
+	jass:subject/jass:categorem/jass:means ?rsrcS ;
+	jass:predicate ?clsP . 
+  ?clsP jass:categorem ?ctgrP .
+  ?ctgrP jass:namedEntity jass:adjectival ;
+	jass:means ?rsrcP .
+}THEN{
+  ?rsrcS mos:attributeOf ?rsrcP .
+};
+
 # サ変接続の動詞
 IF (Action(サ変)) {
   ?stc a jass:Sentence ; 
@@ -41,18 +53,6 @@ IF (Action(サ変)) {
       schema:agent ?rsrcS ;
       schema:object ?rsrcO .
   ?rsrcVb rdfs:subClassOf schema:Action .
-};
-
-# 形容詞的名詞
-IF (attributive) {
-  ?stc a jass:Sentence ;
-	jass:subject/jass:categorem/jass:means ?rsrcS ;
-	jass:predicate ?clsP . 
-  ?clsP jass:categorem ?wrdP .
-  ?wrdP jass:feature "attributive" ;
-	jass:means ?rsrcP . 
-}THEN{
-  ?rsrcS mos:attributeOf ?rsrcP .
 };
 
 

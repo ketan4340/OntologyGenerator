@@ -28,12 +28,12 @@ public interface Resourcable extends JassModelizable {
 	 * @return このオブジェクトを表すリソース
 	 */
 	Resource createCategoremResource(Model m);
-	
 	/**
 	 * 代理ノードのURI.
 	 * @return 代理ノードのURI
 	 */
 	String proxyNodeURI();
+	
 	/**
 	 * 指定のモデルに属する代理ノードを得る. 
 	 * すでに代理ノードが存在すればそれをモデルに追加してから返し、

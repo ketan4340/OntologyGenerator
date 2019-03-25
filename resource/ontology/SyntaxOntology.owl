@@ -251,14 +251,6 @@
     
 
 
-    <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#feature -->
-
-    <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#feature">
-        <rdfs:subPropertyOf rdf:resource="http://www.uec.ac.jp/k-lab/k-tanabe/jass#wordFeature"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://www.uec.ac.jp/k-lab/k-tanabe/jass#infinitive -->
 
     <owl:DatatypeProperty rdf:about="http://www.uec.ac.jp/k-lab/k-tanabe/jass#infinitive">

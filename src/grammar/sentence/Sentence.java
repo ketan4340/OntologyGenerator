@@ -241,10 +241,10 @@ public class Sentence extends SyntacticParent<Clause<?>>
 		List<Clause<?>> predicates = new ArrayList<>();
 		for (final Clause<?> cls2Last: clausesDependTo(lastClause)) {
 			// 末尾が"て"を除く助詞または副詞でないClauseを述語として追加
-			if (( NOUN.matches(cls2Last) || VERB.matches(cls2Last) || 
+			if ( NOUN.matches(cls2Last) || VERB.matches(cls2Last) || 
 					ADJECTIVE.matches(cls2Last) || AUXILIARY.matches(cls2Last) ||
-					PARTICLE1.matches(cls2Last) || PARTICLE2.matches(cls2Last) ) && 
-				nextChild(cls2Last) != lastClause) // 次の文節が最後の文節であるものは除外
+					PARTICLE1.matches(cls2Last) || PARTICLE2.matches(cls2Last) ) 
+				//&& nextChild(cls2Last) != lastClause) // 次の文節が最後の文節であるものは除外
 				predicates.add(cls2Last);
 		}
 		predicates.add(lastClause);

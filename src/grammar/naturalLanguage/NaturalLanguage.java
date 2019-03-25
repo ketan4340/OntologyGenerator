@@ -20,9 +20,6 @@ public class NaturalLanguage implements Identifiable {
 		this.id = SUM++;
 		this.text = text;
 	}
-	public NaturalLanguage() {
-		this("");
-	}
 
 
 	/* ================================================== */

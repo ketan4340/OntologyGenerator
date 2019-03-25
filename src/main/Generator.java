@@ -37,6 +37,7 @@ import util.StringListUtil;
 public class Generator {
 	//private static final Path PATH_NOUN_WORDS;
 	private static final Path PATH_DATE_WORDS;
+	private static final Path PATH_ADJECTIVAL_REGEXES;
 	private static final RDFRules EXTENSION_RULES;
 	private static final RDFRulesSet ONTOLOGY_RULES_SET;
 	private static final Model DEFAULT_JASS;
@@ -63,6 +64,7 @@ public class Generator {
 		}
 		//PATH_NOUN_WORDS = Paths.get(prop.getProperty("noun-file"));
 		PATH_DATE_WORDS = Paths.get(prop.getProperty("date_words-file"));
+		PATH_ADJECTIVAL_REGEXES = Paths.get(prop.getProperty("adjectival_regexes-file"));
 		EXTENSION_RULES = RDFRuleReader.readRDFRules(Paths.get(prop.getProperty("extension_rule-file")));
 		ONTOLOGY_RULES_SET = RDFRuleReader.readRDFRulesSet(Paths.get(prop.getProperty("ontology_rules-dir")));
 		DEFAULT_JASS = ModelFactory.createDefaultModel().read(
@@ -109,9 +111,7 @@ public class Generator {
 	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFile_str) {
-		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
-		//textFile_str = "resource/input/test/whale.txt";
-		//textFile_str = "resource/input/test/literal.txt";
+		textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
 		//textFile_str = "resource/input/test/single.txt";
 		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
@@ -152,7 +152,8 @@ public class Generator {
 		/********** 構文解析モジュール **********/
 		SyntacticParser sp = new SyntacticParser(PATH_CABOCHA_PROP);
 		List<Sentence> sentenceList = sp.parseSentences(naturalLanguages);
-		sp.supplyDatesNamedEntityTag(sentenceList, PATH_DATE_WORDS);
+		sp.supplyDatesNETag(sentenceList, PATH_DATE_WORDS);
+		sp.supplyAdjectivalNETag(sentenceList, PATH_ADJECTIVAL_REGEXES);
 		SentenceIDMap sentenceMap = SentenceIDMap.createFromList(sentenceList);
 		sentenceMap.setLongSentence();
 		System.out.println("Syntactic parsed.");
@@ -169,7 +170,6 @@ public class Generator {
 		sentenceMap.forEachKey(s -> s.uniteSubject());
 		sentenceMap.setShortSentence();
 		System.out.println("Sentence revised.");
-
 		//sentenceMap.forEachKey(s -> s.printDep());	//PRINT
 		
 		/********** 関係抽出モジュール **********/

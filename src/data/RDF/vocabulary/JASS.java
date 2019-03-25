@@ -105,4 +105,5 @@ public class JASS {
 	public static final Resource money = resource("money");
 	public static final Resource percent = resource("percent");
 	
+	public static final Resource adjectival = resource("adjectival");
 }

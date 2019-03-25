@@ -29,6 +29,10 @@ public enum NamedEntityTag {
     MONEY(JASS.money),
     // 割合表現
     PERCENT(JASS.percent),
+    
+    /* オリジナル */
+    // 形容詞的名詞
+    ADJECTIVAL(JASS.adjectival),
     ;
     
 	

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +16,7 @@ import cabocha.Cabocha;
 import grammar.clause.Clause;
 import grammar.morpheme.Morpheme;
 import grammar.naturalLanguage.NaturalLanguage;
+import grammar.pattern.WordPattern;
 import grammar.sentence.Sentence;
 import grammar.word.NamedEntityTag;
 
@@ -51,7 +53,7 @@ public class SyntacticParser {
 		return new CabochaDecoder().decodeProcessOutput(parseResult);
 	}
 
-	public void supplyDatesNamedEntityTag(List<Sentence> sentences, Path dateWordsPath) {
+	public void supplyDatesNETag(List<Sentence> sentences, Path dateWordsPath) {
 		Set<String> dateWords;
 		try (Stream<String> lines = Files.lines(dateWordsPath)) {
 			dateWords = lines.collect(Collectors.toSet());
@@ -75,6 +77,35 @@ public class SyntacticParser {
 			return false;
 		}) 
 		.forEach(c -> c.setNETag(NamedEntityTag.DATE));
+	}
+	
+	private static final WordPattern ADJCTIVAL = new WordPattern("形容動詞語幹");
+	private static final WordPattern NON_ADJ = new WordPattern("ナイ形容詞語幹");
+	public void supplyAdjectivalNETag(List<Sentence> sentences, Path adjectivalRegexesPath) {
+		Set<String> adjectivalRegexes;
+		try (Stream<String> lines = Files.lines(adjectivalRegexesPath)) {
+			adjectivalRegexes = lines.collect(Collectors.toSet());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		Set<Pattern> patterns = adjectivalRegexes.stream()
+				.map(Pattern::compile)
+				.collect(Collectors.toSet());
+		sentences.parallelStream()
+		.flatMap(s -> s.getChildren().stream())
+		.map(Clause<?>::getCategorem)
+		.filter(c -> {
+			Optional<NamedEntityTag> tag_opt = c.getNETag();
+			if (!tag_opt.isPresent()) return true;
+			if (tag_opt.get() == NamedEntityTag.OPTIONAL) return true;
+			return false;
+		})
+		.filter(c -> {
+			return patterns.stream().anyMatch(p -> p.matcher(c.name()).matches()) ||
+					ADJCTIVAL.matches(c) || NON_ADJ.matches(c);
+		})
+		.forEach(c -> c.setNETag(NamedEntityTag.ADJECTIVAL));
 	}
 	
 }

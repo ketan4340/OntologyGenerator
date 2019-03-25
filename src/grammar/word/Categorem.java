@@ -12,7 +12,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import data.RDF.vocabulary.GOO;
 import data.RDF.vocabulary.JASS;
-import data.RDF.vocabulary.MoS;
 import grammar.morpheme.Morpheme;
 
 public class Categorem extends Word implements Resourcable {
@@ -69,8 +68,8 @@ public class Categorem extends Word implements Resourcable {
 	
 	@Override
 	public Resource createCategoremResource(Model m) {
-		return m.createResource(resourceURI())
-				.addProperty(RDF.type, MoS.CategoremResource);
+		return m.createResource(resourceURI());
+				//.addProperty(RDF.type, MoS.CategoremResource);
 	}
 	
 	@Override
