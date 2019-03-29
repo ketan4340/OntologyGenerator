@@ -111,14 +111,14 @@ public class Generator {
 	 */
 	private void execute(String textFile_str) {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
-		//textFile_str = "resource/input/test/single.txt";
+		textFile_str = "resource/input/test/single.txt";
 		//textFile_str = "resource/input/test/failed.txt";
 		//textFile_str = "resource/input/test/hashire_merosu_c.txt";
 		
 		if (Objects.nonNull(textFile_str)) {
 			Path textFilePath = Paths.get(textFile_str);
 			Model ontology = generate(textFilePath);
-			/* デバッグ用
+			///* RDF出力
 			if (ontology.size() < 100)
 				ontology.write(System.out, "TURTLE");
 			//*/

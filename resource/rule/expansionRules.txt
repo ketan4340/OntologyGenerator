@@ -47,17 +47,3 @@ IF (ex:object) {
   ?stc jass:object ?clsO ; 
        ?case ?clsO .
 };
-
-#形容詞的名詞(緑色、辛味)などへのマーキング
-IF (ex:attributiveNoun1) {
-  ?wrd a jass:Categorem ; jass:subPoS1 ?pos .
-  FILTER(?pos IN("形容動詞語幹", "ナイ形容詞語幹"))
-} THEN {
-  ?wrd jass:feature "attributive" .
-};
-IF (ex:attributiveNoun2) {
-  ?wrd a jass:Categorem ; jass:infinitive ?infi .
-  FILTER(regex(?infi,"(色|形|型|味|的)$"))
-} THEN {
-  ?wrd jass:feature "attributive" .
-};
