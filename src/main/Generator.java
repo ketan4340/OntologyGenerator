@@ -108,7 +108,6 @@ public class Generator {
 	/* ================================================== */
 	/**
 	 * ジェネレータの実行.
-	 * ぶっちゃけテスト用に色々書くために仲介させているだけ.
 	 */
 	private void execute(String textFile_str) {
 		//textFile_str = "resource/input/goo/text/gooText生物-動物名-All.txt";
